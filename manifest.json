@@ -1,0 +1,93 @@
+{
+  "manifest_version": 3,
+  "name": "Яндекс Турбо ПИ",
+  "version": "3.19.4",
+  "version_name": "3.19.4-closed-beta",
+  "description": "Расширение для получения дополнительной информации из ПИ 💛",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "downloads",
+    "clipboardWrite"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://logistics.market.yandex.ru/*", "https://hubs.market.yandex.ru/*"],
+      "js": [
+        "libs/firebase-app.js",
+        "libs/firebase-firestore.js",
+        "libs/xlsx.full.min.js",
+        "libs/dom-to-image-more.min.js",
+        "libs/dom-to-image.min.js",
+        "libs/html2canvas.min.js",
+        "libs/qrcode.min.js",
+        "libs/pdf.min.js",
+        "libs/echarts.min.js",
+        
+        "js/tokenSAVE.js",
+        "js/turboPI-label.js",
+        "js/predBrak.js",
+        "js/notifications.js",
+        "js/sortablesScanlog.js",
+        "js/content.js",
+        "js/strokesToOreders_v2.js",
+        "js/strokesToOreders.js",
+        "js/firebase.js",
+        "js/quickLots.js",
+        "js/batchGroupUpdate.js",
+        "js/inboundsFile.js",
+        "js/tpiSettings.js",
+        "js/tpiCartControl.js"
+      ],
+      "css": [
+        "css/styles.css",
+        "css/turboPI-label.css",
+        "css/strokesToOreders.css",
+        "css/strokeToOrders_v2.css",
+        "css/strokeToOrders_v2_icons.css",
+        "css/batchGroupUpdate.css",
+        "css/quickLots.css",
+        "css/quickLots-icons.css",
+        "css/statusIcons.css",
+        "css/missedShiping.css",
+        "css/fos-traker.css",
+        "css/scanLog.css",
+        "css/scanLog__icons.css",
+        "css/proection3d.css",
+        "css/batchMap.css",
+        "css/inbounds.css",
+        "css/scanLog_sortables.css",
+        "css/notifications.css",
+        "css/inboundsFile.css",
+        "css/predBrak.css",
+        "css/tpiSettings.css",
+        "css/tpiCartControl.css"
+      ]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "libs/xlsx.full.min.js",
+        "fonts/Roboto-Regular.ttf",
+        "fonts/*",
+        "img/svg/*",
+        "js/tokenGET.js"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "icons": {
+    "16": "img/piTurboIcon.png",
+    "48": "img/piTurboIcon.png",
+    "128": "img/piTurboIcon.png"
+  },
+  "action": {
+    "default_popup": "html/popup.html",
+    "default_icon": {
+      "16": "img/piTurboIcon.png",
+      "48": "img/piTurboIcon.png",
+      "128": "img/piTurboIcon.png"
+    }
+  }
+}

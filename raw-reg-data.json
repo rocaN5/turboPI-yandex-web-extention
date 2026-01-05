@@ -1,0 +1,48 @@
+{
+    "usersData": [
+        {
+            "tpi-user-data":{
+                "personal-id": "012313132",
+                "registration-date": "dd.mm.yyyy",
+                "registration-time": "hh.mm.ss",
+                "ban": false,
+                "temporary-ban": true,
+                "temporary-ban-date": ["10.09.2025", "14.09.2025"],
+                "temporary-ban-time": ["19:02:20", "19:02:00"],
+                "temporary-ban-count": 2,
+                "roles":[
+                    {
+                        "raw-role-id": "9535820",
+                        "title-role-id": "developer"
+                    },
+                    {
+                        "raw-role-id": "0",
+                        "title-role-id": "tester"
+                    }
+                ]
+            }
+        },
+        {
+            "tpi-user-data":{
+                "personal-id": "012313132",
+                "registration-date": "dd.mm.yyyy",
+                "registration-time": "hh.mm.ss",
+                "ban": false,
+                "temporary-ban": true,
+                "temporary-ban-date": ["10.09.2025", "14.09.2025"],
+                "temporary-ban-time": ["19:02:20", "19:02:00"],
+                "temporary-ban-count": 2,
+                "roles":[
+                    {
+                        "raw-role-id": "9535820",
+                        "title-role-id": "developer"
+                    },
+                    {
+                        "raw-role-id": "0",
+                        "title-role-id": "tester"
+                    }
+                ]
+            }
+        }
+    ]
+}

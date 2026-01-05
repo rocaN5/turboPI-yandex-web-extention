@@ -1,0 +1,202 @@
+/* Контейнер уведомлений */
+.tpi-notification_container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 100000000000000000;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+}
+
+/* Стили уведомлений */
+.tpi-notification_toast {
+    min-width: 280px;
+    max-width: 320px;
+    padding: 14px 18px 14px 14px;
+    border-radius: 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: #000000;
+    color: white;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: 
+        opacity 0.3s ease,
+        transform 0.3s ease,
+        margin-bottom 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid #ffffff12;
+    will-change: transform, opacity, margin-bottom;
+    margin-bottom: 12px;
+    backdrop-filter: blur(5px);
+    box-shadow: 0px 0px 10px 0px #000;
+}
+
+.tpi-notification_toast:last-child {
+    margin-bottom: 0;
+}
+
+.tpi-notification_toast-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    z-index: 2;
+    position: relative;
+    flex-grow: 1;
+}
+
+.tpi-notification_toast-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-shadow: 0px 0px 1px #000, 0px 0px 1px #000;
+}
+
+.tpi-notification_toast-description {
+    font-size: 0.85em;
+    color: #ffffff;
+    margin-left: 32px;
+    line-height: 1.4;
+    text-shadow: 0px 0px 1px #000, 0px 0px 1px #000;
+    font-weight: 500;
+
+    span{
+        color: #d2ff1c;
+        text-decoration: underline;
+    }
+}
+
+.tpi-notification_toast-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.tpi-notification_toast--success { color: #a6ff00; font-weight: 800;}
+.tpi-notification_toast--error { color: #F44336; font-weight: 800;}
+.tpi-notification_toast--warning { color: #FFC107; font-weight: 800;}
+.tpi-notification_toast--version { color: #0787ff; font-weight: 800;}
+.tpi-notification_toast--tpiInject { color: #ffd600; font-weight: 800;}
+.tpi-notification_toast--info { color: #c221f3; font-weight: 800;}
+
+.tpi-notification_toast--show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.tpi-notification_toast--hide {
+    opacity: 0;
+    transform: translateY(-20px);
+    margin-bottom: 0;
+    transition: all 0.3s ease;
+}
+
+/* Стили для частиц */
+.tpi-notification_particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    overflow: hidden;
+}
+
+.tpi-notification_particle {
+    position: absolute;
+    background: currentColor;
+    border-radius: 50%;
+    opacity: 0.3;
+    box-shadow: 0px 0px 6px 2px currentColor;
+    &:nth-child(odd){
+        filter: blur(2px);
+    }
+}
+
+/* Градиентный оверлей */
+.tpi-notification_gradient-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, currentColor 0%, transparent 80%);
+    opacity: 0.5;
+    z-index: 1;
+    transition: opacity 0.2s;
+}
+
+.tpi-notification_toast:hover .tpi-notification_gradient-overlay {
+    opacity: 0.7;
+}
+
+/* Кнопка закрытия */
+.tpi-notification_close-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+    z-index: 3;
+    color: inherit;
+    background: #494949;
+    border-radius: 6px;
+    border: 2px solid #494949;
+}
+
+.tpi-notification_close-btn:hover {
+    opacity: 1;
+}
+
+.tpi-notification_close-icon {
+    width: 12px;
+    height: 12px;
+}
+
+/* Hover эффект для контейнера */
+.tpi-notification_container:hover .tpi-notification_toast {
+    opacity: 0.3;
+    transform: translateY(0) scale(0.98);
+}
+
+.tpi-notification_container:hover .tpi-notification_toast:hover {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+.tpi-notification_particles-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.tpi-notification_toast {
+    position: relative;
+    overflow: hidden;
+}
+
+.tpi-notification_gradient-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 2;
+    /* Ваш существующий градиент */
+}

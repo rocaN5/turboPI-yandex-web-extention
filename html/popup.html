@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="../libs/xlsx.full.min.js"></script>
+    <style>
+        *{
+            font-family: "Roboto", sans-serif;;
+        }
+        
+    body {
+        min-width: 300px;
+        min-height: 300px;
+        background: #000;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    div.container {
+        width: 50%;
+        height: 50%;
+        position: absolute;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50%;
+        background-color: #00000052;
+        backdrop-filter: blur(4px);
+        border: 2px solid #fff143;
+        flex-flow: column;
+    }
+    .icon{
+        width: 80%;
+        height: 80%;
+        position: relative;
+        box-shadow: 0px 0px 10px 0px #000;
+        border-radius: 50%;
+        border: none;
+        background-image: url("../img/piTurboIcon.png");
+        background-position: center;
+        background-size: cover ;
+    }
+    canvas{
+        width: 100%;
+        height: 100%;
+        display: block;
+        position: fixed;
+        background-size: 100%;
+        background-repeat: no-repeat;
+        background: linear-gradient(0deg, #fff66d24, #ffa92e24);
+    }
+    </style>
+</head>
+<body>
+    <canvas id="particle-canvas"></canvas>
+    <div class="container">
+        <div class="icon"></div>
+    </div>
+    <script src="../js/popup.js"></script>
+    <script src="../js/particles.js"></script>
+    <script src="../libs/xlsx.full.min.js"></script>
+</body>
+</html>

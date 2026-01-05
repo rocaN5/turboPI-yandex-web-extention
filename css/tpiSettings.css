@@ -1,0 +1,286 @@
+div.tpi-settings--content-block{
+    display: flex;
+    gap: 20px;
+
+    p{
+        margin: 0;
+    }
+}
+
+div.tpi-settings--wrapper{
+    position: relative;
+    top: 0px;
+    left: 0px;
+    z-index: 9;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: flex-start;
+    font-family: Arial, sans-serif;
+    gap: 20px;
+    padding: 30px;
+    background: #ffffff;
+    flex-flow: column;
+}
+
+div.tpi-settings--left-section-wrapper{
+    width: 100%;
+    display: flex;
+    flex-flow: column;
+    gap: 20px;
+}
+
+div.tpi-settings--wrapper-title{
+    font-size: 44px;
+    font-weight: 700;
+    line-height: 46px;
+    color: rgb(43, 43, 43);
+    justify-content: space-between;
+    display: flex;
+}
+
+div.tpi-settings--controls-panel{
+    display: flex;
+    gap: 20px;
+    width: 100%;
+}
+
+div.tpi-settings--controls-wrapper,
+div.tpi-settings--data-controls-wrapper{
+    --settingsGap: 20px;
+    --controlsWidth: 260px;
+    display: flex;
+    flex-flow: column;
+    gap: var(--settingsGap);
+    padding: 16px 20px;
+    color: #000;
+    border: 1px solid #e8e8e8;
+    border-radius: 20px;
+    position: relative;
+    height: fit-content;
+    overflow: hidden;
+    transition: 500ms;
+    width: var(--controlsWidth);
+}
+
+div.tpi-settings--data-controls-wrapper{
+    width: calc(100% - var(--settingsGap) - var(--controlsWidth));
+}
+
+.tpi-settings--controls-wrapper-title{
+    display: flex;
+    justify-content: space-between;
+    p{
+        margin: 0;
+        font-size: 20px;
+        font-weight: 700;
+        line-height: 22px;
+        color: #212121;
+        white-space: nowrap;
+    }
+}
+
+div.tpi-settings--item-wrapper{
+    display: flex;
+    width: 100%;
+    overflow-y: hidden;
+    overflow-x: auto;
+    gap: 10px;
+}
+
+div.tpi-settings--item{
+    display: flex;
+    width: fit-content;
+    gap: 20px;
+}
+
+/* ! ↓↓↓ Settings section ↓↓↓ */
+
+nav.tpi-settings--navbar-options{
+    display: flex;
+    flex-flow: column;
+    gap: 2px;
+}
+
+button.tpi-settings--option-button{
+    display: flex;
+    gap: 10px;
+    border: 0;
+    padding: 10px;
+    align-items: center;
+    font-size: 1rem;
+    background: transparent;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 300ms, box-shadow 75ms ease;
+    outline: 0px solid transparent;
+    &:hover{
+        background: #f9f9f9;
+    }
+    &:focus-visible{
+        outline: 1px solid #a0a0a0;
+        background: #f9f9f9;
+        box-shadow: 0px 0px 14px -10px inset;
+    }
+    &:active{
+        background: #f9f9f9;
+        box-shadow: 0px 0px 14px -10px inset;
+    }
+    &[tpi-current-state="selected"]{
+        background: #000000;
+        color: #ffffff;
+    }
+}
+
+button.tpi-settings--option-button i.tpi-settings--option-icon{
+    width: 20px;
+    height: 20px;
+    color: currentColor;
+
+    svg{
+        width: 100%;
+        height: 100%;
+        fill: currentColor;
+    }
+}
+
+div.tpi-settings--option-devider{
+    width: 100%;
+    height: 1px;
+    background: #e8e8e8;
+    position: relative;
+    margin: 10px 0px;
+}
+
+p.tpi-settings--option-text{
+    margin: 0;
+    user-select: none;
+}
+
+/* ! ↓↓↓ Options section ↓↓↓ */
+
+body:has(input#tpiOption_general_fixHeader:checked) .p-page__header.tpi-settings--top-header[tpi-curretn-state="sticky"]{
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    box-shadow: 0px 0px 20px -10px;
+
+    &[tpi-option-state="transparent"] div.appBar-appBar___GLVIw{
+        background: #ffffff82;
+        backdrop-filter: blur(4px);
+    }
+}
+
+.tpi-settings--option-wrapper{
+    display: flex;
+    flex-flow: column;
+    gap: 10px;
+    width: fit-content;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 0px 0px transparent;
+    outline: 0px solid transparent;
+    transition: outline 200ms ease-in-out, box-shadow 200ms ease-in-out;
+    &:has(input:focus-visible){
+        box-shadow: 0px 0px 20px -6px #000;
+        outline: 1px solid #b5b5b5;
+    }
+}
+
+.tpi-settings--option-title{
+    display: flex;
+    gap: 1ch;
+    align-items: center;
+}
+
+i.tpi-settings--option-title-icon{
+    width: 20px;
+    height: 20px;
+    svg{
+        color: currentColor;
+        width: 100%;
+        height: 100%;
+    }
+}
+.tpi-settings--option-title-text{
+    font-size: 1.2rem;
+    color: #000;
+}
+
+.tpi-settings--option-label-wrapper{
+    display: flex;
+    flex-flow: column;
+}
+
+.tpi-settings--option-label{
+    display: flex;
+    position: relative;
+    input[type="checkbox"],
+    input[type="radio"]{
+        width: 0;
+        height: 0;
+        opacity: 0;
+        top: 0;
+        left: 0;
+        position: absolute;
+    }
+}
+
+label.tpi-settings--option-label{
+
+    &:has(input:checked) .tpi-settings--checkbox-body{
+        background: #fc0 !important;
+        box-shadow: 0px 0px 0px 1px #000 inset !important;
+    }
+
+    &:has(input:checked) .tpi-settings--checkbox-body-dot{
+        left: 0 !important;
+        background: #fff !important;
+        transform: translateX(0) !important;
+        box-shadow: 0px 0px 6px 0px #000 !important;
+    }
+}
+
+div.tpi-settings--checkbox-wrapper{
+    display: flex;
+    padding: 8px;
+    border-radius: 7px;
+    gap: 1ch;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0px 0px 0px 0px transparent;
+    outline: 1px solid transparent;
+}
+
+div.tpi-settings--checkbox-body{
+    --checkboxPadding: 4px;
+    display: flex;
+    align-items: center;
+    width: 30px;
+    background: #000000;
+    height: 100%;
+    border-radius: 20px;
+    padding: var(--checkboxPadding);
+    transition: 200ms ease-in-out, box-shadow 0ms;
+    box-shadow: 0px 0px 0px 1px #000 inset;
+    background: #fff;
+    overflow: hidden;
+}
+
+div.tpi-settings--checkbox-body-dot {
+    display: flex;
+    width: 10px;
+    height: 10px;
+    background: #000;
+    border-radius: 50%;
+    position: relative;
+    transition: 200ms cubic-bezier(0.65, 0.05, 0.36, 1);
+    transform: translateX(calc(-50% - var(--checkboxPadding)));
+    left: 100%;
+    box-shadow: 0px 0px 0px 0px #000;
+}
+
+.tpi-settings--checkbox-text{
+    user-select: none;
+    color: #000;
+}

@@ -1,0 +1,95 @@
+.diman__batch{
+    width: 100%;
+    position: relative;
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.diman__batchBlock{
+    width: 78px;
+    position: relative;
+}
+
+.diman__batchTitle{
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    top: calc(100% + 2px);
+    font-size: 10em;
+    font-family: monospace;
+    font-weight: 800;
+    margin: unset;
+}
+
+div[container-type="defaultsection"] .diman__batchBlock{
+    width: 209px;
+}
+
+.diman__batchPreivewContainer{
+    display: flex;
+}
+
+.diman__batchPreivewContainer .diman__batchPreivewSection{
+    display: flex;
+    flex-flow: column;
+    border: 3px solid #464646;
+    border-radius: 6px;
+    background: #464646;
+    gap: 1px;
+    filter: drop-shadow(0px 6px 6px black);
+}
+.diman__batchPreivewContainer .diman__batchPreivewSectionRow{
+    display: flex;
+    gap: 1px;
+}
+.diman__batchPreivewContainer .diman__batchPreivewSectionCell{
+    width: 25px;
+    height: 25px;
+    display: flex;
+    font-size: .7em;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    border: 2px solid;
+    background: #fff;
+    border-radius: 3px;
+}
+.diman__batchPreivewContainer .diman__batchPreivewSectionCell[emptyCell="true"]{
+    background: #000;
+    color: #fff;
+}
+
+.diman__batchPreivewSectionCell[diman-cell-active=true]{
+    border: 2px solid #fc0;
+    box-shadow: 0px 0px 10px 4px #000,0px 0px 0px 2px #fc0 inset , 0px 0px 4px 2px #000000 inset;
+    z-index: 99;
+    background: #424242;
+    font-weight: 800;
+    font-size: .9em;
+    color: #fff;
+    border-radius: 6px;
+    animation: dimanCellPulse 1s infinite ease-in-out alternate;
+}
+
+@keyframes dimanCellPulse {
+    from{
+        transform: scale(.95);
+        filter: hue-rotate(0deg);
+    }
+    to{
+        transform: scale(1.05);
+        filter: hue-rotate(360deg);
+    }
+}
+
+.diman__batch:has(.diman__batch-zoneOverflow){
+    height: 100%;
+}
+
+.diman__batch-zoneOverflow{
+    font-weight: 800;
+    font-size: 2rem;
+    text-align: center;
+}
