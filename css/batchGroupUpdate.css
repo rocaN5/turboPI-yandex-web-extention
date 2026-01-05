@@ -1,3 +1,16 @@
+tpi-bgh--make-row{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    height: 100%;
+    height: calc(100% - 136px);
+
+    .tpi-bgh--all-cells-chunk:first-child{
+        width: 70% !important;
+    }
+}
+
 div.tpi-bgh--content-block{
     display: flex;
     gap: 20px;
@@ -60,6 +73,10 @@ div.tpi-bgh--controls-wrapper{
     transition: 500ms;
     &.tpi-bgh--batchMap-section{
         gap: 0;
+    }
+    &.tpi-bgh--all-cells-chunk{
+        width: 50%;
+        height: 100%;
     }
 }
 
@@ -223,7 +240,7 @@ div.tpi-bgh--item{
     gap: 20px;
 }
 
-.tpi-bgh--controls-wrapper button{
+.tpi-bgh--item button{
     width: fit-content;
     font-size: 1rem;
     cursor: pointer;
@@ -325,6 +342,7 @@ div.tpi-bgh--item{
     justify-content: center;
     align-items: center;
     flex-flow: column;
+    /* margin-bottom: 70px; */
 }
 
 .tpi-bgh--map-buttons-wrapper{
@@ -332,4 +350,123 @@ div.tpi-bgh--item{
     gap: 10px;
     justify-content: center;
     align-items: center;
+}
+
+button.tpi-bgh--map-change-chunk {
+    --changeChunk-btn-size: 32px;
+    width: var(--changeChunk-btn-size);
+    height: var(--changeChunk-btn-size);
+    background: #fc0;
+    border: unset;
+    padding: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.15s ease-out, transform 0.15s ease-out;
+    svg{
+        width: 100%;
+        height: 100%;
+    }
+    
+    &:hover{
+        filter: brightness(.95);
+    }
+
+    &:focus-visible{
+        filter: brightness(.95);
+        outline: 1px solid #000;
+        box-shadow: 0px 0px 6px 0px #000;
+    }
+
+    &:active{
+        filter: brightness(.85);
+        transform: scale(.97);
+    }
+}
+
+p.tpi-bgh--map-chunk-title{
+    min-width: 6.5ch;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1rem;
+    font-weight: 500;
+    background: #f3f3f3;
+    padding: 6px 12px;
+    border-radius: 10px;
+}
+
+.tpi-bgh--table-wrapper{
+    max-height: 150px;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+}
+
+.tpi-bgh--table-wrapper table.tpi-bgh--table-cell{
+    width: 100%;
+    border-collapse: collapse;
+    * {
+        white-space: nowrap;
+        margin: 0;
+        padding: 0;
+        font-size: .8rem;
+    }
+    thead{
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+    thead tr{
+        height: 1px;
+        position: relative;
+    }
+    thead tr th{
+        background: #fff;
+    }
+    thead tr th div{
+        position: relative;
+        height: 1.25rem;
+        display: flex;
+        align-items: center;
+        border: 1px solid #dbdbdb;
+        border-right: 0px;
+        border-radius: 0px;
+        padding: 10px;
+        background: #f5f5f5;
+    }
+    thead tr th:first-child div{
+        border-radius: 10px 0px 0px 0px;
+    }
+    thead tr th:last-child div{
+        border-radius: 0px 10px 0px 0px;
+        border-right: 1px solid #dbdbdb;
+    }
+    tbody tr{
+        height: 1px;
+        position: relative;
+    }
+    tbody tr td div{
+        position: relative;
+        height: 1.25rem;
+        display: flex;
+        align-items: center;
+        border: 1px solid #dbdbdb;
+        border-top: 0px;
+        border-right: 0px;
+        border-radius: 0px;
+        padding: 10px;
+        background: transparent;
+    }
+    tbody tr td:last-child div{
+        border-right: 1px solid #dbdbdb;
+    }
+    tbody tr:last-child td:first-child div{
+        border-radius: 0px 0px 0px 10px;
+    }
+    tbody tr:last-child td:last-child div{
+        border-radius: 0px 0px 10px 0px;
+        border-right: 1px solid #dbdbdb;
+    }
 }

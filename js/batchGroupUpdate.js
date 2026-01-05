@@ -3,24 +3,24 @@ const tpiBatchGropuHistory_zone_A = `
         <div class="diman__batchPreivewContainer" container-type="defaultsection">
             <div class="diman__batchPreivewSection" tpi-animation-queue="1">
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimanCell="64">64</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="68">68</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="72">72</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="64">64</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="68">68</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="72">72</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimanCell="63">63</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="67">67</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="71">71</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="63">63</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="67">67</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="71">71</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimanCell="62">62</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="66">66</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="70">70</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="62">62</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="66">66</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="70">70</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimanCell="61">61</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="65">65</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="69">69</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="61">61</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="65">65</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="69">69</div>
                 </div>
             </div>
             <div class="diman__batchBlock">
@@ -30,71 +30,71 @@ const tpiBatchGropuHistory_zone_A = `
             </div>
             <div class="diman__batchPreivewSection" tpi-animation-queue="6">
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimanCell="9">9</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="5">5</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="1">1</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="9">9</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="5">5</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="1">1</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimanCell="10">10</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="6">6</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="2">2</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="10">10</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="6">6</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="2">2</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimanCell="11">11</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="7">7</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="3">3</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="11">11</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="7">7</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="3">3</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimanCell="12">12</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="8">8</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="4">4</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="12">12</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="8">8</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="4">4</div>
                 </div>
             </div>
         </div>
         <div class="diman__batchPreivewContainer" container-type="defaultsection" style="margin-top: 4px;" >
             <div class="diman__batchPreivewSection" tpi-animation-queue="2">
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimanCell="52">52</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="56">56</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="60">60</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="52">52</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="56">56</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="60">60</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimanCell="51">51</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="55">55</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="59">59</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="51">51</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="55">55</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="59">59</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimanCell="50">50</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="54">54</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="58">58</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="50">50</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="54">54</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="58">58</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimanCell="49">49</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="53">53</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="57">57</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="49">49</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="53">53</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="57">57</div>
                 </div>
             </div>
             <div class="diman__batchBlock"></div>
             <div class="diman__batchPreivewSection" tpi-animation-queue="5">
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimanCell="21">21</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="17">17</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="13">13</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="21">21</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="17">17</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="13">13</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimanCell="22">22</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="18">18</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="14">14</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="22">22</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="18">18</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="14">14</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimanCell="23">23</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="19">19</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="15">15</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="23">23</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="19">19</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="15">15</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimanCell="24">24</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="20">20</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="16">16</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="24">24</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="20">20</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="16">16</div>
                 </div>
             </div>
         </div>
@@ -102,42 +102,42 @@ const tpiBatchGropuHistory_zone_A = `
             <div class="diman__batchBlock"></div>
             <div class="diman__batchPreivewSection" style="margin-right: 4px;" tpi-animation-queue="3">
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimanCell="48">48</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="47">47</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="46">46</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="45">45</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="48">48</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="47">47</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="46">46</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="45">45</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimanCell="44">44</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="45">45</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="46">46</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="47">47</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="44">44</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="45">45</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="46">46</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="47">47</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimanCell="40">40</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="39">39</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="38">38</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="37">37</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="40">40</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="39">39</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="38">38</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="37">37</div>
                 </div>
             </div>
             <div class="diman__batchPreivewSection" tpi-animation-queue="4">
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimanCell="36">36</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="35">35</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="34">34</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="33">33</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="36">36</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="35">35</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="34">34</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="33">33</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimanCell="32">32</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="31">31</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="30">30</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="29">29</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="32">32</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="31">31</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="30">30</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="29">29</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimanCell="28">28</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="27">27</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="26">26</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="25">25</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="28">28</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="27">27</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="26">26</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="25">25</div>
                 </div>
             </div>
             <div class="diman__batchBlock"></div>
@@ -150,42 +150,42 @@ const tpiBatchGropuHistory_zone_B = `
             <div class="diman__batchBlock"></div>
             <div class="diman__batchPreivewSection" style="margin-right: 4px;" tpi-animation-queue="3">
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimanCell="97">97</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="98">98</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="99">99</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="100">100</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="97">97</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="98">98</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="99">99</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="100">100</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimanCell="101">101</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="102">102</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="103">103</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="104">104</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="101">101</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="102">102</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="103">103</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="104">104</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimanCell="105">105</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="106">106</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="107">107</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="108">108</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="105">105</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="106">106</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="107">107</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="108">108</div>
                 </div>
             </div>
             <div class="diman__batchPreivewSection" tpi-animation-queue="4">
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimanCell="109">109</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="110">110</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="111">111</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="112">112</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="109">109</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="110">110</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="111">111</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="112">112</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimanCell="113">113</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="114">114</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="115">115</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="116">116</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="113">113</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="114">114</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="115">115</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="116">116</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimanCell="117">117</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="118">118</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="119">119</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="120">120</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="117">117</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="118">118</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="119">119</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="120">120</div>
                 </div>
             </div>
             <div class="diman__batchBlock"></div>
@@ -193,24 +193,24 @@ const tpiBatchGropuHistory_zone_B = `
         <div class="diman__batchPreivewContainer" container-type="defaultsection">
             <div class="diman__batchPreivewSection" tpi-animation-queue="2">
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimanCell="88">88</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="92">92</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="96">96</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="88">88</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="92">92</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="96">96</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimanCell="87">87</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="91">91</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="95">95</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="87">87</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="91">91</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="95">95</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimanCell="86">86</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="90">90</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="94">94</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="86">86</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="90">90</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="94">94</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimanCell="85">85</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="89">89</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="93">93</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="85">85</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="89">89</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="93">93</div>
                 </div>
             </div>
             <div class="diman__batchBlock">
@@ -220,71 +220,71 @@ const tpiBatchGropuHistory_zone_B = `
             </div>
             <div class="diman__batchPreivewSection" tpi-animation-queue="5">
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimanCell="129">129</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="125">125</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="121">121</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="129">129</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="125">125</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="121">121</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimanCell="130">130</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="126">126</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="122">122</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="130">130</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="126">126</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="122">122</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimanCell="131">131</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="127">127</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="123">123</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="131">131</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="127">127</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="123">123</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimanCell="132">132</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="128">128</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="124">124</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="132">132</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="128">128</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="124">124</div>
                 </div>
             </div>
         </div>
         <div class="diman__batchPreivewContainer" container-type="defaultsection" style="margin-top: 4px;" >
             <div class="diman__batchPreivewSection" tpi-animation-queue="1">
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimanCell="76">76</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="80">80</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="84">84</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="76">76</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="80">80</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="84">84</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimanCell="75">75</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="79">79</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="83">83</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="75">75</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="79">79</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="83">83</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimanCell="74">74</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="78">780</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="82">824</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="74">74</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="78">780</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="82">824</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimanCell="73">73</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="77">77</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="81">81</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="73">73</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="77">77</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="81">81</div>
                 </div>
             </div>
             <div class="diman__batchBlock"></div>
             <div class="diman__batchPreivewSection" tpi-animation-queue="6">
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimanCell="141">141</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="137">137</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="133">133</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="141">141</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="137">137</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="133">133</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimanCell="142">142</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="138">138</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="134">134</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="142">142</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="138">138</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="134">134</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimanCell="143">143</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="139">139</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="135">135</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="143">143</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="139">139</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="135">135</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimanCell="144">144</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="140">140</div>
-                    <div class="diman__batchPreivewSectionCell" dimanCell="136">136</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="144">144</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="140">140</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="136">136</div>
                 </div>
             </div>
         </div>
@@ -296,61 +296,61 @@ const tpiBatchGropuHistory_zone_C = `
             <div class="diman__batchBlock"></div>
             <div class="diman__batchPreivewSection" style="margin-right: 4px;" tpi-animation-queue="5">
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="193">193</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="194">194</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="195">195</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="196">196</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="193">193</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="194">194</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="195">195</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="196">196</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="197">197</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="198">198</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="199">199</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="200">200</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="197">197</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="198">198</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="199">199</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="200">200</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="201">201</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="202">202</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="203">203</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="204">204</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="201">201</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="202">202</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="203">203</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="204">204</div>
                 </div>
             </div>
             <div class="diman__batchPreivewSection" style="margin-right: 4px;" tpi-animation-queue="6">
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="205">205</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="206">206</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="207">207</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="208">208</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="205">205</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="206">206</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="207">207</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="208">208</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="209">209</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="210">210</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="211">211</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="212">212</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="209">209</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="210">210</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="211">211</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="212">212</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="213">213</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="214">214</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="215">215</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="216">216</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="213">213</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="214">214</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="215">215</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="216">216</div>
                 </div>
             </div><div class="diman__batchPreivewSection" tpi-animation-queue="7">
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="217">217</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="218">218</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="219">219</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="220">220</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="217">217</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="218">218</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="219">219</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="220">220</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="221">221</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="222">222</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="223">223</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="224">224</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="221">221</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="222">222</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="223">223</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="224">224</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="225">225</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="226">226</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="227">227</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="228">228</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="225">225</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="226">226</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="227">227</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="228">228</div>
                 </div>
             </div>
             <div class="diman__batchBlock"></div>
@@ -358,24 +358,24 @@ const tpiBatchGropuHistory_zone_C = `
         <div class="diman__batchPreivewContainer" container-type="defaultsection">
             <div class="diman__batchPreivewSection" tpi-animation-queue="4">
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="184">184</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="188">188</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="192">192</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="184">184</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="188">188</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="192">192</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="183">183</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="187">187</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="191">191</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="183">183</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="187">187</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="191">191</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="182">182</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="186">186</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="190">190</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="182">182</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="186">186</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="190">190</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="181">181</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="185">185</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="189">189</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="181">181</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="185">185</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="189">189</div>
                 </div>
             </div>
             <div class="diman__batchBlock" style="width: 330px;">
@@ -385,71 +385,71 @@ const tpiBatchGropuHistory_zone_C = `
             </div>
             <div class="diman__batchPreivewSection" tpi-animation-queue="8">
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="237">237</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="233">233</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="229">229</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="237">237</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="233">233</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="229">229</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="238">238</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="234">234</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="230">230</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="238">238</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="234">234</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="230">230</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="239">239</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="234">234</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="231">231</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="239">239</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="234">234</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="231">231</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="240">240</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="236">236</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="232">232</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="240">240</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="236">236</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="232">232</div>
                 </div>
             </div>
         </div>
         <div class="diman__batchPreivewContainer" container-type="defaultsection" style="margin-top: 4px;">
             <div class="diman__batchPreivewSection" tpi-animation-queue="3">
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="172">172</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="176">176</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="180">180</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="172">172</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="176">176</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="180">180</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="171">171</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="175">175</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="179">179</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="171">171</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="175">175</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="179">179</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="170">170</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="174">174</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="178">178</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="170">170</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="174">174</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="178">178</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="169">169</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="173">173</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="177">177</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="169">169</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="173">173</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="177">177</div>
                 </div>
             </div>
             <div class="diman__batchBlock" style="width: 330px;"></div>
             <div class="diman__batchPreivewSection" tpi-animation-queue="9">
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="249">249</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="245">245</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="241">241</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="249">249</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="245">245</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="241">241</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="250">250</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="246">246</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="242">242</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="250">250</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="246">246</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="242">242</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="251">251</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="247">247</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="243">243</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="251">251</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="247">247</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="243">243</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="252">252</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="248">248</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="244">244</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="252">252</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="248">248</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="244">244</div>
                 </div>
             </div>
         </div>
@@ -457,42 +457,42 @@ const tpiBatchGropuHistory_zone_C = `
             <div class="diman__batchBlock"></div>
             <div class="diman__batchPreivewSection" style="margin-right: 4px;" tpi-animation-queue="2">
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="168">168</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="167">167</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="166">166</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="165">165</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="168">168</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="167">167</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="166">166</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="165">165</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="164">164</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="163">163</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="162">162</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="161">161</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="164">164</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="163">163</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="162">162</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="161">161</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="160">160</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="159">159</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="158">158</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="157">157</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="160">160</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="159">159</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="158">158</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="157">157</div>
                 </div>
             </div>
             <div class="diman__batchPreivewSection" tpi-animation-queue="1">
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="156">156</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="155">155</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="154">154</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="153">153</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="156">156</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="155">155</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="154">154</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="153">153</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="152">152</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="151">151</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="150">150</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="149">149</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="152">152</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="151">151</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="150">150</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="149">149</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="148">148</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="147">147</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="146">146</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="145">145</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="148">148</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="147">147</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="146">146</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="145">145</div>
                 </div>
             </div>
             <div class="diman__batchBlock" style="width: 190px;"></div>
@@ -505,42 +505,42 @@ const tpiBatchGropuHistory_zone_D = `
             <div class="diman__batchBlock"></div>
             <div class="diman__batchPreivewSection" style="margin-right: 4px;" tpi-animation-queue="2">
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="337">337</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="338">338</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="339">339</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="340">340</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="337">337</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="338">338</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="339">339</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="340">340</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="341">341</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="342">342</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="343">343</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="344">344</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="341">341</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="342">342</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="343">343</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="344">344</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="345">345</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="346">346</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="347">347</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="348">348</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="345">345</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="346">346</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="347">347</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="348">348</div>
                 </div>
             </div>
             <div class="diman__batchPreivewSection" tpi-animation-queue="1">
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="349">349</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="350">350</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="351">351</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="352">352</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="349">349</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="350">350</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="351">351</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="352">352</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="353">353</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="354">354</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="355">355</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="356">356</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="353">353</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="354">354</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="355">355</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="356">356</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="357">357</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="358">358</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="359">359</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="360">360</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="357">357</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="358">358</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="359">359</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="360">360</div>
                 </div>
             </div>
             <div class="diman__batchBlock" style="width: 190px;"></div>
@@ -548,24 +548,24 @@ const tpiBatchGropuHistory_zone_D = `
         <div class="diman__batchPreivewContainer" container-type="defaultsection">
             <div class="diman__batchPreivewSection" tpi-animation-queue="3">
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="328">328</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="332">332</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="336">336</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="328">328</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="332">332</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="336">336</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="327">327</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="331">331</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="335">335</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="327">327</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="331">331</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="335">335</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="326">326</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="330">330</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="334">334</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="326">326</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="330">330</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="334">334</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="325">325</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="329">329</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="333">333</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="325">325</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="329">329</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="333">333</div>
                 </div>
             </div>
             <div class="diman__batchBlock" style="width: 330px;">
@@ -575,71 +575,71 @@ const tpiBatchGropuHistory_zone_D = `
             </div>
             <div class="diman__batchPreivewSection" tpi-animation-queue="9">
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="261">261</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="257">257</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="253">253</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="261">261</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="257">257</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="253">253</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="262">262</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="258">258</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="254">254</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="262">262</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="258">258</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="254">254</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="263">263</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="259">259</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="255">255</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="263">263</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="259">259</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="255">255</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="264">264</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="260">260</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="256">256</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="264">264</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="260">260</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="256">256</div>
                 </div>
             </div>
         </div>
         <div class="diman__batchPreivewContainer" container-type="defaultsection" style="margin-top: 4px;">
             <div class="diman__batchPreivewSection" tpi-animation-queue="4">
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="316">316</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="320">320</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="324">324</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="316">316</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="320">320</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="324">324</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="315">315</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="319">319</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="323">323</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="315">315</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="319">319</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="323">323</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="314">314</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="318">318</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="322">322</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="314">314</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="318">318</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="322">322</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="313">313</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="317">317</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="321">321</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="313">313</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="317">317</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="321">321</div>
                 </div>
             </div>
             <div class="diman__batchBlock" style="width: 330px;"></div>
             <div class="diman__batchPreivewSection" tpi-animation-queue="8">
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="273">273</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="269">269</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="265">265</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="273">273</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="269">269</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="265">265</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="274">274</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="270">270</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="266">266</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="274">274</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="270">270</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="266">266</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="275">275</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="271">271</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="267">267</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="275">275</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="271">271</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="267">267</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="276">276</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="272">272</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="268">268</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="276">276</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="272">272</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="268">268</div>
                 </div>
             </div>
         </div>
@@ -647,61 +647,61 @@ const tpiBatchGropuHistory_zone_D = `
             <div class="diman__batchBlock"></div>
             <div class="diman__batchPreivewSection" style="margin-right: 4px;" tpi-animation-queue="5">
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="312">312</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="311">311</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="310">310</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="309">309</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="312">312</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="311">311</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="310">310</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="309">309</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="308">308</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="307">307</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="306">306</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="305">305</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="308">308</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="307">307</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="306">306</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="305">305</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="304">304</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="303">303</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="302">302</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="301">301</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="304">304</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="303">303</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="302">302</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="301">301</div>
                 </div>
             </div>
             <div class="diman__batchPreivewSection" style="margin-right: 4px;" tpi-animation-queue="6">
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="300">300</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="299">299</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="298">298</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="297">297</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="300">300</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="299">299</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="298">298</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="297">297</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="296">296</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="295">295</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="294">294</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="293">293</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="296">296</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="295">295</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="294">294</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="293">293</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="292">292</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="291">291</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="290">290</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="289">289</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="292">292</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="291">291</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="290">290</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="289">289</div>
                 </div>
             </div><div class="diman__batchPreivewSection" tpi-animation-queue="7">
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="288">288</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="287">287</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="286">286</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="285">285</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="288">288</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="287">287</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="286">286</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="285">285</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="284">284</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="283">283</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="282">282</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="281">281</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="284">284</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="283">283</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="282">282</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="281">281</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
-                    <div class="diman__batchPreivewSectionCell" dimancell="280">280</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="279">279</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="278">278</div>
-                    <div class="diman__batchPreivewSectionCell" dimancell="277">277</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="280">280</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="279">279</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="278">278</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="277">277</div>
                 </div>
             </div>
             <div class="diman__batchBlock"></div>
@@ -1144,6 +1144,53 @@ function checkiIs__onGroupHistory() {
                             </div>
                         </div>
                     </div>
+
+                        <tpi-bgh--make-row>
+                            <div class="tpi-bgh--controls-wrapper tpi-bgh--all-cells-chunk">
+                                <div class="tpi-bgh--controls-wrapper-title">
+                                    <p>Зона A</p>
+                                </div>
+                                <div class="tpi-bgh--item-wrapper tpi-bgh--table-wrapper">
+                                    <table class="tpi-bgh--table-cell" table-cells-data-id="A">
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    <div>id</div>
+                                                </th>
+                                                <th>
+                                                    <div>Имя</div>
+                                                </th>
+                                                <th>
+                                                    <div>Группировка</div>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <div>3069006</div>
+                                                </td>
+                                                <td>
+                                                    <div>A-1</div>
+                                                </td><td>
+                                                    <div>LOT-PRESORT0_10001687230</div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="tpi-bgh--controls-wrapper tpi-bgh--all-cells-chunk">
+                                <div class="tpi-bgh--controls-wrapper-title">
+                                    <p>Состояние ячеек</p>
+                                </div>
+                                <div class="tpi-bgh--item-wrapper">
+                                    <div class="tpi-bgh--item">
+                                    </div>
+                                </div>
+                            </div>
+                        </tpi-bgh--make-row>
+
                 </div>
 
                 <div class="tpi-bgh--conrols-panel">
@@ -1170,7 +1217,7 @@ function checkiIs__onGroupHistory() {
                                 <button class="tpi-bgh--map-change-chunk" change-direction="backward">
                                     ${tpiIcon__chevron_Left}
                                 </button>
-                                <p>Зона: A</p>
+                                <p class="tpi-bgh--map-chunk-title">Зона: A</p>
                                 <button class="tpi-bgh--map-change-chunk" change-direction="forward">
                                     ${tpiIcon__chevron_Right}
                                 </button>
@@ -1269,7 +1316,7 @@ function addTurboListeners(){
                 batch.setAttribute('current-state', state);
             });
             
-            document.querySelector('.tpi-bgh--map-buttons-wrapper p').innerHTML = `Зона: ${newChunk}`;
+            document.querySelector('p.tpi-bgh--map-chunk-title').innerHTML = `Зона: ${newChunk}`;
             return newChunk;
         }
 }
