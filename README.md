@@ -1,6 +1,7 @@
 <div align="center">
     <source media="(prefers-color-scheme: light)" srcset="img/piTurboIcon.png">
     <source media="(prefers-color-scheme: dark)" srcset="img/piTurboIcon.png">
+      <img src="img/piTurboIcon.png" alt="turboPI logo" width="400">
 	<br>
   <strong>Расширение для программного интерфейса яндекс маркет для ПСЦ</strong>
   <br />
