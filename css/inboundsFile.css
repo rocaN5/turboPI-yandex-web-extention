@@ -2,7 +2,8 @@ body:has(.tpi-infi--content-block) .UserWidget-Dialog {
     z-index: 999;
 }
 
-div[tpi-blocked="true"] > div:not(.tpi-infi--wrapper){
+
+div[tpi-blocked="true"]:has(.tpi-infi--wrapper) > div:nth-child(3){
     display: none;
 }
 

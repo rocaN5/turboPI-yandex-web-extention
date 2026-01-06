@@ -255,8 +255,8 @@ const tpiBatchGropuHistory_zone_B = `
                 </div>
                 <div class="diman__batchPreivewSectionRow">
                     <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="74">74</div>
-                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="78">780</div>
-                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="82">824</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="78">78</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="82">82</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
                     <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="73">73</div>
@@ -1089,7 +1089,7 @@ function checkiIs__onGroupHistory() {
 
     // Функция проверки URL
     function isGroupHistoryPage(url) {
-        const base = 'https://logistics.market.yandex.ru/sorting-center/21972131/orders/tpi-group-history?tpiGroupHistory=true';
+        const base = 'https://hubs.market.yandex.ru/sorting-center/21972131/cells?number=tpiGroupHistory&page=1&pageSize=1&tpiGroupHistory=true';
         if (!url.startsWith(base)) return false;
         
         const params = new URLSearchParams(url.split('?')[1] || '');
@@ -1148,6 +1148,15 @@ function checkiIs__onGroupHistory() {
                         <tpi-bgh--make-row>
                             <div class="tpi-bgh--controls-wrapper tpi-bgh--all-cells-chunk">
                                 <div class="tpi-bgh--controls-wrapper-title">
+                                    <p>Состояние ячеек</p>
+                                </div>
+                                <div class="tpi-bgh--item-wrapper">
+                                    <div class="tpi-bgh--item">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tpi-bgh--controls-wrapper tpi-bgh--all-cells-chunk">
+                                <div class="tpi-bgh--controls-wrapper-title">
                                     <p>Зона A</p>
                                 </div>
                                 <div class="tpi-bgh--item-wrapper tpi-bgh--table-wrapper">
@@ -1161,31 +1170,17 @@ function checkiIs__onGroupHistory() {
                                                     <div>Имя</div>
                                                 </th>
                                                 <th>
+                                                    <div>Статус</div>
+                                                </th>
+                                                <th>
                                                     <div>Группировка</div>
                                                 </th>
                                             </tr>
                                         </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>
-                                                    <div>3069006</div>
-                                                </td>
-                                                <td>
-                                                    <div>A-1</div>
-                                                </td><td>
-                                                    <div>LOT-PRESORT0_10001687230</div>
-                                                </td>
-                                            </tr>
-                                        </tbody>
+                                        <tbody></tbody>
                                     </table>
-                                </div>
-                            </div>
-                            <div class="tpi-bgh--controls-wrapper tpi-bgh--all-cells-chunk">
-                                <div class="tpi-bgh--controls-wrapper-title">
-                                    <p>Состояние ячеек</p>
-                                </div>
-                                <div class="tpi-bgh--item-wrapper">
-                                    <div class="tpi-bgh--item">
+                                    <div class="tpi-bgh--table-loader-wrapper">
+                                        <i class="tpi-bgh--table-loader-circle"></i>
                                     </div>
                                 </div>
                             </div>
@@ -1228,95 +1223,333 @@ function checkiIs__onGroupHistory() {
             </div>
         </div>
         `
-
-        const appID = document.getElementById("app")
-        const headerTitle = document.querySelector(".p-layout__header-wrapper")
-        appID.remove()
-        headerTitle.remove()
-
-        document.querySelector(".p-layout__content").appendChild(overlay);
-        
-        callTurboPI__once();
-        addTurboPiTitle()
-        if (observer) {
-            observer.disconnect();
-            observer = null;
+        function tryInsertOverlayBGH() {
+            const targetSpan = document.querySelector('span[data-i18n-key="pages.sorting-center-cells:page-title"]');
+            
+            if (targetSpan) {
+                const fifthParent = targetSpan.parentElement?.parentElement?.parentElement?.parentElement?.parentElement;
+                
+                if (fifthParent && document.body.contains(fifthParent)) {
+                    // Удаляем старый overlay если есть
+                    const oldOverlay = document.querySelector('.tpi-bgh--wrapper');
+                    if (oldOverlay) oldOverlay.remove();
+                    
+                    fifthParent.classList.add('tpi-infi--default-layout');
+                    
+                    // Проставляем атрибут родителю overlay
+                    fifthParent.parentElement.setAttribute('tpi-blocked', 'true');
+                    
+                    fifthParent.insertAdjacentElement('afterend', overlay);
+                    document.title = "История группировок";
+                    // Загружаем данные после вставки блока
+                    setTimeout(() => {
+                        addTurboListeners();
+                    }, 100);
+                    
+                    return true;
+                }
+            }
+            return false;
         }
+    
+        setTimeout(() => {
+            if (!tryInsertOverlayBGH()) {
+                // Если не получилось, ждем появления элемента
+                const insertionObserver = new MutationObserver(() => {
+                    if (tryInsertOverlayBGH()) {
+                        document.title = "История группировок";
+                        insertionObserver.disconnect();
+                    }
+                });
+                
+                insertionObserver.observe(document.body, {
+                    childList: true,
+                    subtree: true
+                });
+            }
+        }, 1500);
+    
+        // Наблюдатель для повторной вставки после перезагрузки страницы
+        const bodyObserver = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'childList') {
+                    // Проверяем, был ли удален наш overlay
+                    if (!document.querySelector('.tpi-bgh--wrapper')) {
+                        // Даем время на полную перезагрузку контента
+                        setTimeout(() => {
+                            if (!document.querySelector('.tpi-bgh--wrapper')) {
+                                tryInsertOverlayBGH();
+                            }
+                        }, 100);
+                    }
+                }
+            });
+        });
+    
+        bodyObserver.observe(document.body, {
+            childList: true,
+            subtree: false
+        });
+        
+        // observer.disconnect();
+        // observer = null;
     }
-
 
     if (isGroupHistoryPage(location.href)) {
         addTurboBlock();
-        addTurboListeners();
-        addToastContainer()
+        document.querySelector(".tpi-infi--update-all-groups")
+            ?.addEventListener("click", generateInboundsPDF);
+        
+        // Инициализируем переключатели графиков после загрузки DOM
         setTimeout(() => {
-            tpiNotification.show('Страница "История группировок" интегрированна', "info", `Для получения подробной информации о пользовании инструменом, посетите Wiki TURBOpi`);
-        }, 1000);
+            initGraphSwitchers();
+        }, 100);
+        
         return; 
     }
 
-    observer = new MutationObserver(() => {
+    let observer = new MutationObserver(() => {
         if (isGroupHistoryPage(location.href)) {
             addTurboBlock();
+            document.title = "История группировок";
+            console.log("changed")
         }
     });
     observer.observe(document, { subtree: true, childList: true });
-    setTimeout(() => {
-        addTurboPiTitle()
-    }, 1000);
+
 }
 
 checkiIs__onGroupHistory()
 
 //A-
-function addTurboListeners(){
-        //~ Переключение зоны на батчах
-        const tpi__change_mapChunks = document.querySelectorAll('.tpi-bgh--map-change-chunk');
-        if (tpi__change_mapChunks.length > 0) {
-            tpi__change_mapChunks.forEach(button => {
-                button.addEventListener('click', () => {
-                    const direction = button.getAttribute('change-direction');
-                    switch(direction) {
-                        case 'forward':
-                            changeChunk(direction)
-                            break;
-                        case 'backward':
-                            changeChunk(direction)
-                            break;
-                        default:
-                            tpiNotification.show('Ошибка состояния', "error", "Неизсвестное состояние кнопки. Кто-то полез в код и всё сломал");
-                    }
+function addTurboListeners() {
+
+    /* =======================
+       ГЛОБАЛЬНОЕ ХРАНИЛИЩЕ
+    ======================= */
+
+    if (!window.__BATCH_CELLS_GLOBAL__) {
+        window.__BATCH_CELLS_GLOBAL__ = {
+            WORKSTATION_MAP: {
+                A: 41314,
+                B: 41315,
+                C: 41316,
+                D: 41317
+            },
+            store: {
+                A: [],
+                B: [],
+                C: [],
+                D: []
+            },
+            loaded: false,
+            observerInited: false,
+            buttonsInited: false
+        };
+    }
+
+    const GLOBAL = window.__BATCH_CELLS_GLOBAL__;
+    const { WORKSTATION_MAP, store } = GLOBAL;
+
+    /* =======================
+       ИНИЦИАЛИЗАЦИЯ
+    ======================= */
+
+    initBatchCellsTable();
+
+    if (!GLOBAL.buttonsInited) {
+        GLOBAL.buttonsInited = true;
+        initChunkButtons();
+    }
+
+    /* =======================
+       INIT TABLE
+    ======================= */
+
+    async function initBatchCellsTable() {
+        if (!GLOBAL.loaded) {
+            await loadAllZonesData();
+            GLOBAL.loaded = true;
+        }
+
+        renderCurrentZone();
+
+        if (!GLOBAL.observerInited) {
+            observeChunkChange();
+            GLOBAL.observerInited = true;
+        }
+    }
+
+    /* =======================
+       LOAD DATA (ONCE)
+    ======================= */
+
+    async function loadAllZonesData() {
+        const baseUrl =
+            'https://hubs.market.yandex.ru/api/gateway/logpoint/21972131/cells/get-list';
+
+        const requests = Object.keys(WORKSTATION_MAP).map(async zone => {
+            const params = new URLSearchParams({
+                platformType: 'SORTING_CENTER',
+                workstationIdTitle: zone,
+                workstationId: WORKSTATION_MAP[zone],
+                zoneId: 40941,
+                number: '',
+                page: 0,
+                size: 200,
+                sort: 'number,asc'
+            });
+
+            const res = await fetch(`${baseUrl}?${params.toString()}`);
+            const json = await res.json();
+
+            store[zone] = (json.content || []).filter(item => {
+                if (!item?.number) return false;
+                if (['A', 'B', 'C', 'D'].includes(item.number)) return false;
+                return item.number.includes('-');
+            });
+        });
+
+        await Promise.all(requests);
+    }
+
+    /* =======================
+       RENDER
+    ======================= */
+
+    function renderCurrentZone() {
+        const section = document.querySelector('.tpi-bgh--batchMap-section');
+        if (!section) return;
+
+        const zone = section
+            .getAttribute('current-map-chunk')
+            ?.trim()
+            .toUpperCase();
+
+        if (!zone || !store[zone]) return;
+
+        updateZoneTitle(zone);
+        renderZoneTable(zone);
+    }
+
+    function updateZoneTitle(zone) {
+        const title = document.querySelector(
+            '.tpi-bgh--all-cells-chunk:last-child .tpi-bgh--controls-wrapper-title p'
+        );
+        if (title) title.textContent = `Зона ${zone}`;
+    }
+
+    function renderZoneTable(zone) {
+        const tbody = document.querySelector('.tpi-bgh--table-wrapper tbody');
+        if (!tbody) return;
+
+        tbody.innerHTML = '';
+
+        store[zone].forEach(item => {
+            const tr = document.createElement('tr');
+
+            tr.appendChild(createTdDiv('tpi-bgh--tbody-data-cellId', item.id));
+            tr.appendChild(createTdDiv('tpi-bgh--tbody-data-cellName', item.number));
+            tr.appendChild(createTdDiv(
+                'tpi-bgh--tbody-data-status',
+                item.status,
+                item.status === 'ACTIVE' ? 'active' : 'unActive',
+                item.status === 'ACTIVE' ? 'Активна' : 'Не активна',
+            ));
+            tr.appendChild(createTdDiv(
+                'tpi-bgh--tbody-data-group',
+                item.groupingDirection?.readableName || ''
+            ));
+
+            tbody.appendChild(tr);
+        });
+    }
+
+    function createTdDiv(attr, value, attrValue = '', textValue) {
+        const td = document.createElement('td');
+        const div = document.createElement('div');
+        td.setAttribute(attr, attrValue);
+        div.textContent = value ?? '';
+        textValue ? div.textContent = textValue : value
+        td.appendChild(div);
+        return td;
+    }
+
+    /* =======================
+       OBSERVER
+    ======================= */
+
+    function observeChunkChange() {
+        const section = document.querySelector('.tpi-bgh--batchMap-section');
+        if (!section) return;
+
+        const observer = new MutationObserver(mutations => {
+            mutations.forEach(m => {
+                if (m.attributeName === 'current-map-chunk') {
+                    renderCurrentZone();
+                }
+            });
+        });
+
+        observer.observe(section, { attributes: true });
+    }
+
+    /* =======================
+       BUTTONS (ONCE)
+    ======================= */
+
+    function initChunkButtons() {
+        document
+            .querySelectorAll('.tpi-bgh--map-change-chunk')
+            .forEach(button => {
+                button.addEventListener('click', e => {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                    changeChunk(button.getAttribute('change-direction'));
                 });
             });
+    }
+
+    function changeChunk(direction) {
+        const chunkStates = ['A', 'B', 'C', 'D'];
+        const tpi__mapChunks = document.querySelector('.tpi-bgh--batchMap-section');
+    
+        let tpi__currentChunk = tpi__mapChunks
+            .getAttribute('current-map-chunk')
+            ?.trim()
+            .toUpperCase();
+    
+        const currentIndex = chunkStates.indexOf(tpi__currentChunk);
+        if (currentIndex === -1) return;
+    
+        let newIndex;
+    
+        if (direction === 'forward') {
+            newIndex = (currentIndex + 1) % chunkStates.length;
+        } else if (direction === 'backward') {
+            newIndex = (currentIndex - 1 + chunkStates.length) % chunkStates.length;
+        } else {
+            return;
         }
     
-        function changeChunk(direction) {
-            const chunkStates = ['A', 'B', 'C', 'D'];
-            const tpi__mapChunks = document.querySelector('.tpi-bgh--batchMap-section');
-            let tpi__currentChunk = tpi__mapChunks.getAttribute('current-map-chunk');
-            
-            const currentIndex = chunkStates.indexOf(tpi__currentChunk);
-            if (currentIndex === -1) return;
-            
-            let newIndex;
-            
-            if (direction === 'forward') {
-                newIndex = (currentIndex + 1) % chunkStates.length;
-            } else if (direction === 'backward') {
-                newIndex = (currentIndex - 1 + chunkStates.length) % chunkStates.length;
-            } else {
-                return;
-            }
-            
-            const newChunk = chunkStates[newIndex];
-            tpi__mapChunks.setAttribute('current-map-chunk', newChunk);
-
-            document.querySelectorAll('div.diman__batch[tpi-map-adress]').forEach(batch => {
-                const state = batch.getAttribute('tpi-map-adress') === newChunk ? 'default' : 'hidden';
-                batch.setAttribute('current-state', state);
-            });
-            
-            document.querySelector('p.tpi-bgh--map-chunk-title').innerHTML = `Зона: ${newChunk}`;
-            return newChunk;
-        }
+        const newChunk = chunkStates[newIndex];
+        tpi__mapChunks.setAttribute('current-map-chunk', newChunk);
+    
+        document.querySelectorAll('div.diman__batch[tpi-map-adress]').forEach(batch => {
+            batch.setAttribute(
+                'current-state',
+                batch.getAttribute('tpi-map-adress') === newChunk
+                    ? 'default'
+                    : 'hidden'
+            );
+        });
+    
+        document.querySelector('p.tpi-bgh--map-chunk-title').innerHTML = `Зона: ${newChunk}`;
+        return newChunk;
+    }
+    
+    window.changeChunk = changeChunk;
 }
+
+
+// B-
