@@ -1,11 +1,25 @@
-function addToastContainer(){
-    if(!document.getElementById("tpiNotification_toastContainer")){
-        const tpi_toastContainer = document.createElement("div")
-        tpi_toastContainer.className = "tpi-notification_container"
-        tpi_toastContainer.id = "tpiNotification_toastContainer"
-        document.querySelector("body").appendChild(tpi_toastContainer)
+addToastContainer();
+
+function addToastContainer() {
+    let container = document.getElementById("tpiNotification_toastContainer");
+
+    if (container && !container.isConnected) {
+        container.remove();
+        container = null;
     }
+
+    if (!container) {
+        container = document.createElement("div");
+        container.className = "tpi-notification_container";
+        container.id = "tpiNotification_toastContainer";
+
+        (document.body || document.documentElement).appendChild(container);
+
+    }
+
+    return container;
 }
+
 
 // Иконки для уведомлений (SVG)
 const tpiNotification_toastIcons = {
@@ -171,35 +185,44 @@ class tpiNotification_ParticleSystem {
 
 class tpiNotification_ToastManager {
     constructor() {
+    
+        addToastContainer();
+    
         this.container = document.getElementById('tpiNotification_toastContainer');
+    
         this.toasts = [];
         this.gap = 12;
         this.isHovered = false;
-        
+        this.hideAllBtn = null;
+    
+        if (!this.container) {
+            return;
+        }
+    
         this.container.addEventListener('mouseenter', () => this.pauseAllTimers());
         this.container.addEventListener('mouseleave', () => this.resumeAllTimers());
     }
     
+    
     show(message, type = 'info', description = '') {
+        this.container = addToastContainer();
+    
+        if (!this.container || !this.container.isConnected) {
+            return;
+        }
+    
         const toast = this.createToast(message, type, description);
+    
         this.container.appendChild(toast);
-        
-        const color = getComputedStyle(toast).color;
-        const particleSystem = new tpiNotification_ParticleSystem(toast, color);
-        
+    
+    
         const gradientOverlay = document.createElement('div');
         gradientOverlay.className = 'tpi-notification_gradient-overlay';
         toast.appendChild(gradientOverlay);
-        
-        const closeBtn = document.createElement('div');
-        closeBtn.className = 'tpi-notification_close-btn';
-        closeBtn.innerHTML = tpiNotification_closeIcon;
-        closeBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            this.hideIntense(toast);
-        });
-        toast.appendChild(closeBtn);
-        
+
+        const color = getComputedStyle(toast).color;
+        const particleSystem = new tpiNotification_ParticleSystem(toast, color);
+    
         const toastData = {
             element: toast,
             particleSystem,
@@ -208,23 +231,26 @@ class tpiNotification_ToastManager {
             remainingTime: 7000,
             isPaused: false
         };
-        
+    
         this.toasts.push(toastData);
+    
         this.startTimer(toastData);
-        
         this.updateMargins();
-        
-        setTimeout(() => {
+    
+        requestAnimationFrame(() => {
             toast.classList.add('tpi-notification_toast--show');
-        }, 10);
+        });
+    
+        this.updateHideAllButton();
     }
     
     createToast(message, type, description) {
+    
         const toast = document.createElement('div');
         toast.className = `tpi-notification_toast tpi-notification_toast--${type}`;
-        
+    
         const icon = tpiNotification_toastIcons[type] || tpiNotification_toastIcons.info;
-        
+    
         toast.innerHTML = `
             <div class="tpi-notification_toast-content">
                 <div class="tpi-notification_toast-title">
@@ -234,7 +260,7 @@ class tpiNotification_ToastManager {
                 ${description ? `<div class="tpi-notification_toast-description">${description}</div>` : ''}
             </div>
         `;
-        
+    
         return toast;
     }
     
@@ -273,6 +299,7 @@ class tpiNotification_ToastManager {
     }
     
     hide(toast) {
+        if (!toast.isConnected) return;
         const toastData = this.toasts.find(t => t.element === toast);
         if (!toastData || !toast.classList.contains('tpi-notification_toast--show')) return;
         
@@ -285,6 +312,13 @@ class tpiNotification_ToastManager {
             toast.remove();
             this.toasts = this.toasts.filter(t => t !== toastData);
             this.updateMargins();
+            
+            // Если после удаления не осталось уведомлений - удаляем кнопку
+            setTimeout(() => {
+                if (!this.container.querySelector('.tpi-notification_toast')) {
+                    this.removeHideAllButton();
+                }
+            }, 50);
         }, 200);
     }
 
@@ -301,6 +335,12 @@ class tpiNotification_ToastManager {
             toast.remove();
             this.toasts = this.toasts.filter(t => t !== toastData);
             this.updateMargins();
+            
+            setTimeout(() => {
+                if (!this.container.querySelector('.tpi-notification_toast')) {
+                    this.removeHideAllButton();
+                }
+            }, 50);
         }, 25);
     }
     
@@ -313,39 +353,96 @@ class tpiNotification_ToastManager {
             }
         });
     }
+    updateHideAllButton() {
+        const hasToasts = this.container.querySelector('.tpi-notification_toast');
+        if (hasToasts && !this.hideAllBtn) {
+            this.addHideAllButton();
+        }
+    }
+    
+    addHideAllButton() {
+        if (this.hideAllBtn) return;
+        
+        if(document.querySelector('.tpi-notification_hide-all')) {
+            this.hideAllBtn = document.querySelector('.tpi-notification_hide-all');
+            return;
+        }
+        
+        this.hideAllBtn = document.createElement('button');
+        this.hideAllBtn.className = 'tpi-notification_hide-all';
+        this.hideAllBtn.textContent = 'Скрыть все';
+        this.hideAllBtn.addEventListener('click', () => this.hideAllToasts());
+        this.container.appendChild(this.hideAllBtn);
+    }
+    
+    removeHideAllButton() {
+        if (this.hideAllBtn) {
+            this.hideAllBtn.remove();
+            this.hideAllBtn = null;
+        }
+    }
+    
+    hideAllToasts() {
+        const toastsCopy = [...this.toasts];
+        toastsCopy.forEach(toastData => {
+            if (toastData.element && toastData.element.classList.contains('tpi-notification_toast--show')) {
+                clearTimeout(toastData.timer);
+                toastData.element.classList.remove('tpi-notification_toast--show');
+                toastData.element.classList.add('tpi-notification_toast--hide');
+                
+                if (toastData.particleSystem) {
+                    toastData.particleSystem.destroy();
+                }
+                
+                setTimeout(() => {
+                    if (toastData.element && toastData.element.parentNode) {
+                        toastData.element.remove();
+                    }
+                }, 25);
+            }
+        });
+        
+        this.toasts = [];
+        
+        this.removeHideAllButton();
+    }
 }
         
+window.tpiNotification_manager = new tpiNotification_ToastManager();
+
 // Экспорт функционала
 window.tpiNotification = {
-    show: function(message, type = 'info', description = '') {
-        const manager = new tpiNotification_ToastManager();
-        manager.show(message, type, description);
+    show(message, type = 'info', description = '') {
+        window.tpiNotification_manager.show(message, type, description);
     },
-    
-    showSuccess: function(message, description = '') {
+
+    showSuccess(message, description = '') {
         this.show(message, 'success', description);
     },
-    
-    showVersion: function(message, description = '') {
+
+    showVersion(message, description = '') {
         this.show(message, 'version', description);
     },
-    
-    showError: function(message, description = '') {
+
+    showError(message, description = '') {
         this.show(message, 'error', description);
     },
-    
-    showWarning: function(message, description = '') {
+
+    showWarning(message, description = '') {
         this.show(message, 'warning', description);
     },
-    
-    showInfo: function(message, description = '') {
+
+    showInfo(message, description = '') {
         this.show(message, 'info', description);
     },
-    
-    showtpiInject: function(message, description = '') {
+
+    showtpiInject(message, description = '') {
         this.show(message, 'tpiInject', description);
+    },
+
+    hideAll() {
+        window.tpiNotification_manager.hideAllToasts();
     }
 };
 
 // Добавляем контейнер при загрузке
-addToastContainer();

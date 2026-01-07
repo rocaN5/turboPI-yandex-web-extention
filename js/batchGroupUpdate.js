@@ -109,9 +109,9 @@ const tpiBatchGropuHistory_zone_A = `
                 </div>
                 <div class="diman__batchPreivewSectionRow">
                     <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="44">44</div>
-                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="45">45</div>
-                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="46">46</div>
-                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="47">47</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="43">43</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="42">42</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="41">41</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
                     <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="40">40</div>
@@ -396,7 +396,7 @@ const tpiBatchGropuHistory_zone_C = `
                 </div>
                 <div class="diman__batchPreivewSectionRow">
                     <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="239">239</div>
-                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="234">234</div>
+                    <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="235">235</div>
                     <div class="diman__batchPreivewSectionCell" tpi-batch-cell-groupping="unset" tpi-batch-cell-name="231">231</div>
                 </div>
                 <div class="diman__batchPreivewSectionRow">
@@ -718,6 +718,14 @@ const tpiIcon__chevron_Left = `
         <path d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z"></path>
     </svg>
 `
+
+const tpiIcon__copy_pi = `
+<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M20.6 2.001H7.4a1.402 1.402 0 0 0-1.4 1.4v2.602H3.401a1.401 1.401 0 0 0-1.4 1.4v13.2a1.402 1.402 0 0 0 1.4 1.4h13.2a1.4 1.4 0 0 0 1.4-1.4V18h2.6a1.401 1.401 0 0 0 1.4-1.4V3.4a1.402 1.402 0 0 0-1.4-1.4ZM16 20.003H4v-12h12v12ZM20 16h-1.999V7.402a1.401 1.401 0 0 0-1.4-1.4h-8.6v-2h12v12Z"></path>
+    <path d="M9 17.994h2v-3h3v-2h-3v-3H9v3H6v2h3v3Z"></path>
+</svg>
+`
+
 const tpiCurrent_batch_groups = {
     lastUpdate__date: "2024-01-15",
     lastUpdate__time: "14:30:25",
@@ -1244,6 +1252,7 @@ function checkiIs__onGroupHistory() {
                     // Загружаем данные после вставки блока
                     setTimeout(() => {
                         addTurboListeners();
+                        addToastContainer()
                     }, 100);
                     
                     return true;
@@ -1323,6 +1332,8 @@ checkiIs__onGroupHistory()
 
 //A-
 function addTurboListeners() {
+
+    initBatchMapHoverSync();
 
     /* =======================
        ГЛОБАЛЬНОЕ ХРАНИЛИЩЕ
@@ -1442,12 +1453,12 @@ function addTurboListeners() {
     function renderZoneTable(zone) {
         const tbody = document.querySelector('.tpi-bgh--table-wrapper tbody');
         if (!tbody) return;
-
+    
         tbody.innerHTML = '';
-
+    
         store[zone].forEach(item => {
             const tr = document.createElement('tr');
-
+    
             tr.appendChild(createTdDiv('tpi-bgh--tbody-data-cellId', item.id));
             tr.appendChild(createTdDiv('tpi-bgh--tbody-data-cellName', item.number));
             tr.appendChild(createTdDiv(
@@ -1456,11 +1467,14 @@ function addTurboListeners() {
                 item.status === 'ACTIVE' ? 'active' : 'unActive',
                 item.status === 'ACTIVE' ? 'Активна' : 'Не активна',
             ));
-            tr.appendChild(createTdDiv(
+            
+            // Для столбца группы создаем специальную ячейку
+            const groupTd = createTdWithCopyButton(
                 'tpi-bgh--tbody-data-group',
                 item.groupingDirection?.readableName || ''
-            ));
-
+            );
+            tr.appendChild(groupTd);
+    
             tbody.appendChild(tr);
         });
     }
@@ -1472,6 +1486,52 @@ function addTurboListeners() {
         div.textContent = value ?? '';
         textValue ? div.textContent = textValue : value
         td.appendChild(div);
+        return td;
+    }
+
+    function createTdWithCopyButton(attr, value) {
+        const td = document.createElement('td');
+        td.setAttribute(attr, '');
+        
+        // Контейнер для кнопки и текста
+        const container = document.createElement('div');
+        
+        // Кнопка копирования
+        const copyButton = document.createElement('button');
+        copyButton.className = 'tpi-bgh--copy-group-data';
+        copyButton.innerHTML = tpiIcon__copy_pi;
+        
+        // Добавляем обработчик копирования
+        copyButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const textToCopy = value.trim();
+            if (!textToCopy) return;
+            
+            navigator.clipboard.writeText(textToCopy).catch(() => {
+                // Fallback для старых браузеров
+                const textArea = document.createElement('textarea');
+                textArea.value = textToCopy;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+            });
+        tpiNotification.show("Текст скопирован", "success", `${textToCopy}`)
+        });
+        
+        // Текст значения
+        const textSpan = document.createElement('span');
+        textSpan.textContent = value ?? '';
+        
+        // Добавляем кнопку и текст в контейнер
+        container.appendChild(copyButton);
+        container.appendChild(textSpan);
+        
+        // Добавляем контейнер в td
+        td.appendChild(container);
+        
         return td;
     }
 
@@ -1553,3 +1613,194 @@ function addTurboListeners() {
 
 
 // B-
+function initBatchMapHoverSync() {
+
+    const tpi_BGH_batchMap = document.querySelector('.tpi-bgh--batchMap-wrapper')
+    const tpi_BGH_tableWrapper = document.querySelector('.tpi-bgh--table-wrapper')
+
+    /* =======================
+       ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+    ======================= */
+
+    function clearTableHighlight() {
+        document
+            .querySelectorAll('tr[tpi-bgh--highlight-row]')
+            .forEach(tr => tr.removeAttribute('tpi-bgh--highlight-row'));
+    }
+
+    function clearBatchHighlight() {
+        document
+            .querySelectorAll('.diman__batchPreivewSectionCell[tpi-bgh--highlight-cell]')
+            .forEach(cell => cell.removeAttribute('tpi-bgh--highlight-cell'));
+    }
+
+    function getCurrentMapChunk() {
+        return document
+            .querySelector('.tpi-bgh--batchMap-section')
+            ?.getAttribute('current-map-chunk') || null;
+    }
+
+    function getScrollParent(el) {
+        let parent = el.parentElement;
+
+        while (parent) {
+            const style = getComputedStyle(parent);
+            if (/(auto|scroll)/.test(style.overflowY)) {
+                return parent;
+            }
+            parent = parent.parentElement;
+        }
+        return null;
+    }
+
+    function scrollRowToCenter(tr) {
+        const scrollParent = getScrollParent(tr);
+        if (!scrollParent) return;
+
+        const trTop = tr.offsetTop;
+        const trHeight = tr.offsetHeight;
+        const parentHeight = scrollParent.clientHeight;
+
+        // Рассчитываем позицию для центрирования строки
+        const targetScrollTop = trTop - parentHeight / 2 + trHeight / 2;
+        const maxScrollTop = scrollParent.scrollHeight - parentHeight;
+
+        // Ограничиваем прокрутку в пределах допустимого диапазона
+        const clampedScrollTop = Math.max(0, Math.min(targetScrollTop, maxScrollTop));
+
+        // Прокручиваем только если позиция изменилась
+        if (Math.abs(scrollParent.scrollTop - clampedScrollTop) > 5) {
+            scrollParent.scrollTo({
+                top: clampedScrollTop,
+                behavior: 'smooth'
+            });
+        }
+    }
+
+    function copyOrderGroup(tr) {
+        const groupElement = tr.querySelector('td[tpi-bgh--tbody-data-group] div');
+        if (!groupElement) return;
+
+        const groupText = groupElement.textContent.trim();
+        if (!groupText) return;
+
+        // Используем современный Clipboard API
+        navigator.clipboard.writeText(groupText)
+            .then(() => {
+                tpiNotification.show("Текст скопирован", "success", `${groupText}`)
+            })
+            .catch(err => {
+                // Fallback для старых браузеров
+                const textArea = document.createElement('textarea');
+                textArea.value = groupText;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+            });
+    }
+
+    /* =======================
+       НАВЕДЕНИЕ НА ЯЧЕЙКУ КАРТЫ
+    ======================= */
+
+    tpi_BGH_batchMap.addEventListener('mouseover', (e) => {
+        const cell = e.target.closest('.diman__batchPreivewSectionCell');
+        if (!cell) return;
+
+        clearTableHighlight();
+
+        const chunk = getCurrentMapChunk();
+        const cellName = cell.getAttribute('tpi-batch-cell-name');
+        if (!chunk || !cellName) return;
+
+        const searchValue = `${chunk}-${cellName}`;
+
+        tpi_BGH_tableWrapper
+            .querySelectorAll('table.tpi-bgh--table-cell td[tpi-bgh--tbody-data-cellname] div')
+            .forEach(div => {
+                if (div.textContent.trim() === searchValue) {
+                    const tr = div.closest('tr');
+                    if (!tr) return;
+
+                    tr.setAttribute('tpi-bgh--highlight-row', '');
+                    scrollRowToCenter(tr);
+                }
+            });
+    });
+
+    tpi_BGH_batchMap.addEventListener('mouseout', (e) => {
+        if (e.target.closest('.diman__batchPreivewSectionCell')) {
+            clearTableHighlight();
+        }
+    });
+
+    /* =======================
+       НАВЕДЕНИЕ НА СТРОКУ ТАБЛИЦЫ
+    ======================= */
+
+    tpi_BGH_tableWrapper.addEventListener('mouseover', (e) => {
+        const tr = e.target.closest('table.tpi-bgh--table-cell tr');
+        if (!tr) return;
+
+        const div = tr.querySelector('td[tpi-bgh--tbody-data-cellname] div');
+        if (!div) return;
+
+        clearBatchHighlight();
+
+        const value = div.textContent.trim();
+        const [, cellNumber] = value.split('-');
+        if (!cellNumber) return;
+
+        tpi_BGH_batchMap
+            .querySelectorAll('.diman__batchPreivewSectionCell')
+            .forEach(cell => {
+                if (cell.getAttribute('tpi-batch-cell-name') === cellNumber) {
+                    cell.setAttribute('tpi-bgh--highlight-cell', '');
+                }
+            });
+    });
+
+    tpi_BGH_tableWrapper.addEventListener('mouseout', (e) => {
+        if (e.target.closest('table.tpi-bgh--table-cell tr')) {
+            clearBatchHighlight();
+        }
+    });
+
+    /* =======================
+       КЛИК НА ЯЧЕЙКУ КАРТЫ ДЛЯ КОПИРОВАНИЯ ГРУППИРОВКИ
+    ======================= */
+
+    tpi_BGH_batchMap.addEventListener('click', (e) => {
+        const cell = e.target.closest('.diman__batchPreivewSectionCell');
+        if (!cell) return;
+
+        const chunk = getCurrentMapChunk();
+        const cellName = cell.getAttribute('tpi-batch-cell-name');
+        if (!chunk || !cellName) return;
+
+        const searchValue = `${chunk}-${cellName}`;
+        let foundTr = null;
+
+        // Ищем соответствующую строку в таблице
+        tpi_BGH_tableWrapper
+            .querySelectorAll('table.tpi-bgh--table-cell td[tpi-bgh--tbody-data-cellname] div')
+            .forEach(div => {
+                if (div.textContent.trim() === searchValue) {
+                    const tr = div.closest('tr');
+                    if (tr) {
+                        foundTr = tr;
+                    }
+                }
+            });
+
+        // Если нашли строку - копируем группировку
+        if (foundTr) {
+            copyOrderGroup(foundTr);
+            
+            // Дополнительно прокручиваем к центру для лучшей видимости
+            scrollRowToCenter(foundTr);
+        }
+    });
+}
+
