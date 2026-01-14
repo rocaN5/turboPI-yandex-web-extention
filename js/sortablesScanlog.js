@@ -551,115 +551,192 @@ async function processSingleLink(linkEl, progressCallback) {
 }
 
 function handleScanlogLoading() {
-    const miniRadarBtn = document.querySelector('#mini-radar');
-    if (!miniRadarBtn || miniRadarBtn.dataset.listenerAttached) return;
+    let attempts = 0;
+    const maxAttempts = 5;
+    const interval = 2000;
 
-    miniRadarBtn.dataset.listenerAttached = 'true';
+    function tryFindButton() {
+        attempts++;
+        const btn = document.querySelector('#mini-radar');
+        
+        if (btn) {
+            if (btn.dataset.listenerAttached) return;
 
-    if (!miniRadarBtn.hasAttribute('mini-radar-status')) {
-        miniRadarBtn.setAttribute('mini-radar-status', 'search');
+            btn.dataset.listenerAttached = 'true';
+
+            if (!btn.hasAttribute('mini-radar-status')) {
+                btn.setAttribute('mini-radar-status', 'search');
+            }
+
+            btn.addEventListener('click', async function () {
+                const status = this.getAttribute('mini-radar-status');
+                const icon = this.querySelector('i.miniRadarStatusIcon');
+                const text = this.querySelector('div.miniRadar-button-text');
+                const progressEl = document.querySelector('#mini-radar-progress');
+
+                this.disabled = true;
+
+                if (status === 'hideresult') {
+                    document.querySelectorAll('tr[data-scanlog-row]').forEach(el => el.remove());
+
+                    document.querySelectorAll('a[data-scanlog-loaded]').forEach(link => {
+                        delete link.dataset.scanlogLoaded;
+                    });
+
+                    this.setAttribute('mini-radar-status', 'search');
+                    icon.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                            <path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C433.5 68.8 368.8 32 288 32zM144 256a144 144 0 1 1 288 0 144 144 0 1 1 -288 0zm144-64c0 35.3-28.7 64-64 64c-7.1 0-13.9-1.2-20.3-3.3c-5.5-1.8-11.9 1.6-11.7 7.4c.3 6.9 1.3 13.8 3.2 20.7c13.7 51.2 66.4 81.6 117.6 67.9s81.6-66.4 67.9-117.6c-11.1-41.5-47.8-69.4-88.6-71.1c-5.8-.2-9.2 6.1-7.4 11.7c2.1 6.4 3.3 13.2 3.3 20.3z"></path>
+                        </svg>
+                    `;
+                    text.textContent = 'Показать сканлоги';
+                    if (progressEl) {
+                        progressEl.textContent = '';
+                        progressEl.style.display = "none"
+                    } 
+
+                    this.disabled = false;
+                    return;
+                }
+
+                if (status === 'search') {
+                    // Определяем, находимся ли мы на странице turboPI-Text-to-Orders
+                    const currentUrl = window.location.href;
+                    const isTurboPIPage = currentUrl.includes('turboPI-Text-to-Orders');
+                    
+                    let linkTrs = [];
+                    
+                    if (isTurboPIPage) {
+                        // Режим turboPI: ищем ссылки только внутри .diman__TURBOpi__textToOrders__table
+                        const turboTable = document.querySelector('.diman__TURBOpi__textToOrders__table');
+                        if (turboTable) {
+                            // Ищем ссылки внутри таблицы turboPI
+                            // Сначала ищем все строки таблицы с ссылками на sortables
+                            const turboRows = turboTable.querySelectorAll('tr');
+                            
+                            // Фильтруем строки, которые содержат ссылки на sortables
+                            linkTrs = Array.from(turboRows).filter(tr => {
+                                const link = tr.querySelector('a[href*="/sortables/"]');
+                                return link !== null && 
+                                       !link.hasAttribute('data-scanlog-loaded') && 
+                                       !link.hasAttribute('data-scanlog-loading');
+                            });
+                            
+                            console.log(`TurboPI режим: найдено ${linkTrs.length} ссылок в таблице turboPI`);
+                        } else {
+                            console.log('Таблица .diman__TURBOpi__textToOrders__table не найдена');
+                        }
+                    }
+                    
+                    // Если не в режиме turboPI или не нашли ссылок, используем обычный поиск
+                    if (!isTurboPIPage || linkTrs.length === 0) {
+                        // Обычный режим: ищем по всему документу
+                        linkTrs = Array.from(
+                            document.querySelectorAll('tr:has(a[data-tid-prop="8e34e3c2 d47a3f9b 2cf94f05"]:not([data-scanlog-loaded]):not([data-scanlog-loading]))')
+                        );
+                        console.log(`Обычный режим: найдено ${linkTrs.length} ссылок`);
+                    }
+
+                    if (linkTrs.length === 0) {
+                        // Если ссылок нет, показываем сообщение и выходим
+                        tpiNotification.show("Мини-радар", "info", "Нет ссылок для загрузки сканлогов");
+                        this.disabled = false;
+                        return;
+                    }
+
+                    this.setAttribute('mini-radar-status', 'loading');
+                    icon.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"> 
+                            <circle fill="#212121" stroke="#212121" stroke-width="16" r="15" cx="40" cy="100">
+                                <animate attributeName="opacity" calcMode="spline" dur="1.3" values="1;0;1;" keySplines=".5 0 .5 1;.5 0 .5 1" repeatCount="indefinite" begin="-.4"></animate>
+                            </circle>
+                            <circle fill="#212121" stroke="#212121" stroke-width="16" r="15" cx="100" cy="100">
+                                <animate attributeName="opacity" calcMode="spline" dur="1.3" values="1;0;1;" keySplines=".5 0 .5 1;.5 0 .5 1" repeatCount="indefinite" begin="-.2"></animate>
+                            </circle>
+                            <circle fill="#212121" stroke="#212121" stroke-width="16" r="15" cx="160" cy="100">
+                                <animate attributeName="opacity" calcMode="spline" dur="1.3" values="1;0;1;" keySplines=".5 0 .5 1;.5 0 .5 1" repeatCount="indefinite" begin="0"></animate>
+                            </circle>
+                        </svg>
+                    `;
+                    text.textContent = 'Загрузка';
+                    
+                    if (progressEl) {
+                        progressEl.style.display = "flex";
+                        progressEl.textContent = `0 / ${linkTrs.length}`;
+                    }
+                    
+                    let loadedCount = 0;
+                    const BATCH_SIZE = isTurboPIPage ? 3 : 5; // Меньший размер батча для turboPI страниц
+                    const updateProgress = () => {
+                        loadedCount++;
+                        if (progressEl) progressEl.textContent = `${loadedCount} / ${linkTrs.length}`;
+                    };
+                    
+                    const insertions = [];
+                    
+                    // Обрабатываем ссылки батчами
+                    for (let i = 0; i < linkTrs.length; i += BATCH_SIZE) {
+                        const batch = linkTrs.slice(i, i + BATCH_SIZE);
+                        
+                        // Для каждой строки в батче находим ссылку
+                        const results = await Promise.allSettled(
+                            batch.map(tr => {
+                                let link;
+                                if (isTurboPIPage) {
+                                    // На turboPI странице ищем любую ссылку с /sortables/
+                                    link = tr.querySelector('a[href*="/sortables/"]');
+                                } else {
+                                    // В обычном режиме используем стандартный селектор
+                                    link = tr.querySelector('a[data-tid-prop="8e34e3c2 d47a3f9b 2cf94f05"]');
+                                }
+                                
+                                if (link) {
+                                    return processSingleLink(link, updateProgress);
+                                }
+                                return null;
+                            })
+                        );
+                        
+                        // Обрабатываем результаты
+                        results.forEach(result => {
+                            if (result.status === 'fulfilled' && result.value) {
+                                insertions.push(result.value);
+                            } else if (result.status === 'rejected') {
+                                console.error('Ошибка при обработке ссылки:', result.reason);
+                            }
+                        });
+                    }
+                    
+                    // Вставляем результаты в DOM
+                    for (const { trWrapper, targetTr } of insertions) {
+                        if (targetTr && trWrapper) {
+                            targetTr.parentElement.insertBefore(trWrapper, targetTr.nextSibling);
+                        }
+                    }
+                    
+                    // Обновляем состояние кнопки
+                    this.setAttribute('mini-radar-status', 'hideresult');
+                    icon.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512">
+                            <path d="M38.8 5.1C28.4-3.1 13.3-1.2 5.1 9.2S-1.2 34.7 9.2 42.9l592 464c10.4 8.2 25.5 6.3 33.7-4.1s6.3-25.5-4.1-33.7L525.6 386.7c39.6-40.6 66.4-86.1 79.9-118.4c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C465.5 68.8 400.8 32 320 32c-68.2 0-125 26.3-169.3 60.8L38.8 5.1zM223.1 149.5C248.6 126.2 282.7 112 320 112c79.5 0 144 64.5 144 144c0 24.9-6.3 48.3-17.4 68.7L408 294.5c8.4-19.3 10.6-41.4 4.8-63.3c-11.1-41.5-47.8-69.4-88.6-71.1c-5.8-.2-9.2 6.1-7.4 11.7c2.1 6.4 3.3 13.2 3.3 20.3c0 10.2-2.4 19.8-6.6 28.3l-90.3-70.8zM373 389.9c-16.4 6.5-34.3 10.1-53 10.1c-79.5 0-144-64.5-144-144c0-6.9 .5-13.6 1.4-20.2L83.1 161.5C60.3 191.2 44 220.8 34.5 243.7c-3.3 7.9-3.3 16.7 0 24.6c14.9 35.7 46.2 87.7 93 131.1C174.5 443.2 239.2 480 320 480c47.8 0 89.9-12.9 126.2-32.5L373 389.9z"/>    
+                        </svg>
+                    `;
+                    text.textContent = 'Скрыть сканлоги';
+                    this.disabled = false;
+                    
+                    // Показываем уведомление о завершении
+                    if (loadedCount > 0) {
+                        tpiNotification.show("Мини-радар", "success", `Загружено ${loadedCount} из ${linkTrs.length} сканлогов`);
+                    }
+                }
+            });
+        } else if (attempts < maxAttempts) {
+            setTimeout(tryFindButton, interval);
+        }
     }
 
-    miniRadarBtn.addEventListener('click', async function () {
-        const status = this.getAttribute('mini-radar-status');
-        const icon = this.querySelector('i.miniRadarStatusIcon');
-        const text = this.querySelector('div.miniRadar-button-text');
-        const progressEl = document.querySelector('#mini-radar-progress');
-
-        // 🔒 Блокируем кнопку на время выполнения
-        this.disabled = true;
-
-        // 1. Режим скрытия результатов
-        if (status === 'hideresult') {
-            // Удаляем все таблицы
-            document.querySelectorAll('tr[data-scanlog-row]').forEach(el => el.remove());
-
-            // Сбрасываем атрибуты у ссылок
-            document.querySelectorAll('a[data-tid-prop][data-scanlog-loaded]').forEach(link => {
-                delete link.dataset.scanlogLoaded;
-            });
-
-            // Переключаем в режим поиска
-            this.setAttribute('mini-radar-status', 'search');
-            icon.innerHTML = `
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
-                    <path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C433.5 68.8 368.8 32 288 32zM144 256a144 144 0 1 1 288 0 144 144 0 1 1 -288 0zm144-64c0 35.3-28.7 64-64 64c-7.1 0-13.9-1.2-20.3-3.3c-5.5-1.8-11.9 1.6-11.7 7.4c.3 6.9 1.3 13.8 3.2 20.7c13.7 51.2 66.4 81.6 117.6 67.9s81.6-66.4 67.9-117.6c-11.1-41.5-47.8-69.4-88.6-71.1c-5.8-.2-9.2 6.1-7.4 11.7c2.1 6.4 3.3 13.2 3.3 20.3z"></path>
-                </svg>
-            `;
-            text.textContent = 'Показать сканлоги';
-            if (progressEl)
-                {
-                    progressEl.textContent = '';
-                    progressEl.style.display = "none"
-                } 
-
-            this.disabled = false;
-            return;
-        }
-
-        // 2. Режим поиска
-        if (status === 'search') {
-            const linkTrs = Array.from(
-                document.querySelectorAll('tr:has(a[data-tid-prop="8e34e3c2 d47a3f9b 2cf94f05"]:not([data-scanlog-loaded]):not([data-scanlog-loading]))')
-            );
-
-            this.setAttribute('mini-radar-status', 'loading');
-            icon.innerHTML = `
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"> 
-                    <circle fill="#212121" stroke="#212121" stroke-width="16" r="15" cx="40" cy="100">
-                        <animate attributeName="opacity" calcMode="spline" dur="1.3" values="1;0;1;" keySplines=".5 0 .5 1;.5 0 .5 1" repeatCount="indefinite" begin="-.4"></animate>
-                    </circle>
-                    <circle fill="#212121" stroke="#212121" stroke-width="16" r="15" cx="100" cy="100">
-                        <animate attributeName="opacity" calcMode="spline" dur="1.3" values="1;0;1;" keySplines=".5 0 .5 1;.5 0 .5 1" repeatCount="indefinite" begin="-.2"></animate>
-                    </circle>
-                    <circle fill="#212121" stroke="#212121" stroke-width="16" r="15" cx="160" cy="100">
-                        <animate attributeName="opacity" calcMode="spline" dur="1.3" values="1;0;1;" keySplines=".5 0 .5 1;.5 0 .5 1" repeatCount="indefinite" begin="0"></animate>
-                    </circle>
-                </svg>
-            `;
-            text.textContent = 'Загрузка';
-            
-            progressEl.style.display = "flex"
-            if (progressEl) progressEl.textContent = `0 / ${linkTrs.length}`;
-            
-            let loadedCount = 0;
-            const BATCH_SIZE = 10;
-            const updateProgress = () => {
-                loadedCount++;
-                if (progressEl) progressEl.textContent = `${loadedCount} / ${linkTrs.length}`;
-            };
-            
-            const insertions = [];
-            
-            for (let i = 0; i < linkTrs.length; i += BATCH_SIZE) {
-                const batch = linkTrs.slice(i, i + BATCH_SIZE);
-                const results = await Promise.all(
-                    batch.map(tr => {
-                        const link = tr.querySelector('a[data-tid-prop="8e34e3c2 d47a3f9b 2cf94f05"]');
-                        return processSingleLink(link, updateProgress);
-                    })
-                );
-                insertions.push(...results.filter(Boolean));
-            }
-            
-            // ✅ Вставляем всё сразу
-            for (const { trWrapper, targetTr } of insertions) {
-                targetTr.parentElement.insertBefore(trWrapper, targetTr.nextSibling);
-            }
-            
-            this.setAttribute('mini-radar-status', 'hideresult');
-            icon.innerHTML = `
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512">
-                    <path d="M38.8 5.1C28.4-3.1 13.3-1.2 5.1 9.2S-1.2 34.7 9.2 42.9l592 464c10.4 8.2 25.5 6.3 33.7-4.1s6.3-25.5-4.1-33.7L525.6 386.7c39.6-40.6 66.4-86.1 79.9-118.4c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C465.5 68.8 400.8 32 320 32c-68.2 0-125 26.3-169.3 60.8L38.8 5.1zM223.1 149.5C248.6 126.2 282.7 112 320 112c79.5 0 144 64.5 144 144c0 24.9-6.3 48.3-17.4 68.7L408 294.5c8.4-19.3 10.6-41.4 4.8-63.3c-11.1-41.5-47.8-69.4-88.6-71.1c-5.8-.2-9.2 6.1-7.4 11.7c2.1 6.4 3.3 13.2 3.3 20.3c0 10.2-2.4 19.8-6.6 28.3l-90.3-70.8zM373 389.9c-16.4 6.5-34.3 10.1-53 10.1c-79.5 0-144-64.5-144-144c0-6.9 .5-13.6 1.4-20.2L83.1 161.5C60.3 191.2 44 220.8 34.5 243.7c-3.3 7.9-3.3 16.7 0 24.6c14.9 35.7 46.2 87.7 93 131.1C174.5 443.2 239.2 480 320 480c47.8 0 89.9-12.9 126.2-32.5L373 389.9z"/>    
-                </svg>
-            `;
-            text.textContent = 'Скрыть сканлоги';
-            this.disabled = false;
-            
-        }
-    });
+    tryFindButton();
 }
-
 function generateTableHTMLForRadar(data, sortableName, showNotification = false) {
     if (!data || !data.length) {
         return `

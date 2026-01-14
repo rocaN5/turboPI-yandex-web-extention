@@ -5,7 +5,7 @@ function addTurboPiTitle() {
         const newDiv = document.createElement('div');
         newDiv.className = 'turboPiTitle';
         newDiv.innerHTML = `
-        <div class="turboPi__wrapper">
+        <div class="turboPi__wrapper" tpi-active-user="unset">
             <div class="turboPi__container" status="online">Extended by
                 <span class="turboPianimText" style="margin-left: 4px;">T</span>
                 <span class="turboPianimText" style="animation-delay: 50ms;">U</span>

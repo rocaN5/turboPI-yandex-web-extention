@@ -1382,9 +1382,12 @@ function addTurboListeners() {
             await loadAllZonesData();
             GLOBAL.loaded = true;
         }
-
+    
         renderCurrentZone();
-
+        
+        // Добавляем обновление состояния ячеек при первой загрузке
+        setTimeout(updateBatchMapCellStates, 200);
+    
         if (!GLOBAL.observerInited) {
             observeChunkChange();
             GLOBAL.observerInited = true;
@@ -1471,7 +1474,7 @@ function addTurboListeners() {
             // Для столбца группы создаем специальную ячейку
             const groupTd = createTdWithCopyButton(
                 'tpi-bgh--tbody-data-group',
-                item.groupingDirection?.readableName || ''
+                item.groupingDirection?.readableName
             );
             tr.appendChild(groupTd);
     
@@ -1493,7 +1496,16 @@ function addTurboListeners() {
         const td = document.createElement('td');
         td.setAttribute(attr, '');
         
-        // Контейнер для кнопки и текста
+        // Если значение пустое, добавляем <null>null</null>
+        if (!value || value.trim() === '') {
+            // Добавляет <null>null</null>
+            const nullElementDiv = document.createElement('div');
+            nullElementDiv.innerHTML = `<null>null</null>`;
+            td.appendChild(nullElementDiv);
+            return td;
+        }
+        
+        // Контейнер для кнопки и текста (только если есть значение)
         const container = document.createElement('div');
         
         // Кнопка копирования
@@ -1518,7 +1530,7 @@ function addTurboListeners() {
                 document.execCommand('copy');
                 document.body.removeChild(textArea);
             });
-        tpiNotification.show("Текст скопирован", "success", `${textToCopy}`)
+            tpiNotification.show("Текст скопирован", "success", `${textToCopy}`)
         });
         
         // Текст значения
@@ -1542,15 +1554,17 @@ function addTurboListeners() {
     function observeChunkChange() {
         const section = document.querySelector('.tpi-bgh--batchMap-section');
         if (!section) return;
-
+    
         const observer = new MutationObserver(mutations => {
             mutations.forEach(m => {
                 if (m.attributeName === 'current-map-chunk') {
                     renderCurrentZone();
+                    // Добавляем вызов обновления состояния ячеек
+                    setTimeout(updateBatchMapCellStates, 100);
                 }
             });
         });
-
+    
         observer.observe(section, { attributes: true });
     }
 
@@ -1684,13 +1698,11 @@ function initBatchMapHoverSync() {
         const groupText = groupElement.textContent.trim();
         if (!groupText) return;
 
-        // Используем современный Clipboard API
         navigator.clipboard.writeText(groupText)
             .then(() => {
                 tpiNotification.show("Текст скопирован", "success", `${groupText}`)
             })
             .catch(err => {
-                // Fallback для старых браузеров
                 const textArea = document.createElement('textarea');
                 textArea.value = groupText;
                 document.body.appendChild(textArea);
@@ -1699,10 +1711,6 @@ function initBatchMapHoverSync() {
                 document.body.removeChild(textArea);
             });
     }
-
-    /* =======================
-       НАВЕДЕНИЕ НА ЯЧЕЙКУ КАРТЫ
-    ======================= */
 
     tpi_BGH_batchMap.addEventListener('mouseover', (e) => {
         const cell = e.target.closest('.diman__batchPreivewSectionCell');
@@ -1735,9 +1743,7 @@ function initBatchMapHoverSync() {
         }
     });
 
-    /* =======================
-       НАВЕДЕНИЕ НА СТРОКУ ТАБЛИЦЫ
-    ======================= */
+    //! НАВЕДЕНИЕ НА СТРОКУ ТАБЛИЦЫ • #Код полное говно нужно передлать или забить болт
 
     tpi_BGH_tableWrapper.addEventListener('mouseover', (e) => {
         const tr = e.target.closest('table.tpi-bgh--table-cell tr');
@@ -1800,6 +1806,62 @@ function initBatchMapHoverSync() {
             
             // Дополнительно прокручиваем к центру для лучшей видимости
             scrollRowToCenter(foundTr);
+        }
+    });
+}
+
+function updateBatchMapCellStates() {
+    // Получаем текущую зону
+    const section = document.querySelector('.tpi-bgh--batchMap-section');
+    const currentChunk = section?.getAttribute('current-map-chunk')?.toUpperCase() || 'A';
+    
+    // Собираем все ячейки карты для текущей зоны
+    const batchCells = document.querySelectorAll('.diman__batchPreivewSectionCell');
+    
+    // Собираем данные из таблицы для текущей зоны
+    const tableCells = {};
+    
+    // Проходим по всем строкам таблицы
+    document.querySelectorAll('.tpi-bgh--table-wrapper tbody tr').forEach(tr => {
+        const cellNameDiv = tr.querySelector('td[tpi-bgh--tbody-data-cellname] div');
+        const groupDiv = tr.querySelector('td[tpi-bgh--tbody-data-group] div span');
+        
+        if (cellNameDiv) {
+            const fullCellName = cellNameDiv.textContent.trim();
+            // Проверяем, относится ли ячейка к текущей зоне
+            if (fullCellName.startsWith(currentChunk + '-')) {
+                const cellNumber = fullCellName.substring(2); // Удаляем "A-", "B-" и т.д.
+                const hasGroup = groupDiv && groupDiv.textContent.trim() !== '';
+                
+                tableCells[cellNumber] = {
+                    exists: true,
+                    hasGroup: hasGroup
+                };
+            }
+        }
+    });
+    
+    // Обновляем состояние ячеек карты
+    batchCells.forEach(cell => {
+        const cellName = cell.getAttribute('tpi-batch-cell-name');
+        
+        // Удаляем старые атрибуты
+        cell.removeAttribute('tpi-bgh-empty-cell');
+        cell.removeAttribute('tpi-bgh-null-cell');
+        
+        // Проверяем наличие ячейки в таблице
+        if (tableCells[cellName]) {
+            const cellData = tableCells[cellName];
+            
+            if (cellData.hasGroup) {
+                // Ячейка существует и имеет группировку - всё хорошо
+            } else {
+                // Ячейка существует, но группировка пустая
+                cell.setAttribute('tpi-bgh-empty-cell', '');
+            }
+        } else {
+            // Ячейки нет в таблице
+            cell.setAttribute('tpi-bgh-null-cell', '');
         }
     });
 }

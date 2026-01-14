@@ -611,6 +611,9 @@ p.tpi-bgh--map-chunk-title{
         display: flex;
         gap: 10px;
     }
+    tbody td[tpi-bgh--tbody-data-group] null{
+        color: #bdbdbd;
+    }
 }
 
 .diman__batchPreivewSectionCell[tpi-bgh--highlight-cell]{
