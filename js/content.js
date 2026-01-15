@@ -1,4 +1,4 @@
-const turboPi__version = "3.19.4";
+const turboPi__version = "3.19.5";
 
 // Глобальный флаг для внешнего MutationObserver’а
 let notMutation = true;

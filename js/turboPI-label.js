@@ -1,6 +1,95 @@
+const tpi_activeUser = null;
+const currentUrl = window.location.href;
+const tpi_WPversion = getTPIversion(currentUrl);
+let tokenAttempts = 0;
+const MAX_TOKEN_ATTEMPTS = 10;
+const TOKEN_RETRY_INTERVAL = 2000; // 2 секунды в миллисекундах
+
+function getTPIversion(url) {
+    if (url.startsWith('https://hubs.market.yandex.ru/')) {
+        return "new";
+    } else if (url.startsWith('https://logistics.market.yandex.ru/')) {
+        return "old";
+    }
+    return "unknown";
+}
+
+function getLoginFromCookies() {
+    const cookies = document.cookie.split(';');
+    for (let cookie of cookies) {
+        const [name, value] = cookie.trim().split('=');
+        if (name === 'yandex_login') {
+            return decodeURIComponent(value);
+        }
+    }
+    return null;
+}
+
+function processTokenAndLogin() {
+    // Проверяем, определена ли переменная tpiUserTOKEN
+    if (typeof tpiUserTOKEN !== 'undefined' && tpiUserTOKEN !== null) {
+        const login = getLoginFromCookies();
+        
+        if (login) {
+            // ОБНОВЛЯЕМ АТРИБУТ С ЛОГИНОМ
+            const wrapper = document.querySelector('.turboPi__wrapper');
+            if (wrapper) {
+                wrapper.setAttribute('tpi-active-user', login); // Вставляем сам логин
+            }
+            
+            // Также обновляем текст в блоке пользователя
+            const userInfoElement = document.querySelector('.auth__userData-info');
+            if (userInfoElement) {
+                userInfoElement.textContent = login;
+            }
+            
+            // Сохраняем в глобальную переменную
+            window.tpi_activeUser = {
+                token: tpiUserTOKEN,
+                login: login
+            };
+            
+            console.log('Token and login processed successfully. Login:', login);
+            return true;
+        } else {
+            console.log('Login not found in cookies');
+        }
+    }
+    
+    return false;
+}
+
+function retryTokenProcessing() {
+    tokenAttempts++;
+    
+    if (tokenAttempts <= MAX_TOKEN_ATTEMPTS) {
+        console.log(`Attempt ${tokenAttempts}/${MAX_TOKEN_ATTEMPTS} to get token`);
+        
+        if (processTokenAndLogin()) {
+            console.log('Token processing successful');
+            return true;
+        } else {
+            console.log(`Retrying in ${TOKEN_RETRY_INTERVAL/1000} seconds...`);
+            setTimeout(retryTokenProcessing, TOKEN_RETRY_INTERVAL);
+            return false;
+        }
+    } else {
+        console.log('Max token retrieval attempts reached');
+        
+        // Устанавливаем значение по умолчанию
+        const wrapper = document.querySelector('.turboPi__wrapper');
+        if (wrapper) {
+            wrapper.setAttribute('tpi-active-user', 'unset');
+        }
+        
+        return false;
+    }
+}
+
 function addTurboPiTitle() {
     const targetDiv = document.querySelector('div[data-tid="c08f713 7915f99e"]');
     const targetDivExtra = document.querySelector('div.cursor-pointer');
+    
     if (targetDiv && !document.querySelector('.turboPiTitle') || targetDivExtra && !document.querySelector('.turboPiTitle')) {
         const newDiv = document.createElement('div');
         newDiv.className = 'turboPiTitle';
@@ -194,6 +283,7 @@ function addTurboPiTitle() {
         `;
         if(targetDiv) targetDiv.parentNode.insertBefore(newDiv, targetDiv);
         if (targetDivExtra) targetDivExtra.parentNode.insertBefore(newDiv, targetDivExtra);
+        
         const avatarImg = document.querySelector('.UserID-Avatar img');
 
         function cloneAvatarImage() {
@@ -217,6 +307,17 @@ function addTurboPiTitle() {
         
         if (avatarImg && avatarImg.src !== 'https://avatars.mds.yandex.net/get-yapic/0/0-0/islands-middle') {
             cloneAvatarImage();
+        }
+
+        if(tpi_WPversion == "old" || tpi_WPversion == "new"){
+            // Пытаемся сразу обработать токен
+            if (processTokenAndLogin()) {
+                console.log('Token processed on first attempt');
+            } else {
+                // Если не получилось, начинаем повторные попытки
+                console.log('Starting retry attempts for token...');
+                setTimeout(retryTokenProcessing, TOKEN_RETRY_INTERVAL);
+            }
         }
     }
 }

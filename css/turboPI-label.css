@@ -208,7 +208,7 @@ div.turboPiTitle:hover div.turboPi__options .turboPI__Autorithation{
     padding: 4px 4px;
     padding-right: 10px;
     border-radius: 30px;
-    width: 160px;
+    width: 100%;
     background: #000000;
     box-shadow: 0px 0px 10px 0px #000;
 }
@@ -301,7 +301,9 @@ div.turboPiTitle:hover div.turboPi__options .turboPI__Autorithation{
     gap: 2px;
     justify-content: center;
     align-items: flex-start;
-    width: 90px;
+    width: 100%;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 
 .auth__userData .auth__userData-info{
@@ -359,10 +361,26 @@ div.turboPiTitle:hover div.turboPi__options .turboPI__Autorithation{
     display: flex;
     justify-content: center;
     align-items: center;
-    background: #ffffff1c;
     cursor: pointer;
     border-radius: 10px;
     box-shadow: 0px 0px 10px 0px #000;
+    position: absolute;
+    right: 0;
+    opacity: 0;
+    scale: 0;
+    transition: 150ms ease-in-out;
+    z-index: 9;
+    background: #373737bd;
+    backdrop-filter: blur(2px);
+    outline: 1px solid #878787;
+
+    &:hover{
+        filter: brightness(1.2);
+    }
+    &:active{
+        filter: brightness(1.25);
+        transform: scale(.95);
+    }
 
     svg{
         fill: #fff;
@@ -697,6 +715,12 @@ button.miniRadar i svg{
     justify-content: space-between;
     width: 100%;
     align-items: center;
+
+    &:hover .auth__logOut{
+        opacity: 1;
+        right: 20px;
+        scale: 1;
+    }
 }
 
 /* TODO END*/
@@ -739,6 +763,21 @@ button.miniRadar i svg{
 .turboPI__hubSection::-webkit-scrollbar-thumb:active {
   background-color: #ffb700;
 }
+
+/*C- Выключение вкладок в разработке у смертных */
+/*C- Выключение вкладок в разработке у смертных */
+/*C- Выключение вкладок в разработке у смертных */
+
+div.turboPi__wrapper:not([tpi-active-user="R.TSD"]) {
+    a:has(div.tpi-options--inDevelopment),
+    button:has(div.tpi-options--inDevelopment) {
+        display: none;
+    }
+}
+
+/*C- Выключение вкладок в разработке у смертных END*/
+/*C- Выключение вкладок в разработке у смертных END*/
+/*C- Выключение вкладок в разработке у смертных END*/
 
 /* ! •  ! END*/
 /* ! •  ! END*/
