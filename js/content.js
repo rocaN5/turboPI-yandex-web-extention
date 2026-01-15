@@ -2838,6 +2838,7 @@ function callTurboPI__mutation(){
         addCopyButton()
         setIconsToSortableStatus()
         addToastContainer()
+        fixOutboundsNames()
    }, 10);
 }
 

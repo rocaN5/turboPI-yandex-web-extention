@@ -25,6 +25,7 @@
         "libs/echarts.min.js",
         
         "js/tokenSAVE.js",
+        "js/anomalyBoard.js",
         "js/turboPI-label.js",
         "js/predBrak.js",
         "js/notifications.js",
@@ -37,7 +38,8 @@
         "js/batchGroupUpdate.js",
         "js/inboundsFile.js",
         "js/tpiSettings.js",
-        "js/tpiCartControl.js"
+        "js/tpiCartControl.js",
+        "js/fixOutboundsNames.js"
       ],
       "css": [
         "css/styles.css",
@@ -61,7 +63,8 @@
         "css/inboundsFile.css",
         "css/predBrak.css",
         "css/tpiSettings.css",
-        "css/tpiCartControl.css"
+        "css/tpiCartControl.css",
+        "css/anomalyBoard.css"
       ]
     }
   ],
