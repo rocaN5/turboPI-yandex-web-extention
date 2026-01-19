@@ -425,3 +425,99 @@ div.tpi-cc--table-tbody-data-pallets{
     color: #000;
     user-select: none;
 }
+
+/* ! Print-delete */
+
+.tpi-cc-process-manager-wrapper{
+    position: sticky;
+    bottom: 16px;
+    z-index: 10;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    visibility: hidden;
+    transition: 300ms ease-in-out;
+
+    &[current-state="hidden"]{
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    &[current-state="shown"]{
+        transform: translateY(0);
+        opacity: 1;
+    }
+    
+
+    .tpi-cc-process-manager-block{
+        background-color: #212121;
+        border-radius: 18px;
+        display: flex;
+        gap: 20px;
+        color: #fff;
+        position: relative;
+        visibility: visible;
+        padding: 16px 20px;
+    }
+}
+
+
+.tpi-cc-process-manager-block .tpi-cc-process-manager-title{
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+
+    p{
+        margin: 0;
+        font-weight: 100 !important;
+        font-size: 1rem;
+    }
+}
+
+.tpi-cc-process-manager-block .tpi-cc-process-manager-button{
+    border: 0px;
+    background: #fc0;
+    border-radius: 8px;
+    font-weight: 800;
+    cursor: pointer;
+    padding: 10px 16px;
+    color: #212121;
+    transition: background-color .15s ease-out,transform .15s ease-out;
+    
+    &:hover{
+        filter: brightness(.95);
+    }
+            
+    &:active{
+        filter: brightness(.85);
+        transform: scale(.97);
+    }
+}
+.tpi-cc-process-manager-block .tpi-cc-process-manager-close{
+    border: 0px;
+    border-radius: 8px;
+    font-weight: 800;
+    cursor: pointer;
+    padding: 10px;
+    width: 40px;
+    height: 40px;
+    background: transparent;
+    color: #fff;
+    transition: background-color .15s ease-out,transform .15s ease-out;
+
+    &:hover{
+        background: #ffffff1a;
+    }
+    &:active{
+        background-color: #fff3;
+        transform: scale(.97);
+    }
+
+    svg{
+        width: 20px;
+        height: 20px;
+        fill: currentColor;
+    }
+    path{
+        fill: currentColor;
+    }
+}

@@ -46,6 +46,13 @@ tpi_cc_i_courier_print = `
 <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
     <path d="M5 1a2 2 0 0 0-2 2v1h10V3a2 2 0 0 0-2-2zm6 8H5a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1"></path><path d="M0 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-1v-2a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2H2a2 2 0 0 1-2-2zm2.5 1a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1"></path>
 </svg>
+`,
+tpi_cc_i_warning = `
+<svg stroke="currentColor" fill="currentColor" stroke-width="0" version="1.2" baseProfile="tiny" width="16" height="16" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 5.511c.561 0 1.119.354 1.544 1.062l5.912 9.854c.851 1.415.194 2.573-1.456 2.573h-12c-1.65 0-2.307-1.159-1.456-2.573l5.912-9.854c.425-.708.983-1.062 1.544-1.062m0-2c-1.296 0-2.482.74-3.259 2.031l-5.912 9.856c-.786 1.309-.872 2.705-.235 3.83s1.879 1.772 3.406 1.772h12c1.527 0 2.77-.646 3.406-1.771s.551-2.521-.235-3.83l-5.912-9.854c-.777-1.294-1.963-2.034-3.259-2.034z"></path>
+    <circle cx="12" cy="16" r="1.3"></circle>
+    <path d="M13.5 10c0-.83-.671-1.5-1.5-1.5s-1.5.67-1.5 1.5c0 .199.041.389.111.562.554 1.376 1.389 3.438 1.389 3.438l1.391-3.438c.068-.173.109-.363.109-.562z"></path>
+</svg>
 `
 
 function checkiIs__onCartControlsPage() {
@@ -72,7 +79,23 @@ function checkiIs__onCartControlsPage() {
         overlay.innerHTML = 
         `
         <div class="tpi-cc--wrapper-title">
-            Управление МК
+            Управление MK
+        </div>
+        <div class="tpi-cc--no-ds-data-wrapper">
+            <div class="tpi-cc--no-ds-data-container">
+                <div class="tpi-cc--no-ds-data-icon-wrapper">
+                    <i>${tpi_cc_i_warning}</i>
+                </div>
+                <div class="tpi-cc--no-ds-data-info-wrapper">
+                    <div class="tpi-cc--no-ds-data-title">
+                        <p>Данных нет</p>
+                    </div>
+                    <div class="tpi-cc--no-ds-data-description">
+                        <p class="tpi-cc--no-ds-data-description-block">В базе данных нет записей о текущей дате отгрузки, для записи данных нажмите кнопку ниже</p>
+                        <p class="tpi-cc--no-ds-data-description-block-sub">Внимание! Нажав на кнопку вы перезапишите текущую отгрузку и вся несохраненная или поврежденная информация будет утеряна, коридор для записи новых данных - с 23:00:00 по 23:00:00 следующего дня</p>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="tpi-cc--table-wrapper">
             <table class="tpi-cc--table-data-output">
@@ -273,6 +296,21 @@ function checkiIs__onCartControlsPage() {
                 </tbody>
             </table>
         </div>
+        <div class="tpi-cc-process-manager-wrapper" current-state="shown" style="display: flex;">
+            <div class="tpi-cc-process-manager-block">
+                <div class="tpi-cc-process-manager-title">
+                    <p>Выбранные CART:</p>
+                </div>
+                <button class="tpi-cc-process-manager-button">
+                    Удалить пачку лотов
+                </button>
+                <button class="tpi-cc-process-manager-close">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M13.44 12 21 19.56 19.56 21 12 13.44 4.44 21 3 19.56 10.56 12 3 4.44 4.44 3 12 10.56 19.56 3 21 4.44 13.44 12Z" fill="#000"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
         `
         
         const appID = document.getElementById("app")
@@ -321,10 +359,12 @@ function addCartsControlsListeners(){
 
 
 //B- Функции для работы с курьерами и ячейками
+//B- Функции для работы с курьерами и ячейками
 async function tpi_getCouriersAndCells() {
     console.log('🔍 Получение данных о курьерах и ячейках...');
     
     try {
+        // Шаг 1: Получаем данные о маршрутах
         const url = new URL('https://logistics.market.yandex.ru/api/resolve/');
         url.searchParams.append('r', 'sortingCenter/routes/resolveGetRoutesFullInfo:resolveGetRoutesFullInfo');
 
@@ -360,7 +400,7 @@ async function tpi_getCouriersAndCells() {
                 'Content-Type': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest',
                 'X-Market-Core-Service': '<UNKNOWN>',
-                'sk': tpiUserTOKEN // Используем напрямую
+                'sk': tpiUserTOKEN
             },
             body: JSON.stringify(requestBody)
         });
@@ -383,25 +423,69 @@ async function tpi_getCouriersAndCells() {
                 const routes = result.data.content;
                 console.log(`✅ Найдено маршрутов: ${routes.length}`);
                 
-                // Формируем данные для таблицы
-                const couriersData = routes.map(route => {
-                    const courierName = route.courier?.name || 'Не указан';
+                // Шаг 2: Получаем ФИО курьеров по одному с кэшированием
+                let courierNamesMap = {};
+                const encryptedIds = [];
+                const routeIdToEncryptedIdMap = {};
+                
+                // Собираем все encrypted IDs
+                routes.forEach((route, index) => {
+                    if (route.destination && 
+                        route.destination.destinationName && 
+                        route.destination.destinationName.encryptedPersonalFullNameId) {
+                        
+                        const encryptedId = route.destination.destinationName.encryptedPersonalFullNameId;
+                        encryptedIds.push(encryptedId);
+                        routeIdToEncryptedIdMap[index] = encryptedId;
+                    }
+                });
+                
+                console.log(`🔐 Собрано encrypted IDs: ${encryptedIds.length}`);
+                
+                if (encryptedIds.length > 0) {
+                    console.log('📤 Получаем ФИО курьеров по одному...');
+                    courierNamesMap = await tpi_getCourierNamesOneByOneWithCache(encryptedIds);
+                    console.log(`✅ Получено ФИО для ${Object.keys(courierNamesMap).length} курьеров`);
+                }
+                
+                // Шаг 3: Формируем данные для таблицы
+                const couriersData = routes.map((route, index) => {
+                    // Получаем ФИО
+                    let courierName = 'Не указан';
+                    const encryptedId = routeIdToEncryptedIdMap[index];
                     
-                    // Получаем ячейки из массива cells (если они есть)
+                    if (encryptedId && courierNamesMap[encryptedId]) {
+                        courierName = courierNamesMap[encryptedId];
+                    } else if (route.courier && route.courier.externalId) {
+                        courierName = `Курьер ${route.courier.externalId}`;
+                    } else if (route.courier && route.courier.id) {
+                        courierName = `Курьер ID:${route.courier.id}`;
+                    }
+                    
+                    // Определяем ячейку
                     let cellNumbers = 'Нет ячеек';
                     let mainCell = 'Нет ячейки';
                     
                     if (route.cells && route.cells.length > 0) {
+                        // Есть ячейки
                         cellNumbers = route.cells.map(cell => cell.number || 'Без номера').join(', ');
                         mainCell = route.cells[0]?.number || 'Нет ячейки';
+                    } else if (route.cell && route.cell.number) {
+                        // Есть отдельное поле cell
+                        cellNumbers = route.cell.number;
+                        mainCell = route.cell.number;
+                    } else {
+                        // Пустой cells - курьер уже отгружен и пропал
+                        cellNumbers = 'Уже пропал';
+                        mainCell = 'Уже пропал';
                     }
                     
                     const routeStatus = route.status || 'Неизвестно';
                     
                     return {
                         courier: courierName,
-                        cell: mainCell, // Основная ячейка для сортировки
-                        cells: cellNumbers, // Все ячейки для отображения
+                        cell: mainCell,
+                        cells: cellNumbers,
                         status: routeStatus,
                         ordersLeft: route.ordersLeft || 0,
                         ordersSorted: route.ordersSorted || 0,
@@ -409,12 +493,48 @@ async function tpi_getCouriersAndCells() {
                         ordersPlanned: route.ordersPlanned || 0,
                         courierArrivesAt: route.courierArrivesAt || 'Не указано',
                         finishedAt: route.finishedAt || 'Не завершен',
-                        routeId: route.id || null
+                        routeId: route.id || null,
+                        courierId: route.courier?.id || null,
+                        externalId: route.courier?.externalId || null,
+                        encryptedId: encryptedId || null,
+                        hasCells: route.cells && route.cells.length > 0
                     };
-                }).filter(item => item.cell !== 'Нет ячейки'); // Фильтруем только курьеров с ячейками
+                });
                 
-                console.log(`📊 Обработано курьеров с ячейками: ${couriersData.length}`);
+                console.log(`📊 Обработано курьеров: ${couriersData.length}`);
+                
+                // Статистика по ФИО
+                const withRealNames = couriersData.filter(item => 
+                    !item.courier.startsWith('Курьер ') && 
+                    !item.courier.startsWith('Курьер ID:') && 
+                    item.courier !== 'Не указан'
+                ).length;
+                
+                console.log('📊 Статистика по ФИО:');
+                console.log(`  - С реальными ФИО: ${withRealNames}`);
+                console.log(`  - С ID вместо ФИО: ${couriersData.length - withRealNames}`);
+                
+                // Покажем примеры курьеров с ФИО и без
+                const withNames = couriersData.filter(item => !item.courier.includes('Курьер'));
+                const withoutNames = couriersData.filter(item => item.courier.includes('Курьер'));
+                
+                if (withNames.length > 0) {
+                    console.log('\n✅ Курьеры с ФИО:');
+                    withNames.slice(0, 5).forEach((item, i) => {
+                        console.log(`  ${i + 1}. ${item.courier} (${item.cell})`);
+                    });
+                }
+                
+                if (withoutNames.length > 0) {
+                    console.log('\n⚠️ Курьеры без ФИО (только ID):');
+                    withoutNames.slice(0, 5).forEach((item, i) => {
+                        console.log(`  ${i + 1}. ${item.courier} (${item.cell})`);
+                    });
+                    console.log(`  ...и еще ${withoutNames.length - 5} других`);
+                }
+                
                 return couriersData;
+                
             } else {
                 console.log('❌ Нет данных о маршрутах');
                 return null;
@@ -429,17 +549,149 @@ async function tpi_getCouriersAndCells() {
     }
 }
 
+// Получение ФИО по одному с кэшированием
+async function tpi_getCourierNamesOneByOneWithCache(encryptedIds) {
+    const nameMap = {};
+    const batchSize = 15; // По 3 за раз
+    const delay = 1500; // Задержка 1.5 сек между запросами
+    
+    console.log(`🔐 Запрашиваем ФИО для ${encryptedIds.length} курьеров...`);
+    
+    // Создаем кэш в localStorage
+    const cacheKey = 'tpi_courier_names_cache';
+    let cache = {};
+    
+    try {
+        const cached = localStorage.getItem(cacheKey);
+        if (cached) {
+            cache = JSON.parse(cached);
+            console.log(`📦 Загружено ${Object.keys(cache).length} ФИО из кэша`);
+        }
+    } catch (e) {
+        console.log('⚠️ Не удалось загрузить кэш');
+    }
+    
+    // Сначала проверяем кэш
+    const toFetch = [];
+    encryptedIds.forEach(id => {
+        if (cache[id]) {
+            nameMap[id] = cache[id];
+        } else {
+            toFetch.push(id);
+        }
+    });
+    
+    console.log(`📊 Из кэша: ${Object.keys(nameMap).length}, нужно запросить: ${toFetch.length}`);
+    
+    // Запрашиваем оставшиеся
+    for (let i = 0; i < toFetch.length; i += batchSize) {
+        const batch = toFetch.slice(i, i + batchSize);
+        console.log(`📦 Батч ${Math.floor(i/batchSize) + 1}: ${batch.length} шт`);
+        
+        const promises = batch.map(async (encryptedId) => {
+            try {
+                const name = await tpi_getSingleCourierName(encryptedId);
+                if (name) {
+                    nameMap[encryptedId] = name;
+                    cache[encryptedId] = name; // Сохраняем в кэш
+                    return { success: true, id: encryptedId };
+                }
+                return { success: false, id: encryptedId };
+            } catch (error) {
+                console.log(`❌ Ошибка для ${encryptedId.substring(0, 15)}...: ${error.message}`);
+                return { success: false, id: encryptedId };
+            }
+        });
+        
+        const results = await Promise.all(promises);
+        const successCount = results.filter(r => r.success).length;
+        console.log(`  ✅ Успешно: ${successCount}/${batch.length}`);
+        
+        // Сохраняем кэш после каждого батча
+        try {
+            localStorage.setItem(cacheKey, JSON.stringify(cache));
+        } catch (e) {
+            console.log('⚠️ Не удалось сохранить кэш');
+        }
+        
+        // Ждем перед следующим батчем
+        if (i + batchSize < toFetch.length) {
+            console.log(`  ⏳ Ждем ${delay}ms...`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+        }
+    }
+    
+    console.log(`🎯 Итог: ${Object.keys(nameMap).length} ФИО (${Object.keys(nameMap).length - (encryptedIds.length - toFetch.length)} новых)`);
+    return nameMap;
+}
+
+// Получение ФИО для одного курьера
+async function tpi_getSingleCourierName(encryptedId) {
+    try {
+        const url = new URL('https://logistics.market.yandex.ru/api/resolve/');
+        url.searchParams.append('r', 'logPoint/getLogpointPersonalIdBulk:getLogpointPersonalIdBulk');
+        
+        // Используем правильный формат запроса
+        const requestBody = {
+            "params": [{
+                "campaignId": 21972131,
+                "ids": [encryptedId]
+            }],
+            "path": `/sorting-center/21972131/routes?type=OUTGOING_COURIER&sort=&hasCarts=false&category=COURIER`
+        };
+
+        const response = await fetch(url.toString(), {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-Market-Core-Service': '<UNKNOWN>',
+                'sk': tpiUserTOKEN
+            },
+            body: JSON.stringify(requestBody)
+        });
+
+        if (!response.ok) {
+            return null;
+        }
+
+        const responseText = await response.text();
+        if (!responseText) return null;
+
+        try {
+            const data = JSON.parse(responseText);
+            if (data && data.results && data.results[0] && data.results[0].data) {
+                const name = Object.values(data.results[0].data)[0];
+                if (name && typeof name === 'string') {
+                    return name;
+                }
+            }
+        } catch (e) {
+            // Игнорируем ошибки парсинга
+        }
+        
+        return null;
+    } catch (error) {
+        return null;
+    }
+}
+
 // Функция для сортировки курьеров по группам
 function sortCouriersByGroups(couriersData) {
     const firstWave = []; // MK-1...
     const secondWave = []; // MK-2...
     const kgt = []; // KGT...
+    const alreadyGone = []; // Уже пропал
     const others = []; // Остальные
     
     couriersData.forEach(courier => {
         const cell = courier.cell.toUpperCase();
         
-        if (cell.startsWith('MK-1')) {
+        if (cell === 'УЖЕ ПРОПАЛ') {
+            alreadyGone.push(courier);
+        } else if (cell.startsWith('MK-1')) {
             firstWave.push(courier);
         } else if (cell.startsWith('MK-2')) {
             secondWave.push(courier);
@@ -452,6 +704,8 @@ function sortCouriersByGroups(couriersData) {
     
     // Функция для сортировки по номеру ячейки
     const sortByCellNumber = (a, b) => {
+        if (a.cell === 'Уже пропал' || b.cell === 'Уже пропал') return 0;
+        
         const extractNumber = (cell) => {
             const match = cell.match(/\d+/);
             return match ? parseInt(match[0]) : 0;
@@ -460,49 +714,78 @@ function sortCouriersByGroups(couriersData) {
         return extractNumber(a.cell) - extractNumber(b.cell);
     };
     
+    // Функция для сортировки по ФИО (если есть) или по ID
+    const sortByNameOrId = (a, b) => {
+        // Сначала сортируем по наличию реального ФИО
+        const aHasRealName = !a.courier.includes('Курьер ');
+        const bHasRealName = !b.courier.includes('Курьер ');
+        
+        if (aHasRealName && !bHasRealName) return -1;
+        if (!aHasRealName && bHasRealName) return 1;
+        
+        // Если оба с ФИО или оба без - сортируем по имени/ID
+        return a.courier.localeCompare(b.courier);
+    };
+    
     // Сортируем каждую группу
     firstWave.sort(sortByCellNumber);
     secondWave.sort(sortByCellNumber);
     kgt.sort(sortByCellNumber);
     others.sort(sortByCellNumber);
+    alreadyGone.sort(sortByNameOrId); // Сортируем "Уже пропал" по имени
     
-    return { firstWave, secondWave, kgt, others };
+    return { firstWave, secondWave, kgt, alreadyGone, others };
 }
 
 // Функция для вывода таблицы в консоль
 function displayCourierTable(couriers, title) {
     if (couriers.length === 0) return;
     
-    console.log(`\n📋 ${title}:`);
-    console.table(couriers.map(item => ({
+    console.log(`\n📋 ${title} (${couriers.length}):`);
+    
+    const tableData = couriers.map(item => ({
         'Ячейка': item.cell,
         'Курьер': item.courier,
         'Статус': item.status,
         'Осталось': item.ordersLeft,
-        'Отсортировано': item.ordersSorted,
         'Отгружено': item.ordersShipped,
         'Всего': item.ordersPlanned,
         'Прибытие': item.courierArrivesAt ? new Date(item.courierArrivesAt).toLocaleTimeString() : '-'
-    })));
+    }));
+    
+    // Сортируем таблицу: сначала с ФИО, потом с ID
+    tableData.sort((a, b) => {
+        const aHasName = !a.Курьер.includes('Курьер ');
+        const bHasName = !b.Курьер.includes('Курьер ');
+        if (aHasName && !bHasName) return -1;
+        if (!aHasName && bHasName) return 1;
+        return a.Курьер.localeCompare(b.Курьер);
+    });
+    
+    console.table(tableData);
 }
 
 // Функция для быстрого вызова с таблицей в консоли
 async function showCouriers() {
     try {
+        console.log('🚀 Запуск получения данных о курьерах...');
         const data = await tpi_getCouriersAndCells();
         
         if (!data || data.length === 0) {
-            console.log('❌ Нет данных о курьерах с ячейками');
+            console.log('❌ Нет данных о курьерах');
             return;
         }
 
+        console.log(`✅ Получено ${data.length} курьеров`);
+        
         // Сортируем курьеров по группам
-        const { firstWave, secondWave, kgt, others } = sortCouriersByGroups(data);
+        const { firstWave, secondWave, kgt, alreadyGone, others } = sortCouriersByGroups(data);
         
         // Выводим таблицы
         displayCourierTable(firstWave, 'ПЕРВАЯ ВОЛНА (MK-1...)');
         displayCourierTable(secondWave, 'ВТОРАЯ ВОЛНА (MK-2...)');
         displayCourierTable(kgt, 'КГТ (KGT...)');
+        displayCourierTable(alreadyGone, 'УЖЕ ПРОПАЛИ');
         
         if (others.length > 0) {
             displayCourierTable(others, 'ДРУГИЕ ЯЧЕЙКИ');
@@ -510,22 +793,41 @@ async function showCouriers() {
         
         // Общая статистика
         const shippedCouriers = data.filter(item => item.status === 'SHIPPED').length;
+        const withRealNames = data.filter(item => !item.courier.includes('Курьер ')).length;
         const totalOrdersLeft = data.reduce((sum, item) => sum + (item.ordersLeft || 0), 0);
         const totalOrdersShipped = data.reduce((sum, item) => sum + (item.ordersShipped || 0), 0);
         const totalOrdersPlanned = data.reduce((sum, item) => sum + (item.ordersPlanned || 0), 0);
         
         console.log(`\n📈 ОБЩАЯ СТАТИСТИКА:`);
-        console.log(`   Всего курьеров с ячейками: ${data.length}`);
+        console.log(`   Всего курьеров: ${data.length}`);
+        console.log(`   ├─ С ФИО: ${withRealNames}`);
+        console.log(`   ├─ С ID: ${data.length - withRealNames}`);
         console.log(`   ├─ Первая волна: ${firstWave.length}`);
         console.log(`   ├─ Вторая волна: ${secondWave.length}`);
         console.log(`   ├─ КГТ: ${kgt.length}`);
+        console.log(`   ├─ Уже пропали: ${alreadyGone.length}`);
         console.log(`   └─ Другие: ${others.length}`);
         console.log(`   Отгружено: ${shippedCouriers}`);
         console.log(`   В работе: ${data.length - shippedCouriers}`);
         console.log(`   Всего заказов запланировано: ${totalOrdersPlanned}`);
         console.log(`   Всего заказов осталось: ${totalOrdersLeft}`);
         console.log(`   Всего заказов отгружено: ${totalOrdersShipped}`);
-        console.log(`   Эффективность: ${((totalOrdersShipped / totalOrdersPlanned) * 100).toFixed(1)}%`);
+        const efficiency = totalOrdersPlanned > 0 ? ((totalOrdersShipped / totalOrdersPlanned) * 100).toFixed(1) : 0;
+        console.log(`   Эффективность: ${efficiency}%`);
+        
+        // Дополнительная статистика
+        console.log(`\n📊 ДОПОЛНИТЕЛЬНО:`);
+        console.log(`   Среднее на курьера: ${(totalOrdersPlanned / data.length).toFixed(1)} заказов`);
+        console.log(`   Среднее осталось: ${(totalOrdersLeft / data.length).toFixed(1)} на курьера`);
+        
+        // Покажем курьеров с ФИО
+        const couriersWithNames = data.filter(item => !item.courier.includes('Курьер '));
+        if (couriersWithNames.length > 0) {
+            console.log(`\n👤 Курьеры с ФИО (${couriersWithNames.length}):`);
+            couriersWithNames.forEach(item => {
+                console.log(`  • ${item.courier}`);
+            });
+        }
         
     } catch (error) {
         console.error('💥 Ошибка:', error);
@@ -535,6 +837,12 @@ async function showCouriers() {
 // Добавляем функции в глобальную область видимости
 window.tpi_getCouriersAndCells = tpi_getCouriersAndCells;
 window.showCouriers = showCouriers;
+
+// Функция для очистки кэша ФИО
+function tpi_clearCourierNamesCache() {
+    localStorage.removeItem('tpi_courier_names_cache');
+    console.log('🗑️ Кэш ФИО очищен');
+}
 
 // Функция для ожидания загрузки токена
 function waitForTokenAndRun() {
@@ -556,6 +864,3 @@ function waitForTokenAndRun() {
         }
     }, 1000);
 }
-
-
-// Запускаем ожидание токена
