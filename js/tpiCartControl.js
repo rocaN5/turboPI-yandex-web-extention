@@ -48,11 +48,23 @@ tpi_cc_i_courier_print = `
 </svg>
 `,
 tpi_cc_i_warning = `
-<svg stroke="currentColor" fill="currentColor" stroke-width="0" version="1.2" baseProfile="tiny" width="16" height="16" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<svg stroke="currentColor" fill="url(#myGradient)" stroke-width="0" version="1.2" baseProfile="tiny" width="16" height="16" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient id="myGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#fc0" />
+            <stop offset="100%" stop-color="#ff8f00" />
+        </linearGradient>
+    </defs>
     <path d="M12 5.511c.561 0 1.119.354 1.544 1.062l5.912 9.854c.851 1.415.194 2.573-1.456 2.573h-12c-1.65 0-2.307-1.159-1.456-2.573l5.912-9.854c.425-.708.983-1.062 1.544-1.062m0-2c-1.296 0-2.482.74-3.259 2.031l-5.912 9.856c-.786 1.309-.872 2.705-.235 3.83s1.879 1.772 3.406 1.772h12c1.527 0 2.77-.646 3.406-1.771s.551-2.521-.235-3.83l-5.912-9.854c-.777-1.294-1.963-2.034-3.259-2.034z"></path>
     <circle cx="12" cy="16" r="1.3"></circle>
     <path d="M13.5 10c0-.83-.671-1.5-1.5-1.5s-1.5.67-1.5 1.5c0 .199.041.389.111.562.554 1.376 1.389 3.438 1.389 3.438l1.391-3.438c.068-.173.109-.363.109-.562z"></path>
 </svg>
+`,
+tpi_cc_i_loading = `
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid" style="shape-rendering: auto; display: block; background: transparent;">
+    <path style="transform:scale(0.8);transform-origin:50px 50px" stroke-linecap="round" d="M24.3 30C11.4 30 5 43.3 5 50s6.4 20 19.3 20c19.3 0 32.1-40 51.4-40 C88.6 30 95 43.3 95 50s-6.4 20-19.3 20C56.4 70 43.6 30 24.3 30z" stroke-dasharray="130.8603533935547 125.72857482910155" stroke-width="10" stroke="#ffb801" fill="none">
+  <animate values="0;256.58892822265625" keyTimes="0;1" dur="0.9523809523809523s" repeatCount="indefinite" attributeName="stroke-dashoffset"/>
+</path></svg>
 `
 
 function checkiIs__onCartControlsPage() {
@@ -83,18 +95,25 @@ function checkiIs__onCartControlsPage() {
         </div>
         <div class="tpi-cc--no-ds-data-wrapper">
             <div class="tpi-cc--no-ds-data-container">
-                <div class="tpi-cc--no-ds-data-icon-wrapper">
-                    <i>${tpi_cc_i_warning}</i>
-                </div>
-                <div class="tpi-cc--no-ds-data-info-wrapper">
+                <div class="tpi-cc--no-ds-data-block">
                     <div class="tpi-cc--no-ds-data-title">
                         <p>Данных нет</p>
                     </div>
-                    <div class="tpi-cc--no-ds-data-description">
-                        <p class="tpi-cc--no-ds-data-description-block">В базе данных нет записей о текущей дате отгрузки, для записи данных нажмите кнопку ниже</p>
-                        <p class="tpi-cc--no-ds-data-description-block-sub">Внимание! Нажав на кнопку вы перезапишите текущую отгрузку и вся несохраненная или поврежденная информация будет утеряна, коридор для записи новых данных - с 23:00:00 по 23:00:00 следующего дня</p>
-                    </div>
                 </div>
+                <div class="tpi-cc--no-ds-data-block">
+                    <div class="tpi-cc--no-ds-data-icon-wrapper">
+                        <i>${tpi_cc_i_warning}</i>
+                    </div>
+                    <div class="tpi-cc--no-ds-data-info-wrapper">
+                        <div class="tpi-cc--no-ds-data-description">
+                            <p class="tpi-cc--no-ds-data-description-block">В базе данных нет записей о текущей дате отгрузки, для записи данных нажмите кнопку ниже</p>
+                            <p class="tpi-cc--no-ds-data-description-block-sub">Внимание! Нажав на кнопку вы перезапишите текущую отгрузку и вся несохраненная или поврежденная информация будет утеряна, коридор для записи новых данных - с 23:00:00 по 23:00:00 следующего дня</p>
+                        </div>
+                    </div>
+                </div>  
+                <div class="tpi-cc--no-ds-data-block">
+                    <button class="tpi-cc--no-ds-data-start">Начать</button>
+                </div>  
             </div>
         </div>
         <div class="tpi-cc--table-wrapper">
