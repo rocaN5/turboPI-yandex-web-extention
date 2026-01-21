@@ -564,6 +564,7 @@ div.tpi-cc--table-tbody-data-pallets{
     justify-content: center;
     align-items: center;
     height: 100%;
+    min-width: 175px;
 
     i {
         width: 100%;
@@ -637,5 +638,10 @@ p.tpi-cc--no-ds-data-description-block-sub {
     display: flex;
     flex-flow: row;
     gap: 20px;
-    
+
+    &:nth-child(2){
+        width: 100%;
+        justify-content: space-between;
+    }
 }
+
