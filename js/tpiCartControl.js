@@ -48,11 +48,11 @@ tpi_cc_i_courier_print = `
 </svg>
 `,
 tpi_cc_i_warning = `
-<svg stroke="currentColor" fill="url(#myGradient)" stroke-width="0" version="1.2" baseProfile="tiny" width="16" height="16" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<svg class="tpi-cc-i-warning" stroke="currentColor" fill="url(#myGradient)" stroke-width="0" version="1.2" baseProfile="tiny" width="16" height="16" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
     <defs>
         <linearGradient id="myGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#fc0" />
-            <stop offset="100%" stop-color="#ff8f00" />
+            <stop offset="0%" stop-color="var(--no-ds-color-1)" />
+            <stop offset="100%" stop-color="var(--no-ds-color-2)" />
         </linearGradient>
     </defs>
     <path d="M12 5.511c.561 0 1.119.354 1.544 1.062l5.912 9.854c.851 1.415.194 2.573-1.456 2.573h-12c-1.65 0-2.307-1.159-1.456-2.573l5.912-9.854c.425-.708.983-1.062 1.544-1.062m0-2c-1.296 0-2.482.74-3.259 2.031l-5.912 9.856c-.786 1.309-.872 2.705-.235 3.83s1.879 1.772 3.406 1.772h12c1.527 0 2.77-.646 3.406-1.771s.551-2.521-.235-3.83l-5.912-9.854c-.777-1.294-1.963-2.034-3.259-2.034z"></path>
@@ -61,8 +61,14 @@ tpi_cc_i_warning = `
 </svg>
 `,
 tpi_cc_i_loading = `
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid" style="shape-rendering: auto; display: block; background: transparent;">
-    <path style="transform:scale(0.8);transform-origin:50px 50px" stroke-linecap="round" d="M24.3 30C11.4 30 5 43.3 5 50s6.4 20 19.3 20c19.3 0 32.1-40 51.4-40 C88.6 30 95 43.3 95 50s-6.4 20-19.3 20C56.4 70 43.6 30 24.3 30z" stroke-dasharray="130.8603533935547 125.72857482910155" stroke-width="10" stroke="#ffb801" fill="none">
+<svg class="tpi-cc-i-loading" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid" style="shape-rendering: auto; background: transparent;">
+    <defs>
+        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="var(--no-ds-color-1)"/>
+            <stop offset="100%" stop-color="var(--no-ds-color-2)"/>
+        </linearGradient>
+    </defs>
+    <path style="transform:scale(0.8);transform-origin:50px 50px" stroke-linecap="round" d="M24.3 30C11.4 30 5 43.3 5 50s6.4 20 19.3 20c19.3 0 32.1-40 51.4-40 C88.6 30 95 43.3 95 50s-6.4 20-19.3 20C56.4 70 43.6 30 24.3 30z" stroke-dasharray="130.8603533935547 125.72857482910155" stroke-width="10" stroke="url(#gradient)" fill="none">
         <animate values="0;256.58892822265625" keyTimes="0;1" dur="0.9523809523809523s" repeatCount="indefinite" attributeName="stroke-dashoffset"/>
     </path>
 </svg>
@@ -95,7 +101,7 @@ function checkiIs__onCartControlsPage() {
             Управление MK
         </div>
         <div class="tpi-cc--no-ds-data-wrapper">
-            <div class="tpi-cc--no-ds-data-container">
+            <div class="tpi-cc--no-ds-data-container" tpi-current-state="ready-to-data-search">
                 <div class="tpi-cc--no-ds-data-block">
                     <div class="tpi-cc--no-ds-data-title">
                         <p>Данных нет</p>
@@ -103,7 +109,7 @@ function checkiIs__onCartControlsPage() {
                 </div>
                 <div class="tpi-cc--no-ds-data-block">
                     <div class="tpi-cc--no-ds-data-icon-wrapper">
-                        <i>${tpi_cc_i_warning}</i>
+                        <i>${tpi_cc_i_warning}${tpi_cc_i_loading}</i>
                     </div>
                     <div class="tpi-cc--no-ds-data-info-wrapper">
                         <div class="tpi-cc--no-ds-data-description">
@@ -373,12 +379,11 @@ function checkiIs__onCartControlsPage() {
 checkiIs__onCartControlsPage()
 
 function addCartsControlsListeners(){
-    console.log("test")
     waitForTokenAndRun();
+    couriersDataCapturing();
 }
 
 
-//B- Функции для работы с курьерами и ячейками
 //B- Функции для работы с курьерами и ячейками
 async function tpi_getCouriersAndCells() {
     console.log('🔍 Получение данных о курьерах и ячейках...');
@@ -884,3 +889,41 @@ function waitForTokenAndRun() {
         }
     }, 1000);
 }
+
+let dataCapturingFlag = false
+
+function couriersDataCapturing(){
+    const tpi_cc_startButton = document.querySelector('.tpi-cc--no-ds-data-start')
+    const tpi_cc_areaContainer = document.querySelector('.tpi-cc--no-ds-data-container')
+    const tpi_cc_desctiption = document.querySelector('.tpi-cc--no-ds-data-description')
+    tpi_cc_startButton.addEventListener('click', () => {
+        if(dataCapturingFlag === false){
+            document.querySelector('.tpi-cc--no-ds-data-title').innerHTML = "<p>Загрузка</p>"
+            dataCapturingFlag = true
+            tpi_cc_areaContainer.setAttribute('tpi-current-state', 'loading-data')
+            tpi_cc_desctiption.innerHTML = `
+                <div class="tpi-cc-no-ds-data-loading-item" tpi-cc-search-id="0" tpi-cc-status="waiting">
+                    <i class="tpi-cc-no-ds-data-loading-item-icon"></i>
+                    <p>Проверка ключа</p>
+                </div>
+                <div class="tpi-cc-no-ds-data-loading-item" tpi-cc-search-id="1" tpi-cc-status="waiting">
+                    <i class="tpi-cc-no-ds-data-loading-item-icon"></i>
+                    <p>Поиск маршрутов</p>
+                </div>
+                <div class="tpi-cc-no-ds-data-loading-item" tpi-cc-search-id="2" tpi-cc-status="waiting">
+                    <i class="tpi-cc-no-ds-data-loading-item-icon"></i>
+                    <p>Расшифровка данных курьеров</p>
+                </div>
+                <div class="tpi-cc-no-ds-data-loading-item" tpi-cc-search-id="3" tpi-cc-status="waiting">
+                    <i class="tpi-cc-no-ds-data-loading-item-icon"></i>
+                    <p>Запись инормации в базу данных</p>
+                </div>
+                <div class="tpi-cc-no-ds-data-loading-item" tpi-cc-search-id="4" tpi-cc-status="waiting">
+                    <i class="tpi-cc-no-ds-data-loading-item-icon"></i>
+                    <p>Построение и внедрение таблицы в DOM</p>
+                </div>
+            `
+        }else return
+    })
+}
+
