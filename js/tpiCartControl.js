@@ -162,164 +162,7 @@ function checkiIs__onCartControlsPage() {
                         </th>
                     </tr>
                 </thead>
-                <tbody class="tpi-cc--table-tbody-wrapper">
-                    <tr class="tpi-cc--table-tbody">
-                        <td class="tpi-cc--table-tbody-item">
-                            <div class="tpi-cc--table-tbody-data-courier">
-                                <div class="tpi-cc--sortable-data-wrapper tpi-cc--courier-id-data-wrapper">
-                                    <a href="#" target="_blank" class="tpi-cc--table-tbody-data-link">
-                                        <i>${tpi_cc_i_courier}</i>
-                                        <p class="tpi-cc--sortable-data-courier" tpi-cc-parsing-data="courier-full-name">Шишкин Александр Викторович</p>
-                                    </a>
-                                    <div class="tpi-cc--table-tbody-data-courier-extra-info-wrapper">
-                                        <div class="tpi-cc--table-tbody-data-courier-extra-info">
-                                            <i>${tpi_cc_i_courier_route_id}</i>
-                                            <p tpi-cc-parsing-data="courier-route-id">1093235550</p>
-                                        </div>
-                                        <div class="tpi-cc--table-tbody-data-courier-extra-info">
-                                            <i>${tpi_cc_i_courier_id}</i>
-                                            <p tpi-cc-parsing-data="courier-personal-id">2005466013</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="tpi-cc--table-tbody-item">
-                            <div class="tpi-cc--table-tbody-data">
-                                <a href="#" class="tpi-cc--table-tbody-data-link" tpi-cc-parsing-data="courier-route-cell">
-                                    MK-101
-                                </a>
-                            </div>
-                        </td>
-                        <td class="tpi-cc--table-tbody-item">
-                            <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-data-carts">
-                                <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-cart-id">
-                                    <i class="tpi-cc-table-tbody-data-cart-icon">${tpi_cc_i_cart}</i>
-                                    -1011
-                                </button>
-                                <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-cart-id">
-                                    <i class="tpi-cc-table-tbody-data-cart-icon">${tpi_cc_i_cart}</i>
-                                    -1012
-                                </button>
-                                <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-cart-id">
-                                    <i class="tpi-cc-table-tbody-data-cart-icon">${tpi_cc_i_cart}</i>
-                                    -1013
-                                </button>
-                                <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-cart-id">
-                                    <i class="tpi-cc-table-tbody-data-cart-icon">${tpi_cc_i_cart}</i>
-                                    -1014
-                                </button>
-                                <div class="tpi-cc--carts-control-buttons-wrapper">
-                                    <button class="tpi-cc--table-tbody-add-cart" tpi-state-change="tpi-add-cart">
-                                        <i>${tpi_cc_i_cart_add}</i>
-                                    </button>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="tpi-cc--table-tbody-item">
-                            <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-data-pallets">
-                                <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-pallet-id">
-                                    <i class="tpi-cc-table-tbody-data-pallet-icon">${tpi_cc_i_pallet}</i>
-                                    -776
-                                </button>
-                                <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-pallet-id">
-                                    <i class="tpi-cc-table-tbody-data-pallet-icon">${tpi_cc_i_pallet}</i>
-                                    -466
-                                </button>
-                                <div class="tpi-cc--carts-control-buttons-wrapper">
-                                    <button class="tpi-cc--table-tbody-add-cart" tpi-state-change="tpi-add-cart">
-                                        <i>${tpi_cc_i_cart_add}</i>
-                                    </button>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="tpi-cc--table-tbody-item">
-                            <div class="tpi-cc--table-tbody-data">
-                                <div class="tpi-cc-table-tbody-data-route-status" tpi-cc-route-status="shipped">
-                                    <i></i>
-                                    <p tpi-cc-parsing-data="courier-route-status">Отгружен</p>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="tpi-cc--table-tbody-item">
-                            <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-data-sort-progress-container">
-                                <p class="tpi-cc--table-tbody-data-sort-progress" tpi-cc-parsing-data="courier-sorting-progress">150 из 230</p>
-                                <div class="tpi-cc--table-tbody-data-sort-progress-circle-wrapper">
-                                    <p class="tpi-cc--table-tbody-data-sort-progress-circle-value" tpi-cc-parsing-data="courier-sorting-progress-percent">64%</p>
-                                    <svg width="50" height="50" viewBox="-6.25 -6.25 62.5 62.5" version="1.1" xmlns="http://www.w3.org/2000/svg" style="transform:rotate(-90deg)">
-                                        <circle r="25" cx="25" cy="25" fill="transparent" stroke="#e8e8e8" stroke-width="4"></circle>
-                                        <circle r="25" cx="25" cy="25" stroke="#ffcc00" stroke-width="7" stroke-linecap="round" stroke-dashoffset="12px" fill="transparent" stroke-dasharray="94.2px" tpi-cc-parsing-data="courier-sorting-progress-circle"></circle>
-                                    </svg>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="tpi-cc--table-tbody-item">
-                            <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-data-sort-progress-container">
-                                <p class="tpi-cc--table-tbody-data-sort-progress" tpi-cc-parsing-data="courier-prepared-progress">13 из 230</p>
-                                <div class="tpi-cc--table-tbody-data-sort-progress-circle-wrapper">
-                                    <p class="tpi-cc--table-tbody-data-sort-progress-circle-value" tpi-cc-parsing-data="courier-prepared-progress-percent">64%</p>
-                                    <svg width="50" height="50" viewBox="-6.25 -6.25 62.5 62.5" version="1.1" xmlns="http://www.w3.org/2000/svg" style="transform:rotate(-90deg)">
-                                        <circle r="25" cx="25" cy="25" fill="transparent" stroke="#e8e8e8" stroke-width="4"></circle>
-                                        <circle r="25" cx="25" cy="25" stroke="#ffcc00" stroke-width="7" stroke-linecap="round" stroke-dashoffset="12px" fill="transparent" stroke-dasharray="94.2px" tpi-cc-parsing-data="courier-prepared-progress-circle"></circle>
-                                    </svg>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="tpi-cc--table-tbody-item">
-                            <div class="tpi-cc--table-body-date-container">
-                                <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-date-wrapper">
-                                    <i class="tpi-cc--table-tbody-data-icon">${tpiIcon__calendar}</i>
-                                    <p class="tpi-cc--table-tbody-data-courier-status" tpi-cc-parsing-data="courier-started-at-date">
-                                        03/11/2025
-                                    </p>
-                                </div>
-                                <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-date-wrapper">
-                                    <i class="tpi-cc--table-tbody-data-icon">${tpiIcon__clock}</i>
-                                    <p class="tpi-cc--table-tbody-data-courier-status" tpi-cc-parsing-data="courier-started-at-time">
-                                        21:36:24
-                                    </p>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="tpi-cc--table-tbody-item">
-                            <div class="tpi-cc--table-body-date-container">
-                                <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-date-wrapper">
-                                    <i class="tpi-cc--table-tbody-data-icon">${tpiIcon__calendar}</i>
-                                    <p class="tpi-cc--table-tbody-data-courier-status" tpi-cc-parsing-data="courier-ended-at-date">
-                                        04/11/2025
-                                    </p>
-                                </div>
-                                <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-date-wrapper">
-                                    <i class="tpi-cc--table-tbody-data-icon">${tpiIcon__clock}</i>
-                                    <p class="tpi-cc--table-tbody-data-courier-status" tpi-cc-parsing-data="courier-ended-at-time">
-                                        07:30:12
-                                    </p>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="tpi-cc--table-tbody-item">
-                            <div class="tpi-cc--table-body-date-container">
-                                <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-date-wrapper">
-                                    <i class="tpi-cc--table-tbody-data-icon">${tpiIcon__calendar}</i>
-                                    <p class="tpi-cc--table-tbody-data-courier-status" tpi-cc-parsing-data="courier-arrives-at-date">
-                                        04/11/2025
-                                    </p>
-                                </div>
-                                <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-date-wrapper">
-                                    <i class="tpi-cc--table-tbody-data-icon">${tpiIcon__clock}</i>
-                                    <p class="tpi-cc--table-tbody-data-courier-status" tpi-cc-parsing-data="courier-arrives-at-time">
-                                        07:30:00
-                                    </p>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="tpi-cc--table-tbody-item">
-                            <div class="tpi-cc--table-body-print-container">
-                                <button class="tpi-cc--print-current-row">${tpi_cc_i_courier_print}</button>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
+                <tbody class="tpi-cc--table-tbody-wrapper"></tbody>
             </table>
         </div>
         <div class="tpi-cc-process-manager-wrapper" current-state="shown" style="display: flex;">
@@ -507,8 +350,8 @@ async function tpi_getCouriersAndCells() {
                         mainCell = route.cell.number;
                     } else {
                         // Пустой cells - курьер уже отгружен и пропал
-                        cellNumbers = 'Уже пропал';
-                        mainCell = 'Уже пропал';
+                        cellNumbers = 'null';
+                        mainCell = 'null';
                     }
                     
                     const routeStatus = route.status || 'Неизвестно';
@@ -522,8 +365,11 @@ async function tpi_getCouriersAndCells() {
                         ordersSorted: route.ordersSorted || 0,
                         ordersShipped: route.ordersShipped || 0,
                         ordersPlanned: route.ordersPlanned || 0,
-                        courierArrivesAt: route.courierArrivesAt || 'Не указано',
-                        finishedAt: route.finishedAt || 'Не завершен',
+                        sortablesInCell: route.sortablesInCell || 0,
+                        sortablesPrepared: route.sortablesPrepared || 0,
+                        courierArrivesAt: route.courierArrivesAt || null,
+                        startedAt: route.startedAt || null,
+                        finishedAt: route.finishedAt || null,
                         routeId: route.id || null,
                         courierId: route.courier?.id || null,
                         externalId: route.courier?.externalId || null,
@@ -714,13 +560,13 @@ function sortCouriersByGroups(couriersData) {
     const firstWave = []; // MK-1...
     const secondWave = []; // MK-2...
     const kgt = []; // KGT...
-    const alreadyGone = []; // Уже пропал
+    const alreadyGone = []; // null
     const others = []; // Остальные
     
     couriersData.forEach(courier => {
         const cell = courier.cell.toUpperCase();
         
-        if (cell === 'УЖЕ ПРОПАЛ') {
+        if (cell === 'null') {
             alreadyGone.push(courier);
         } else if (cell.startsWith('MK-1')) {
             firstWave.push(courier);
@@ -735,7 +581,7 @@ function sortCouriersByGroups(couriersData) {
     
     // Функция для сортировки по номеру ячейки
     const sortByCellNumber = (a, b) => {
-        if (a.cell === 'Уже пропал' || b.cell === 'Уже пропал') return 0;
+        if (a.cell === 'null' || b.cell === 'null') return 0;
         
         const extractNumber = (cell) => {
             const match = cell.match(/\d+/);
@@ -763,7 +609,7 @@ function sortCouriersByGroups(couriersData) {
     secondWave.sort(sortByCellNumber);
     kgt.sort(sortByCellNumber);
     others.sort(sortByCellNumber);
-    alreadyGone.sort(sortByNameOrId); // Сортируем "Уже пропал" по имени
+    alreadyGone.sort(sortByNameOrId); // Сортируем "null" по имени
     
     return { firstWave, secondWave, kgt, alreadyGone, others };
 }
@@ -816,7 +662,7 @@ async function showCouriers() {
         displayCourierTable(firstWave, 'ПЕРВАЯ ВОЛНА (MK-1...)');
         displayCourierTable(secondWave, 'ВТОРАЯ ВОЛНА (MK-2...)');
         displayCourierTable(kgt, 'КГТ (KGT...)');
-        displayCourierTable(alreadyGone, 'УЖЕ ПРОПАЛИ');
+        displayCourierTable(alreadyGone, 'nullИ');
         
         if (others.length > 0) {
             displayCourierTable(others, 'ДРУГИЕ ЯЧЕЙКИ');
@@ -836,7 +682,7 @@ async function showCouriers() {
         console.log(`   ├─ Первая волна: ${firstWave.length}`);
         console.log(`   ├─ Вторая волна: ${secondWave.length}`);
         console.log(`   ├─ КГТ: ${kgt.length}`);
-        console.log(`   ├─ Уже пропали: ${alreadyGone.length}`);
+        console.log(`   ├─ nullи: ${alreadyGone.length}`);
         console.log(`   └─ Другие: ${others.length}`);
         console.log(`   Отгружено: ${shippedCouriers}`);
         console.log(`   В работе: ${data.length - shippedCouriers}`);
@@ -886,7 +732,7 @@ function waitForTokenAndRun() {
         if (tpiUserTOKEN !== null && tpiUserTOKEN !== undefined) {
             console.log('✅ Токен загружен, запускаем получение данных...');
             clearInterval(checkInterval);
-            showCouriers();
+            // showCouriers();
         } else if (attempts >= maxAttempts) {
             console.log('❌ Превышено количество попыток ожидания токена');
             clearInterval(checkInterval);
@@ -902,7 +748,9 @@ function couriersDataCapturing(){
     const tpi_cc_startButton = document.querySelector('.tpi-cc--no-ds-data-start')
     const tpi_cc_areaContainer = document.querySelector('.tpi-cc--no-ds-data-container')
     const tpi_cc_desctiption = document.querySelector('.tpi-cc--no-ds-data-description')
-    tpi_cc_startButton.addEventListener('click', () => {
+    const tpi_cc_tableBody = document.querySelector('.tpi-cc--table-tbody-wrapper')
+    
+    tpi_cc_startButton.addEventListener('click', async () => {
         if(dataCapturingFlag === false){
             document.querySelector('.tpi-cc--no-ds-data-title').innerHTML = "<p>Загрузка</p>"
             dataCapturingFlag = true
@@ -922,14 +770,426 @@ function couriersDataCapturing(){
                 </div>
                 <div class="tpi-cc-no-ds-data-loading-item" tpi-cc-search-id="3" tpi-cc-status="waiting">
                     <i class="tpi-cc-no-ds-data-loading-item-icon"></i>
-                    <p>Запись инормации в базу данных</p>
+                    <p>Запись информации в базу данных</p>
                 </div>
                 <div class="tpi-cc-no-ds-data-loading-item" tpi-cc-search-id="4" tpi-cc-status="waiting">
                     <i class="tpi-cc-no-ds-data-loading-item-icon"></i>
                     <p>Построение и внедрение таблицы в DOM</p>
                 </div>
             `
-        }else return
+            
+            await fillCouriersTable();
+        } else return
     })
+    
+    async function fillCouriersTable() {
+        try {
+            console.log('🚀 Начинаем заполнение таблицы...');
+
+            // Обновляем статус загрузки
+            updateLoadingStatus(0, 'in-progress');
+
+            // Получаем данные о курьерах
+            const data = await tpi_getCouriersAndCells();
+
+            if (!data || data.length === 0) {
+                console.log('❌ Нет данных о курьерах');
+                updateLoadingStatus(1, 'error');
+                return;
+            }
+
+            updateLoadingStatus(1, 'completed');
+            updateLoadingStatus(2, 'in-progress');
+
+            // Сортируем курьеров по группам
+            const { firstWave, secondWave, kgt, alreadyGone, others } = sortCouriersByGroups(data);
+
+            // Объединяем все группы
+            const allCouriers = [
+                ...firstWave,
+                ...secondWave, 
+                ...kgt,
+                ...alreadyGone,
+                ...others
+            ];
+
+            updateLoadingStatus(2, 'completed');
+            updateLoadingStatus(3, 'in-progress');
+
+            // Очищаем таблицу (оставляем только заголовки)
+            tpi_cc_tableBody.innerHTML = '';
+
+            // Создаем строки для каждого курьера
+            allCouriers.forEach((courier, index) => {
+                const row = createCourierTableRow(courier, index);
+                tpi_cc_tableBody.appendChild(row);
+            });
+
+            updateLoadingStatus(3, 'completed');
+            updateLoadingStatus(4, 'in-progress');
+
+            // Показываем таблицу и скрываем блок "Нет данных"
+            document.querySelector('.tpi-cc--no-ds-data-wrapper').style.display = 'none';
+            document.querySelector('.tpi-cc--table-wrapper').style.display = 'block';
+
+            updateLoadingStatus(4, 'completed');
+
+            console.log(`✅ Таблица заполнена: ${allCouriers.length} курьеров`);
+
+        } catch (error) {
+            console.error('💥 Ошибка при заполнении таблицы:', error);
+            updateLoadingStatus(0, 'error');
+        }
+    }
+
+    function createCourierTableRow(courierData, index) {
+        const row = document.createElement('tr');
+        row.className = 'tpi-cc--table-tbody';
+        
+        // Рассчитываем проценты
+        const sortPercent = courierData.ordersPlanned > 0 
+            ? Math.round((courierData.ordersSorted / courierData.ordersPlanned) * 100)
+            : 0;
+            
+        const preparedPercent = courierData.sortablesInCell > 0
+            ? Math.round((courierData.sortablesPrepared / courierData.sortablesInCell) * 100)
+            : 0;
+        
+        // Получаем цвет для прогресс-бара
+        const sortColor = getProgressColor(sortPercent);
+        const preparedColor = getProgressColor(preparedPercent);
+        
+        // Форматируем даты
+        const startedDate = courierData.startedAt ? cc_formatDate(courierData.startedAt) : null;
+        const startedTime = courierData.startedAt ? cc_formatTime(courierData.startedAt) : null;
+        const endedDate = courierData.finishedAt ? cc_formatDate(courierData.finishedAt) : null;
+        const endedTime = courierData.finishedAt ? cc_formatTime(courierData.finishedAt) : null;
+        const arrivesDate = courierData.courierArrivesAt ? cc_formatDate(courierData.courierArrivesAt) : null;
+        const arrivesTime = courierData.courierArrivesAt ? cc_formatTime(courierData.courierArrivesAt) : null;
+        
+        // Определяем статус маршрута
+        const routeStatusText = getRouteStatusText(courierData.status);
+        
+        // Извлекаем номер из ячейки (например, "101" из "MK-101")
+        let cellNumber = "000";
+        if (courierData.cell && courierData.cell !== 'null' && courierData.cell !== 'Нет ячейки') {
+            const match = courierData.cell.match(/\d+/);
+            cellNumber = match ? match[0].padStart(3, '0') : "000";
+        }
+        
+        // Проверяем, является ли курьер КГТ
+        const isKGT = courierData.cell.toUpperCase().startsWith('KGT');
+        
+        // Проверяем, является ли ячейка null
+        const isNullCell = courierData.cell === 'null';
+        
+        // Создаем HTML для кнопок CART (только для обычных курьеров, не для null ячеек)
+        let cartButtonsHTML = '';
+        if (!isNullCell && !isKGT) {
+            // Для обычных курьеров - 4 кнопки CART
+            for (let i = 1; i <= 4; i++) {
+                const cartNumber = `${cellNumber}${i}`;
+                cartButtonsHTML += `
+                    <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-cart-id">
+                        <i class="tpi-cc-table-tbody-data-cart-icon">${tpi_cc_i_cart}</i>
+                        -${cartNumber}
+                    </button>
+                `;
+            }
+        }
+        
+        // Кнопка добавления CART (всегда показываем)
+        const addCartButton = `
+            <div class="tpi-cc--carts-control-buttons-wrapper">
+                <button class="tpi-cc--table-tbody-add-cart" tpi-state-change="tpi-add-cart">
+                    <i>${tpi_cc_i_cart_add}</i>
+                </button>
+            </div>
+        `;
+        
+        // Создаем HTML для кнопок PALLET (для обычных курьеров и КГТ, не для null ячеек)
+        let palletButtonsHTML = '';
+        if (!isNullCell) {
+            if (isKGT) {
+                // Для КГТ - одна кнопка PALLET с номером ячейки (например, "1" из "KGT-1")
+                const kgtNumber = courierData.cell.replace('KGT-', '').replace('kgt-', '');
+                palletButtonsHTML += `
+                    <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-pallet-id">
+                        <i class="tpi-cc-table-tbody-data-pallet-icon">${tpi_cc_i_pallet}</i>
+                        -${kgtNumber}
+                    </button>
+                `;
+            } else {
+                // Для обычных курьеров - 2 кнопки PALLET со случайными номерами
+                const palletNumbers = generateRandomPalletNumbers(2, index);
+                palletNumbers.forEach(palletNumber => {
+                    palletButtonsHTML += `
+                        <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-pallet-id">
+                            <i class="tpi-cc-table-tbody-data-pallet-icon">${tpi_cc_i_pallet}</i>
+                            -${palletNumber}
+                        </button>
+                    `;
+                });
+            }
+        }
+        
+        // Кнопка добавления PALLET (всегда показываем)
+        const addPalletButton = `
+            <div class="tpi-cc--carts-control-buttons-wrapper">
+                <button class="tpi-cc--table-tbody-add-pallet" tpi-state-change="tpi-add-pallet">
+                    <i>${tpi_cc_i_cart_add}</i>
+                </button>
+            </div>
+        `;
+        
+        row.innerHTML = `
+            <td class="tpi-cc--table-tbody-item">
+                <div class="tpi-cc--table-tbody-data-courier">
+                    <div class="tpi-cc--sortable-data-wrapper tpi-cc--courier-id-data-wrapper">
+                        <a href="https://logistics.market.yandex.ru/sorting-center/21972131/routes?type=OUTGOING_COURIER&sort=&hasCarts=false&category=COURIER&id=21972131&page=1&pageSize=50&recipientName=${courierData.externalId}" target="_blank" class="tpi-cc--table-tbody-data-link">
+                            <i>${tpi_cc_i_courier}</i>
+                            <p class="tpi-cc--sortable-data-courier" tpi-cc-parsing-data="courier-full-name">${courierData.courier}</p>
+                        </a>
+                        <div class="tpi-cc--table-tbody-data-courier-extra-info-wrapper">
+                            <div class="tpi-cc--table-tbody-data-courier-extra-info">
+                                <i>${tpi_cc_i_courier_route_id}</i>
+                                <p tpi-cc-parsing-data="courier-route-id">${courierData.routeId || 'Нет данных'}</p>
+                            </div>
+                            <div class="tpi-cc--table-tbody-data-courier-extra-info">
+                                <i>${tpi_cc_i_courier_id}</i>
+                                <p tpi-cc-parsing-data="courier-personal-id">${courierData.externalId || courierData.courierId || 'Нет данных'}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </td>
+            <td class="tpi-cc--table-tbody-item">
+                <div class="tpi-cc--table-tbody-data">
+                    <a href="https://logistics.market.yandex.ru/sorting-center/21972131/sortables?sortableTypes=CART&sortableTypes=COURIER_PALLET&cellName=${courierData.cell}" class="tpi-cc--table-tbody-data-link" tpi-cc-parsing-data="courier-route-cell" target="_blank">
+                        ${courierData.cell}
+                    </a>
+                </div>
+            </td>
+            <td class="tpi-cc--table-tbody-item">
+                <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-data-carts">
+                    ${cartButtonsHTML}
+                    ${addCartButton}
+                </div>
+            </td>
+            <td class="tpi-cc--table-tbody-item">
+                <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-data-pallets">
+                    ${palletButtonsHTML}
+                    ${addPalletButton}
+                </div>
+            </td>
+            <td class="tpi-cc--table-tbody-item">
+                <div class="tpi-cc--table-tbody-data">
+                    <div class="tpi-cc-table-tbody-data-route-status" tpi-cc-route-status="${courierData.status.toLowerCase()}">
+                        <i></i>
+                        <p tpi-cc-parsing-data="courier-route-status">${routeStatusText}</p>
+                    </div>
+                </div>
+            </td>
+            <td class="tpi-cc--table-tbody-item">
+                <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-data-sort-progress-container">
+                    <p class="tpi-cc--table-tbody-data-sort-progress" tpi-cc-parsing-data="courier-sorting-progress">
+                        ${courierData.ordersSorted || 0} из ${courierData.ordersPlanned || 0}
+                    </p>
+                    <div class="tpi-cc--table-tbody-data-sort-progress-circle-wrapper">
+                        <p class="tpi-cc--table-tbody-data-sort-progress-circle-value" tpi-cc-parsing-data="courier-sorting-progress-percent">
+                            ${sortPercent}%
+                        </p>
+                        <svg width="50" height="50" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg" style="transform: rotate(-90deg)">
+                            <circle cx="25" cy="25" r="20" fill="transparent" stroke="#e8e8e8" stroke-width="4"></circle>
+                            <circle cx="25" cy="25" r="20" fill="transparent" 
+                                    stroke="${sortColor}" stroke-width="5" stroke-linecap="round"
+                                    stroke-dasharray="125.6" 
+                                    stroke-dashoffset="${125.6 - (125.6 * sortPercent / 100)}"
+                                    tpi-cc-parsing-data="courier-sorting-progress-circle">
+                            </circle>
+                        </svg>
+                    </div>
+                </div>
+            </td>
+            <td class="tpi-cc--table-tbody-item">
+                <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-data-sort-progress-container">
+                    <p class="tpi-cc--table-tbody-data-sort-progress" tpi-cc-parsing-data="courier-prepared-progress">
+                        ${courierData.sortablesPrepared || 0} из ${courierData.sortablesInCell || 0}
+                    </p>
+                    <div class="tpi-cc--table-tbody-data-sort-progress-circle-wrapper">
+                        <p class="tpi-cc--table-tbody-data-sort-progress-circle-value" tpi-cc-parsing-data="courier-prepared-progress-percent">
+                            ${preparedPercent}%
+                        </p>
+                        <svg width="50" height="50" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg" style="transform: rotate(-90deg)">
+                            <circle cx="25" cy="25" r="20" fill="transparent" stroke="#e8e8e8" stroke-width="4"></circle>
+                            <circle cx="25" cy="25" r="20" fill="transparent" 
+                                    stroke="${preparedColor}" stroke-width="5" stroke-linecap="round"
+                                    stroke-dasharray="125.6" 
+                                    stroke-dashoffset="${125.6 - (125.6 * preparedPercent / 100)}"
+                                    tpi-cc-parsing-data="courier-prepared-progress-circle">
+                            </circle>
+                        </svg>
+                    </div>
+                </div>
+            </td>
+            <td class="tpi-cc--table-tbody-item">
+                <div class="tpi-cc--table-body-date-container">
+                    <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-date-wrapper">
+                        <i class="tpi-cc--table-tbody-data-icon">${tpiIcon__calendar}</i>
+                        <p class="tpi-cc--table-tbody-data-courier-status" tpi-cc-date-type="start" tpi-cc-parsing-data="courier-started-at-date">
+                            ${startedDate || 'null'}
+                        </p>
+                    </div>
+                    <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-date-wrapper">
+                        <i class="tpi-cc--table-tbody-data-icon">${tpiIcon__clock}</i>
+                        <p class="tpi-cc--table-tbody-data-courier-status" tpi-cc-time-type="start" tpi-cc-parsing-data="courier-started-at-time">
+                            ${startedTime || 'null'}
+                        </p>
+                    </div>
+                </div>
+            </td>
+            <td class="tpi-cc--table-tbody-item">
+                <div class="tpi-cc--table-body-date-container">
+                    <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-date-wrapper">
+                        <i class="tpi-cc--table-tbody-data-icon">${tpiIcon__calendar}</i>
+                        <p class="tpi-cc--table-tbody-data-courier-status" tpi-cc-date-type="end" tpi-cc-parsing-data="courier-ended-at-date">
+                            ${endedDate || 'null'}
+                        </p>
+                    </div>
+                    <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-date-wrapper">
+                        <i class="tpi-cc--table-tbody-data-icon">${tpiIcon__clock}</i>
+                        <p class="tpi-cc--table-tbody-data-courier-status" tpi-cc-time-type="end" tpi-cc-parsing-data="courier-ended-at-time">
+                            ${endedTime || 'null'}
+                        </p>
+                    </div>
+                </div>
+            </td>
+            <td class="tpi-cc--table-tbody-item">
+                <div class="tpi-cc--table-body-date-container">
+                    <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-date-wrapper">
+                        <i class="tpi-cc--table-tbody-data-icon">${tpiIcon__calendar}</i>
+                        <p class="tpi-cc--table-tbody-data-courier-status" tpi-cc-date-type="arrived" tpi-cc-parsing-data="courier-arrives-at-date">
+                            ${arrivesDate || 'null'}
+                        </p>
+                    </div>
+                    <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-date-wrapper">
+                        <i class="tpi-cc--table-tbody-data-icon">${tpiIcon__clock}</i>
+                        <p class="tpi-cc--table-tbody-data-courier-status" tpi-cc-time-type="arrived" tpi-cc-parsing-data="courier-arrives-at-time">
+                            ${arrivesTime || 'null'}
+                        </p>
+                    </div>
+                </div>
+            </td>
+            <td class="tpi-cc--table-tbody-item">
+                <div class="tpi-cc--table-body-print-container">
+                    <button class="tpi-cc--print-current-row">${tpi_cc_i_courier_print}</button>
+                </div>
+            </td>
+        `;
+        
+        return row;
+    }
+
+    function getProgressColor(percent) {
+        let r, g, b;
+        
+        if (percent <= 50) {
+            const ratio = percent / 50;
+            r = Math.floor(255);
+            g = Math.floor(ratio * 204);
+            b = 0;
+        } else {
+            const ratio = (percent - 50) / 50;
+            r = Math.floor(255 - (255 - 42) * ratio);
+            g = Math.floor(204 + (173 - 204) * ratio);
+            b = Math.floor(0 + 46 * ratio);
+        }
+        return `rgb(${r}, ${g}, ${b})`;
+    }
+
+    function generateRandomPalletNumbers(count, seed) {
+    const numbers = [];
+    const usedNumbers = new Set();
+    
+    // Используем seed для псевдослучайности, но разной для каждого курьера
+    const baseSeed = seed * 9301 + 49297; // Простые числа для лучшей случайности
+    
+    for (let i = 0; i < count; i++) {
+        let number;
+        let attempts = 0;
+        
+        do {
+            // Генерируем случайное число от 100 до 999
+            const random = (baseSeed * (i + 1) * 233 + 741) % 900;
+            number = 100 + random;
+            attempts++;
+            
+            // Если не можем сгенерировать уникальное число за 10 попыток, используем следующее доступное
+            if (attempts > 10) {
+                number = 100 + ((baseSeed + i) % 900);
+                while (usedNumbers.has(number) && number < 999) {
+                    number++;
+                }
+            }
+        } while (usedNumbers.has(number) && number >= 100 && number <= 999);
+        
+        numbers.push(number);
+        usedNumbers.add(number);
+    }
+    
+    return numbers;
 }
 
+    function updateLoadingStatus(stepId, status) {
+        const loadingItem = document.querySelector(`[tpi-cc-search-id="${stepId}"]`);
+        if (loadingItem) {
+            loadingItem.setAttribute('tpi-cc-status', status);
+        }
+    }
+
+    function cc_formatDate(dateString) {
+        if (!dateString || dateString === 'null') return null;
+
+        try {
+            const date = new Date(dateString);
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        } catch (e) {
+            console.error('Ошибка форматирования даты:', e);
+            return null;
+        }
+    }
+
+    function cc_formatTime(dateString) {
+        if (!dateString || dateString === 'null') return null;
+
+        try {
+            const date = new Date(dateString);
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
+            return `${hours}:${minutes}:${seconds}`;
+        } catch (e) {
+            console.error('Ошибка форматирования времени:', e);
+            return null;
+        }
+    }
+    function getRouteStatusText(status) {
+        switch(status) {
+            case 'CELL_SHIPPED':
+                return 'Передано курьеру';
+            case 'FINISHED':
+                return 'Собран';
+            case 'IN_PROGRESS':
+                return 'В работе';
+            case 'NOT_STARTED':
+                return 'Не начат';
+            case 'SHIPPED':
+                return 'Отгружен';
+            default:
+                return status || 'Неизвестно';
+        }
+    }
+}
