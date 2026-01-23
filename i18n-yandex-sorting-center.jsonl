@@ -66,6 +66,14 @@
 //?? "common.sorting-center:stage-TRANSIT_NOT_READY_LOT_DIRECT": "Неготовый лот в процессе перемещения, прямой поток",
 //?? "common.sorting-center:stage-TRANSIT_NOT_READY_LOT_RETURN": "Неготовый лот в процессе перемещения, обратный поток",
 
+//@ Статусы маршрута курьера
+
+//~ "pages.sorting-center-routes:OUTGOING_COURIER.route-status.CELL_SHIPPED":"Передано курьеру",
+//~ "pages.sorting-center-routes:OUTGOING_COURIER.route-status.FINISHED":"Собран",
+//~ "pages.sorting-center-routes:OUTGOING_COURIER.route-status.IN_PROGRESS":"В работе",
+//~ "pages.sorting-center-routes:OUTGOING_COURIER.route-status.NOT_STARTED":"Не начат",
+//~ "pages.sorting-center-routes:OUTGOING_COURIER.route-status.SHIPPED":"Отгружен"
+
 //@ Тип грузоместа
 // "common.sorting-center:sortable-type.PLACE": "Посылка",
 // "common.sorting-center:sortable-type.PALLET": "Палета",

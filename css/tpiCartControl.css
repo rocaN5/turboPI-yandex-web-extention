@@ -595,6 +595,24 @@ div.tpi-cc--table-tbody-data-pallets{
     &[tpi-current-state="loading-data"] svg.tpi-cc-i-loading{
         display: flex;
     }
+
+    &[tpi-current-state="loading-data"] button{
+        background-image: repeating-linear-gradient(-45deg, var(--no-ds-color-1), var(--no-ds-color-1) 6px, #fc8efc 0, #fc8efc 12px);
+        background-size: 119px;
+        background-position: 0px;
+        cursor: not-allowed;
+        animation: tpi-cc-nd-loading-button 750ms infinite linear;
+        opacity: .6;
+    }
+}
+
+@keyframes tpi-cc-nd-loading-button{
+    from{
+        background-position: 0px;
+    }
+    to{
+        background-position: 17px;
+    }
 }
 
 .tpi-cc--no-ds-data-info-wrapper {
