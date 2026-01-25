@@ -83,8 +83,15 @@ th.tpi-cc--table-thead-item{
 th.tpi-cc--table-thead-item .tpi-cc--table-thead-data {
     display: flex;
     align-items: center;
-    justify-content: flex-start;
     height: 100%;
+    gap: 10px;
+    width: 100%;
+    justify-content: space-between;
+
+    i.tpi-cc--table-thead-filter{
+        width: 1rem;
+        height: 1rem;
+    }
 }
 
 .tpi-cc--table-data-output tr.tpi-cc--table-tbody{
