@@ -74,13 +74,18 @@ tpi_cc_i_loading = `
 </svg>
 `,
 tpi_cc_i_filter_up = `
-<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-    <path d="M240 96h64a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16h-64a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16zm0 128h128a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16H240a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16zm256 192H240a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h256a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm-256-64h192a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16H240a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16zm-64 0h-48V48a16 16 0 0 0-16-16H80a16 16 0 0 0-16 16v304H16c-14.19 0-21.37 17.24-11.29 27.31l80 96a16 16 0 0 0 22.62 0l80-96C197.35 369.26 190.22 352 176 352z"></path>
+<svg class="tpi-filter-icon-up" stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+    <path d="M304 416h-64a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zM16 160h48v304a16 16 0 0 0 16 16h32a16 16 0 0 0 16-16V160h48c14.21 0 21.38-17.24 11.31-27.31l-80-96a16 16 0 0 0-22.62 0l-80 96C-5.35 142.74 1.77 160 16 160zm416 0H240a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h192a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm-64 128H240a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zM496 32H240a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h256a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16z"></path>
 </svg>
 `,
 tpi_cc_i_filter_down = `
-<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+<svg class="tpi-filter-icon-down" stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
     <path d="M240 96h64a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16h-64a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16zm0 128h128a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16H240a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16zm256 192H240a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h256a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm-256-64h192a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16H240a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16zm-64 0h-48V48a16 16 0 0 0-16-16H80a16 16 0 0 0-16 16v304H16c-14.19 0-21.37 17.24-11.29 27.31l80 96a16 16 0 0 0 22.62 0l80-96C197.35 369.26 190.22 352 176 352z"></path>
+</svg>
+`,
+tpi_cc_i_print_row = `
+<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <path d="M5 1a2 2 0 0 0-2 2v1h10V3a2 2 0 0 0-2-2zm6 8H5a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1"></path><path d="M0 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-1v-2a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2H2a2 2 0 0 1-2-2zm2.5 1a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1"></path>
 </svg>
 `
 
@@ -141,6 +146,7 @@ function checkiIs__onCartControlsPage() {
                             <div class="tpi-cc--table-thead-data">
                                 <p>Данные курьера</p>
                                 <i class="tpi-cc--table-thead-filter">
+                                    ${tpi_cc_i_filter_up}
                                     ${tpi_cc_i_filter_down}
                                 </i>
                             </div>
@@ -149,6 +155,7 @@ function checkiIs__onCartControlsPage() {
                             <div class="tpi-cc--table-thead-data">
                                 <p>Ячейка</p>
                                 <i class="tpi-cc--table-thead-filter">
+                                    ${tpi_cc_i_filter_up}
                                     ${tpi_cc_i_filter_down}
                                 </i>
                             </div>
@@ -157,6 +164,7 @@ function checkiIs__onCartControlsPage() {
                             <div class="tpi-cc--table-thead-data">
                                 <p>Номер CART</p>
                                 <i class="tpi-cc--table-thead-filter">
+                                    ${tpi_cc_i_filter_up}
                                     ${tpi_cc_i_filter_down}
                                 </i>
                             </div>
@@ -165,6 +173,7 @@ function checkiIs__onCartControlsPage() {
                             <div class="tpi-cc--table-thead-data">
                                 <p>Номер PALLET</p>
                                 <i class="tpi-cc--table-thead-filter">
+                                    ${tpi_cc_i_filter_up}
                                     ${tpi_cc_i_filter_down}
                                 </i>
                             </div>
@@ -173,6 +182,7 @@ function checkiIs__onCartControlsPage() {
                             <div class="tpi-cc--table-thead-data">
                                 <p>Cтатус</p>
                                 <i class="tpi-cc--table-thead-filter">
+                                    ${tpi_cc_i_filter_up}
                                     ${tpi_cc_i_filter_down}
                                 </i>
                             </div>
@@ -181,6 +191,7 @@ function checkiIs__onCartControlsPage() {
                             <div class="tpi-cc--table-thead-data">
                                 <p>Прогресс сортировки</p>
                                 <i class="tpi-cc--table-thead-filter">
+                                    ${tpi_cc_i_filter_up}
                                     ${tpi_cc_i_filter_down}
                                 </i>
                             </div>
@@ -189,6 +200,7 @@ function checkiIs__onCartControlsPage() {
                             <div class="tpi-cc--table-thead-data">
                                 <p>Прогресс подготовки</p>
                                 <i class="tpi-cc--table-thead-filter">
+                                    ${tpi_cc_i_filter_up}
                                     ${tpi_cc_i_filter_down}
                                 </i>
                             </div>
@@ -197,6 +209,7 @@ function checkiIs__onCartControlsPage() {
                             <div class="tpi-cc--table-thead-data">
                                 <p>Начало<br>сортировки</p>
                                 <i class="tpi-cc--table-thead-filter">
+                                    ${tpi_cc_i_filter_up}
                                     ${tpi_cc_i_filter_down}
                                 </i>
                             </div>
@@ -205,6 +218,7 @@ function checkiIs__onCartControlsPage() {
                             <div class="tpi-cc--table-thead-data">
                                 <p>Конец<br>сортировки</p>
                                 <i class="tpi-cc--table-thead-filter">
+                                    ${tpi_cc_i_filter_up}
                                     ${tpi_cc_i_filter_down}
                                 </i>
                             </div>
@@ -213,14 +227,16 @@ function checkiIs__onCartControlsPage() {
                             <div class="tpi-cc--table-thead-data">
                                 <p>Прибытие<br>курьера</p>
                                 <i class="tpi-cc--table-thead-filter">
+                                    ${tpi_cc_i_filter_up}
                                     ${tpi_cc_i_filter_down}
                                 </i>
                             </div>
                         </th>
-                        <th class="tpi-cc--table-thead-item">
+                        <th class="tpi-cc--table-thead-item" tpi-cc-filters-not-allowed>
                             <div class="tpi-cc--table-thead-data">
                                 <p>Печать</p>
                                 <i class="tpi-cc--table-thead-filter">
+                                    ${tpi_cc_i_filter_up}
                                     ${tpi_cc_i_filter_down}
                                 </i>
                             </div>
@@ -289,6 +305,7 @@ checkiIs__onCartControlsPage()
 function addCartsControlsListeners(){
     waitForTokenAndRun();
     couriersDataCapturing();
+    tpi_cc_filteringColumnData()
 }
 
 
@@ -893,7 +910,6 @@ function couriersDataCapturing(){
             updateLoadingStatus(3, 'completed');
             updateLoadingStatus(4, 'in-progress');
 
-            // Показываем таблицу и скрываем блок "Нет данных"
             document.querySelector('.tpi-cc--no-ds-data-wrapper').style.display = 'none';
             document.querySelector('.tpi-cc--table-wrapper').style.display = 'block';
 
@@ -902,7 +918,7 @@ function couriersDataCapturing(){
             console.log(`✅ Таблица заполнена: ${allCouriers.length} курьеров`);
 
         } catch (error) {
-            console.error('💥 Ошибка при заполнении таблицы:', error);
+            console.log('💥 Ошибка при заполнении таблицы:', error);
             updateLoadingStatus(0, 'error');
         }
     }
@@ -911,9 +927,12 @@ function couriersDataCapturing(){
         const row = document.createElement('tr');
         row.className = 'tpi-cc--table-tbody';
         
-        // Рассчитываем проценты
+        const sortCount = courierData.ordersSorted > 0 
+            ? courierData.ordersSorted 
+            : (courierData.ordersShipped > 0 ? courierData.ordersShipped : 0);
+            
         const sortPercent = courierData.ordersPlanned > 0 
-            ? Math.round((courierData.ordersSorted / courierData.ordersPlanned) * 100)
+            ? Math.round((sortCount / courierData.ordersPlanned) * 100)
             : 0;
             
         const preparedPercent = courierData.sortablesInCell > 0
@@ -1057,9 +1076,9 @@ function couriersDataCapturing(){
             </td>
             <td class="tpi-cc--table-tbody-item">
                 <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-data-sort-progress-container">
-                    <p class="tpi-cc--table-tbody-data-sort-progress" tpi-cc-parsing-data="courier-sorting-progress">
-                        ${courierData.ordersSorted || 0} из ${courierData.ordersPlanned || 0}
-                    </p>
+                        <p class="tpi-cc--table-tbody-data-sort-progress" tpi-cc-parsing-data="courier-sorting-progress">
+                            ${sortCount} из ${courierData.ordersPlanned || 0}
+                        </p>
                     <div class="tpi-cc--table-tbody-data-sort-progress-circle-wrapper">
                         <p class="tpi-cc--table-tbody-data-sort-progress-circle-value" tpi-cc-parsing-data="courier-sorting-progress-percent">
                             ${sortPercent}%
@@ -1147,7 +1166,10 @@ function couriersDataCapturing(){
             </td>
             <td class="tpi-cc--table-tbody-item">
                 <div class="tpi-cc--table-body-print-container">
-                    <button class="tpi-cc--print-current-row">${tpi_cc_i_courier_print}</button>
+                    <button class="tpi-cc--print-current-row">
+                        <p class="tpi-cc--table-tbody-data-courier-print-text">Печать</p>
+                        <i class="tpi-cc--table-tbody-data-icon">${tpi_cc_i_courier_print}</i>
+                    </button>
                 </div>
             </td>
         `;
@@ -1257,4 +1279,62 @@ function couriersDataCapturing(){
                 return status || 'Неизвестно';
         }
     }
+}
+
+
+function tpi_cc_filteringColumnData() {
+    const table = document.querySelector('table.tpi-cc--table-data-output');
+    if (!table) {
+        tpiNotification.show('Ошибка', "error", "Не смог найти таблицу");
+        return;
+    }
+    
+    table.addEventListener('click', (event) => {
+        const headerItem = event.target.closest('.tpi-cc--table-thead-item');
+        if (!headerItem) return;
+        if (headerItem.hasAttribute('tpi-cc-filters-not-allowed')) {
+            return;
+        }
+        
+        const targetDiv = headerItem.querySelector('div.tpi-cc--table-thead-data');
+        if (!targetDiv) return;
+        
+        const currentState = targetDiv.getAttribute('tpi-current-state');
+        let nextState = null;
+        
+        if (!currentState) {
+            nextState = 'filtered-down';
+        } else if (currentState === 'filtered-down') {
+            nextState = 'filtered-up';
+        }
+        
+        document.querySelectorAll('div.tpi-cc--table-thead-data[tpi-current-state]').forEach(div => {
+            div.removeAttribute('tpi-current-state');
+        });
+        
+        document.querySelectorAll('td.tpi-cc--table-tbody-item[tpi-current-state]').forEach(td => {
+            td.removeAttribute('tpi-current-state');
+        });
+        
+        if (nextState) {
+            targetDiv.setAttribute('tpi-current-state', nextState);
+            
+            const thIndex = Array.from(headerItem.parentElement.children).indexOf(headerItem);
+            
+            const tableBodyRows = table.querySelectorAll('tbody tr');
+            
+            tableBodyRows.forEach((row, rowIndex) => {
+                const cells = row.querySelectorAll('td.tpi-cc--table-tbody-item');
+                if (cells.length > thIndex) {
+                    const cell = cells[thIndex];
+                    
+                    if (rowIndex === tableBodyRows.length - 1) {
+                        cell.setAttribute('tpi-current-state', 'filtered-last');
+                    } else {
+                        cell.setAttribute('tpi-current-state', 'filtered');
+                    }
+                }
+            });
+        }
+    });
 }
