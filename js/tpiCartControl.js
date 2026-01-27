@@ -47,6 +47,12 @@ tpi_cc_i_courier_print = `
     <path d="M5 1a2 2 0 0 0-2 2v1h10V3a2 2 0 0 0-2-2zm6 8H5a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1"></path><path d="M0 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-1v-2a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2H2a2 2 0 0 1-2-2zm2.5 1a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1"></path>
 </svg>
 `,
+tpi_cc_i_courier_delete = `
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 16 16">
+        <path fill="currentColor" d="M5.386 6h1.806l.219 7H5.886zm3.206 7 .218-7h1.814l-.5 7z"></path>
+        <path fill="currentColor" fill-rule="evenodd" d="M7.837.014h.303c.71-.001 1.333-.002 1.881.22a3 3 0 0 1 1.257.962c.36.47.522 1.072.707 1.758l.012.046H15v2l-.96.48-.585 5.922c-.177 1.787-.265 2.68-.72 3.326a3 3 0 0 1-.975.883C11.073 16 10.175 16 8.38 16h-.76c-1.795 0-2.693 0-3.38-.39a3 3 0 0 1-.974-.882c-.456-.646-.544-1.54-.72-3.326L1.96 5.48 1 5V3h2.98l.012-.046c.185-.686.347-1.287.706-1.758A3 3 0 0 1 5.955.235C6.503.012 7.126.013 7.837.015M3.922 5l.614 6.205c.092.93.15 1.494.23 1.911.036.194.07.308.095.376.022.06.037.08.04.084.085.12.196.221.324.294a.3.3 0 0 0 .088.031c.07.018.187.04.383.059.423.038.99.04 1.925.04h.758c.935 0 1.502-.002 1.925-.04.196-.018.313-.04.383-.059.062-.016.083-.028.088-.03a1 1 0 0 0 .325-.295c.002-.004.017-.024.039-.084a2.4 2.4 0 0 0 .096-.376c.08-.417.138-.981.23-1.91L12.077 5zm5.766-2.592c.063.084.116.2.232.592H6.057c.115-.393.168-.508.232-.592a1 1 0 0 1 .419-.32c.137-.056.327-.074 1.28-.074s1.144.018 1.28.074a1 1 0 0 1 .42.32" clip-rule="evenodd"></path>
+</svg>
+`,
 tpi_cc_i_warning = `
 <svg class="tpi-cc-i-warning" stroke="currentColor" fill="url(#myGradient)" stroke-width="0" version="1.2" baseProfile="tiny" width="16" height="16" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
     <defs>
@@ -246,13 +252,30 @@ function checkiIs__onCartControlsPage() {
                 <tbody class="tpi-cc--table-tbody-wrapper"></tbody>
             </table>
         </div>
-        <div class="tpi-cc-process-manager-wrapper" current-state="shown" style="display: flex;">
+        <div class="tpi-cc-process-manager-wrapper" tpi-current-state="hidden">
             <div class="tpi-cc-process-manager-block">
-                <div class="tpi-cc-process-manager-title">
-                    <p>Выбранные CART:</p>
+                <div class="tpi-cc-process-manager-data-wrapper">
+                    <div class="tpi-cc-process-manager-title">
+                        <p>Выбранно:</p>
+                    </div>
+                    <div class="tpi-cc-process-data-container">
+                        <div class="tpi-cc-process-data-item">
+                            <i class="tpi-cc-process-data-item-icon">${tpi_cc_i_cart}</i>
+                            <p class="tpi-cc-process-data-item-text tpi-cc-data-cart-amount">CART: <span>${'0'}</span></p>
+                        </div>
+                        <div class="tpi-cc-process-data-item">
+                            <i class="tpi-cc-process-data-item-icon">${tpi_cc_i_pallet}</i>
+                            <p class="tpi-cc-process-data-item-text tpi-cc-data-pallet-amount">PALLET: <span>${'0'}</span></p>
+                        </div>
+                    </div>
                 </div>
-                <button class="tpi-cc-process-manager-button">
-                    Удалить пачку лотов
+                <button class="tpi-cc-process-manager-button" tpi-cc-action="print">
+                    <p>Печать</p>
+                    <i class="tpi-cc-progress-action-icon">${tpi_cc_i_courier_print}</i>
+                </button>
+                <button class="tpi-cc-process-manager-button" tpi-cc-action="delete">
+                    <p>Удалить</p>
+                    <i class="tpi-cc-progress-action-icon">${tpi_cc_i_courier_delete}</i>
                 </button>
                 <button class="tpi-cc-process-manager-close">
                     <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -269,6 +292,17 @@ function checkiIs__onCartControlsPage() {
         headerTitle.remove()
 
         document.querySelector(".p-layout__content").appendChild(overlay);
+
+        const tpi_cc_closeManager = document.querySelector('.tpi-cc-process-manager-close')
+        tpi_cc_closeManager.addEventListener('click', ()=>{
+            if(document.querySelectorAll('button.tpi-cc--table-tbody-data-button[tpi-cc-selected-courier-cell]')){
+                const evrySelectedButton = document.querySelectorAll('button.tpi-cc--table-tbody-data-button[tpi-cc-selected-courier-cell]')
+                evrySelectedButton.forEach(btn =>{
+                    btn.removeAttribute('tpi-cc-selected-courier-cell')
+                })
+                update_ActionProcessContainer()
+            }else return
+        })
         
         callTurboPI__once();
         addTurboPiTitle()
@@ -916,11 +950,28 @@ function couriersDataCapturing(){
             updateLoadingStatus(4, 'completed');
 
             console.log(`✅ Таблица заполнена: ${allCouriers.length} курьеров`);
+            cartPallet_btnActions()
+            
 
         } catch (error) {
             console.log('💥 Ошибка при заполнении таблицы:', error);
             updateLoadingStatus(0, 'error');
         }
+    }
+
+    function cartPallet_btnActions(){
+        const tpi_cc_actionButtons = document.querySelectorAll('.tpi-cc-table-tbody-data-cart-id, .tpi-cc-table-tbody-data-pallet-id');
+        tpi_cc_actionButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (btn.hasAttribute('tpi-cc-selected-courier-cell')) {
+                    btn.removeAttribute('tpi-cc-selected-courier-cell');
+                } else {
+                    btn.setAttribute('tpi-cc-selected-courier-cell', '');
+                }
+                update_ActionProcessContainer()
+            })
+        });
+        update_ActionProcessContainer()
     }
 
     function createCourierTableRow(courierData, index) {
@@ -974,7 +1025,7 @@ function couriersDataCapturing(){
             for (let i = 1; i <= 4; i++) {
                 const cartNumber = `${cellNumber}${i}`;
                 cartButtonsHTML += `
-                    <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-cart-id">
+                    <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-cart-id" tpi-data-courier-spec-cell="CART-${cartNumber}">
                         <i class="tpi-cc-table-tbody-data-cart-icon">${tpi_cc_i_cart}</i>
                         -${cartNumber}
                     </button>
@@ -998,7 +1049,7 @@ function couriersDataCapturing(){
                 // Для КГТ - одна кнопка PALLET с номером ячейки (например, "1" из "KGT-1")
                 const kgtNumber = courierData.cell.replace('KGT-', '').replace('kgt-', '');
                 palletButtonsHTML += `
-                    <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-pallet-id">
+                    <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-pallet-id" tpi-data-courier-spec-cell="PALLET-${kgtNumber}">
                         <i class="tpi-cc-table-tbody-data-pallet-icon">${tpi_cc_i_pallet}</i>
                         -${kgtNumber}
                     </button>
@@ -1008,7 +1059,7 @@ function couriersDataCapturing(){
                 const palletNumbers = generateRandomPalletNumbers(2, index);
                 palletNumbers.forEach(palletNumber => {
                     palletButtonsHTML += `
-                        <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-pallet-id">
+                        <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-pallet-id" tpi-data-courier-spec-cell="PALLET-${palletNumber}">
                             <i class="tpi-cc-table-tbody-data-pallet-icon">${tpi_cc_i_pallet}</i>
                             -${palletNumber}
                         </button>
@@ -1337,4 +1388,76 @@ function tpi_cc_filteringColumnData() {
             });
         }
     });
+}
+
+function toggle_ActionProcessContainer(state){
+    const actionProcessContainer = document.querySelector('.tpi-cc-process-manager-wrapper');
+    
+    if (!actionProcessContainer) {
+        console.error('Элемент .tpi-cc-process-manager-wrapper не найден');
+        return;
+    }
+    
+    const actionAttributeState = actionProcessContainer.getAttribute('tpi-current-state');
+    
+    if (state === "show" && actionAttributeState === 'hidden') {
+        actionProcessContainer.style.display = 'flex';
+        setTimeout(() => {
+            actionProcessContainer.setAttribute('tpi-current-state', 'shown');
+        }, 2);
+    } else if (state === "hide" && actionAttributeState === 'shown') {
+        actionProcessContainer.setAttribute('tpi-current-state', 'hidden');
+        setTimeout(() => {
+            actionProcessContainer.style.display = 'none';
+        }, 400);
+    }
+}
+
+function update_ActionProcessContainer(){
+    const tpi_cc_selected_carts = document.querySelector('div.tpi-cc-process-data-item:has(p.tpi-cc-process-data-item-text.tpi-cc-data-cart-amount)');
+    const tpi_cc_selected_pallets = document.querySelector('div.tpi-cc-process-data-item:has(p.tpi-cc-process-data-item-text.tpi-cc-data-pallet-amount)');
+    const tpi_cc_selected_data_carts = document.querySelector('p.tpi-cc-process-data-item-text.tpi-cc-data-cart-amount span');
+    const tpi_cc_selected_data_pallets = document.querySelector('p.tpi-cc-process-data-item-text.tpi-cc-data-pallet-amount span');
+
+    const tpi_cc_actionButtons = document.querySelectorAll('.tpi-cc-table-tbody-data-cart-id, .tpi-cc-table-tbody-data-pallet-id');
+    
+    let hasSelected = false;
+    let tpi_cc_cart_amount = document.querySelectorAll('.tpi-cc-table-tbody-data-cart-id[tpi-cc-selected-courier-cell]');
+    let tpi_cc_pallet_amount = document.querySelectorAll('.tpi-cc-table-tbody-data-pallet-id[tpi-cc-selected-courier-cell]');
+    
+    if (tpi_cc_selected_data_carts) {
+        tpi_cc_selected_data_carts.innerText = tpi_cc_cart_amount.length;
+        
+        if (tpi_cc_cart_amount.length > 0) {
+            tpi_cc_selected_data_carts.style.color = '#fc0';
+            tpi_cc_selected_carts.style.height = '.8rem'
+        } else {
+            tpi_cc_selected_data_carts.style.color = '';
+            tpi_cc_selected_carts.style.height = '0rem'
+        }
+    }
+    
+    if (tpi_cc_selected_data_pallets) {
+        tpi_cc_selected_data_pallets.innerText = tpi_cc_pallet_amount.length;
+        
+        if (tpi_cc_pallet_amount.length > 0) {
+            tpi_cc_selected_data_pallets.style.color = '#fc0';
+            tpi_cc_selected_pallets.style.height = '.8rem'
+        } else {
+            tpi_cc_selected_data_pallets.style.color = '';
+            tpi_cc_selected_pallets.style.height = '0rem'
+        }
+    }
+    
+    tpi_cc_actionButtons.forEach(button => {
+        if (button.hasAttribute('tpi-cc-selected-courier-cell')) {
+            hasSelected = true;
+        }
+    });
+    
+    if (hasSelected) {
+        toggle_ActionProcessContainer("show");
+    } else {
+        toggle_ActionProcessContainer("hide");
+    }
 }
