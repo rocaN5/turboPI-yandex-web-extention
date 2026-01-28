@@ -64,8 +64,8 @@ th.tpi-cc--table-thead-item{
     box-shadow: -2px -1px 0px -1px #e8e8e8 inset;
     z-index: 0;
 
-    &:hover{
-        background: #e8e8e8;
+    &:not([tpi-cc-filters-not-allowed]):hover{
+        background: #efefef;
     }
     
     &:first-child{
@@ -104,14 +104,36 @@ th.tpi-cc--table-thead-item{
         background: #f7f7f7;
     }
     &:has(div[tpi-current-state]):hover::before {
-        background: #e8e8e8;
+        background: #efefef;
     }
     
     p{
         user-select: none;
     }
+
+    &:not(:has(div.tpi-cc--table-thead-data[tpi-current-state])):hover i.tpi-cc--table-thead-filter svg.tpi-filter-icon-default{
+        display: flex;
+        animation: defaultFilterIconPOPup 200ms cubic-bezier(.17,.73,0,1.32);
+    }
+
+    &[tpi-cc-filters-not-allowed] .tpi-cc--table-thead-data p{
+        color: #717171;
+    }
+    &[tpi-cc-filters-not-allowed] i.tpi-cc--table-thead-filter{
+        display: none !important;
+    }
 }
 
+@keyframes defaultFilterIconPOPup {
+    from{
+        opacity: 0;
+        transform: scale(.7) translateY(200%);
+    }
+    to{
+        opacity: 1;
+        transform: scale(1) translateY(0%);
+    }
+}
 
 th.tpi-cc--table-thead-item .tpi-cc--table-thead-data {
     display: flex;
@@ -707,7 +729,7 @@ div.tpi-cc--table-tbody-data-pallets{
         gap: 4px;
         height: .8rem;
         overflow: hidden;
-        transition: height 200ms cubic-bezier(.17,.73,0,1.32);
+        transition: height 200ms cubic-bezier(.17,.73,0,1.32), opacity 200ms ease;
     }
 
     i.tpi-cc-process-data-item-icon{

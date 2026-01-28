@@ -79,6 +79,12 @@ tpi_cc_i_loading = `
     </path>
 </svg>
 `,
+tpi_cc_i_filter_default = `
+<svg class="tpi-filter-icon-default" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <path d="M8.53039 5.46978L5.00006 1.93945L1.46973 5.46978L2.53039 6.53044L4.25006 4.81077V14.0001H5.75006V4.81077L7.46973 6.53044L8.53039 5.46978Z"></path>
+    <path d="M11.7501 11.1895L13.4697 9.46978L14.5304 10.5304L11.0001 14.0608L7.46973 10.5304L8.53039 9.46978L10.2501 11.1895V2.00011H11.7501V11.1895Z"></path>
+</svg>
+`,
 tpi_cc_i_filter_up = `
 <svg class="tpi-filter-icon-up" stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
     <path d="M304 416h-64a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zM16 160h48v304a16 16 0 0 0 16 16h32a16 16 0 0 0 16-16V160h48c14.21 0 21.38-17.24 11.31-27.31l-80-96a16 16 0 0 0-22.62 0l-80 96C-5.35 142.74 1.77 160 16 160zm416 0H240a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h192a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm-64 128H240a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zM496 32H240a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h256a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16z"></path>
@@ -152,6 +158,7 @@ function checkiIs__onCartControlsPage() {
                             <div class="tpi-cc--table-thead-data">
                                 <p>Данные курьера</p>
                                 <i class="tpi-cc--table-thead-filter">
+                                    ${tpi_cc_i_filter_default}
                                     ${tpi_cc_i_filter_up}
                                     ${tpi_cc_i_filter_down}
                                 </i>
@@ -161,24 +168,27 @@ function checkiIs__onCartControlsPage() {
                             <div class="tpi-cc--table-thead-data">
                                 <p>Ячейка</p>
                                 <i class="tpi-cc--table-thead-filter">
+                                    ${tpi_cc_i_filter_default}
                                     ${tpi_cc_i_filter_up}
                                     ${tpi_cc_i_filter_down}
                                 </i>
                             </div>
                         </th>
-                        <th class="tpi-cc--table-thead-item">
+                        <th class="tpi-cc--table-thead-item" tpi-cc-filters-not-allowed>
                             <div class="tpi-cc--table-thead-data">
                                 <p>Номер CART</p>
                                 <i class="tpi-cc--table-thead-filter">
+                                    ${tpi_cc_i_filter_default}
                                     ${tpi_cc_i_filter_up}
                                     ${tpi_cc_i_filter_down}
                                 </i>
                             </div>
                         </th>
-                        <th class="tpi-cc--table-thead-item">
+                        <th class="tpi-cc--table-thead-item" tpi-cc-filters-not-allowed>
                             <div class="tpi-cc--table-thead-data">
                                 <p>Номер PALLET</p>
                                 <i class="tpi-cc--table-thead-filter">
+                                    ${tpi_cc_i_filter_default}
                                     ${tpi_cc_i_filter_up}
                                     ${tpi_cc_i_filter_down}
                                 </i>
@@ -188,6 +198,7 @@ function checkiIs__onCartControlsPage() {
                             <div class="tpi-cc--table-thead-data">
                                 <p>Cтатус</p>
                                 <i class="tpi-cc--table-thead-filter">
+                                    ${tpi_cc_i_filter_default}
                                     ${tpi_cc_i_filter_up}
                                     ${tpi_cc_i_filter_down}
                                 </i>
@@ -197,6 +208,7 @@ function checkiIs__onCartControlsPage() {
                             <div class="tpi-cc--table-thead-data">
                                 <p>Прогресс сортировки</p>
                                 <i class="tpi-cc--table-thead-filter">
+                                    ${tpi_cc_i_filter_default}
                                     ${tpi_cc_i_filter_up}
                                     ${tpi_cc_i_filter_down}
                                 </i>
@@ -206,6 +218,7 @@ function checkiIs__onCartControlsPage() {
                             <div class="tpi-cc--table-thead-data">
                                 <p>Прогресс подготовки</p>
                                 <i class="tpi-cc--table-thead-filter">
+                                    ${tpi_cc_i_filter_default}
                                     ${tpi_cc_i_filter_up}
                                     ${tpi_cc_i_filter_down}
                                 </i>
@@ -215,6 +228,7 @@ function checkiIs__onCartControlsPage() {
                             <div class="tpi-cc--table-thead-data">
                                 <p>Начало<br>сортировки</p>
                                 <i class="tpi-cc--table-thead-filter">
+                                    ${tpi_cc_i_filter_default}
                                     ${tpi_cc_i_filter_up}
                                     ${tpi_cc_i_filter_down}
                                 </i>
@@ -224,6 +238,7 @@ function checkiIs__onCartControlsPage() {
                             <div class="tpi-cc--table-thead-data">
                                 <p>Конец<br>сортировки</p>
                                 <i class="tpi-cc--table-thead-filter">
+                                    ${tpi_cc_i_filter_default}
                                     ${tpi_cc_i_filter_up}
                                     ${tpi_cc_i_filter_down}
                                 </i>
@@ -233,6 +248,7 @@ function checkiIs__onCartControlsPage() {
                             <div class="tpi-cc--table-thead-data">
                                 <p>Прибытие<br>курьера</p>
                                 <i class="tpi-cc--table-thead-filter">
+                                    ${tpi_cc_i_filter_default}
                                     ${tpi_cc_i_filter_up}
                                     ${tpi_cc_i_filter_down}
                                 </i>
@@ -242,6 +258,7 @@ function checkiIs__onCartControlsPage() {
                             <div class="tpi-cc--table-thead-data">
                                 <p>Печать</p>
                                 <i class="tpi-cc--table-thead-filter">
+                                    ${tpi_cc_i_filter_default}
                                     ${tpi_cc_i_filter_up}
                                     ${tpi_cc_i_filter_down}
                                 </i>
@@ -1431,9 +1448,11 @@ function update_ActionProcessContainer(){
         if (tpi_cc_cart_amount.length > 0) {
             tpi_cc_selected_data_carts.style.color = '#fc0';
             tpi_cc_selected_carts.style.height = '.8rem'
+            tpi_cc_selected_carts.style.opacity = '1'
         } else {
             tpi_cc_selected_data_carts.style.color = '';
             tpi_cc_selected_carts.style.height = '0rem'
+            tpi_cc_selected_carts.style.opacity = '0'
         }
     }
     
@@ -1443,9 +1462,11 @@ function update_ActionProcessContainer(){
         if (tpi_cc_pallet_amount.length > 0) {
             tpi_cc_selected_data_pallets.style.color = '#fc0';
             tpi_cc_selected_pallets.style.height = '.8rem'
+            tpi_cc_selected_pallets.style.opacity = '1'
         } else {
             tpi_cc_selected_data_pallets.style.color = '';
             tpi_cc_selected_pallets.style.height = '0rem'
+            tpi_cc_selected_pallets.style.opacity = '0'
         }
     }
     
