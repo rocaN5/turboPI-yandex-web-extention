@@ -79,6 +79,19 @@ tpi_cc_i_loading = `
     </path>
 </svg>
 `,
+tpi_cc_i_checmark = `
+<svg class="tpi_cc_i_checmark" viewBox="0 0 120 120">
+    <defs>
+        <linearGradient id="circleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="var(--no-ds-color-1)" />
+            <stop offset="100%" stop-color="var(--no-ds-color-2)" />
+        </linearGradient>
+    </defs>
+    
+    <circle class="tpi-circle-outline" cx="60" cy="60" r="50" stroke="url(#circleGradient)"/>
+    <path class="tpi-checkmark" d="M43,60 L55,75 L78,45" stroke="url(#circleGradient)" fill="none" stroke-width="4"/>
+</svg>
+`,
 tpi_cc_i_filter_default = `
 <svg class="tpi-filter-icon-default" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
     <path d="M8.53039 5.46978L5.00006 1.93945L1.46973 5.46978L2.53039 6.53044L4.25006 4.81077V14.0001H5.75006V4.81077L7.46973 6.53044L8.53039 5.46978Z"></path>
@@ -98,6 +111,32 @@ tpi_cc_i_filter_down = `
 tpi_cc_i_print_row = `
 <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
     <path d="M5 1a2 2 0 0 0-2 2v1h10V3a2 2 0 0 0-2-2zm6 8H5a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1"></path><path d="M0 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-1v-2a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2H2a2 2 0 0 1-2-2zm2.5 1a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1"></path>
+</svg>
+`,
+tpi_cc_i_search = `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="tpi-search-icon">
+    <circle class="glass" cx="10.5" cy="10.5" r="7.5" fill="none" stroke="currentcolor" stroke-width="1.5"/>
+    <circle class="glassGap" cx="10.5" cy="10.5" r="7.5" fill="none" stroke="currentcolor" stroke-width="1.5"/>
+    <path class="handle" d="m16.563 16.458 4.223 5.372-1.572 1.236-4.21-5.356" fill="currentcolor"/>
+</svg>
+`,
+tpi_cc_i_calendar = `
+<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" height="14px" width="14px" xmlns="http://www.w3.org/2000/svg">
+    <rect width="416" height="384" x="48" y="80" fill="none" stroke-linejoin="round" stroke-width="32" rx="48"></rect>
+    <circle cx="296" cy="232" r="24"></circle>
+    <circle cx="376" cy="232" r="24"></circle
+    <circle cx="296" cy="312" r="24"></circle<circle cx="376" cy="312" r="24"></circle>
+    <circle cx="136" cy="312" r="24"></circle><circle cx="216" cy="312" r="24"></circle>
+    <circle cx="136" cy="392" r="24"></circle><circle cx="216" cy="392" r="24"></circle>
+    <circle cx="296" cy="392" r="24"></circle>
+    <path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M128 48v32m256-32v32"></path>
+    <path fill="none" stroke-linejoin="round" stroke-width="32" d="M464 160H48"></path>
+</svg>
+`,
+tpi_cc_i_clock = `
+<svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="14px" width="14px" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="12" cy="12" r="10"></circle>
+    <polyline points="12 6 12 12 16 14"></polyline>
 </svg>
 `
 
@@ -127,6 +166,36 @@ function checkiIs__onCartControlsPage() {
         <div class="tpi-cc--wrapper-title">
             Управление MK
         </div>
+
+        <div class="tpi-cc-filters-panel">
+            <div class="tpi-cc-filters-wrapper">
+                <div class="tpi-cc-filters-wrapper-title">
+                    <p>Фильтры</p>
+                </div>
+                <div class="tpi-cc-filters-items-wrapper">
+                    <div class="tpi-cc-filters-item">
+                        <button class="tpi-cc-search-date">
+                            <div class="tpi-cc-search-icon">${tpi_cc_i_calendar}</div>
+                            <div class="tpi-cc-search-label-title" id="tpi-cc-seleceted-date">Дата отгрузки</div>
+                        </button>
+                    </div>
+                    <div class="tpi-cc-filters-item">
+                        <label for="tpi-cc-search-courier-name" class="tpi-cc-search-label">
+                            <div class="tpi-cc-search-icon">${tpi_cc_i_search}</div>
+                            <div class="tpi-cc-search-label-title">ФИО курьера</div>
+                            <input type="text" id="tpi-cc-search-courier-name" placeholder="Введите ФИО курьера" autocomplete="off">
+                        </label>
+                    </div>
+                    <div class="tpi-cc-filters-item">
+                        <label for="tpi-cc-search-courier-cell" class="tpi-cc-search-label">
+                            <div class="tpi-cc-search-icon">${tpi_cc_i_search}</div>
+                            <div class="tpi-cc-search-label-title">Имя ячейки</div>
+                            <input type="text" id="tpi-cc-search-courier-cell" placeholder="Введите имя ячейки" autocomplete="off">
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="tpi-cc--no-ds-data-wrapper">
             <div class="tpi-cc--no-ds-data-container" tpi-current-state="ready-to-data-search">
                 <div class="tpi-cc--no-ds-data-block">
@@ -136,7 +205,7 @@ function checkiIs__onCartControlsPage() {
                 </div>
                 <div class="tpi-cc--no-ds-data-block">
                     <div class="tpi-cc--no-ds-data-icon-wrapper">
-                        <i>${tpi_cc_i_warning}${tpi_cc_i_loading}</i>
+                        <i>${tpi_cc_i_warning}${tpi_cc_i_loading}${tpi_cc_i_checmark}</i>
                     </div>
                     <div class="tpi-cc--no-ds-data-info-wrapper">
                         <div class="tpi-cc--no-ds-data-description">
@@ -918,25 +987,39 @@ function couriersDataCapturing(){
     async function fillCouriersTable() {
         try {
             console.log('🚀 Начинаем заполнение таблицы...');
-
+    
             // Обновляем статус загрузки
             updateLoadingStatus(0, 'in-progress');
-
+    
+            // Шаг 0: Проверка ключа (реальное выполнение)
+            if (!tpiUserTOKEN) {
+                throw new Error('Токен не найден');
+            }
+            
+            // Минимум 1.5 секунды для статуса
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            updateLoadingStatus(0, 'complete');
+    
+            // Шаг 1: Поиск маршрутов
+            updateLoadingStatus(1, 'in-progress');
+            
             // Получаем данные о курьерах
             const data = await tpi_getCouriersAndCells();
-
+    
             if (!data || data.length === 0) {
-                console.log('❌ Нет данных о курьерах');
-                updateLoadingStatus(1, 'error');
-                return;
+                throw new Error('Нет данных о курьерах');
             }
-
-            updateLoadingStatus(1, 'completed');
+            
+            // Минимум 1.5 секунды для статуса
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            updateLoadingStatus(1, 'complete');
+    
+            // Шаг 2: Расшифровка данных курьеров
             updateLoadingStatus(2, 'in-progress');
-
+            
             // Сортируем курьеров по группам
             const { firstWave, secondWave, kgt, alreadyGone, others } = sortCouriersByGroups(data);
-
+            
             // Объединяем все группы
             const allCouriers = [
                 ...firstWave,
@@ -945,31 +1028,53 @@ function couriersDataCapturing(){
                 ...alreadyGone,
                 ...others
             ];
-
-            updateLoadingStatus(2, 'completed');
+            
+            // Минимум 1.5 секунды для статуса
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            updateLoadingStatus(2, 'complete');
+    
+            // Шаг 3: Запись информации в базу данных
             updateLoadingStatus(3, 'in-progress');
+            
+            // Задержка 3 секунды для имитации записи в БД
+            await new Promise(resolve => setTimeout(resolve, 3000));
+            updateLoadingStatus(3, 'complete');
+    
+            // Шаг 4: Построение и внедрение таблицы в DOM
+            updateLoadingStatus(4, 'in-progress');
+            
+            // Минимум 1.5 секунды для статуса
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            
+            // ВАЖНО: Сначала меняем статус на complete
+            updateLoadingStatus(4, 'complete');
 
-            // Очищаем таблицу (оставляем только заголовки)
-            tpi_cc_tableBody.innerHTML = '';
+            await new Promise(resolve => setTimeout(resolve, 500));
+            const progressContainerWrapper = document.querySelector('.tpi-cc--no-ds-data-container')
+            progressContainerWrapper.setAttribute('tpi-current-state', 'loading-data-animation')
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            document.querySelector('.tpi-cc-no-ds-data-loading-item[tpi-cc-search-id="2"] p').innerText = "Данные успешно загружены, обработаны и сохранены в базу данных, хорошей сортировки!"
+            progressContainerWrapper.setAttribute('tpi-current-state', 'done')
 
+            // Ждем 1.5 секунды после того как последний шаг стал complete
+            await new Promise(resolve => setTimeout(resolve, 2000));
+
+            progressContainerWrapper.setAttribute('tpi-current-state', 'hidden')
+
+            await new Promise(resolve => setTimeout(resolve, 600));
+            
             // Создаем строки для каждого курьера
             allCouriers.forEach((courier, index) => {
                 const row = createCourierTableRow(courier, index);
                 tpi_cc_tableBody.appendChild(row);
             });
-
-            updateLoadingStatus(3, 'completed');
-            updateLoadingStatus(4, 'in-progress');
-
+            
+            // Скрываем блок загрузки и показываем таблицу
             document.querySelector('.tpi-cc--no-ds-data-wrapper').style.display = 'none';
             document.querySelector('.tpi-cc--table-wrapper').style.display = 'block';
-
-            updateLoadingStatus(4, 'completed');
-
-            console.log(`✅ Таблица заполнена: ${allCouriers.length} курьеров`);
-            cartPallet_btnActions()
-            
-
+    
+            cartPallet_btnActions();
+    
         } catch (error) {
             console.log('💥 Ошибка при заполнении таблицы:', error);
             updateLoadingStatus(0, 'error');
@@ -1187,13 +1292,13 @@ function couriersDataCapturing(){
             <td class="tpi-cc--table-tbody-item">
                 <div class="tpi-cc--table-body-date-container">
                     <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-date-wrapper">
-                        <i class="tpi-cc--table-tbody-data-icon">${tpiIcon__calendar}</i>
+                        <i class="tpi-cc--table-tbody-data-icon">${tpi_cc_i_calendar}</i>
                         <p class="tpi-cc--table-tbody-data-courier-status" tpi-cc-date-type="start" tpi-cc-parsing-data="courier-started-at-date">
                             ${startedDate || 'null'}
                         </p>
                     </div>
                     <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-date-wrapper">
-                        <i class="tpi-cc--table-tbody-data-icon">${tpiIcon__clock}</i>
+                        <i class="tpi-cc--table-tbody-data-icon">${tpi_cc_i_clock}</i>
                         <p class="tpi-cc--table-tbody-data-courier-status" tpi-cc-time-type="start" tpi-cc-parsing-data="courier-started-at-time">
                             ${startedTime || 'null'}
                         </p>
@@ -1203,13 +1308,13 @@ function couriersDataCapturing(){
             <td class="tpi-cc--table-tbody-item">
                 <div class="tpi-cc--table-body-date-container">
                     <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-date-wrapper">
-                        <i class="tpi-cc--table-tbody-data-icon">${tpiIcon__calendar}</i>
+                        <i class="tpi-cc--table-tbody-data-icon">${tpi_cc_i_calendar}</i>
                         <p class="tpi-cc--table-tbody-data-courier-status" tpi-cc-date-type="end" tpi-cc-parsing-data="courier-ended-at-date">
                             ${endedDate || 'null'}
                         </p>
                     </div>
                     <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-date-wrapper">
-                        <i class="tpi-cc--table-tbody-data-icon">${tpiIcon__clock}</i>
+                        <i class="tpi-cc--table-tbody-data-icon">${tpi_cc_i_clock}</i>
                         <p class="tpi-cc--table-tbody-data-courier-status" tpi-cc-time-type="end" tpi-cc-parsing-data="courier-ended-at-time">
                             ${endedTime || 'null'}
                         </p>
@@ -1219,13 +1324,13 @@ function couriersDataCapturing(){
             <td class="tpi-cc--table-tbody-item">
                 <div class="tpi-cc--table-body-date-container">
                     <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-date-wrapper">
-                        <i class="tpi-cc--table-tbody-data-icon">${tpiIcon__calendar}</i>
+                        <i class="tpi-cc--table-tbody-data-icon">${tpi_cc_i_calendar}</i>
                         <p class="tpi-cc--table-tbody-data-courier-status" tpi-cc-date-type="arrived" tpi-cc-parsing-data="courier-arrives-at-date">
                             ${arrivesDate || 'null'}
                         </p>
                     </div>
                     <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-date-wrapper">
-                        <i class="tpi-cc--table-tbody-data-icon">${tpiIcon__clock}</i>
+                        <i class="tpi-cc--table-tbody-data-icon">${tpi_cc_i_clock}</i>
                         <p class="tpi-cc--table-tbody-data-courier-status" tpi-cc-time-type="arrived" tpi-cc-parsing-data="courier-arrives-at-time">
                             ${arrivesTime || 'null'}
                         </p>
