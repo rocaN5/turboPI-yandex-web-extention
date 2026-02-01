@@ -138,6 +138,30 @@ tpi_cc_i_clock = `
     <circle cx="12" cy="12" r="10"></circle>
     <polyline points="12 6 12 12 16 14"></polyline>
 </svg>
+`,
+tpi_cc_i_chevron_right = `
+<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 320 512" xmlns="http://www.w3.org/2000/svg">
+    <path d="M285.476 272.971L91.132 467.314c-9.373 9.373-24.569 9.373-33.941 0l-22.667-22.667c-9.357-9.357-9.375-24.522-.04-33.901L188.505 256 34.484 101.255c-9.335-9.379-9.317-24.544.04-33.901l22.667-22.667c9.373-9.373 24.569-9.373 33.941 0L285.475 239.03c9.373 9.372 9.373 24.568.001 33.941z"></path>
+</svg>
+`,
+tpi_cc_i_chevron_left = `
+<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 320 512" xmlns="http://www.w3.org/2000/svg">
+    <path d="M34.52 239.03L228.87 44.69c9.37-9.37 24.57-9.37 33.94 0l22.67 22.67c9.36 9.36 9.37 24.52.04 33.9L131.49 256l154.02 154.75c9.34 9.38 9.32 24.54-.04 33.9l-22.67 22.67c-9.37 9.37-24.57 9.37-33.94 0L34.52 272.97c-9.37-9.37-9.37-24.57 0-33.94z"></path>
+</svg>
+`,
+tpi_cc_liquid_glass = `
+<svg style="display: none;">
+  <filter id="container-glass" x="0%" y="0%" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.008 0.008" numOctaves="2" seed="92" result="noise"></feTurbulence>
+    <feGaussianBlur in="noise" stdDeviation="0.02" result="blur"></feGaussianBlur>
+    <feDisplacementMap in="SourceGraphic" in2="blur" scale="50" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
+  </filter>
+  <filter id="settings-glass" x="0%" y="0%" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.005 0.05" numOctaves="5" seed="15" result="noise"></feTurbulence>
+    <feGaussianBlur in="noise" stdDeviation="0.02" result="blur"></feGaussianBlur>
+    <feDisplacementMap in="SourceGraphic" in2="blur" scale="30" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
+  </filter>
+</svg>
 `
 
 function checkiIs__onCartControlsPage() {
@@ -192,6 +216,9 @@ function checkiIs__onCartControlsPage() {
                             <div class="tpi-cc-search-label-title">Имя ячейки</div>
                             <input type="text" id="tpi-cc-search-courier-cell" placeholder="Введите имя ячейки" autocomplete="off">
                         </label>
+                    </div>
+                    <div class="tpi-cc-filters-item">
+                        <button class="tpi-cc-filters-reset">Сбросить фильтры</button>
                     </div>
                 </div>
             </div>
@@ -370,6 +397,7 @@ function checkiIs__onCartControlsPage() {
                 </button>
             </div>
         </div>
+        ${tpi_cc_liquid_glass}
         `
         
         const appID = document.getElementById("app")
@@ -426,6 +454,7 @@ function addCartsControlsListeners(){
     waitForTokenAndRun();
     couriersDataCapturing();
     tpi_cc_filteringColumnData()
+    initializeDatePicker();
 }
 
 
@@ -1586,4 +1615,283 @@ function update_ActionProcessContainer(){
     } else {
         toggle_ActionProcessContainer("hide");
     }
+}
+
+// B-
+// B-
+// B-   CALENDAR
+// B-
+// B-
+function initializeDatePicker() {
+    const searchDateButton = document.querySelector('.tpi-cc-search-date');
+    const selectedDateElement = document.getElementById('tpi-cc-seleceted-date');
+    
+    if (!searchDateButton) return;
+    
+    // Устанавливаем текущую дату по умолчанию
+    const today = new Date();
+    const formattedToday = formatDateToDDMMYYYY(today);
+    selectedDateElement.textContent = formattedToday;
+    searchDateButton.setAttribute('tpi-cc-selected-date-value', formattedToday);
+    
+    // Создаем и добавляем контейнер календаря
+    const calendarContainer = document.createElement('div');
+    calendarContainer.className = 'tpi-cc-calendar-container';
+    calendarContainer.style.display = 'none';
+    
+    searchDateButton.parentNode.appendChild(calendarContainer);
+    
+    // Переменные для хранения выбранной даты
+    let selectedDate = new Date(today);
+    
+    // Функция для открытия календаря
+    function openCalendar() {
+        // Обновляем календарь с текущей выбранной датой
+        createCalendar(calendarContainer, new Date(), selectedDate);
+        
+        // Показываем текущий календарь
+        calendarContainer.style.display = 'block';
+        
+        // Позиционируем под кнопкой
+        const buttonRect = searchDateButton.getBoundingClientRect();
+        
+        // Ждем 1мс для начала анимации
+        setTimeout(() => {
+            calendarContainer.setAttribute('tpi-current-animation', 'shown');
+            searchDateButton.setAttribute('tpi-current-state', 'active')
+            
+        }, 1);
+    }
+    
+    // Функция для закрытия календаря
+    function closeCalendar() {
+        if (calendarContainer.style.display === 'none') return;
+        
+        calendarContainer.removeAttribute('tpi-current-animation');
+        searchDateButton.removeAttribute('tpi-current-state')
+        
+        // Через 200мс скрываем и удаляем атрибут
+        setTimeout(() => {
+            calendarContainer.style.display = 'none';
+        }, 200);
+    }
+    
+    // Создаем календарь с передачей выбранной даты
+    createCalendar(calendarContainer, today, selectedDate);
+    
+    // Обработчик клика на кнопку
+    searchDateButton.addEventListener('click', function(event) {
+        event.stopPropagation();
+        
+        const isVisible = calendarContainer.style.display === 'block';
+        
+        // Скрываем все открытые календари
+        document.querySelectorAll('.tpi-cc-calendar-container').forEach(cal => {
+            if (cal !== calendarContainer) {
+                closeCalendarElement(cal);
+            }
+        });
+        
+        if (!isVisible) {
+            openCalendar();
+        } else {
+            closeCalendar();
+        }
+    });
+    
+    // Закрываем календарь при клике вне его
+    document.addEventListener('click', function(event) {
+        if (!calendarContainer.contains(event.target) && 
+            !searchDateButton.contains(event.target) &&
+            calendarContainer.style.display === 'block') {
+            closeCalendar();
+        }
+    });
+    
+    // Функция для закрытия другого элемента календаря
+    function closeCalendarElement(element) {
+        if (element.style.display === 'none') return;
+        
+        element.removeAttribute('tpi-current-animation');
+        searchDateButton.removeAttribute('tpi-current-state')
+        
+        setTimeout(() => {
+            element.style.display = 'none';
+        }, 200);
+    }
+    
+    // Слушаем событие изменения даты
+    document.addEventListener('tpi-date-changed', function(event) {
+        if (event.detail && event.detail.date) {
+            selectedDate = new Date(event.detail.date);
+            const formattedDate = formatDateToDDMMYYYY(selectedDate);
+            selectedDateElement.textContent = formattedDate;
+            searchDateButton.setAttribute('tpi-cc-selected-date-value', formattedDate);
+        }
+    });
+}
+
+// Функция для создания календаря
+function createCalendar(container, currentDisplayDate, currentSelectedDate) {
+    let currentMonth = currentDisplayDate.getMonth();
+    let currentYear = currentDisplayDate.getFullYear();
+    
+    function renderCalendar() {
+        container.innerHTML = '';
+        
+        // Заголовок календаря
+        const header = document.createElement('div');
+        header.className = 'tpi-cc-calendar-header';
+        
+        // Кнопка предыдущего месяца
+        const prevButton = document.createElement('button');
+        prevButton.innerHTML = tpi_cc_i_chevron_left;
+        prevButton.className = 'tpi-cc-calendar-nav';
+        prevButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            renderCalendar();
+        });
+        
+        // Отображение текущего месяца и года
+        const monthYear = document.createElement('div');
+        monthYear.className = 'tpi-cc-calendar-month-year';
+        monthYear.textContent = getMonthName(currentMonth) + ' ' + currentYear;
+        
+        // Кнопка следующего месяца
+        const nextButton = document.createElement('button');
+        nextButton.innerHTML = tpi_cc_i_chevron_right;
+        nextButton.className = 'tpi-cc-calendar-nav';
+        nextButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            renderCalendar();
+        });
+        
+        header.appendChild(prevButton);
+        header.appendChild(monthYear);
+        header.appendChild(nextButton);
+        container.appendChild(header);
+        
+        // Дни недели
+        const daysOfWeek = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+        const weekDaysRow = document.createElement('div');
+        weekDaysRow.className = 'tpi-cc-calendar-weekdays';
+        
+        daysOfWeek.forEach(day => {
+            const dayElement = document.createElement('div');
+            dayElement.textContent = day;
+            dayElement.className = 'tpi-cc-calendar-weekday';
+            weekDaysRow.appendChild(dayElement);
+        });
+        
+        container.appendChild(weekDaysRow);
+        
+        // Дни месяца
+        const daysGrid = document.createElement('div');
+        daysGrid.className = 'tpi-cc-calendar-days';
+        
+        // Получаем первый день месяца и количество дней
+        const firstDay = new Date(currentYear, currentMonth, 1);
+        const lastDay = new Date(currentYear, currentMonth + 1, 0);
+        const daysInMonth = lastDay.getDate();
+        const firstDayIndex = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
+        
+        // Пустые ячейки для первых дней
+        for (let i = 0; i < firstDayIndex; i++) {
+            const emptyCell = document.createElement('div');
+            emptyCell.className = 'tpi-cc-calendar-day empty';
+            daysGrid.appendChild(emptyCell);
+        }
+        
+        // Дни месяца
+        const today = new Date();
+        const isCurrentMonth = today.getMonth() === currentMonth && today.getFullYear() === currentYear;
+        const isSelectedMonth = currentSelectedDate.getMonth() === currentMonth && 
+                               currentSelectedDate.getFullYear() === currentYear;
+        
+        for (let day = 1; day <= daysInMonth; day++) {
+            const dayElement = document.createElement('div');
+            dayElement.textContent = day;
+            dayElement.className = 'tpi-cc-calendar-day';
+            
+            const cellDate = new Date(currentYear, currentMonth, day);
+            
+            // Проверяем, является ли этот день сегодняшним
+            const isToday = isCurrentMonth && day === today.getDate();
+            
+            // Проверяем, является ли этот день выбранным
+            const isSelected = isSelectedMonth && day === currentSelectedDate.getDate();
+            
+            // Подсвечиваем сегодняшний день (если он не выбран)
+            if (isToday && !isSelected) {
+                dayElement.classList.add('today');
+            }
+            
+            // Подсвечиваем выбранный день (включая текущий, если он выбран)
+            if (isSelected) {
+                dayElement.classList.add('selected');
+            }
+            
+            // Добавляем обработчик выбора даты
+            dayElement.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const newSelectedDate = new Date(currentYear, currentMonth, day);
+                
+                // Обновляем глобальную переменную выбранной даты
+                window.tpiSelectedDate = newSelectedDate;
+                
+                const formattedDate = formatDateToDDMMYYYY(newSelectedDate);
+                
+                // Обновляем отображение выбранной даты
+                const selectedDateElement = document.getElementById('tpi-cc-seleceted-date');
+                const searchDateButton = document.querySelector('.tpi-cc-search-date');
+                
+                selectedDateElement.textContent = formattedDate;
+                searchDateButton.setAttribute('tpi-cc-selected-date-value', formattedDate);
+                
+                // Пересоздаем календарь с новой выбранной датой
+                createCalendar(container, new Date(currentYear, currentMonth, 1), newSelectedDate);
+                
+                // Триггерим событие изменения даты
+                const dateChangeEvent = new CustomEvent('tpi-date-changed', {
+                    detail: { 
+                        date: newSelectedDate, 
+                        formattedDate: formattedDate 
+                    }
+                });
+                document.dispatchEvent(dateChangeEvent);
+            });
+            
+            daysGrid.appendChild(dayElement);
+        }
+        
+        container.appendChild(daysGrid);
+    }
+    
+    renderCalendar();
+}
+
+// Вспомогательные функции
+function formatDateToDDMMYYYY(date) {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+}
+
+function getMonthName(monthIndex) {
+    const months = [
+        'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+        'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
+    ];
+    return months[monthIndex];
 }
