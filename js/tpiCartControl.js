@@ -120,6 +120,11 @@ tpi_cc_i_search = `
     <path class="handle" d="m16.563 16.458 4.223 5.372-1.572 1.236-4.21-5.356" fill="currentcolor"/>
 </svg>
 `,
+tpi_cc_i_list = `
+<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+    <path d="M152.1 38.2c9.9 8.9 10.7 24 1.8 33.9l-72 80c-4.4 4.9-10.6 7.8-17.2 7.9s-12.9-2.4-17.6-7L7 113C-2.3 103.6-2.3 88.4 7 79s24.6-9.4 33.9 0l22.1 22.1 55.1-61.2c8.9-9.9 24-10.7 33.9-1.8zm0 160c9.9 8.9 10.7 24 1.8 33.9l-72 80c-4.4 4.9-10.6 7.8-17.2 7.9s-12.9-2.4-17.6-7L7 273c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l22.1 22.1 55.1-61.2c8.9-9.9 24-10.7 33.9-1.8zM224 96c0-17.7 14.3-32 32-32l224 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-224 0c-17.7 0-32-14.3-32-32zm0 160c0-17.7 14.3-32 32-32l224 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-224 0c-17.7 0-32-14.3-32-32zM160 416c0-17.7 14.3-32 32-32l288 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-288 0c-17.7 0-32-14.3-32-32zM48 368a48 48 0 1 1 0 96 48 48 0 1 1 0-96z"></path>
+</svg>
+`,
 tpi_cc_i_calendar = `
 <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" height="14px" width="14px" xmlns="http://www.w3.org/2000/svg">
     <rect width="416" height="384" x="48" y="80" fill="none" stroke-linejoin="round" stroke-width="32" rx="48"></rect>
@@ -215,6 +220,13 @@ function checkiIs__onCartControlsPage() {
                             <div class="tpi-cc-search-icon">${tpi_cc_i_search}</div>
                             <div class="tpi-cc-search-label-title">Имя ячейки</div>
                             <input type="text" id="tpi-cc-search-courier-cell" placeholder="Введите имя ячейки" autocomplete="off">
+                        </label>
+                    </div>
+                    <div class="tpi-cc-filters-item">
+                        <label for="tpi-cc-search-courier-status" class="tpi-cc-search-label tpi-cc-search-dropdown">
+                            <div class="tpi-cc-search-label-title">Статус курьера</div>
+                            <input type="text" id="tpi-cc-search-courier-status" placeholder="Выберите статус курьера" autocomplete="off" value="Выбраны все">
+                            <div class="tpi-cc-search-icon" style="padding: 2px">${tpi_cc_i_list}</div>
                         </label>
                     </div>
                     <div class="tpi-cc-filters-item">
@@ -455,6 +467,8 @@ function addCartsControlsListeners(){
     couriersDataCapturing();
     tpi_cc_filteringColumnData()
     initializeDatePicker();
+    initializeCourierStatusDropdown()
+    // const statusDropdown = initializeCourierStatusDropdown();
 }
 
 
@@ -1652,15 +1666,34 @@ function initializeDatePicker() {
         // Показываем текущий календарь
         calendarContainer.style.display = 'block';
         
-        // Позиционируем под кнопкой
-        const buttonRect = searchDateButton.getBoundingClientRect();
+        // Закрываем все выпадающие списки при открытии календаря
+        closeAllDropdowns();
         
         // Ждем 1мс для начала анимации
         setTimeout(() => {
             calendarContainer.setAttribute('tpi-current-animation', 'shown');
-            searchDateButton.setAttribute('tpi-current-state', 'active')
-            
+            searchDateButton.setAttribute('tpi-current-state', 'active');
         }, 1);
+        
+        // Генерируем событие открытия календаря
+        const calendarOpenedEvent = new CustomEvent('tpi-calendar-opened');
+        document.dispatchEvent(calendarOpenedEvent);
+    }
+    
+    // Добавьте эту функцию для закрытия всех выпадающих списков
+    function closeAllDropdowns() {
+        document.querySelectorAll('.tpi-cc-dropdown-container').forEach(dropdown => {
+            if (dropdown.style.display === 'block') {
+                dropdown.removeAttribute('tpi-current-animation');
+                setTimeout(() => {
+                    dropdown.style.display = 'none';
+                    const button = dropdown.parentNode.querySelector('.tpi-cc-search-dropdown');
+                    if (button) {
+                        button.removeAttribute('tpi-current-state');
+                    }
+                }, 200);
+            }
+        });
     }
     
     // Функция для закрытия календаря
@@ -1894,4 +1927,803 @@ function getMonthName(monthIndex) {
         'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
     ];
     return months[monthIndex];
+}
+
+// B- Выпадающий список с чекбоксами (универсальный компонент)
+// B- Выпадающий список с чекбоксами (универсальный компонент)
+function createDropdownCheckboxFilter(dropdownButton, options, config = {}) {
+    // Конфигурация по умолчанию
+    const defaultConfig = {
+        placeholder: 'Выберите значения',
+        selectAllText: 'Выбрать все',
+        nothingFoundText: 'Ничего не найдено',
+        showCountInInput: true,
+        multiple: true,
+        allowFiltering: true,
+        closeOnSelect: false // По умолчанию не закрываем при выборе
+    };
+    
+    const cfg = { ...defaultConfig, ...config };
+    
+    // Проверяем, что передан правильный элемент
+    if (!dropdownButton || !(dropdownButton instanceof HTMLElement)) {
+        console.error('Dropdown button element is required');
+        return null;
+    }
+    
+    // Проверяем options
+    if (!Array.isArray(options) || options.length === 0) {
+        console.error('Options array is required');
+        return null;
+    }
+    
+    // Создаем контейнер для выпадающего списка
+    const dropdownContainer = document.createElement('div');
+    dropdownContainer.className = 'tpi-cc-dropdown-container';
+    dropdownContainer.style.display = 'none';
+    
+    // Находим ближайший .tpi-cc-filters-item для правильного позиционирования
+    const filterItem = dropdownButton.closest('.tpi-cc-filters-item');
+    if (!filterItem) {
+        console.error('Could not find parent filter item');
+        return null;
+    }
+    
+    // Вставляем контейнер после фильтра
+    filterItem.appendChild(dropdownContainer);
+    
+    // Состояние компонента
+    let selectedOptions = [];
+    let allOptions = [...options];
+    let isOpen = false;
+    let filteredOptions = [...allOptions];
+    let searchTerm = '';
+    let lastFocusTime = 0;
+    let focusTimeout = null;
+    let isFirstOpen = true; // Флаг первого открытия
+    
+    // Инициализируем все опции как выбранные, если multiple = true
+    if (cfg.multiple) {
+        selectedOptions = [...options];
+    }
+    
+    // Получаем элемент ввода
+    const input = dropdownButton.querySelector('input');
+    if (!input) {
+        console.error('Input element not found inside dropdown button');
+        return null;
+    }
+    
+    // Сохраняем оригинальный текст
+    const originalText = input.value || cfg.placeholder;
+    input.setAttribute('data-original-value', originalText);
+    
+    // Функция для рендеринга выпадающего списка
+    function renderDropdown() {
+        dropdownContainer.innerHTML = '';
+        
+        // Контейнер для опций
+        const optionsContainer = document.createElement('div');
+        optionsContainer.className = 'tpi-cc-dropdown-options';
+        
+        // Добавляем чекбокс "Выбрать все" только для множественного выбора и если есть отфильтрованные опции
+        if (cfg.multiple && filteredOptions.length > 0) {
+            // Рассчитываем количество выбранных в отфильтрованных опций
+            const filteredSelected = selectedOptions.filter(opt => 
+                filteredOptions.some(fopt => fopt.value === opt.value)
+            ).length;
+            const allFilteredSelected = filteredSelected === filteredOptions.length;
+            
+            const selectAllItem = createSelectAllItem(allFilteredSelected);
+            optionsContainer.appendChild(selectAllItem);
+            
+            // Добавляем разделитель
+            const separator = document.createElement('div');
+            separator.className = 'tpi-cc-dropdown-separator';
+            optionsContainer.appendChild(separator);
+        }
+        
+        // Добавляем опции или сообщение "Ничего не найдено"
+        if (filteredOptions.length === 0) {
+            // Показываем сообщение "Ничего не найдено"
+            const nothingFoundEl = document.createElement('div');
+            nothingFoundEl.className = 'tpi-cc-dropdown-nothing';
+            nothingFoundEl.textContent = cfg.nothingFoundText;
+            optionsContainer.appendChild(nothingFoundEl);
+        } else {
+            // Создаем обертку для всех остальных элементов
+            const otherItemsWrapper = document.createElement('div');
+            otherItemsWrapper.className = 'tpi-cc-dropdown-item-wrapper';
+            
+            filteredOptions.forEach(option => {
+                const isSelected = selectedOptions.some(
+                    selected => selected.value === option.value
+                );
+                
+                const optionItem = createOptionItem(option, isSelected);
+                otherItemsWrapper.appendChild(optionItem);
+            });
+            
+            optionsContainer.appendChild(otherItemsWrapper);
+        }
+        
+        dropdownContainer.appendChild(optionsContainer);
+        
+        // Обновляем счетчики статусов
+        updateDropdownCounts(dropdownContainer);
+    }
+    
+    // Функция для создания элемента "Выбрать все"
+    function createSelectAllItem(isChecked) {
+        const item = document.createElement('div');
+        item.className = 'tpi-cc-dropdown-item';
+        item.setAttribute('data-value', 'select-all');
+        item.setAttribute('data-type', 'select-all');
+        
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = `tpi-cc-dropdown-select-all-${Date.now()}`;
+        checkbox.checked = isChecked;
+        
+        const checkboxCustom = document.createElement('div');
+        checkboxCustom.className = 'tpi-cc-dropdown-checkbox-custom';
+        
+        const labelEl = document.createElement('div');
+        labelEl.className = 'tpi-cc-dropdown-label';
+        
+        // Для "Выбрать все" используем обычный текст без дополнительной разметки
+        const labelName = document.createElement('span');
+        labelName.className = 'tpi-cc-dropdown-label-name';
+        labelName.textContent = 'Выбрать все';
+        
+        labelEl.appendChild(labelName);
+        
+        item.appendChild(checkbox);
+        item.appendChild(checkboxCustom);
+        item.appendChild(labelEl);
+        
+        // Обработчик клика
+        item.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const checkbox = item.querySelector('input[type="checkbox"]');
+            if (checkbox) {
+                if (checkbox.checked) {
+                    // Снимаем выделение со ВСЕХ отфильтрованных опций
+                    filteredOptions.forEach(option => {
+                        selectedOptions = selectedOptions.filter(
+                            selected => selected.value !== option.value
+                        );
+                    });
+                } else {
+                    // Выбираем ВСЕ отфильтрованные опции
+                    filteredOptions.forEach(option => {
+                        if (!selectedOptions.some(selected => selected.value === option.value)) {
+                            selectedOptions.push(option);
+                        }
+                    });
+                }
+                // Обновляем состояние чекбоксов
+                updateCheckboxStates();
+            }
+        });
+        
+        return item;
+    }
+    
+    // Функция для создания элемента опции
+    function createOptionItem(option, isSelected) {
+        const item = document.createElement('div');
+        item.className = 'tpi-cc-dropdown-item';
+        item.setAttribute('data-value', option.value);
+        item.setAttribute('data-type', 'option');
+        
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = `tpi-cc-dropdown-${option.value}-${Date.now()}`;
+        checkbox.checked = isSelected;
+        
+        const checkboxCustom = document.createElement('div');
+        checkboxCustom.className = 'tpi-cc-dropdown-checkbox-custom';
+        
+        const labelEl = document.createElement('div');
+        labelEl.className = 'tpi-cc-dropdown-label';
+        
+        // Создаем элементы для текста опции и количества
+        const labelName = document.createElement('p');
+        labelName.className = 'tpi-cc-dropdown-label-name';
+        labelName.textContent = option.label;
+        
+        const labelAmount = document.createElement('span');
+        labelAmount.className = 'tpi-cc-dropdown-label-amount';
+        labelAmount.textContent = '0'; // Временное значение
+        
+        labelEl.appendChild(labelName);
+        labelEl.appendChild(labelAmount);
+        
+        item.appendChild(checkbox);
+        item.appendChild(checkboxCustom);
+        item.appendChild(labelEl);
+        
+        // Обработчик клика
+        item.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const checkbox = item.querySelector('input[type="checkbox"]');
+            if (checkbox) {
+                toggleOption(option, !checkbox.checked); // Инвертируем, так как состояние еще не обновилось
+            }
+        });
+        
+        return item;
+    }
+    
+    // Функция для переключения опции
+    function toggleOption(option, shouldSelect) {
+        if (shouldSelect) {
+            // Добавляем опцию
+            if (cfg.multiple) {
+                if (!selectedOptions.some(selected => selected.value === option.value)) {
+                    selectedOptions.push(option);
+                }
+            } else {
+                // Для одиночного выбора - только одна опция
+                selectedOptions = [option];
+            }
+        } else {
+            // Удаляем опцию
+            selectedOptions = selectedOptions.filter(
+                selected => selected.value !== option.value
+            );
+        }
+        
+        updateCheckboxStates();
+        
+        if (cfg.closeOnSelect && !cfg.multiple) {
+            closeDropdown();
+        }
+    }
+    
+    // Функция для обновления состояния чекбоксов
+    function updateCheckboxStates() {
+        if (!isOpen) return;
+        
+        const optionsContainer = dropdownContainer.querySelector('.tpi-cc-dropdown-options');
+        if (!optionsContainer) return;
+        
+        // Обновляем "Выбрать все" только если он есть
+        const selectAllItem = optionsContainer.querySelector('.tpi-cc-dropdown-item[data-type="select-all"]');
+        if (selectAllItem) {
+            const selectAllCheckbox = selectAllItem.querySelector('input[type="checkbox"]');
+            // Рассчитываем количество выбранных в отфильтрованном списке
+            const filteredSelected = selectedOptions.filter(opt => 
+                filteredOptions.some(fopt => fopt.value === opt.value)
+            ).length;
+            const allFilteredSelected = filteredSelected === filteredOptions.length && filteredOptions.length > 0;
+            selectAllCheckbox.checked = allFilteredSelected;
+        }
+        
+        // Обновляем опции
+        const optionItems = optionsContainer.querySelectorAll('.tpi-cc-dropdown-item[data-type="option"]');
+        optionItems.forEach(item => {
+            const value = item.getAttribute('data-value');
+            const checkbox = item.querySelector('input[type="checkbox"]');
+            if (checkbox) {
+                const isSelected = selectedOptions.some(
+                    option => option.value === value
+                );
+                checkbox.checked = isSelected;
+            }
+        });
+    }
+    
+    // Функция для обновления текста в инпуте
+    function updateInputText() {
+        // Подсчитываем активные опции (кроме "Выбрать все")
+        const activeOptionsCount = selectedOptions.length;
+        
+        // Если ничего не выбрано, показываем placeholder
+        if (activeOptionsCount === 0) {
+            input.value = cfg.placeholder;
+            input.setAttribute('data-original-value', cfg.placeholder);
+        } 
+        // Если выбраны все доступные опции
+        else if (cfg.multiple && activeOptionsCount === allOptions.length) {
+            input.value = 'Выбраны все';
+            input.setAttribute('data-original-value', 'Выбраны все');
+        } 
+        // Если выбрано несколько
+        else if (cfg.multiple && cfg.showCountInInput) {
+            input.value = `Выбрано: ${activeOptionsCount}`;
+            input.setAttribute('data-original-value', `Выбрано: ${activeOptionsCount}`);
+        } 
+        // Если одиночный выбор
+        else if (!cfg.multiple && activeOptionsCount > 0) {
+            input.value = selectedOptions[0].label;
+            input.setAttribute('data-original-value', selectedOptions[0].label);
+        } 
+        // По умолчанию - показываем выбранные метки
+        else {
+            const labels = selectedOptions.map(opt => opt.label).join(', ');
+            input.value = labels;
+            input.setAttribute('data-original-value', labels);
+        }
+        
+        // Генерируем событие изменения
+        const changeEvent = new CustomEvent('tpi-dropdown-change', {
+            detail: {
+                selected: selectedOptions,
+                allSelected: cfg.multiple && activeOptionsCount === allOptions.length
+            }
+        });
+        dropdownButton.dispatchEvent(changeEvent);
+    }
+    
+    // Функция для фильтрации опций на основе текста в инпуте
+    function filterOptions() {
+        const searchText = input.value.toLowerCase().trim();
+        searchTerm = searchText;
+        
+        if (searchText === '') {
+            filteredOptions = [...allOptions];
+        } else {
+            filteredOptions = allOptions.filter(option =>
+                option.label.toLowerCase().includes(searchText)
+            );
+        }
+        
+        if (isOpen) {
+            renderDropdown();
+        }
+    }
+    
+    // Функция для обработки фокуса с задержкой
+    function handleFocusWithDelay() {
+        const now = Date.now();
+        const timeSinceLastFocus = now - lastFocusTime;
+        
+        // Очищаем предыдущий таймаут
+        if (focusTimeout) {
+            clearTimeout(focusTimeout);
+            focusTimeout = null;
+        }
+        
+        // Если прошло меньше 250ms с последнего фокуса
+        if (timeSinceLastFocus < 250 && lastFocusTime > 0) {
+            // Открываем немедленно
+            immediateOpenDropdown();
+        } else {
+            // Открываем с небольшой задержкой
+            focusTimeout = setTimeout(() => {
+                if (!isOpen) {
+                    openDropdown();
+                }
+                focusTimeout = null;
+            }, 50);
+        }
+        
+        lastFocusTime = now;
+    }
+    
+    // Функция для немедленного открытия (без анимации закрытия)
+    function immediateOpenDropdown() {
+        if (isOpen) return;
+        
+        // Отменяем таймер закрытия, если он есть
+        if (dropdownContainer._closeTimeout) {
+            clearTimeout(dropdownContainer._closeTimeout);
+            dropdownContainer._closeTimeout = null;
+        }
+        
+        // Сбрасываем анимацию
+        dropdownContainer.removeAttribute('tpi-current-animation');
+        dropdownButton.removeAttribute('tpi-current-state');
+        
+        // Закрываем другие открытые выпадающие списки
+        closeAllOtherDropdowns(dropdownContainer);
+        // Также закрываем открытые календари
+        closeAllCalendars();
+        
+        // Сбрасываем фильтр при открытии
+        searchTerm = '';
+        filteredOptions = [...allOptions];
+        
+        // Немедленно показываем выпадающий список
+        dropdownContainer.style.display = 'block';
+        
+        // Для первого открытия даем время на рендеринг перед анимацией
+        if (isFirstOpen) {
+            isFirstOpen = false;
+            // Рендерим содержимое
+            renderDropdown();
+            
+            // Ждем следующего фрейма для гарантированной отрисовки DOM
+            requestAnimationFrame(() => {
+                // Даем браузеру время на отрисовку
+                requestAnimationFrame(() => {
+                    dropdownContainer.setAttribute('tpi-current-animation', 'shown');
+                    dropdownButton.setAttribute('tpi-current-state', 'active');
+                });
+            });
+        } else {
+            // Рендерим содержимое
+            renderDropdown();
+            
+            // Ждем следующего фрейма для отрисовки
+            requestAnimationFrame(() => {
+                dropdownContainer.setAttribute('tpi-current-animation', 'shown');
+                dropdownButton.setAttribute('tpi-current-state', 'active');
+            });
+        }
+        
+        isOpen = true;
+        
+        // Очищаем инпут для поиска, только если это placeholder
+        if (input.value === cfg.placeholder || 
+            input.value === 'Выбраны все' || 
+            input.value.startsWith('Выбрано: ')) {
+            input.value = '';
+        }
+    }
+    
+    // Функция для открытия выпадающего списка
+    function openDropdown() {
+        if (isOpen) return;
+        
+        // Проверяем, идет ли анимация закрытия
+        if (dropdownContainer._closeTimeout) {
+            // Отменяем таймер закрытия
+            clearTimeout(dropdownContainer._closeTimeout);
+            dropdownContainer._closeTimeout = null;
+            dropdownContainer.removeAttribute('tpi-current-animation');
+            dropdownButton.removeAttribute('tpi-current-state');
+        }
+        
+        // Закрываем другие открытые выпадающие списки
+        closeAllOtherDropdowns(dropdownContainer);
+        // Также закрываем открытые календари
+        closeAllCalendars();
+        
+        // Сбрасываем фильтр при открытии
+        searchTerm = '';
+        filteredOptions = [...allOptions];
+        
+        // Показываем выпадающий список
+        dropdownContainer.style.display = 'block';
+        
+        // Для первого открытия даем время на рендеринг
+        if (isFirstOpen) {
+            isFirstOpen = false;
+            // Рендерим содержимое
+            renderDropdown();
+            
+            // Ждем следующего фрейма для отрисовки
+            requestAnimationFrame(() => {
+                // Дополнительный фрейм для гарантии
+                requestAnimationFrame(() => {
+                    dropdownContainer.setAttribute('tpi-current-animation', 'shown');
+                    dropdownButton.setAttribute('tpi-current-state', 'active');
+                });
+            });
+        } else {
+            // Рендерим содержимое
+            renderDropdown();
+            
+            // Ждем следующего фрейма для отрисовки
+            requestAnimationFrame(() => {
+                dropdownContainer.setAttribute('tpi-current-animation', 'shown');
+                dropdownButton.setAttribute('tpi-current-state', 'active');
+            });
+        }
+        
+        isOpen = true;
+        
+        // Очищаем инпут для поиска, только если это placeholder
+        if (input.value === cfg.placeholder || 
+            input.value === 'Выбраны все' || 
+            input.value.startsWith('Выбрано: ')) {
+            input.value = '';
+        }
+    }
+    
+    // Функция для закрытия выпадающего списка с проверкой фокуса
+    function closeDropdown() {
+        if (!isOpen) return;
+        
+        // Проверяем, находится ли инпут в фокусе
+        const isInputFocused = document.activeElement === input;
+        
+        if (isInputFocused) {
+            // Если инпут в фокусе, не закрываем выпадающий список
+            // Вместо этого обновляем атрибут анимации для повторного показа
+            dropdownContainer.removeAttribute('tpi-current-animation');
+            dropdownButton.removeAttribute('tpi-current-state');
+            
+            // Через 10ms снова показываем анимацию
+            setTimeout(() => {
+                if (isOpen && document.activeElement === input) {
+                    dropdownContainer.setAttribute('tpi-current-animation', 'shown');
+                    dropdownButton.setAttribute('tpi-current-state', 'active');
+                }
+            }, 10);
+            
+            return; // Не закрываем выпадающий список
+        }
+        
+        // Если инпут не в фокусе, продолжаем с закрытием
+        dropdownContainer.removeAttribute('tpi-current-animation');
+        dropdownButton.removeAttribute('tpi-current-state');
+        
+        // Мгновенно обновляем текст в инпуте
+        updateInputText();
+        
+        // Сохраняем таймер для возможности отмены
+        dropdownContainer._closeTimeout = setTimeout(() => {
+            // Перед скрытием еще раз проверяем фокус
+            const isStillFocused = document.activeElement === input;
+            if (isStillFocused) {
+                // Если инпут снова в фокусе, не скрываем
+                dropdownContainer.setAttribute('tpi-current-animation', 'shown');
+                dropdownButton.setAttribute('tpi-current-state', 'active');
+                dropdownContainer._closeTimeout = null;
+                return;
+            }
+            
+            dropdownContainer.style.display = 'none';
+            isOpen = false;
+            dropdownContainer._closeTimeout = null;
+        }, 200);
+        
+        // Очищаем фильтр при закрытии
+        searchTerm = '';
+        filteredOptions = [...allOptions];
+    }
+    
+    // Функция для принудительного закрытия выпадающего списка
+    function forceCloseDropdown() {
+        if (!isOpen) return;
+        
+        // Отменяем таймер закрытия, если он есть
+        if (dropdownContainer._closeTimeout) {
+            clearTimeout(dropdownContainer._closeTimeout);
+            dropdownContainer._closeTimeout = null;
+        }
+        
+        dropdownContainer.removeAttribute('tpi-current-animation');
+        dropdownButton.removeAttribute('tpi-current-state');
+        
+        // Мгновенно обновляем текст в инпуте
+        updateInputText();
+        
+        // Немедленно скрываем контейнер (не проверяем фокус)
+        dropdownContainer.style.display = 'none';
+        isOpen = false;
+        
+        // Очищаем фильтр
+        searchTerm = '';
+        filteredOptions = [...allOptions];
+    }
+    
+    // Функция для закрытия других выпадающих списков
+    function closeAllOtherDropdowns(currentDropdown) {
+        document.querySelectorAll('.tpi-cc-dropdown-container').forEach(dropdown => {
+            if (dropdown !== currentDropdown && dropdown.style.display === 'block') {
+                // Принудительно закрываем
+                dropdown.removeAttribute('tpi-current-animation');
+                const button = dropdown.parentNode.querySelector('.tpi-cc-search-dropdown');
+                if (button) {
+                    button.removeAttribute('tpi-current-state');
+                }
+                dropdown.style.display = 'none';
+            }
+        });
+    }
+    
+    // Функция для закрытия всех календарей
+    function closeAllCalendars() {
+        document.querySelectorAll('.tpi-cc-calendar-container').forEach(calendar => {
+            if (calendar.style.display === 'block') {
+                calendar.removeAttribute('tpi-current-animation');
+                const searchDateButton = document.querySelector('.tpi-cc-search-date');
+                if (searchDateButton) {
+                    searchDateButton.removeAttribute('tpi-current-state');
+                }
+                calendar.style.display = 'none';
+            }
+        });
+    }
+    
+    // Обработчики событий
+    
+    // Фокус на инпуте с умной обработкой
+    input.addEventListener('focus', function() {
+        handleFocusWithDelay();
+    });
+    
+    // Клик по инпуту
+    input.addEventListener('click', function(event) {
+        event.stopPropagation();
+        // Дополнительно обрабатываем клик для немедленного открытия
+        if (!isOpen) {
+            immediateOpenDropdown();
+        }
+    });
+    
+    // Потеря фокуса инпутом - закрываем с небольшой задержкой
+    input.addEventListener('blur', function() {
+        // Очищаем таймаут фокуса
+        if (focusTimeout) {
+            clearTimeout(focusTimeout);
+            focusTimeout = null;
+        }
+        
+        // Даем время на обработку клика внутри выпадающего списка
+        setTimeout(() => {
+            const activeElement = document.activeElement;
+            const isClickInside = dropdownContainer.contains(activeElement) || 
+                                 dropdownButton.contains(activeElement);
+            
+            // Если клик был вне выпадающего списка и кнопки, закрываем
+            if (!isClickInside) {
+                closeDropdown();
+            }
+        }, 100);
+    });
+    
+    // Ввод текста для фильтрации
+    if (cfg.allowFiltering) {
+        input.addEventListener('input', function() {
+            filterOptions();
+        });
+    }
+    
+    // Обработчик клика на кнопку (иконка)
+    const icon = dropdownButton.querySelector('.tpi-cc-search-icon');
+    if (icon) {
+        icon.addEventListener('click', function(event) {
+            event.stopPropagation();
+            if (!isOpen) {
+                immediateOpenDropdown();
+            } else {
+                closeDropdown();
+            }
+        });
+    }
+    
+    // Предотвращаем событие mousedown на контейнере выпадающего списка
+    dropdownContainer.addEventListener('mousedown', function(event) {
+        event.preventDefault();
+        // Восстанавливаем фокус на input
+        if (document.activeElement !== input) {
+            input.focus();
+        }
+    });
+    
+    // Обработчик клика на весь контейнер выпадающего списка
+    dropdownContainer.addEventListener('click', function(event) {
+        event.stopPropagation();
+    });
+    
+    // Закрываем выпадающий список при клике вне его
+    document.addEventListener('click', function(event) {
+        const target = event.target;
+        const isClickInsideDropdown = dropdownContainer.contains(target) || 
+                                      dropdownButton.contains(target);
+        
+        if (!isClickInsideDropdown && isOpen) {
+            closeDropdown();
+        }
+    });
+    
+    // Закрываем выпадающий список при открытии календаря
+    document.addEventListener('tpi-calendar-opened', function() {
+        if (isOpen) {
+            forceCloseDropdown();
+        }
+    });
+    
+    // Инициализация текста в инпуте
+    updateInputText();
+    
+    // Возвращаем методы для управления компонентом
+    return {
+        getSelectedOptions: () => [...selectedOptions],
+        setSelectedOptions: (options) => {
+            selectedOptions = [...options];
+            updateCheckboxStates();
+            updateInputText();
+        },
+        getAllOptions: () => [...allOptions],
+        setOptions: (newOptions) => {
+            allOptions = [...newOptions];
+            // Фильтруем selectedOptions, оставляя только те, которые есть в новых options
+            selectedOptions = selectedOptions.filter(selected => 
+                newOptions.some(option => option.value === selected.value)
+            );
+            filteredOptions = [...allOptions];
+            if (isOpen) {
+                renderDropdown();
+            }
+            updateInputText();
+        },
+        open: () => immediateOpenDropdown(),
+        close: () => closeDropdown(),
+        isOpen: () => isOpen,
+        updateInputText: () => updateInputText()
+    };
+}
+// Инициализация выпадающего списка для статусов курьера
+function initializeCourierStatusDropdown() {
+    const statusDropdownButton = document.querySelector('.tpi-cc-search-dropdown');
+    
+    if (!statusDropdownButton) {
+        console.warn('Status dropdown button not found');
+        return null;
+    }
+    
+    // Опции для статусов курьера
+    const statusOptions = [
+        { value: 'finished', label: 'Собран' },
+        { value: 'in_progress', label: 'В работе' },
+        { value: 'not_started', label: 'Не начат' },
+        { value: 'shipped', label: 'Отгружен' },
+        { value: 'cell_shipped', label: 'Передано курьеру' }
+    ];
+    
+    // Создаем выпадающий список
+    const statusDropdown = createDropdownCheckboxFilter(statusDropdownButton, statusOptions, {
+        placeholder: '',
+        selectAllText: 'Выбрать все',
+        nothingFoundText: 'Ничего не найдено',
+        searchPlaceholder: 'Поиск статуса...',
+        showCountInInput: true,
+        multiple: true
+    });
+    
+    return statusDropdown;
+}
+
+// Функция для подсчета статусов в таблице
+function countStatusInTable() {
+    const tableBody = document.querySelector('tbody.tpi-cc--table-tbody-wrapper');
+    if (!tableBody) {
+        return null; // Таблица еще не создана
+    }
+    
+    const rows = tableBody.querySelectorAll('tr.tpi-cc--table-tbody');
+    if (rows.length === 0) {
+        return null; // Нет строк в таблице
+    }
+    
+    const statusCounts = {};
+    
+    rows.forEach(row => {
+        const statusElement = row.querySelector('p[tpi-cc-parsing-data="courier-route-status"]');
+        if (statusElement) {
+            const statusText = statusElement.textContent.trim();
+            statusCounts[statusText] = (statusCounts[statusText] || 0) + 1;
+        }
+    });
+    
+    return statusCounts;
+}
+
+// Функция для обновления счетчиков в выпадающем списке
+function updateDropdownCounts(dropdownContainer) {
+    const statusCounts = countStatusInTable();
+    if (!statusCounts) return;
+    
+    // Находим все элементы опций в выпадающем списке
+    const optionItems = dropdownContainer.querySelectorAll('.tpi-cc-dropdown-item[data-type="option"]');
+    
+    optionItems.forEach(item => {
+        const labelName = item.querySelector('.tpi-cc-dropdown-label-name');
+        if (labelName) {
+            const optionText = labelName.textContent.trim();
+            const count = statusCounts[optionText] || 0;
+            
+            const labelAmount = item.querySelector('.tpi-cc-dropdown-label-amount');
+            if (labelAmount) {
+                labelAmount.textContent = count > 0 ? count.toString() : '0';
+            }
+        }
+    });
 }

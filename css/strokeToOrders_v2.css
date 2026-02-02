@@ -1179,8 +1179,6 @@ label.tpi-sto--settiings-option {
         opacity: 0;
         filter: blur(3px);
         transition: 150ms linear;
-        /* left: 40%;
-        top: 1px; */
     }
 }
 
