@@ -87,7 +87,6 @@ tpi_cc_i_checmark = `
             <stop offset="100%" stop-color="var(--no-ds-color-2)" />
         </linearGradient>
     </defs>
-    
     <circle class="tpi-circle-outline" cx="60" cy="60" r="50" stroke="url(#circleGradient)"/>
     <path class="tpi-checkmark" d="M43,60 L55,75 L78,45" stroke="url(#circleGradient)" fill="none" stroke-width="4"/>
 </svg>
@@ -120,9 +119,9 @@ tpi_cc_i_search = `
     <path class="handle" d="m16.563 16.458 4.223 5.372-1.572 1.236-4.21-5.356" fill="currentcolor"/>
 </svg>
 `,
-tpi_cc_i_list = `
-<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-    <path d="M152.1 38.2c9.9 8.9 10.7 24 1.8 33.9l-72 80c-4.4 4.9-10.6 7.8-17.2 7.9s-12.9-2.4-17.6-7L7 113C-2.3 103.6-2.3 88.4 7 79s24.6-9.4 33.9 0l22.1 22.1 55.1-61.2c8.9-9.9 24-10.7 33.9-1.8zm0 160c9.9 8.9 10.7 24 1.8 33.9l-72 80c-4.4 4.9-10.6 7.8-17.2 7.9s-12.9-2.4-17.6-7L7 273c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l22.1 22.1 55.1-61.2c8.9-9.9 24-10.7 33.9-1.8zM224 96c0-17.7 14.3-32 32-32l224 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-224 0c-17.7 0-32-14.3-32-32zm0 160c0-17.7 14.3-32 32-32l224 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-224 0c-17.7 0-32-14.3-32-32zM160 416c0-17.7 14.3-32 32-32l288 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-288 0c-17.7 0-32-14.3-32-32zM48 368a48 48 0 1 1 0 96 48 48 0 1 1 0-96z"></path>
+tpi_cc_i_chevron_down = `
+<svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" style="fill: transparent;">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
 </svg>
 `,
 tpi_cc_i_calendar = `
@@ -152,6 +151,16 @@ tpi_cc_i_chevron_right = `
 tpi_cc_i_chevron_left = `
 <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 320 512" xmlns="http://www.w3.org/2000/svg">
     <path d="M34.52 239.03L228.87 44.69c9.37-9.37 24.57-9.37 33.94 0l22.67 22.67c9.36 9.36 9.37 24.52.04 33.9L131.49 256l154.02 154.75c9.34 9.38 9.32 24.54-.04 33.9l-22.67 22.67c-9.37 9.37-24.57 9.37-33.94 0L34.52 272.97c-9.37-9.37-9.37-24.57 0-33.94z"></path>
+</svg>
+`,
+tpi_cc_i_couriersTotal = `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512">
+    <path d="M320 16a104 104 0 1 1 0 208 104 104 0 1 1 0-208zM96 88a72 72 0 1 1 0 144 72 72 0 1 1 0-144zM0 416c0-70.7 57.3-128 128-128 12.8 0 25.2 1.9 36.9 5.4-32.9 36.8-52.9 85.4-52.9 138.6l0 16c0 11.4 2.4 22.2 6.7 32L32 480c-17.7 0-32-14.3-32-32l0-32zm521.3 64c4.3-9.8 6.7-20.6 6.7-32l0-16c0-53.2-20-101.8-52.9-138.6 11.7-3.5 24.1-5.4 36.9-5.4 70.7 0 128 57.3 128 128l0 32c0 17.7-14.3 32-32 32l-86.7 0zM472 160a72 72 0 1 1 144 0 72 72 0 1 1 -144 0zM160 432c0-88.4 71.6-160 160-160s160 71.6 160 160l0 16c0 17.7-14.3 32-32 32l-256 0c-17.7 0-32-14.3-32-32l0-16z"></path>
+</svg>
+`,
+tpi_cc_i_couriersFiltered = `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512">
+    <path d="M256.1 8a120 120 0 1 1 0 240 120 120 0 1 1 0-240zM226.4 304l59.4 0c6.7 0 13.2 .4 19.7 1.1-.9 4.9-1.4 9.9-1.4 15l0 92.1c0 25.5 10.1 49.9 28.1 67.9l31.9 31.9-286.3 0c-16.4 0-29.7-13.3-29.7-29.7 0-98.5 79.8-178.3 178.3-178.3zM352.1 412.2l0-92.1c0-17.7 14.3-32 32-32l92.1 0c12.7 0 24.9 5.1 33.9 14.1l96 96c18.7 18.7 18.7 49.1 0 67.9l-76.1 76.1c-18.7 18.7-49.1 18.7-67.9 0l-96-96c-9-9-14.1-21.2-14.1-33.9zm104-44.2a24 24 0 1 0 -48 0 24 24 0 1 0 48 0z"></path>
 </svg>
 `,
 tpi_cc_liquid_glass = `
@@ -205,7 +214,7 @@ function checkiIs__onCartControlsPage() {
                     <div class="tpi-cc-filters-item">
                         <button class="tpi-cc-search-date">
                             <div class="tpi-cc-search-icon">${tpi_cc_i_calendar}</div>
-                            <div class="tpi-cc-search-label-title" id="tpi-cc-seleceted-date">Дата отгрузки</div>
+                            <div class="tpi-cc-search-label-title" id="tpi-cc-seleceted-date">Дата</div>
                         </button>
                     </div>
                     <div class="tpi-cc-filters-item">
@@ -226,8 +235,18 @@ function checkiIs__onCartControlsPage() {
                         <label for="tpi-cc-search-courier-status" class="tpi-cc-search-label tpi-cc-search-dropdown">
                             <div class="tpi-cc-search-label-title">Статус курьера</div>
                             <input type="text" id="tpi-cc-search-courier-status" placeholder="Выберите статус курьера" autocomplete="off" value="Выбраны все">
-                            <div class="tpi-cc-search-icon" style="padding: 2px">${tpi_cc_i_list}</div>
+                            <div class="tpi-cc-search-icon">${tpi_cc_i_chevron_down}</div>
                         </label>
+                    </div>
+                    <div class="tpi-cc-data-item">
+                        <div class="tpi-cc-data-item-container">
+                            <i class="tpi-cc-data-item-icon">${tpi_cc_i_couriersTotal}</i>
+                            <p class="tpi-cc-data-item-title" id="tpi-cc-data-total-couriers">Всего: <span>0</span></p>
+                        </div>
+                        <div class="tpi-cc-data-item-container">
+                            <i class="tpi-cc-data-item-icon">${tpi_cc_i_couriersFiltered}</i>
+                            <p class="tpi-cc-data-item-title" id="tpi-cc-data-filtered-couriers">Фильтр: <span>0</span></p>
+                        </div>
                     </div>
                     <div class="tpi-cc-filters-item">
                         <button class="tpi-cc-filters-reset">Сбросить фильтры</button>
@@ -1111,32 +1130,37 @@ function couriersDataCapturing(){
                 const row = createCourierTableRow(courier, index);
                 tpi_cc_tableBody.appendChild(row);
             });
-            
+            saveOriginalRowOrder();
+            initializeAllFilters();
             // Скрываем блок загрузки и показываем таблицу
             document.querySelector('.tpi-cc--no-ds-data-wrapper').style.display = 'none';
             document.querySelector('.tpi-cc--table-wrapper').style.display = 'block';
     
             cartPallet_btnActions();
-    
+            tpi_cc_filteringColumnData();
+            
         } catch (error) {
             console.log('💥 Ошибка при заполнении таблицы:', error);
             updateLoadingStatus(0, 'error');
         }
     }
 
-    function cartPallet_btnActions(){
+    function cartPallet_btnActions() {
         const tpi_cc_actionButtons = document.querySelectorAll('.tpi-cc-table-tbody-data-cart-id, .tpi-cc-table-tbody-data-pallet-id');
         tpi_cc_actionButtons.forEach(btn => {
-            btn.addEventListener('click', () => {
-                if (btn.hasAttribute('tpi-cc-selected-courier-cell')) {
-                    btn.removeAttribute('tpi-cc-selected-courier-cell');
+            const newBtn = btn.cloneNode(true);
+            btn.parentNode.replaceChild(newBtn, btn);
+            
+            newBtn.addEventListener('click', () => {
+                if (newBtn.hasAttribute('tpi-cc-selected-courier-cell')) {
+                    newBtn.removeAttribute('tpi-cc-selected-courier-cell');
                 } else {
-                    btn.setAttribute('tpi-cc-selected-courier-cell', '');
+                    newBtn.setAttribute('tpi-cc-selected-courier-cell', '');
                 }
-                update_ActionProcessContainer()
-            })
+                update_ActionProcessContainer();
+            });
         });
-        update_ActionProcessContainer()
+        update_ActionProcessContainer();
     }
 
     function createCourierTableRow(courierData, index) {
@@ -2623,8 +2647,8 @@ function createDropdownCheckboxFilter(dropdownButton, options, config = {}) {
     // Инициализация текста в инпуте
     updateInputText();
     
-    // Возвращаем методы для управления компонентом
-    return {
+
+    const dropdownInstance = {
         getSelectedOptions: () => [...selectedOptions],
         setSelectedOptions: (options) => {
             selectedOptions = [...options];
@@ -2634,7 +2658,6 @@ function createDropdownCheckboxFilter(dropdownButton, options, config = {}) {
         getAllOptions: () => [...allOptions],
         setOptions: (newOptions) => {
             allOptions = [...newOptions];
-            // Фильтруем selectedOptions, оставляя только те, которые есть в новых options
             selectedOptions = selectedOptions.filter(selected => 
                 newOptions.some(option => option.value === selected.value)
             );
@@ -2649,6 +2672,10 @@ function createDropdownCheckboxFilter(dropdownButton, options, config = {}) {
         isOpen: () => isOpen,
         updateInputText: () => updateInputText()
     };
+
+    dropdownButton.tpiDropdownInstance = dropdownInstance;
+    
+    return dropdownInstance;
 }
 // Инициализация выпадающего списка для статусов курьера
 function initializeCourierStatusDropdown() {
@@ -2726,4 +2753,736 @@ function updateDropdownCounts(dropdownContainer) {
             }
         }
     });
+}
+
+// C-
+// C-
+// C- Сортировка ТАБЛИЦЫ
+// C-
+// C-
+
+// Глобальная переменная для хранения исходного порядка строк
+let tpi_cc_originalRowOrder = [];
+let tpi_cc_currentFilterColumn = null;
+let tpi_cc_currentFilterDirection = null;
+
+// Сохраняем исходный порядок строк с их обработчиками
+function saveOriginalRowOrder() {
+    const tableBody = document.querySelector('.tpi-cc--table-tbody-wrapper');
+    if (!tableBody || tableBody.children.length === 0) return;
+    
+    tpi_cc_originalRowOrder = Array.from(tableBody.querySelectorAll('.tpi-cc--table-tbody'));
+}
+
+// Модифицированная функция фильтрации с сохранением обработчиков
+function tpi_cc_filteringColumnData() {
+    const table = document.querySelector('table.tpi-cc--table-data-output');
+    if (!table) {
+        tpiNotification.show('Ошибка', "error", "Не смог найти таблицу");
+        return;
+    }
+    
+    table.addEventListener('click', (event) => {
+        const headerItem = event.target.closest('.tpi-cc--table-thead-item');
+        if (!headerItem) return;
+        if (headerItem.hasAttribute('tpi-cc-filters-not-allowed')) {
+            return;
+        }
+        
+        const targetDiv = headerItem.querySelector('div.tpi-cc--table-thead-data');
+        if (!targetDiv) return;
+        
+        const currentState = targetDiv.getAttribute('tpi-current-state');
+        const columnIndex = Array.from(headerItem.parentElement.children).indexOf(headerItem);
+        let nextState = null;
+        
+        // Проверяем, нажимаем ли мы на тот же столбец
+        const isSameColumn = tpi_cc_currentFilterColumn === columnIndex;
+        
+        if (!currentState) {
+            nextState = 'filtered-down';
+            tpi_cc_currentFilterDirection = 'down';
+        } else if (currentState === 'filtered-down') {
+            nextState = 'filtered-up';
+            tpi_cc_currentFilterDirection = 'up';
+        }
+        
+        // Сбрасываем все фильтры перед применением нового
+        document.querySelectorAll('div.tpi-cc--table-thead-data[tpi-current-state]').forEach(div => {
+            div.removeAttribute('tpi-current-state');
+        });
+        
+        // Сбрасываем визуальные эффекты
+        document.querySelectorAll('td.tpi-cc--table-tbody-item[tpi-current-state]').forEach(td => {
+            td.removeAttribute('tpi-current-state');
+        });
+        
+        if (nextState) {
+            // Устанавливаем новый фильтр
+            targetDiv.setAttribute('tpi-current-state', nextState);
+            tpi_cc_currentFilterColumn = columnIndex;
+            
+            // Сортируем таблицу по выбранному столбцу
+            sortTableByColumnMove(columnIndex, nextState);
+            
+        } else {
+            // Если фильтр снят
+            tpi_cc_currentFilterColumn = null;
+            tpi_cc_currentFilterDirection = null;
+            // Восстанавливаем исходный порядок
+            restoreOriginalRowOrder();
+        }
+    });
+}
+
+// Новая функция сортировки, которая перемещает строки, а не пересоздает их
+function sortTableByColumnMove(columnIndex, sortDirection) {
+    const tableBody = document.querySelector('.tpi-cc--table-tbody-wrapper');
+    if (!tableBody) return;
+    
+    // Если исходный порядок не сохранен, сохраняем его
+    if (tpi_cc_originalRowOrder.length === 0) {
+        saveOriginalRowOrder();
+    }
+    
+    // Получаем только видимые строки
+    const rows = Array.from(tableBody.querySelectorAll('.tpi-cc--table-tbody'))
+        .filter(row => row.style.display !== 'none');
+    
+    if (rows.length === 0) return;
+    
+    // Сохраняем порядок скрытых строк
+    const hiddenRows = Array.from(tableBody.querySelectorAll('.tpi-cc--table-tbody'))
+        .filter(row => row.style.display === 'none');
+    
+    // Создаем массив объектов с данными видимых строк для сортировки
+    const rowData = rows.map((row, index) => {
+        const cell = row.querySelectorAll('td.tpi-cc--table-tbody-item')[columnIndex];
+        return {
+            row: row,
+            originalIndex: index,
+            value: extractCellValue(cell),
+            sortValue: getSortValue(cell, columnIndex)
+        };
+    });
+    
+    // Сортируем данные
+    rowData.sort((a, b) => {
+        let comparison = 0;
+        
+        if (a.sortValue !== null && b.sortValue !== null) {
+            comparison = a.sortValue - b.sortValue;
+        } else if (typeof a.value === 'string' && typeof b.value === 'string') {
+            comparison = a.value.localeCompare(b.value, 'ru', { sensitivity: 'base' });
+        }
+        
+        if (comparison === 0) {
+            comparison = a.originalIndex - b.originalIndex;
+        }
+        
+        if (sortDirection === 'filtered-up') {
+            comparison = -comparison;
+        }
+        
+        return comparison;
+    });
+    
+    // Собираем все строки в правильном порядке
+    const sortedVisibleRows = rowData.map(item => item.row);
+    const allRows = [...sortedVisibleRows, ...hiddenRows];
+    
+    // Перемещаем строки в новом порядке
+    moveRowsToNewOrder(allRows);
+    
+    // Добавляем визуальные эффекты к ячейкам
+    addVisualEffectsWithFilter(columnIndex);
+}
+
+// Функция для получения значения для сортировки
+function getSortValue(cell, columnIndex) {
+    if (!cell) return null;
+    
+    // Для процентных значений
+    const percentElement = cell.querySelector('p[tpi-cc-parsing-data*="progress-percent"]');
+    if (percentElement) {
+        const percentText = percentElement.textContent.trim().replace('%', '');
+        return parseInt(percentText) || 0;
+    }
+    
+    // Для числовых значений (прогресс)
+    const progressElement = cell.querySelector('p[tpi-cc-parsing-data*="progress"]');
+    if (progressElement && !progressElement.textContent.includes('%')) {
+        const match = progressElement.textContent.match(/(\d+)\s*из\s*(\d+)/);
+        if (match) {
+            return parseInt(match[1]) || 0;
+        }
+    }
+    
+    // Для дат
+    const dateElement = cell.querySelector('p[tpi-cc-parsing-data*="date"]');
+    if (dateElement && dateElement.textContent !== 'null') {
+        return parseDateString(dateElement.textContent.trim());
+    }
+    
+    // Для времени
+    const timeElement = cell.querySelector('p[tpi-cc-parsing-data*="time"]');
+    if (timeElement && timeElement.textContent !== 'null') {
+        return parseTimeString(timeElement.textContent.trim());
+    }
+    
+    return null; // Используем текстовое сравнение
+}
+
+// Функция для перемещения строк с анимацией
+function moveRowsToNewOrder(rowsInNewOrder) {
+    const tableBody = document.querySelector('.tpi-cc--table-tbody-wrapper');
+    if (!tableBody) return;
+    
+    // Временно отключаем анимацию для производительности
+    tableBody.style.transition = 'none';
+    
+    // Сохраняем текущие позиции
+    const originalPositions = new Map();
+    const rows = Array.from(tableBody.querySelectorAll('.tpi-cc--table-tbody'));
+    
+    rows.forEach((row, index) => {
+        originalPositions.set(row, {
+            element: row,
+            originalIndex: index,
+            rect: row.getBoundingClientRect()
+        });
+    });
+    
+    // Очищаем таблицу
+    tableBody.innerHTML = '';
+    
+    // Добавляем строки в новом порядке
+    rowsInNewOrder.forEach(row => {
+        tableBody.appendChild(row);
+    });
+    
+    // Включаем анимацию обратно
+    setTimeout(() => {
+        tableBody.style.transition = '';
+    }, 10);
+}
+
+// Функция для восстановления исходного порядка
+function restoreOriginalRowOrder() {
+    if (tpi_cc_originalRowOrder.length === 0) return;
+    
+    const tableBody = document.querySelector('.tpi-cc--table-tbody-wrapper');
+    if (!tableBody) return;
+    
+    // Удаляем сообщение "нет результатов", если оно есть
+    removeNoResultsMessage();
+    
+    // Очищаем таблицу
+    tableBody.innerHTML = '';
+    
+    // Добавляем строки в исходном порядке
+    tpi_cc_originalRowOrder.forEach(row => {
+        tableBody.appendChild(row);
+    });
+    
+    // Восстанавливаем фильтры
+    applyAllFilters();
+    
+    // Восстанавливаем обработчики событий
+    restoreEventListeners();
+}
+
+function removeNoResultsMessage() {
+    const existingMessage = document.querySelector('tr[tpi-cc-no-filtered-results]');
+    if (existingMessage) {
+        existingMessage.classList.remove('shown');
+        if (existingMessage.parentNode) {
+            existingMessage.parentNode.removeChild(existingMessage);
+        }
+    }
+}
+
+function showNoResultsMessage() {
+    const tableBody = document.querySelector('.tpi-cc--table-tbody-wrapper');
+    if (!tableBody) return;
+    
+    // Проверяем, не добавлено ли уже сообщение
+    const existingMessage = document.querySelector('tr[tpi-cc-no-filtered-results]');
+    if (existingMessage) return; // Сообщение уже есть, ничего не делаем
+    
+    // Создаем строку с сообщением
+    const noResultsRow = document.createElement('tr');
+    noResultsRow.setAttribute('tpi-cc-no-filtered-results', '');
+    noResultsRow.className = 'tpi-cc-no-results-row';
+    
+    // Создаем ячейку, которая занимает все колонки
+    const td = document.createElement('td');
+    td.colSpan = 11; // Количество колонок в таблице
+    td.className = 'tpi-cc-no-results-cell';
+    td.innerHTML = `
+        <div class="tpi-cc-no-results-container">
+            <p class="tpi-cc-no-results-title">Нет результатов по выбранным фильтрам</p>
+            <i class="tpi-cc-no-results-icon"></i>
+        </div>
+    `
+    
+    noResultsRow.appendChild(td);
+    tableBody.appendChild(noResultsRow);
+    
+    // Добавляем CSS класс для анимации
+    setTimeout(() => {
+        noResultsRow.classList.add('shown');
+    }, 10);
+}
+
+// Функция для добавления визуальных эффектов
+function addVisualEffects(columnIndex) {
+    const table = document.querySelector('table.tpi-cc--table-data-output');
+    if (!table) return;
+    
+    const tableBodyRows = table.querySelectorAll('tbody tr');
+    
+    tableBodyRows.forEach((row, rowIndex) => {
+        const cells = row.querySelectorAll('td.tpi-cc--table-tbody-item');
+        if (cells.length > columnIndex) {
+            const cell = cells[columnIndex];
+            
+            // Удаляем старые атрибуты
+            cell.removeAttribute('tpi-current-state');
+            
+            // Добавляем новые
+            if (rowIndex === tableBodyRows.length - 1) {
+                cell.setAttribute('tpi-current-state', 'filtered-last');
+            } else {
+                cell.setAttribute('tpi-current-state', 'filtered');
+            }
+        }
+    });
+}
+
+// Функция для восстановления обработчиков событий
+function restoreEventListeners() {
+    // Восстанавливаем обработчики для кнопок CART и PALLET
+    const tpi_cc_actionButtons = document.querySelectorAll('.tpi-cc-table-tbody-data-cart-id, .tpi-cc-table-tbody-data-pallet-id');
+    tpi_cc_actionButtons.forEach(btn => {
+        // Удаляем старые обработчики
+        const newBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn, btn);
+        
+        // Добавляем новый обработчик
+        newBtn.addEventListener('click', () => {
+            if (newBtn.hasAttribute('tpi-cc-selected-courier-cell')) {
+                newBtn.removeAttribute('tpi-cc-selected-courier-cell');
+            } else {
+                newBtn.setAttribute('tpi-cc-selected-courier-cell', '');
+            }
+            update_ActionProcessContainer();
+        });
+    });
+    
+    // Восстанавливаем обработчики для кнопок добавления CART/PALLET
+    const addCartButtons = document.querySelectorAll('.tpi-cc--table-tbody-add-cart');
+    const addPalletButtons = document.querySelectorAll('.tpi-cc--table-tbody-add-pallet');
+    
+    addCartButtons.forEach(btn => {
+        const newBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn, btn);
+        // Здесь можно добавить обработчик для добавления CART
+    });
+    
+    addPalletButtons.forEach(btn => {
+        const newBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn, btn);
+        // Здесь можно добавить обработчик для добавления PALLET
+    });
+    
+    // Восстанавливаем обработчики для кнопок печати
+    const printButtons = document.querySelectorAll('.tpi-cc--print-current-row');
+    printButtons.forEach(btn => {
+        const newBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn, btn);
+        // Здесь можно добавить обработчик для печати
+    });
+    
+    // Обновляем контейнер действий
+    update_ActionProcessContainer();
+}
+
+// Функция для извлечения текстового значения из ячейки
+function extractCellValue(cell) {
+    if (!cell) return '';
+    
+    // Для ячеек со ссылками
+    const linkElement = cell.querySelector('a.tpi-cc--table-tbody-data-link');
+    if (linkElement) {
+        return linkElement.textContent.trim();
+    }
+    
+    // Для ячеек с кнопками CART/PALLET
+    const buttonElements = cell.querySelectorAll('.tpi-cc--table-tbody-data-button');
+    if (buttonElements.length > 0) {
+        // Возвращаем текст первой кнопки или пустую строку
+        return buttonElements[0].textContent.trim();
+    }
+    
+    // Для ячеек с текстовыми данными
+    const textElements = cell.querySelectorAll('p[tpi-cc-parsing-data]');
+    if (textElements.length > 0) {
+        // Объединяем текст всех параграфов
+        return Array.from(textElements)
+            .map(el => el.textContent.trim())
+            .filter(text => text)
+            .join(' ');
+    }
+    
+    // Для ячеек с обычным текстом
+    if (cell.textContent) {
+        return cell.textContent.trim();
+    }
+    
+    return '';
+}
+
+// Функция для парсинга даты из строки (если еще не существует)
+function parseDateString(dateStr) {
+    if (!dateStr || dateStr === 'null') return null;
+    
+    try {
+        // Формат: DD/MM/YYYY
+        const parts = dateStr.split('/');
+        if (parts.length === 3) {
+            const day = parseInt(parts[0], 10);
+            const month = parseInt(parts[1], 10) - 1;
+            const year = parseInt(parts[2], 10);
+            return new Date(year, month, day).getTime();
+        }
+    } catch (e) {
+        console.error('Ошибка парсинга даты:', e);
+    }
+    return null;
+}
+
+// Функция для парсинга времени из строки (если еще не существует)
+function parseTimeString(timeStr) {
+    if (!timeStr || timeStr === 'null') return null;
+    
+    try {
+        // Формат: HH:MM:SS
+        const parts = timeStr.split(':');
+        if (parts.length >= 2) {
+            const hours = parseInt(parts[0], 10);
+            const minutes = parseInt(parts[1], 10);
+            const seconds = parts.length > 2 ? parseInt(parts[2], 10) : 0;
+            return hours * 3600 + minutes * 60 + seconds;
+        }
+    } catch (e) {
+        console.error('Ошибка парсинга времени:', e);
+    }
+    return null;
+}
+
+// C-
+// C-
+// C- Фильтр ИНПУТОВ
+// C-
+// C-
+
+let tpi_cc_currentFilters = {
+    courierName: '',
+    cellName: '',
+    statuses: [], // Массив выбранных статусов
+    allStatusesSelected: false
+};
+
+// Инициализация всех фильтров
+function initializeAllFilters() {
+    initializeCourierNameFilter();
+    initializeCellFilter();
+    initializeStatusFilter();
+    initializeResetFiltersButton();
+    initializeTotalCourierCount();
+}
+
+// Фильтр по ФИО курьера
+function initializeCourierNameFilter() {
+    const nameInput = document.getElementById('tpi-cc-search-courier-name');
+    if (!nameInput) return;
+    
+    // Дебаунс для оптимизации
+    let debounceTimer;
+    
+    nameInput.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+            tpi_cc_currentFilters.courierName = this.value.trim().toLowerCase();
+            applyAllFilters();
+        }, 300);
+    });
+    
+    // Очистка по кнопке Esc
+    nameInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            this.value = '';
+            tpi_cc_currentFilters.courierName = '';
+            applyAllFilters();
+        }
+    });
+}
+
+// Фильтр по ячейке
+function initializeCellFilter() {
+    const cellInput = document.getElementById('tpi-cc-search-courier-cell');
+    if (!cellInput) return;
+    
+    let debounceTimer;
+    
+    cellInput.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+            tpi_cc_currentFilters.cellName = this.value.trim().toLowerCase();
+            applyAllFilters();
+        }, 300);
+    });
+    
+    cellInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            this.value = '';
+            tpi_cc_currentFilters.cellName = '';
+            applyAllFilters();
+        }
+    });
+}
+
+// Фильтр по статусам через выпадающий список
+function initializeStatusFilter() {
+    const statusDropdown = document.querySelector('.tpi-cc-search-dropdown');
+    if (!statusDropdown) return;
+    
+    // Слушаем изменения в выпадающем списке
+    statusDropdown.addEventListener('tpi-dropdown-change', function(event) {
+        if (event.detail) {
+            // Получаем выбранные статусы
+            const selectedOptions = event.detail.selected;
+            tpi_cc_currentFilters.statuses = selectedOptions.map(opt => opt.label);
+            tpi_cc_currentFilters.allStatusesSelected = event.detail.allSelected || false;
+            
+            applyAllFilters();
+        }
+    });
+}
+
+// Кнопка сброса всех фильтров
+function initializeResetFiltersButton() {
+    const resetButton = document.querySelector('.tpi-cc-filters-reset');
+    if (!resetButton) return;
+    
+    resetButton.addEventListener('click', function() {
+        // Сбрасываем инпуты
+        const nameInput = document.getElementById('tpi-cc-search-courier-name');
+        const cellInput = document.getElementById('tpi-cc-search-courier-cell');
+        
+        if (nameInput) {
+            nameInput.value = '';
+            nameInput.blur();
+        }
+        
+        if (cellInput) {
+            cellInput.value = '';
+            cellInput.blur();
+        }
+        
+        // Сбрасываем статусы через выпадающий список
+        const statusDropdown = document.querySelector('.tpi-cc-search-dropdown');
+        if (statusDropdown && statusDropdown.tpiDropdownInstance) {
+            // Выбираем все статусы
+            const allOptions = statusDropdown.tpiDropdownInstance.getAllOptions();
+            statusDropdown.tpiDropdownInstance.setSelectedOptions(allOptions);
+        }
+        
+        // Сбрасываем глобальные фильтры
+        tpi_cc_currentFilters = {
+            courierName: '',
+            cellName: '',
+            statuses: [],
+            allStatusesSelected: true
+        };
+        
+        // Удаляем сообщение "нет результатов"
+        removeNoResultsMessage();
+        
+        // Применяем фильтры (покажет все строки)
+        applyAllFilters();
+    });
+}
+
+function initializeTotalCourierCount() {
+    const tableBody = document.querySelector('.tpi-cc--table-tbody-wrapper');
+    if (!tableBody) return;
+    
+    const rows = tableBody.querySelectorAll('.tpi-cc--table-tbody');
+    const total = rows.length;
+    
+    // Устанавливаем начальное значение
+    updateFilterCounters(total, total);
+}
+
+// Основная функция применения всех фильтров
+function applyAllFilters() {
+    const tableBody = document.querySelector('.tpi-cc--table-tbody-wrapper');
+    if (!tableBody) return;
+    
+    const rows = Array.from(tableBody.querySelectorAll('.tpi-cc--table-tbody'));
+    if (rows.length === 0) return;
+    
+    // Проверяем, были ли изменения в фильтрах
+    const previousVisibleCount = getVisibleRowCount();
+    
+    // Подсчитываем сколько строк отображается
+    let visibleCount = 0;
+    
+    rows.forEach(row => {
+        let shouldShow = true;
+        
+        // Проверяем все фильтры
+        if (tpi_cc_currentFilters.courierName) {
+            const nameElement = row.querySelector('p[tpi-cc-parsing-data="courier-full-name"]');
+            const name = nameElement ? nameElement.textContent.trim().toLowerCase() : '';
+            shouldShow = shouldShow && name.includes(tpi_cc_currentFilters.courierName);
+        }
+        
+        if (shouldShow && tpi_cc_currentFilters.cellName) {
+            const cellElement = row.querySelector('a[tpi-cc-parsing-data="courier-route-cell"]');
+            const cell = cellElement ? cellElement.textContent.trim().toLowerCase() : '';
+            shouldShow = shouldShow && cell.includes(tpi_cc_currentFilters.cellName);
+        }
+        
+        if (shouldShow && !tpi_cc_currentFilters.allStatusesSelected && tpi_cc_currentFilters.statuses.length > 0) {
+            const statusElement = row.querySelector('p[tpi-cc-parsing-data="courier-route-status"]');
+            const status = statusElement ? statusElement.textContent.trim() : '';
+            shouldShow = shouldShow && tpi_cc_currentFilters.statuses.includes(status);
+        }
+        
+        // Применяем видимость
+        if (shouldShow) {
+            row.style.display = '';
+            visibleCount++;
+        } else {
+            row.style.display = 'none';
+        }
+    });
+    
+    // Проверяем, изменилось ли количество видимых строк
+    if (visibleCount !== previousVisibleCount) {
+        // Удаляем старое сообщение "нет результатов", если оно есть
+        removeNoResultsMessage();
+        
+        // Обновляем счетчики
+        updateFilterCounters(rows.length, visibleCount);
+        
+        // Если нет видимых строк, показываем сообщение
+        if (visibleCount === 0 && hasActiveFilters()) {
+            showNoResultsMessage();
+        }
+    }
+    
+    // Обновляем визуальные эффекты сортировки, если она активна
+    updateSortVisualEffects();
+}
+
+function getVisibleRowCount() {
+    const tableBody = document.querySelector('.tpi-cc--table-tbody-wrapper');
+    if (!tableBody) return 0;
+    
+    const rows = tableBody.querySelectorAll('.tpi-cc--table-tbody');
+    let count = 0;
+    
+    rows.forEach(row => {
+        if (row.style.display !== 'none') {
+            count++;
+        }
+    });
+    
+    return count;
+}
+
+function hasActiveFilters() {
+    return tpi_cc_currentFilters.courierName || 
+           tpi_cc_currentFilters.cellName || 
+           (!tpi_cc_currentFilters.allStatusesSelected && tpi_cc_currentFilters.statuses.length > 0);
+}
+
+function updateSortVisualEffects() {
+    if (tpi_cc_currentFilterColumn === null) return;
+    
+    const table = document.querySelector('table.tpi-cc--table-data-output');
+    if (!table) return;
+    
+    // Удаляем старые эффекты
+    document.querySelectorAll('td.tpi-cc--table-tbody-item[tpi-current-state]').forEach(td => {
+        td.removeAttribute('tpi-current-state');
+    });
+    
+    // Добавляем эффекты только к видимым строкам
+    const visibleRows = Array.from(table.querySelectorAll('tbody tr'))
+        .filter(row => row.style.display !== 'none');
+    
+    visibleRows.forEach((row, rowIndex) => {
+        const cells = row.querySelectorAll('td.tpi-cc--table-tbody-item');
+        if (cells.length > tpi_cc_currentFilterColumn) {
+            const cell = cells[tpi_cc_currentFilterColumn];
+            
+            if (rowIndex === visibleRows.length - 1) {
+                cell.setAttribute('tpi-current-state', 'filtered-last');
+            } else {
+                cell.setAttribute('tpi-current-state', 'filtered');
+            }
+        }
+    });
+}
+
+function addVisualEffectsWithFilter(columnIndex) {
+    const table = document.querySelector('table.tpi-cc--table-data-output');
+    if (!table) return;
+    
+    // Получаем только видимые строки
+    const visibleRows = Array.from(table.querySelectorAll('tbody tr'))
+        .filter(row => row.style.display !== 'none');
+    
+    visibleRows.forEach((row, rowIndex) => {
+        const cells = row.querySelectorAll('td.tpi-cc--table-tbody-item');
+        if (cells.length > columnIndex) {
+            const cell = cells[columnIndex];
+            
+            cell.removeAttribute('tpi-current-state');
+            
+            if (rowIndex === visibleRows.length - 1) {
+                cell.setAttribute('tpi-current-state', 'filtered-last');
+            } else {
+                cell.setAttribute('tpi-current-state', 'filtered');
+            }
+        }
+    });
+}
+
+// Функция для обновления счетчиков в фильтрах
+function updateFilterCounters(total, filtered) {
+    const totalElement = document.getElementById('tpi-cc-data-total-couriers');
+    const filteredElement = document.getElementById('tpi-cc-data-filtered-couriers');
+    
+    if (totalElement) {
+        const span = totalElement.querySelector('span');
+        if (span) span.textContent = total;
+    }
+    
+    if (filteredElement) {
+        const span = filteredElement.querySelector('span');
+        if (span) {
+            // Если все строки отображаются, показываем 0
+            if (filtered === total) {
+                span.textContent = '0';
+            } else {
+                span.textContent = filtered;
+            }
+        }
+    }
 }
