@@ -1,3 +1,211 @@
+// const encodedConfig = {
+//     apiKey: '41497a6153792d7a43542d5f7045366d66776f644f566569725f44747778346e674a61357559',
+//     authDomain: '6461696c796c6f742e66697265626173656170702e636f6d',
+//     projectId: '6461696c796c6f74',
+//     storageBucket: '6461696c796c6f742e61707073706f742e636f6d',
+//     messagingSenderId: '373335383330333238353939',
+//     appId: '313a3733353833303332383539393a7765623a39663334383638376465643165316330366232333532'
+// };
+
+// function decode(hex) {
+//     let str = '';
+//     for (let i = 0; i < hex.length; i += 2) {
+//         str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+//     }
+//     return str;
+// }
+
+// const firebaseConfig = {
+//     apiKey: decode(encodedConfig.apiKey),
+//     authDomain: decode(encodedConfig.authDomain),
+//     projectId: decode(encodedConfig.projectId),
+//     storageBucket: decode(encodedConfig.storageBucket),
+//     messagingSenderId: decode(encodedConfig.messagingSenderId),
+//     appId: decode(encodedConfig.appId)
+// };
+
+// Глобальные переменные для Firebase
+let tpiFirebaseInitialized = false;
+let tpiDb = null;
+
+// Инициализация Firebase
+function tpiInitializeFirebase() {
+    if (tpiFirebaseInitialized) return tpiDb;
+    
+    try {
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig, 'tpiCartControlsApp');
+        } else {
+            // Используем существующее приложение
+            tpiDb = firebase.firestore();
+        }
+        tpiDb = firebase.firestore();
+        tpiFirebaseInitialized = true;
+        console.log('✅ TPI Firebase успешно инициализирован');
+        return tpiDb;
+    } catch (error) {
+        console.error('❌ Ошибка инициализации TPI Firebase:', error);
+        return null;
+    }
+}
+
+// Функция для проверки существования данных в Firebase
+async function tpiCheckDataInFirebase(selectedDate) {
+    try {
+        if (!tpiFirebaseInitialized) {
+            tpiDb = tpiInitializeFirebase();
+            if (!tpiDb) return false;
+        }
+        
+        // Форматируем дату в формат YYYY-MM-DD
+        const dateParts = selectedDate.split('/');
+        if (dateParts.length !== 3) {
+            console.error('Неверный формат даты:', selectedDate);
+            return false;
+        }
+        
+        const firebaseDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+        console.log('🔍 TPI Проверка данных в Firebase для даты:', firebaseDate);
+        
+        // Проверяем существование документа с датой
+        const dateDocRef = tpiDb.collection("dates").doc(firebaseDate);
+        const dateDoc = await dateDocRef.get();
+        
+        if (!dateDoc.exists) {
+            console.log('📭 TPI Документа с датой не существует');
+            return false;
+        }
+        
+        // Проверяем существование подколлекции cartControl
+        const cartControlRef = dateDocRef.collection("cartControl");
+        const cartControlSnapshot = await cartControlRef.get();
+        
+        const hasData = !cartControlSnapshot.empty;
+        console.log('📊 TPI Найдено записей в cartControl:', cartControlSnapshot.size);
+        
+        return hasData;
+        
+    } catch (error) {
+        console.error('💥 TPI Ошибка при проверке данных в Firebase:', error);
+        return false;
+    }
+}
+
+// Функция для загрузки данных из Firebase
+async function tpiLoadDataFromFirebase(selectedDate) {
+    try {
+        if (!tpiFirebaseInitialized) {
+            tpiDb = tpiInitializeFirebase();
+            if (!tpiDb) return null;
+        }
+        
+        // Форматируем дату в формат YYYY-MM-DD
+        const dateParts = selectedDate.split('/');
+        const firebaseDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+        
+        console.log('📥 TPI Загрузка данных из Firebase для даты:', firebaseDate);
+        
+        const dateDocRef = tpiDb.collection("dates").doc(firebaseDate);
+        const cartControlRef = dateDocRef.collection("cartControl");
+        const snapshot = await cartControlRef.get();
+        
+        if (snapshot.empty) {
+            console.log('📭 TPI Нет данных в cartControl');
+            return null;
+        }
+        
+        const couriersData = [];
+        snapshot.forEach(doc => {
+            const courierData = doc.data();
+            // Убираем служебные поля
+            delete courierData.savedAt;
+            couriersData.push(courierData);
+        });
+        
+        console.log('✅ TPI Загружено курьеров из Firebase:', couriersData.length);
+        return couriersData;
+        
+    } catch (error) {
+        console.error('💥 TPI Ошибка при загрузке данных из Firebase:', error);
+        return null;
+    }
+}
+
+// Функция для сохранения данных в Firebase
+async function tpiSaveDataToFirebase(selectedDate, couriersData) {
+    try {
+        if (!tpiFirebaseInitialized) {
+            tpiDb = tpiInitializeFirebase();
+            if (!tpiDb) return false;
+        }
+        
+        // Форматируем дату в формат YYYY-MM-DD
+        const dateParts = selectedDate.split('/');
+        const firebaseDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+        
+        console.log('💾 TPI Сохранение данных в Firebase для даты:', firebaseDate);
+        console.log('📊 TPI Количество курьеров для сохранения:', couriersData.length);
+        
+        const dateDocRef = tpiDb.collection("dates").doc(firebaseDate);
+        const dateDoc = await dateDocRef.get();
+        
+        // Создаем документ даты, если он не существует
+        if (!dateDoc.exists) {
+            await dateDocRef.set({
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            console.log('📄 TPI Создан новый документ даты:', firebaseDate);
+        } else {
+            // Обновляем время обновления
+            await dateDocRef.update({
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        }
+        
+        // Получаем ссылку на подколлекцию cartControl
+        const cartControlRef = dateDocRef.collection("cartControl");
+        
+        // Удаляем старые данные (очищаем коллекцию)
+        const oldSnapshot = await cartControlRef.get();
+        const deletePromises = [];
+        oldSnapshot.forEach(doc => {
+            deletePromises.push(doc.ref.delete());
+        });
+        await Promise.all(deletePromises);
+        console.log('🗑️ TPI Удалено старых записей:', deletePromises.length);
+        
+        // Сохраняем каждого курьера отдельным документом
+        let savedCount = 0;
+        for (const courier of couriersData) {
+            try {
+                // Используем courier-personal-id как ID документа
+                const courierId = courier.externalId || courier.courierId || `courier_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+                
+                // Подготавливаем данные для сохранения
+                const courierDataToSave = {
+                    ...courier,
+                    savedAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                
+                // Сохраняем документ
+                await cartControlRef.doc(courierId).set(courierDataToSave);
+                savedCount++;
+                
+            } catch (error) {
+                console.error(`❌ TPI Ошибка при сохранении курьера ${courier.courier}:`, error);
+            }
+        }
+        
+        console.log(`✅ TPI Успешно сохранено ${savedCount}/${couriersData.length} курьеров в Firebase`);
+        return savedCount > 0;
+        
+    } catch (error) {
+        console.error('💥 TPI Ошибка при сохранении данных в Firebase:', error);
+        return false;
+    }
+}
+
 const tpi_cc_i_cart_add = `
 <svg stroke="currentColor" fill="none" stroke-width="0" viewBox="0 0 15 15" height="16px" width="16px" xmlns="http://www.w3.org/2000/svg">
     <path fill-rule="evenodd" clip-rule="evenodd" d="M7.49991 0.876892C3.84222 0.876892 0.877075 3.84204 0.877075 7.49972C0.877075 11.1574 3.84222 14.1226 7.49991 14.1226C11.1576 14.1226 14.1227 11.1574 14.1227 7.49972C14.1227 3.84204 11.1576 0.876892 7.49991 0.876892ZM1.82707 7.49972C1.82707 4.36671 4.36689 1.82689 7.49991 1.82689C10.6329 1.82689 13.1727 4.36671 13.1727 7.49972C13.1727 10.6327 10.6329 13.1726 7.49991 13.1726C4.36689 13.1726 1.82707 10.6327 1.82707 7.49972ZM7.50003 4C7.77617 4 8.00003 4.22386 8.00003 4.5V7H10.5C10.7762 7 11 7.22386 11 7.5C11 7.77614 10.7762 8 10.5 8H8.00003V10.5C8.00003 10.7761 7.77617 11 7.50003 11C7.22389 11 7.00003 10.7761 7.00003 10.5V8H4.50003C4.22389 8 4.00003 7.77614 4.00003 7.5C4.00003 7.22386 4.22389 7 4.50003 7H7.00003V4.5C7.00003 4.22386 7.22389 4 7.50003 4Z" fill="currentColor"></path>
@@ -449,6 +657,14 @@ function checkiIs__onCartControlsPage() {
             }else return
         })
         
+        // Инициализируем Firebase для TPI
+        tpiInitializeFirebase();
+
+        // Запускаем проверку данных для текущей даты
+        setTimeout(async () => {
+            await tpiCheckAndLoadData();
+        }, 1000);
+
         callTurboPI__once();
         addTurboPiTitle()
         if (observer) {
@@ -490,9 +706,240 @@ function addCartsControlsListeners(){
     // const statusDropdown = initializeCourierStatusDropdown();
 }
 
+//A-
+
+// Функция проверки и загрузки данных
+async function tpiCheckAndLoadData() {
+    try {
+        const searchDateButton = document.querySelector('.tpi-cc-search-date');
+        if (!searchDateButton) return;
+        
+        // Получаем выбранную дату
+        const selectedDate = searchDateButton.getAttribute('tpi-cc-selected-date-value');
+        if (!selectedDate) return;
+        
+        console.log('🔍 TPI Проверка данных для даты:', selectedDate);
+        
+        // Очищаем таблицу
+        const tpi_cc_tableBody = document.querySelector('.tpi-cc--table-tbody-wrapper');
+        if (tpi_cc_tableBody) {
+            tpi_cc_tableBody.innerHTML = '';
+        }
+        
+        // Скрываем таблицу
+        const tableWrapper = document.querySelector('.tpi-cc--table-wrapper');
+        if (tableWrapper) {
+            tableWrapper.style.display = 'none';
+        }
+        
+        // Сбрасываем обработчики и данные
+        tpi_cc_originalRowOrder = [];
+        tpi_cc_currentFilterColumn = null;
+        tpi_cc_currentFilterDirection = null;
+        
+        // Показываем плашку "нет данных" FLEX
+        const noDataWrapper = document.querySelector('.tpi-cc--no-ds-data-wrapper');
+        if (noDataWrapper) {
+            noDataWrapper.style.display = 'flex';
+        }
+        
+        // Восстанавливаем исходное состояние плашки
+        const noDataContainer = document.querySelector('.tpi-cc--no-ds-data-container');
+        if (noDataContainer) {
+            noDataContainer.setAttribute('tpi-current-state', 'ready-to-data-search');
+            
+            // Сбрасываем заголовок
+            const titleElement = noDataContainer.querySelector('.tpi-cc--no-ds-data-title p');
+            if (titleElement) {
+                titleElement.textContent = 'Данных нет';
+            }
+            
+            // Восстанавливаем оригинальное описание с правильной датой
+            const descriptionBlock = noDataContainer.querySelector('.tpi-cc--no-ds-data-description');
+            if (descriptionBlock) {
+                descriptionBlock.innerHTML = `
+                    <p class="tpi-cc--no-ds-data-description-block">В базе данных нет записей о дате отгрузки ${selectedDate}, для записи данных нажмите кнопку ниже</p>
+                    <p class="tpi-cc--no-ds-data-description-block-sub">Внимание! Нажав на кнопку вы перезапишите текущую отгрузку и вся несохраненная или поврежденная информация будет утеряна, коридор для записи новых данных - с 23:00:00 по 23:00:00 следующего дня</p>
+                `;
+            }
+            
+            // Восстанавливаем кнопку
+            const startButton = noDataContainer.querySelector('.tpi-cc--no-ds-data-start');
+            if (startButton) {
+                startButton.textContent = 'Начать';
+                startButton.disabled = false;
+                startButton.onclick = null; // Удаляем старые обработчики
+                
+                // Удаляем старую кнопку и создаем новую
+                const newStartButton = startButton.cloneNode(true);
+                startButton.parentNode.replaceChild(newStartButton, startButton);
+                
+                // Добавляем новый обработчик
+                newStartButton.addEventListener('click', async () => {
+                    if(window.dataCapturingFlag === false){
+                        document.querySelector('.tpi-cc--no-ds-data-title p').innerHTML = "<p>Загрузка</p>";
+                        window.dataCapturingFlag = true;
+                        noDataContainer.setAttribute('tpi-current-state', 'loading-data');
+                        
+                        // Заменяем текст на элементы загрузки
+                        const descriptionBlock = document.querySelector('.tpi-cc--no-ds-data-description');
+                        if (descriptionBlock) {
+                            descriptionBlock.innerHTML = `
+                                <div class="tpi-cc-no-ds-data-loading-item" tpi-cc-search-id="0" tpi-cc-status="waiting">
+                                    <i class="tpi-cc-no-ds-data-loading-item-icon"></i>
+                                    <p>Проверка ключа</p>
+                                </div>
+                                <div class="tpi-cc-no-ds-data-loading-item" tpi-cc-search-id="1" tpi-cc-status="waiting">
+                                    <i class="tpi-cc-no-ds-data-loading-item-icon"></i>
+                                    <p>Поиск маршрутов</p>
+                                </div>
+                                <div class="tpi-cc-no-ds-data-loading-item" tpi-cc-search-id="2" tpi-cc-status="waiting">
+                                    <i class="tpi-cc-no-ds-data-loading-item-icon"></i>
+                                    <p>Расшифровка данных курьеров</p>
+                                </div>
+                                <div class="tpi-cc-no-ds-data-loading-item" tpi-cc-search-id="3" tpi-cc-status="waiting">
+                                    <i class="tpi-cc-no-ds-data-loading-item-icon"></i>
+                                    <p>Запись информации в базу данных</p>
+                                </div>
+                                <div class="tpi-cc-no-ds-data-loading-item" tpi-cc-search-id="4" tpi-cc-status="waiting">
+                                    <i class="tpi-cc-no-ds-data-loading-item-icon"></i>
+                                    <p>Построение и внедрение таблицы в DOM</p>
+                                </div>
+                            `;
+                        }
+                        
+                        await fillCouriersTableAndSaveToFirebase();
+                    } else return;
+                });
+            }
+        }
+        
+        // Проверяем наличие данных в Firebase
+        const hasDataInFirebase = await tpiCheckDataInFirebase(selectedDate);
+        
+        if (hasDataInFirebase) {
+            // Данные есть в Firebase - загружаем их
+            console.log('✅ TPI Данные найдены в Firebase, загружаем...');
+            await tpiLoadAndDisplayData(selectedDate);
+        } else {
+            // Данных нет в Firebase - оставляем плашку видимой
+            console.log('📭 TPI Данных нет в Firebase, показываем плашку');
+        }
+    } catch (error) {
+        console.error('💥 TPI Ошибка при проверке данных:', error);
+    }
+}
+
+// Функция загрузки и отображения данных
+async function tpiLoadAndDisplayData(selectedDate) {
+    try {
+        const couriersData = await tpiLoadDataFromFirebase(selectedDate);
+        
+        if (!couriersData || couriersData.length === 0) {
+            return; // Оставляем плашку видимой
+        }
+        
+        // Сортируем данные по группам в правильном порядке
+        const sortedCouriersData = sortCouriersByGroupsForDisplay(couriersData);
+        
+        // Скрываем плашку "нет данных" FLEX
+        const noDataWrapper = document.querySelector('.tpi-cc--no-ds-data-wrapper');
+        if (noDataWrapper) {
+            noDataWrapper.style.display = 'none';
+        }
+        
+        // Показываем таблицу
+        const tableWrapper = document.querySelector('.tpi-cc--table-wrapper');
+        if (tableWrapper) {
+            tableWrapper.style.display = 'block';
+        }
+        
+        // Заполняем таблицу данными
+        const tpi_cc_tableBody = document.querySelector('.tpi-cc--table-tbody-wrapper');
+        if (tpi_cc_tableBody) {
+            tpi_cc_tableBody.innerHTML = '';
+            
+            // Создаем строки для каждого курьера в правильном порядке
+            sortedCouriersData.forEach((courierData, index) => {
+                const row = createCourierTableRow(courierData, index);
+                tpi_cc_tableBody.appendChild(row);
+            });
+            
+            // Инициализируем систему
+            saveOriginalRowOrder();
+            initializeAllFilters();
+            cartPallet_btnActions();
+            tpi_cc_filteringColumnData();
+        }
+        
+    } catch (error) {
+        console.error('💥 TPI Ошибка при загрузке данных из Firebase:', error);
+    }
+}
+
+function sortCouriersByGroupsForDisplay(couriersData) {
+    const firstWave = []; // MK-1...
+    const secondWave = []; // MK-2...
+    const kgt = []; // KGT...
+    const alreadyGone = []; // null
+    const others = []; // Остальные
+    
+    couriersData.forEach(courier => {
+        const cell = courier.cell ? courier.cell.toUpperCase() : '';
+        
+        if (cell === 'NULL') {
+            alreadyGone.push(courier);
+        } else if (cell.startsWith('MK-1')) {
+            firstWave.push(courier);
+        } else if (cell.startsWith('MK-2')) {
+            secondWave.push(courier);
+        } else if (cell.startsWith('KGT')) {
+            kgt.push(courier);
+        } else {
+            others.push(courier);
+        }
+    });
+    
+    // Функция для сортировки по номеру ячейки (по возрастанию)
+    const sortByCellNumber = (a, b) => {
+        const cellA = a.cell ? a.cell.toUpperCase() : '';
+        const cellB = b.cell ? b.cell.toUpperCase() : '';
+        
+        if (cellA === 'NULL' || cellB === 'NULL') return 0;
+        
+        const extractNumber = (cell) => {
+            const match = cell.match(/\d+/);
+            return match ? parseInt(match[0]) : 9999;
+        };
+        
+        return extractNumber(cellA) - extractNumber(cellB);
+    };
+    
+    // Сортируем каждую группу по возрастанию номеров
+    firstWave.sort(sortByCellNumber);
+    secondWave.sort(sortByCellNumber);
+    kgt.sort(sortByCellNumber);
+    others.sort(sortByCellNumber);
+    alreadyGone.sort((a, b) => {
+        // Для null сортируем по имени курьера
+        return (a.courier || '').localeCompare(b.courier || '');
+    });
+    
+    // Объединяем в правильном порядке
+    return [
+        ...firstWave,
+        ...secondWave,
+        ...kgt,
+        ...others,
+        ...alreadyGone
+    ];
+}
+
+//A-
+
 
 //B- Функции для работы с курьерами и ячейками
-async function tpi_getCouriersAndCells() {
+async function tpi_getCouriersAndCells(selectedDate = null) {
     console.log('🔍 Получение данных о курьерах и ячейках...');
     
     try {
@@ -500,18 +947,38 @@ async function tpi_getCouriersAndCells() {
         const url = new URL('https://logistics.market.yandex.ru/api/resolve/');
         url.searchParams.append('r', 'sortingCenter/routes/resolveGetRoutesFullInfo:resolveGetRoutesFullInfo');
 
-        const today = new Date();
-        const currentHour = today.getHours();
-
-        const targetDate = new Date(today);
-        if (currentHour >= 22) {
-            targetDate.setDate(targetDate.getDate() + 1);
+        let targetDate;
+        
+        if (selectedDate) {
+            // Используем выбранную дату из формата DD/MM/YYYY
+            const dateParts = selectedDate.split('/');
+            if (dateParts.length === 3) {
+                targetDate = new Date(`${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`);
+            } else {
+                // Если формат неправильный, используем логику по умолчанию
+                const today = new Date();
+                const currentHour = today.getHours();
+                targetDate = new Date(today);
+                if (currentHour >= 22) {
+                    targetDate.setDate(targetDate.getDate() + 1);
+                }
+            }
+        } else {
+            // Логика по умолчанию
+            const today = new Date();
+            const currentHour = today.getHours();
+            targetDate = new Date(today);
+            if (currentHour >= 22) {
+                targetDate.setDate(targetDate.getDate() + 1);
+            }
         }
 
         const year = targetDate.getFullYear();
         const month = String(targetDate.getMonth() + 1).padStart(2, '0');
         const day = String(targetDate.getDate()).padStart(2, '0');
         const currentDate = `${year}-${month}-${day}`;
+        
+        console.log('📅 Дата запроса API:', currentDate, '(выбранная дата:', selectedDate || 'не указана', ')');
         
         const requestBody = {
             "params": [{
@@ -1006,7 +1473,7 @@ function waitForTokenAndRun() {
     }, 1000);
 }
 
-let dataCapturingFlag = false
+window.dataCapturingFlag = false;
 
 function couriersDataCapturing(){
     const tpi_cc_startButton = document.querySelector('.tpi-cc--no-ds-data-start')
@@ -1014,10 +1481,13 @@ function couriersDataCapturing(){
     const tpi_cc_desctiption = document.querySelector('.tpi-cc--no-ds-data-description')
     const tpi_cc_tableBody = document.querySelector('.tpi-cc--table-tbody-wrapper')
     
+    // Инициализируем глобальную переменную
+    window.dataCapturingFlag = false;
+    
     tpi_cc_startButton.addEventListener('click', async () => {
-        if(dataCapturingFlag === false){
-            document.querySelector('.tpi-cc--no-ds-data-title').innerHTML = "<p>Загрузка</p>"
-            dataCapturingFlag = true
+        if(window.dataCapturingFlag === false){
+            document.querySelector('.tpi-cc--no-ds-data-title p').innerHTML = "<p>Загрузка</p>"
+            window.dataCapturingFlag = true
             tpi_cc_areaContainer.setAttribute('tpi-current-state', 'loading-data')
             tpi_cc_desctiption.innerHTML = `
                 <div class="tpi-cc-no-ds-data-loading-item" tpi-cc-search-id="0" tpi-cc-status="waiting">
@@ -1042,399 +1512,184 @@ function couriersDataCapturing(){
                 </div>
             `
             
-            await fillCouriersTable();
+            await fillCouriersTableAndSaveToFirebase();
+            window.dataCapturingFlag = false;
         } else return
     })
-    
-    async function fillCouriersTable() {
-        try {
-            console.log('🚀 Начинаем заполнение таблицы...');
-    
-            // Обновляем статус загрузки
-            updateLoadingStatus(0, 'in-progress');
-    
-            // Шаг 0: Проверка ключа (реальное выполнение)
-            if (!tpiUserTOKEN) {
-                throw new Error('Токен не найден');
-            }
-            
-            // Минимум 1.5 секунды для статуса
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            updateLoadingStatus(0, 'complete');
-    
-            // Шаг 1: Поиск маршрутов
-            updateLoadingStatus(1, 'in-progress');
-            
-            // Получаем данные о курьерах
-            const data = await tpi_getCouriersAndCells();
-    
-            if (!data || data.length === 0) {
-                throw new Error('Нет данных о курьерах');
-            }
-            
-            // Минимум 1.5 секунды для статуса
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            updateLoadingStatus(1, 'complete');
-    
-            // Шаг 2: Расшифровка данных курьеров
-            updateLoadingStatus(2, 'in-progress');
-            
-            // Сортируем курьеров по группам
-            const { firstWave, secondWave, kgt, alreadyGone, others } = sortCouriersByGroups(data);
-            
-            // Объединяем все группы
-            const allCouriers = [
-                ...firstWave,
-                ...secondWave, 
-                ...kgt,
-                ...alreadyGone,
-                ...others
-            ];
-            
-            // Минимум 1.5 секунды для статуса
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            updateLoadingStatus(2, 'complete');
-    
-            // Шаг 3: Запись информации в базу данных
-            updateLoadingStatus(3, 'in-progress');
-            
-            // Задержка 3 секунды для имитации записи в БД
-            await new Promise(resolve => setTimeout(resolve, 3000));
-            updateLoadingStatus(3, 'complete');
-    
-            // Шаг 4: Построение и внедрение таблицы в DOM
-            updateLoadingStatus(4, 'in-progress');
-            
-            // Минимум 1.5 секунды для статуса
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            
-            // ВАЖНО: Сначала меняем статус на complete
-            updateLoadingStatus(4, 'complete');
+}
 
-            await new Promise(resolve => setTimeout(resolve, 500));
-            const progressContainerWrapper = document.querySelector('.tpi-cc--no-ds-data-container')
-            progressContainerWrapper.setAttribute('tpi-current-state', 'loading-data-animation')
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            document.querySelector('.tpi-cc-no-ds-data-loading-item[tpi-cc-search-id="2"] p').innerText = "Данные успешно загружены, обработаны и сохранены в базу данных, хорошей сортировки!"
-            progressContainerWrapper.setAttribute('tpi-current-state', 'done')
-
-            // Ждем 1.5 секунды после того как последний шаг стал complete
-            await new Promise(resolve => setTimeout(resolve, 2000));
-
-            progressContainerWrapper.setAttribute('tpi-current-state', 'hidden')
-
-            await new Promise(resolve => setTimeout(resolve, 600));
-            
-            // Создаем строки для каждого курьера
-            allCouriers.forEach((courier, index) => {
-                const row = createCourierTableRow(courier, index);
-                tpi_cc_tableBody.appendChild(row);
-            });
-            saveOriginalRowOrder();
-            initializeAllFilters();
-            // Скрываем блок загрузки и показываем таблицу
-            document.querySelector('.tpi-cc--no-ds-data-wrapper').style.display = 'none';
-            document.querySelector('.tpi-cc--table-wrapper').style.display = 'block';
-    
-            cartPallet_btnActions();
-            tpi_cc_filteringColumnData();
-            
-        } catch (error) {
-            console.log('💥 Ошибка при заполнении таблицы:', error);
-            updateLoadingStatus(0, 'error');
-        }
+function updateLoadingStatus(stepId, status) {
+    const loadingItem = document.querySelector(`[tpi-cc-search-id="${stepId}"]`);
+    if (loadingItem) {
+        loadingItem.setAttribute('tpi-cc-status', status);
     }
+}
 
-    function cartPallet_btnActions() {
-        const tpi_cc_actionButtons = document.querySelectorAll('.tpi-cc-table-tbody-data-cart-id, .tpi-cc-table-tbody-data-pallet-id');
-        tpi_cc_actionButtons.forEach(btn => {
-            const newBtn = btn.cloneNode(true);
-            btn.parentNode.replaceChild(newBtn, btn);
-            
-            newBtn.addEventListener('click', () => {
-                if (newBtn.hasAttribute('tpi-cc-selected-courier-cell')) {
-                    newBtn.removeAttribute('tpi-cc-selected-courier-cell');
-                } else {
-                    newBtn.setAttribute('tpi-cc-selected-courier-cell', '');
-                }
-                update_ActionProcessContainer();
-            });
-        });
-        update_ActionProcessContainer();
-    }
-
-    function createCourierTableRow(courierData, index) {
-        const row = document.createElement('tr');
-        row.className = 'tpi-cc--table-tbody';
+function cartPallet_btnActions() {
+    const tpi_cc_actionButtons = document.querySelectorAll('.tpi-cc-table-tbody-data-cart-id, .tpi-cc-table-tbody-data-pallet-id');
+    tpi_cc_actionButtons.forEach(btn => {
+        const newBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn, btn);
         
-        const sortCount = courierData.ordersSorted > 0 
-            ? courierData.ordersSorted 
-            : (courierData.ordersShipped > 0 ? courierData.ordersShipped : 0);
-            
-        const sortPercent = courierData.ordersPlanned > 0 
-            ? Math.round((sortCount / courierData.ordersPlanned) * 100)
-            : 0;
-            
-        const preparedPercent = courierData.sortablesInCell > 0
-            ? Math.round((courierData.sortablesPrepared / courierData.sortablesInCell) * 100)
-            : 0;
-        
-        // Получаем цвет для прогресс-бара
-        const sortColor = getProgressColor(sortPercent);
-        const preparedColor = getProgressColor(preparedPercent);
-        
-        // Форматируем даты
-        const startedDate = courierData.startedAt ? cc_formatDate(courierData.startedAt) : null;
-        const startedTime = courierData.startedAt ? cc_formatTime(courierData.startedAt) : null;
-        const endedDate = courierData.finishedAt ? cc_formatDate(courierData.finishedAt) : null;
-        const endedTime = courierData.finishedAt ? cc_formatTime(courierData.finishedAt) : null;
-        const arrivesDate = courierData.courierArrivesAt ? cc_formatDate(courierData.courierArrivesAt) : null;
-        const arrivesTime = courierData.courierArrivesAt ? cc_formatTime(courierData.courierArrivesAt) : null;
-        
-        // Определяем статус маршрута
-        const routeStatusText = getRouteStatusText(courierData.status);
-        
-        // Извлекаем номер из ячейки (например, "101" из "MK-101")
-        let cellNumber = "000";
-        if (courierData.cell && courierData.cell !== 'null' && courierData.cell !== 'Нет ячейки') {
-            const match = courierData.cell.match(/\d+/);
-            cellNumber = match ? match[0].padStart(3, '0') : "000";
-        }
-        
-        // Проверяем, является ли курьер КГТ
-        const isKGT = courierData.cell.toUpperCase().startsWith('KGT');
-        
-        // Проверяем, является ли ячейка null
-        const isNullCell = courierData.cell === 'null';
-        
-        // Создаем HTML для кнопок CART (только для обычных курьеров, не для null ячеек)
-        let cartButtonsHTML = '';
-        if (!isNullCell && !isKGT) {
-            // Для обычных курьеров - 4 кнопки CART
-            for (let i = 1; i <= 4; i++) {
-                const cartNumber = `${cellNumber}${i}`;
-                cartButtonsHTML += `
-                    <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-cart-id" tpi-data-courier-spec-cell="CART-${cartNumber}">
-                        <i class="tpi-cc-table-tbody-data-cart-icon">${tpi_cc_i_cart}</i>
-                        -${cartNumber}
-                    </button>
-                `;
-            }
-        }
-        
-        // Кнопка добавления CART (всегда показываем)
-        const addCartButton = `
-            <div class="tpi-cc--carts-control-buttons-wrapper">
-                <button class="tpi-cc--table-tbody-add-cart" tpi-state-change="tpi-add-cart">
-                    <i>${tpi_cc_i_cart_add}</i>
-                </button>
-            </div>
-        `;
-        
-        // Создаем HTML для кнопок PALLET (для обычных курьеров и КГТ, не для null ячеек)
-        let palletButtonsHTML = '';
-        if (!isNullCell) {
-            if (isKGT) {
-                // Для КГТ - одна кнопка PALLET с номером ячейки (например, "1" из "KGT-1")
-                const kgtNumber = courierData.cell.replace('KGT-', '').replace('kgt-', '');
-                palletButtonsHTML += `
-                    <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-pallet-id" tpi-data-courier-spec-cell="PALLET-${kgtNumber}">
-                        <i class="tpi-cc-table-tbody-data-pallet-icon">${tpi_cc_i_pallet}</i>
-                        -${kgtNumber}
-                    </button>
-                `;
+        newBtn.addEventListener('click', () => {
+            if (newBtn.hasAttribute('tpi-cc-selected-courier-cell')) {
+                newBtn.removeAttribute('tpi-cc-selected-courier-cell');
             } else {
-                // Для обычных курьеров - 2 кнопки PALLET со случайными номерами
-                const palletNumbers = generateRandomPalletNumbers(2, index);
-                palletNumbers.forEach(palletNumber => {
-                    palletButtonsHTML += `
-                        <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-pallet-id" tpi-data-courier-spec-cell="PALLET-${palletNumber}">
-                            <i class="tpi-cc-table-tbody-data-pallet-icon">${tpi_cc_i_pallet}</i>
-                            -${palletNumber}
-                        </button>
-                    `;
-                });
+                newBtn.setAttribute('tpi-cc-selected-courier-cell', '');
             }
+            update_ActionProcessContainer();
+        });
+    });
+    update_ActionProcessContainer();
+}
+
+async function fillCouriersTable() {
+    try {
+        console.log('🚀 Начинаем заполнение таблицы...');
+
+        // Обновляем статус загрузки
+        updateLoadingStatus(0, 'in-progress');
+
+        // Шаг 0: Проверка ключа (реальное выполнение)
+        if (!tpiUserTOKEN) {
+            throw new Error('Токен не найден');
         }
         
-        // Кнопка добавления PALLET (всегда показываем)
-        const addPalletButton = `
-            <div class="tpi-cc--carts-control-buttons-wrapper">
-                <button class="tpi-cc--table-tbody-add-pallet" tpi-state-change="tpi-add-pallet">
-                    <i>${tpi_cc_i_cart_add}</i>
-                </button>
-            </div>
-        `;
-        
-        row.innerHTML = `
-            <td class="tpi-cc--table-tbody-item">
-                <div class="tpi-cc--table-tbody-data-courier">
-                    <div class="tpi-cc--sortable-data-wrapper tpi-cc--courier-id-data-wrapper">
-                        <a href="https://logistics.market.yandex.ru/sorting-center/21972131/routes?type=OUTGOING_COURIER&sort=&hasCarts=false&category=COURIER&id=21972131&page=1&pageSize=50&recipientName=${courierData.externalId}" target="_blank" class="tpi-cc--table-tbody-data-link">
-                            <i>${tpi_cc_i_courier}</i>
-                            <p class="tpi-cc--sortable-data-courier" tpi-cc-parsing-data="courier-full-name">${courierData.courier}</p>
-                        </a>
-                        <div class="tpi-cc--table-tbody-data-courier-extra-info-wrapper">
-                            <div class="tpi-cc--table-tbody-data-courier-extra-info">
-                                <i>${tpi_cc_i_courier_route_id}</i>
-                                <p tpi-cc-parsing-data="courier-route-id">${courierData.routeId || 'Нет данных'}</p>
-                            </div>
-                            <div class="tpi-cc--table-tbody-data-courier-extra-info">
-                                <i>${tpi_cc_i_courier_id}</i>
-                                <p tpi-cc-parsing-data="courier-personal-id">${courierData.externalId || courierData.courierId || 'Нет данных'}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </td>
-            <td class="tpi-cc--table-tbody-item">
-                <div class="tpi-cc--table-tbody-data">
-                    <a href="https://logistics.market.yandex.ru/sorting-center/21972131/sortables?sortableTypes=CART&sortableTypes=COURIER_PALLET&cellName=${courierData.cell}" class="tpi-cc--table-tbody-data-link" tpi-cc-parsing-data="courier-route-cell" target="_blank">
-                        ${courierData.cell}
-                    </a>
-                </div>
-            </td>
-            <td class="tpi-cc--table-tbody-item">
-                <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-data-carts">
-                    ${cartButtonsHTML}
-                    ${addCartButton}
-                </div>
-            </td>
-            <td class="tpi-cc--table-tbody-item">
-                <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-data-pallets">
-                    ${palletButtonsHTML}
-                    ${addPalletButton}
-                </div>
-            </td>
-            <td class="tpi-cc--table-tbody-item">
-                <div class="tpi-cc--table-tbody-data">
-                    <div class="tpi-cc-table-tbody-data-route-status" tpi-cc-route-status="${courierData.status.toLowerCase()}">
-                        <i></i>
-                        <p tpi-cc-parsing-data="courier-route-status">${routeStatusText}</p>
-                    </div>
-                </div>
-            </td>
-            <td class="tpi-cc--table-tbody-item">
-                <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-data-sort-progress-container">
-                        <p class="tpi-cc--table-tbody-data-sort-progress" tpi-cc-parsing-data="courier-sorting-progress">
-                            ${sortCount} из ${courierData.ordersPlanned || 0}
-                        </p>
-                    <div class="tpi-cc--table-tbody-data-sort-progress-circle-wrapper">
-                        <p class="tpi-cc--table-tbody-data-sort-progress-circle-value" tpi-cc-parsing-data="courier-sorting-progress-percent">
-                            ${sortPercent}%
-                        </p>
-                        <svg width="50" height="50" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg" style="transform: rotate(-90deg)">
-                            <circle cx="25" cy="25" r="20" fill="transparent" stroke="#e8e8e8" stroke-width="4"></circle>
-                            <circle cx="25" cy="25" r="20" fill="transparent" 
-                                    stroke="${sortColor}" stroke-width="5" stroke-linecap="round"
-                                    stroke-dasharray="125.6" 
-                                    stroke-dashoffset="${125.6 - (125.6 * sortPercent / 100)}"
-                                    tpi-cc-parsing-data="courier-sorting-progress-circle">
-                            </circle>
-                        </svg>
-                    </div>
-                </div>
-            </td>
-            <td class="tpi-cc--table-tbody-item">
-                <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-data-sort-progress-container">
-                    <p class="tpi-cc--table-tbody-data-sort-progress" tpi-cc-parsing-data="courier-prepared-progress">
-                        ${courierData.sortablesPrepared || 0} из ${courierData.sortablesInCell || 0}
-                    </p>
-                    <div class="tpi-cc--table-tbody-data-sort-progress-circle-wrapper">
-                        <p class="tpi-cc--table-tbody-data-sort-progress-circle-value" tpi-cc-parsing-data="courier-prepared-progress-percent">
-                            ${preparedPercent}%
-                        </p>
-                        <svg width="50" height="50" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg" style="transform: rotate(-90deg)">
-                            <circle cx="25" cy="25" r="20" fill="transparent" stroke="#e8e8e8" stroke-width="4"></circle>
-                            <circle cx="25" cy="25" r="20" fill="transparent" 
-                                    stroke="${preparedColor}" stroke-width="5" stroke-linecap="round"
-                                    stroke-dasharray="125.6" 
-                                    stroke-dashoffset="${125.6 - (125.6 * preparedPercent / 100)}"
-                                    tpi-cc-parsing-data="courier-prepared-progress-circle">
-                            </circle>
-                        </svg>
-                    </div>
-                </div>
-            </td>
-            <td class="tpi-cc--table-tbody-item">
-                <div class="tpi-cc--table-body-date-container">
-                    <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-date-wrapper">
-                        <i class="tpi-cc--table-tbody-data-icon">${tpi_cc_i_calendar}</i>
-                        <p class="tpi-cc--table-tbody-data-courier-status" tpi-cc-date-type="start" tpi-cc-parsing-data="courier-started-at-date">
-                            ${startedDate || 'null'}
-                        </p>
-                    </div>
-                    <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-date-wrapper">
-                        <i class="tpi-cc--table-tbody-data-icon">${tpi_cc_i_clock}</i>
-                        <p class="tpi-cc--table-tbody-data-courier-status" tpi-cc-time-type="start" tpi-cc-parsing-data="courier-started-at-time">
-                            ${startedTime || 'null'}
-                        </p>
-                    </div>
-                </div>
-            </td>
-            <td class="tpi-cc--table-tbody-item">
-                <div class="tpi-cc--table-body-date-container">
-                    <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-date-wrapper">
-                        <i class="tpi-cc--table-tbody-data-icon">${tpi_cc_i_calendar}</i>
-                        <p class="tpi-cc--table-tbody-data-courier-status" tpi-cc-date-type="end" tpi-cc-parsing-data="courier-ended-at-date">
-                            ${endedDate || 'null'}
-                        </p>
-                    </div>
-                    <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-date-wrapper">
-                        <i class="tpi-cc--table-tbody-data-icon">${tpi_cc_i_clock}</i>
-                        <p class="tpi-cc--table-tbody-data-courier-status" tpi-cc-time-type="end" tpi-cc-parsing-data="courier-ended-at-time">
-                            ${endedTime || 'null'}
-                        </p>
-                    </div>
-                </div>
-            </td>
-            <td class="tpi-cc--table-tbody-item">
-                <div class="tpi-cc--table-body-date-container">
-                    <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-date-wrapper">
-                        <i class="tpi-cc--table-tbody-data-icon">${tpi_cc_i_calendar}</i>
-                        <p class="tpi-cc--table-tbody-data-courier-status" tpi-cc-date-type="arrived" tpi-cc-parsing-data="courier-arrives-at-date">
-                            ${arrivesDate || 'null'}
-                        </p>
-                    </div>
-                    <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-date-wrapper">
-                        <i class="tpi-cc--table-tbody-data-icon">${tpi_cc_i_clock}</i>
-                        <p class="tpi-cc--table-tbody-data-courier-status" tpi-cc-time-type="arrived" tpi-cc-parsing-data="courier-arrives-at-time">
-                            ${arrivesTime || 'null'}
-                        </p>
-                    </div>
-                </div>
-            </td>
-            <td class="tpi-cc--table-tbody-item">
-                <div class="tpi-cc--table-body-print-container">
-                    <button class="tpi-cc--print-current-row">
-                        <p class="tpi-cc--table-tbody-data-courier-print-text">Печать</p>
-                        <i class="tpi-cc--table-tbody-data-icon">${tpi_cc_i_courier_print}</i>
-                    </button>
-                </div>
-            </td>
-        `;
-        
-        return row;
-    }
+        // Минимум 1.5 секунды для статуса
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        updateLoadingStatus(0, 'complete');
 
-    function getProgressColor(percent) {
-        let r, g, b;
+        // Шаг 1: Поиск маршрутов
+        updateLoadingStatus(1, 'in-progress');
         
-        if (percent <= 50) {
-            const ratio = percent / 50;
-            r = Math.floor(255);
-            g = Math.floor(ratio * 204);
-            b = 0;
-        } else {
-            const ratio = (percent - 50) / 50;
-            r = Math.floor(255 - (255 - 42) * ratio);
-            g = Math.floor(204 + (173 - 204) * ratio);
-            b = Math.floor(0 + 46 * ratio);
+        // Получаем данные о курьерах
+        const data = await tpi_getCouriersAndCells();
+
+        if (!data || data.length === 0) {
+            throw new Error('Нет данных о курьерах');
         }
-        return `rgb(${r}, ${g}, ${b})`;
-    }
+        
+        // Минимум 1.5 секунды для статуса
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        updateLoadingStatus(1, 'complete');
 
-    function generateRandomPalletNumbers(count, seed) {
+        // Шаг 2: Расшифровка данных курьеров
+        updateLoadingStatus(2, 'in-progress');
+        
+        // Сортируем курьеров по группам
+        const { firstWave, secondWave, kgt, alreadyGone, others } = sortCouriersByGroups(data);
+        
+        // Объединяем все группы
+        const allCouriers = [
+            ...firstWave,
+            ...secondWave, 
+            ...kgt,
+            ...alreadyGone,
+            ...others
+        ];
+        
+        // Минимум 1.5 секунды для статуса
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        updateLoadingStatus(2, 'complete');
+
+        // Шаг 3: Запись информации в базу данных
+        updateLoadingStatus(3, 'in-progress');
+        
+        // Задержка 3 секунды для имитации записи в БД
+        await new Promise(resolve => setTimeout(resolve, 3000));
+        updateLoadingStatus(3, 'complete');
+
+        // Шаг 4: Построение и внедрение таблицы в DOM
+        updateLoadingStatus(4, 'in-progress');
+        
+        // Минимум 1.5 секунды для статуса
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        // ВАЖНО: Сначала меняем статус на complete
+        updateLoadingStatus(4, 'complete');
+
+        await new Promise(resolve => setTimeout(resolve, 500));
+        const progressContainerWrapper = document.querySelector('.tpi-cc--no-ds-data-container')
+        progressContainerWrapper.setAttribute('tpi-current-state', 'loading-data-animation')
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        document.querySelector('.tpi-cc-no-ds-data-loading-item[tpi-cc-search-id="2"] p').innerText = "Данные успешно загружены, обработаны и сохранены в базу данных, хорошей сортировки!"
+        progressContainerWrapper.setAttribute('tpi-current-state', 'done')
+
+        // Ждем 1.5 секунды после того как последний шаг стал complete
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        progressContainerWrapper.setAttribute('tpi-current-state', 'hidden')
+
+        await new Promise(resolve => setTimeout(resolve, 600));
+        
+        // Создаем строки для каждого курьера
+        allCouriers.forEach((courier, index) => {
+            const row = createCourierTableRow(courier, index);
+            tpi_cc_tableBody.appendChild(row);
+        });
+        saveOriginalRowOrder();
+        initializeAllFilters();
+        // Скрываем блок загрузки и показываем таблицу
+        document.querySelector('.tpi-cc--no-ds-data-wrapper').style.display = 'none';
+        document.querySelector('.tpi-cc--table-wrapper').style.display = 'flex';
+
+        cartPallet_btnActions();
+        tpi_cc_filteringColumnData();
+        
+    } catch (error) {
+        console.log('💥 Ошибка при заполнении таблицы:', error);
+        updateLoadingStatus(0, 'error');
+    }
+}
+
+function getRouteStatusText(status) {
+    switch(status) {
+        case 'CELL_SHIPPED':
+            return 'Передано курьеру';
+        case 'FINISHED':
+            return 'Собран';
+        case 'IN_PROGRESS':
+            return 'В работе';
+        case 'NOT_STARTED':
+            return 'Не начат';
+        case 'SHIPPED':
+            return 'Отгружен';
+        default:
+            return status || 'Неизвестно';
+    }
+}
+
+function cc_formatTime(dateString) {
+    if (!dateString || dateString === 'null') return null;
+
+    try {
+        const date = new Date(dateString);
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+        return `${hours}:${minutes}:${seconds}`;
+    } catch (e) {
+        console.error('Ошибка форматирования времени:', e);
+        return null;
+    }
+}
+
+function cc_formatDate(dateString) {
+    if (!dateString || dateString === 'null') return null;
+
+    try {
+        const date = new Date(dateString);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+    } catch (e) {
+        console.error('Ошибка форматирования даты:', e);
+        return null;
+    }
+}
+
+function generateRandomPalletNumbers(count, seed) {
     const numbers = [];
     const usedNumbers = new Set();
     
@@ -1465,62 +1720,392 @@ function couriersDataCapturing(){
     }
     
     return numbers;
+    }
+
+function getProgressColor(percent) {
+    let r, g, b;
+    
+    if (percent <= 50) {
+        const ratio = percent / 50;
+        r = Math.floor(255);
+        g = Math.floor(ratio * 204);
+        b = 0;
+    } else {
+        const ratio = (percent - 50) / 50;
+        r = Math.floor(255 - (255 - 42) * ratio);
+        g = Math.floor(204 + (173 - 204) * ratio);
+        b = Math.floor(0 + 46 * ratio);
+    }
+    return `rgb(${r}, ${g}, ${b})`;
 }
 
-    function updateLoadingStatus(stepId, status) {
-        const loadingItem = document.querySelector(`[tpi-cc-search-id="${stepId}"]`);
-        if (loadingItem) {
-            loadingItem.setAttribute('tpi-cc-status', status);
+function createCourierTableRow(courierData, index) {
+    const row = document.createElement('tr');
+    row.className = 'tpi-cc--table-tbody';
+    
+    const sortCount = courierData.ordersSorted > 0 
+        ? courierData.ordersSorted 
+        : (courierData.ordersShipped > 0 ? courierData.ordersShipped : 0);
+        
+    const sortPercent = courierData.ordersPlanned > 0 
+        ? Math.round((sortCount / courierData.ordersPlanned) * 100)
+        : 0;
+        
+    const preparedPercent = courierData.sortablesInCell > 0
+        ? Math.round((courierData.sortablesPrepared / courierData.sortablesInCell) * 100)
+        : 0;
+    
+    // Получаем цвет для прогресс-бара
+    const sortColor = getProgressColor(sortPercent);
+    const preparedColor = getProgressColor(preparedPercent);
+    
+    // Форматируем даты
+    const startedDate = courierData.startedAt ? cc_formatDate(courierData.startedAt) : null;
+    const startedTime = courierData.startedAt ? cc_formatTime(courierData.startedAt) : null;
+    const endedDate = courierData.finishedAt ? cc_formatDate(courierData.finishedAt) : null;
+    const endedTime = courierData.finishedAt ? cc_formatTime(courierData.finishedAt) : null;
+    const arrivesDate = courierData.courierArrivesAt ? cc_formatDate(courierData.courierArrivesAt) : null;
+    const arrivesTime = courierData.courierArrivesAt ? cc_formatTime(courierData.courierArrivesAt) : null;
+    
+    // Определяем статус маршрута
+    const routeStatusText = getRouteStatusText(courierData.status);
+    
+    // Извлекаем номер из ячейки (например, "101" из "MK-101")
+    let cellNumber = "000";
+    if (courierData.cell && courierData.cell !== 'null' && courierData.cell !== 'Нет ячейки') {
+        const match = courierData.cell.match(/\d+/);
+        cellNumber = match ? match[0].padStart(3, '0') : "000";
+    }
+    
+    // Проверяем, является ли курьер КГТ
+    const isKGT = courierData.cell.toUpperCase().startsWith('KGT');
+    
+    // Проверяем, является ли ячейка null
+    const isNullCell = courierData.cell === 'null';
+    
+    // Создаем HTML для кнопок CART (только для обычных курьеров, не для null ячеек)
+    let cartButtonsHTML = '';
+    if (!isNullCell && !isKGT) {
+        // Для обычных курьеров - 4 кнопки CART
+        for (let i = 1; i <= 4; i++) {
+            const cartNumber = `${cellNumber}${i}`;
+            cartButtonsHTML += `
+                <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-cart-id" tpi-data-courier-spec-cell="CART-${cartNumber}">
+                    <i class="tpi-cc-table-tbody-data-cart-icon">${tpi_cc_i_cart}</i>
+                    -${cartNumber}
+                </button>
+            `;
         }
     }
-
-    function cc_formatDate(dateString) {
-        if (!dateString || dateString === 'null') return null;
-
-        try {
-            const date = new Date(dateString);
-            const day = String(date.getDate()).padStart(2, '0');
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const year = date.getFullYear();
-            return `${day}/${month}/${year}`;
-        } catch (e) {
-            console.error('Ошибка форматирования даты:', e);
-            return null;
+    
+    // Кнопка добавления CART (всегда показываем)
+    const addCartButton = `
+        <div class="tpi-cc--carts-control-buttons-wrapper">
+            <button class="tpi-cc--table-tbody-add-cart" tpi-state-change="tpi-add-cart">
+                <i>${tpi_cc_i_cart_add}</i>
+            </button>
+        </div>
+    `;
+    
+    // Создаем HTML для кнопок PALLET (для обычных курьеров и КГТ, не для null ячеек)
+    let palletButtonsHTML = '';
+    if (!isNullCell) {
+        if (isKGT) {
+            // Для КГТ - одна кнопка PALLET с номером ячейки (например, "1" из "KGT-1")
+            const kgtNumber = courierData.cell.replace('KGT-', '').replace('kgt-', '');
+            palletButtonsHTML += `
+                <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-pallet-id" tpi-data-courier-spec-cell="PALLET-${kgtNumber}">
+                    <i class="tpi-cc-table-tbody-data-pallet-icon">${tpi_cc_i_pallet}</i>
+                    -${kgtNumber}
+                </button>
+            `;
+        } else {
+            // Для обычных курьеров - 2 кнопки PALLET со случайными номерами
+            const palletNumbers = generateRandomPalletNumbers(2, index);
+            palletNumbers.forEach(palletNumber => {
+                palletButtonsHTML += `
+                    <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-pallet-id" tpi-data-courier-spec-cell="PALLET-${palletNumber}">
+                        <i class="tpi-cc-table-tbody-data-pallet-icon">${tpi_cc_i_pallet}</i>
+                        -${palletNumber}
+                    </button>
+                `;
+            });
         }
     }
-
-    function cc_formatTime(dateString) {
-        if (!dateString || dateString === 'null') return null;
-
-        try {
-            const date = new Date(dateString);
-            const hours = String(date.getHours()).padStart(2, '0');
-            const minutes = String(date.getMinutes()).padStart(2, '0');
-            const seconds = String(date.getSeconds()).padStart(2, '0');
-            return `${hours}:${minutes}:${seconds}`;
-        } catch (e) {
-            console.error('Ошибка форматирования времени:', e);
-            return null;
-        }
-    }
-    function getRouteStatusText(status) {
-        switch(status) {
-            case 'CELL_SHIPPED':
-                return 'Передано курьеру';
-            case 'FINISHED':
-                return 'Собран';
-            case 'IN_PROGRESS':
-                return 'В работе';
-            case 'NOT_STARTED':
-                return 'Не начат';
-            case 'SHIPPED':
-                return 'Отгружен';
-            default:
-                return status || 'Неизвестно';
-        }
-    }
+    
+    // Кнопка добавления PALLET (всегда показываем)
+    const addPalletButton = `
+        <div class="tpi-cc--carts-control-buttons-wrapper">
+            <button class="tpi-cc--table-tbody-add-pallet" tpi-state-change="tpi-add-pallet">
+                <i>${tpi_cc_i_cart_add}</i>
+            </button>
+        </div>
+    `;
+    
+    row.innerHTML = `
+        <td class="tpi-cc--table-tbody-item">
+            <div class="tpi-cc--table-tbody-data-courier">
+                <div class="tpi-cc--sortable-data-wrapper tpi-cc--courier-id-data-wrapper">
+                    <a href="https://logistics.market.yandex.ru/sorting-center/21972131/routes?type=OUTGOING_COURIER&sort=&hasCarts=false&category=COURIER&id=21972131&page=1&pageSize=50&recipientName=${courierData.externalId}" target="_blank" class="tpi-cc--table-tbody-data-link">
+                        <i>${tpi_cc_i_courier}</i>
+                        <p class="tpi-cc--sortable-data-courier" tpi-cc-parsing-data="courier-full-name">${courierData.courier}</p>
+                    </a>
+                    <div class="tpi-cc--table-tbody-data-courier-extra-info-wrapper">
+                        <div class="tpi-cc--table-tbody-data-courier-extra-info">
+                            <i>${tpi_cc_i_courier_route_id}</i>
+                            <p tpi-cc-parsing-data="courier-route-id">${courierData.routeId || 'Нет данных'}</p>
+                        </div>
+                        <div class="tpi-cc--table-tbody-data-courier-extra-info">
+                            <i>${tpi_cc_i_courier_id}</i>
+                            <p tpi-cc-parsing-data="courier-personal-id">${courierData.externalId || courierData.courierId || 'Нет данных'}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </td>
+        <td class="tpi-cc--table-tbody-item">
+            <div class="tpi-cc--table-tbody-data">
+                <a href="https://logistics.market.yandex.ru/sorting-center/21972131/sortables?sortableTypes=CART&sortableTypes=COURIER_PALLET&cellName=${courierData.cell}" class="tpi-cc--table-tbody-data-link" tpi-cc-parsing-data="courier-route-cell" target="_blank">
+                    ${courierData.cell}
+                </a>
+            </div>
+        </td>
+        <td class="tpi-cc--table-tbody-item">
+            <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-data-carts">
+                ${cartButtonsHTML}
+                ${addCartButton}
+            </div>
+        </td>
+        <td class="tpi-cc--table-tbody-item">
+            <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-data-pallets">
+                ${palletButtonsHTML}
+                ${addPalletButton}
+            </div>
+        </td>
+        <td class="tpi-cc--table-tbody-item">
+            <div class="tpi-cc--table-tbody-data">
+                <div class="tpi-cc-table-tbody-data-route-status" tpi-cc-route-status="${courierData.status.toLowerCase()}">
+                    <i></i>
+                    <p tpi-cc-parsing-data="courier-route-status">${routeStatusText}</p>
+                </div>
+            </div>
+        </td>
+        <td class="tpi-cc--table-tbody-item">
+            <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-data-sort-progress-container">
+                    <p class="tpi-cc--table-tbody-data-sort-progress" tpi-cc-parsing-data="courier-sorting-progress">
+                        ${sortCount} из ${courierData.ordersPlanned || 0}
+                    </p>
+                <div class="tpi-cc--table-tbody-data-sort-progress-circle-wrapper">
+                    <p class="tpi-cc--table-tbody-data-sort-progress-circle-value" tpi-cc-parsing-data="courier-sorting-progress-percent">
+                        ${sortPercent}%
+                    </p>
+                    <svg width="50" height="50" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg" style="transform: rotate(-90deg)">
+                        <circle cx="25" cy="25" r="20" fill="transparent" stroke="#e8e8e8" stroke-width="4"></circle>
+                        <circle cx="25" cy="25" r="20" fill="transparent" 
+                                stroke="${sortColor}" stroke-width="5" stroke-linecap="round"
+                                stroke-dasharray="125.6" 
+                                stroke-dashoffset="${125.6 - (125.6 * sortPercent / 100)}"
+                                tpi-cc-parsing-data="courier-sorting-progress-circle">
+                        </circle>
+                    </svg>
+                </div>
+            </div>
+        </td>
+        <td class="tpi-cc--table-tbody-item">
+            <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-data-sort-progress-container">
+                <p class="tpi-cc--table-tbody-data-sort-progress" tpi-cc-parsing-data="courier-prepared-progress">
+                    ${courierData.sortablesPrepared || 0} из ${courierData.sortablesInCell || 0}
+                </p>
+                <div class="tpi-cc--table-tbody-data-sort-progress-circle-wrapper">
+                    <p class="tpi-cc--table-tbody-data-sort-progress-circle-value" tpi-cc-parsing-data="courier-prepared-progress-percent">
+                        ${preparedPercent}%
+                    </p>
+                    <svg width="50" height="50" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg" style="transform: rotate(-90deg)">
+                        <circle cx="25" cy="25" r="20" fill="transparent" stroke="#e8e8e8" stroke-width="4"></circle>
+                        <circle cx="25" cy="25" r="20" fill="transparent" 
+                                stroke="${preparedColor}" stroke-width="5" stroke-linecap="round"
+                                stroke-dasharray="125.6" 
+                                stroke-dashoffset="${125.6 - (125.6 * preparedPercent / 100)}"
+                                tpi-cc-parsing-data="courier-prepared-progress-circle">
+                        </circle>
+                    </svg>
+                </div>
+            </div>
+        </td>
+        <td class="tpi-cc--table-tbody-item">
+            <div class="tpi-cc--table-body-date-container">
+                <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-date-wrapper">
+                    <i class="tpi-cc--table-tbody-data-icon">${tpi_cc_i_calendar}</i>
+                    <p class="tpi-cc--table-tbody-data-courier-status" tpi-cc-date-type="start" tpi-cc-parsing-data="courier-started-at-date">
+                        ${startedDate || 'null'}
+                    </p>
+                </div>
+                <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-date-wrapper">
+                    <i class="tpi-cc--table-tbody-data-icon">${tpi_cc_i_clock}</i>
+                    <p class="tpi-cc--table-tbody-data-courier-status" tpi-cc-time-type="start" tpi-cc-parsing-data="courier-started-at-time">
+                        ${startedTime || 'null'}
+                    </p>
+                </div>
+            </div>
+        </td>
+        <td class="tpi-cc--table-tbody-item">
+            <div class="tpi-cc--table-body-date-container">
+                <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-date-wrapper">
+                    <i class="tpi-cc--table-tbody-data-icon">${tpi_cc_i_calendar}</i>
+                    <p class="tpi-cc--table-tbody-data-courier-status" tpi-cc-date-type="end" tpi-cc-parsing-data="courier-ended-at-date">
+                        ${endedDate || 'null'}
+                    </p>
+                </div>
+                <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-date-wrapper">
+                    <i class="tpi-cc--table-tbody-data-icon">${tpi_cc_i_clock}</i>
+                    <p class="tpi-cc--table-tbody-data-courier-status" tpi-cc-time-type="end" tpi-cc-parsing-data="courier-ended-at-time">
+                        ${endedTime || 'null'}
+                    </p>
+                </div>
+            </div>
+        </td>
+        <td class="tpi-cc--table-tbody-item">
+            <div class="tpi-cc--table-body-date-container">
+                <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-date-wrapper">
+                    <i class="tpi-cc--table-tbody-data-icon">${tpi_cc_i_calendar}</i>
+                    <p class="tpi-cc--table-tbody-data-courier-status" tpi-cc-date-type="arrived" tpi-cc-parsing-data="courier-arrives-at-date">
+                        ${arrivesDate || 'null'}
+                    </p>
+                </div>
+                <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-date-wrapper">
+                    <i class="tpi-cc--table-tbody-data-icon">${tpi_cc_i_clock}</i>
+                    <p class="tpi-cc--table-tbody-data-courier-status" tpi-cc-time-type="arrived" tpi-cc-parsing-data="courier-arrives-at-time">
+                        ${arrivesTime || 'null'}
+                    </p>
+                </div>
+            </div>
+        </td>
+        <td class="tpi-cc--table-tbody-item">
+            <div class="tpi-cc--table-body-print-container">
+                <button class="tpi-cc--print-current-row">
+                    <p class="tpi-cc--table-tbody-data-courier-print-text">Печать</p>
+                    <i class="tpi-cc--table-tbody-data-icon">${tpi_cc_i_courier_print}</i>
+                </button>
+            </div>
+        </td>
+    `;
+    
+    return row;
 }
 
+async function fillCouriersTableAndSaveToFirebase() {
+    try {
+        console.log('🚀 Начинаем заполнение таблицы и сохранение в Firebase...');
+        
+        // Получаем выбранную дату
+        const searchDateButton = document.querySelector('.tpi-cc-search-date');
+        const selectedDate = searchDateButton.getAttribute('tpi-cc-selected-date-value');
+        
+        if (!selectedDate) {
+            tpiNotification.show('Ошибка', "error", "Не удалось определить дату");
+            return;
+        }
+        
+        // Обновляем статус загрузки
+        updateLoadingStatus(0, 'in-progress');
+        
+        // Шаг 0: Проверка ключа (реальное выполнение)
+        if (!tpiUserTOKEN) {
+            throw new Error('Токен не найден');
+        }
+        
+        // Минимум 1.5 секунды для статуса
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        updateLoadingStatus(0, 'complete');
+        
+        // Шаг 1: Поиск маршрутов
+        updateLoadingStatus(1, 'in-progress');
+        
+        // Получаем данные о курьерах для выбранной даты
+        const data = await tpi_getCouriersAndCells(selectedDate);
+        
+        if (!data || data.length === 0) {
+            throw new Error('Нет данных о курьерах для выбранной даты');
+        }
+        
+        // Минимум 1.5 секунды для статуса
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        updateLoadingStatus(1, 'complete');
+        
+        // Шаг 2: Расшифровка данных курьеров
+        updateLoadingStatus(2, 'in-progress');
+        
+        // Сортируем курьеров по группам в правильном порядке
+        const sortedCouriersData = sortCouriersByGroupsForDisplay(data);
+        
+        // Минимум 1.5 секунды для статуса
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        updateLoadingStatus(2, 'complete');
+        
+        // Шаг 3: Запись информации в базу данных
+        updateLoadingStatus(3, 'in-progress');
+        
+        // Сохраняем данные в Firebase
+        const saveResult = await tpiSaveDataToFirebase(selectedDate, sortedCouriersData);
+        
+        if (!saveResult) {
+            throw new Error('Не удалось сохранить данные в Firebase');
+        }
+        
+        // Задержка 3 секунды для имитации записи в БД
+        await new Promise(resolve => setTimeout(resolve, 3000));
+        updateLoadingStatus(3, 'complete');
+        
+        // Шаг 4: Построение и внедрение таблицы в DOM
+        updateLoadingStatus(4, 'in-progress');
+        
+        // Минимум 1.5 секунды для статуса
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        // ВАЖНО: Сначала меняем статус на complete
+        updateLoadingStatus(4, 'complete');
+
+        await new Promise(resolve => setTimeout(resolve, 500));
+        const progressContainerWrapper = document.querySelector('.tpi-cc--no-ds-data-container')
+        progressContainerWrapper.setAttribute('tpi-current-state', 'loading-data-animation')
+        
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        document.querySelector('.tpi-cc-no-ds-data-loading-item[tpi-cc-search-id="2"] p').innerText = 
+            "Данные успешно загружены, обработаны и сохранены в базу данных, хорошей сортировки!"
+        progressContainerWrapper.setAttribute('tpi-current-state', 'done')
+
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        progressContainerWrapper.setAttribute('tpi-current-state', 'hidden')
+
+        await new Promise(resolve => setTimeout(resolve, 600));
+        
+        // Заполняем таблицу отсортированными данными
+        const tpi_cc_tableBody = document.querySelector('.tpi-cc--table-tbody-wrapper');
+        tpi_cc_tableBody.innerHTML = '';
+        
+        sortedCouriersData.forEach((courier, index) => {
+            const row = createCourierTableRow(courier, index);
+            tpi_cc_tableBody.appendChild(row);
+        });
+        
+        // Скрываем блок загрузки и показываем таблицу
+        document.querySelector('.tpi-cc--no-ds-data-wrapper').style.display = 'none';
+        document.querySelector('.tpi-cc--table-wrapper').style.display = 'flex';
+        
+        // Инициализируем систему
+        saveOriginalRowOrder();
+        initializeAllFilters();
+        cartPallet_btnActions();
+        tpi_cc_filteringColumnData();
+        
+    } catch (error) {
+        console.log('💥 Ошибка при заполнении таблицы и сохранении в Firebase:', error);
+        updateLoadingStatus(0, 'error');
+        tpiNotification.show('Ошибка', "error", "Не удалось сохранить данные: " + error.message);
+        window.dataCapturingFlag = false;
+    }
+}
 
 function tpi_cc_filteringColumnData() {
     const table = document.querySelector('table.tpi-cc--table-data-output');
@@ -1784,6 +2369,41 @@ function initializeDatePicker() {
             const formattedDate = formatDateToDDMMYYYY(selectedDate);
             selectedDateElement.textContent = formattedDate;
             searchDateButton.setAttribute('tpi-cc-selected-date-value', formattedDate);
+        }
+    });
+
+    // Проверяем данные при изменении даты
+    document.addEventListener('tpi-date-changed', async function(event) {
+        if (event.detail && event.detail.date) {
+            // Обновляем UI немедленно
+            const tpi_cc_tableBody = document.querySelector('.tpi-cc--table-tbody-wrapper');
+            if (tpi_cc_tableBody) {
+                tpi_cc_tableBody.innerHTML = '';
+            }
+            
+            const tableWrapper = document.querySelector('.tpi-cc--table-wrapper');
+            if (tableWrapper) {
+                tableWrapper.style.display = 'none';
+            }
+            
+            const noDataWrapper = document.querySelector('.tpi-cc--no-ds-data-wrapper');
+            if (noDataWrapper) {
+                noDataWrapper.style.display = 'flex'; // FLEX!
+            }
+            
+            // Сбрасываем состояние плашки
+            const noDataContainer = document.querySelector('.tpi-cc--no-ds-data-container');
+            if (noDataContainer) {
+                noDataContainer.setAttribute('tpi-current-state', 'ready-to-data-search');
+            }
+            
+            // Сбрасываем флаг загрузки
+            window.dataCapturingFlag = false;
+            
+            // Ждем 100ms для обновления UI и проверяем данные
+            setTimeout(async () => {
+                await tpiCheckAndLoadData();
+            }, 100);
         }
     });
 }

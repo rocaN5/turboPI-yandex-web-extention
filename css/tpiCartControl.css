@@ -33,11 +33,21 @@ div.tpi-cc--wrapper-title{
     border-color: #e8e8e8;
     border-image: initial;
     border-radius: 20px 20px 0px 0px;
+    animation: tpi-cc--table-wrapper-show 1s ease-in-out forwards; 
     &:has(.tpi-cc--table-tbody-wrapper:empty) {
         display: none;
     }
     &:has(.tpi-cc-no-results-row.shown){
         border-radius: 20px;
+    }
+}
+
+@keyframes tpi-cc--table-wrapper-show {
+    from{
+        filter: blur(50px) grayscale(1) contrast(1.5);
+    }
+    to{
+        filter: blur(0px) grayscale(0) contrast(1);
     }
 }
 
@@ -1985,6 +1995,7 @@ p.tpi-cc-dropdown-label-name{
     position: relative;
     flex-flow: column;
     color: #212121;
+    min-width: 100px;
 }
 
 .tpi-cc-data-item-container {
