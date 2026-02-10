@@ -8,6 +8,8 @@ let calendarDatesCache = {};
 let tpiCalendarDataLoaded = false;
 let tpiCalendarPreloadPromise = null;
 let tpiCalendarPreloadComplete = false;
+let tpi_cc_lastLoaderShowTime = 0; 
+const tpi_cc_minLoaderTextChangeInterval = 2300; 
 const DEBUG_CALENDAR = false;
 
 // Функция для предзагрузки данных календаря
@@ -698,8 +700,7 @@ tpi_cc_i_circle_error = `
     <path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path>
     <path d="M18.364 5.636l-12.728 12.728"></path>
 </svg>
-`
-,
+`,
 tpi_cc_i_filter_default = `
 <svg class="tpi-filter-icon-default" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
     <path d="M8.53039 5.46978L5.00006 1.93945L1.46973 5.46978L2.53039 6.53044L4.25006 4.81077V14.0001H5.75006V4.81077L7.46973 6.53044L8.53039 5.46978Z"></path>
@@ -770,6 +771,11 @@ tpi_cc_i_couriersTotal = `
 tpi_cc_i_couriersFiltered = `
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512">
     <path d="M256.1 8a120 120 0 1 1 0 240 120 120 0 1 1 0-240zM226.4 304l59.4 0c6.7 0 13.2 .4 19.7 1.1-.9 4.9-1.4 9.9-1.4 15l0 92.1c0 25.5 10.1 49.9 28.1 67.9l31.9 31.9-286.3 0c-16.4 0-29.7-13.3-29.7-29.7 0-98.5 79.8-178.3 178.3-178.3zM352.1 412.2l0-92.1c0-17.7 14.3-32 32-32l92.1 0c12.7 0 24.9 5.1 33.9 14.1l96 96c18.7 18.7 18.7 49.1 0 67.9l-76.1 76.1c-18.7 18.7-49.1 18.7-67.9 0l-96-96c-9-9-14.1-21.2-14.1-33.9zm104-44.2a24 24 0 1 0 -48 0 24 24 0 1 0 48 0z"></path>
+</svg>
+`,
+tpi_cc_i_tag = `
+<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+    <path d="M416 64H257.6L76.5 251.6c-8 8-12.3 18.5-12.5 29-.3 11.3 3.9 22.6 12.5 31.2l123.7 123.6c8 8 20.8 12.5 28.8 12.5s22.8-3.9 31.4-12.5L448 256V96l-32-32zm-30.7 102.7c-21.7 6.1-41.3-10-41.3-30.7 0-17.7 14.3-32 32-32 20.7 0 36.8 19.6 30.7 41.3-2.9 10.3-11.1 18.5-21.4 21.4z"></path>
 </svg>
 `,
 tpi_cc_liquid_glass = `
@@ -889,6 +895,10 @@ function checkiIs__onCartControlsPage() {
         <div class="tpi-cc--no-data-loading-wrapper">
             <div class="tpi-cc--no-data-loader-item">
                 <span class="tpi-cc--no-data-loader-spinner"></span>
+            </div>
+            <div class="tpi-cc--no-data-loader-funny-text-wrapper">
+                <p class="tpi-cc--no-data-loader-funny-text" id="tpi-cc-funny-text-left"></p>
+                <p class="tpi-cc--no-data-loader-funny-text" id="tpi-cc-funny-text-right"></p>
             </div>
         </div>
         <div class="tpi-cc--table-wrapper">
@@ -1051,6 +1061,9 @@ function checkiIs__onCartControlsPage() {
         headerTitle.remove()
 
         document.querySelector(".p-layout__content").appendChild(overlay);
+        setTimeout(() => {
+            initializeLoaderTexts();
+        }, 100);
 
         const tpi_cc_closeManager = document.querySelector('.tpi-cc-process-manager-close')
         tpi_cc_closeManager.addEventListener('click', ()=>{
@@ -1239,6 +1252,34 @@ async function tpiCheckAndLoadData() {
     }
 }
 
+const tpi_cc_funny_text_array = [
+    'Что-то загружаем',
+    'Ильященко - черт ;)',
+    'Продам гараж',
+    'Дима устал придумывать текст',
+    'Делаем всё сразом',
+    'Обращаемся к коленям',
+    'Ищем 47 шк на заказе',
+    'Вырубаем свет на СЦ',
+    'Делаем так, чтобы ЛХ опоздали',
+    'Сканируем каждый шк на заказе',
+    'Подметаем заказы в мусорку',
+    'Находим второй шк',
+    'Ждём пока Матыцин уедет с СЦ',
+    'Отгружаем все с баланса СЦ',
+    'Чанган - лучшая машина в мире',
+    'Депортируем Иззата домой',
+    'Несем брак к столу',
+    'Брат два щека',
+    'Mitsubishi Lancer X',
+    'Коллеги, я устал',
+    'До самоуничтожения - 3 секунды',
+    'Брат дай чуаркод по братски',
+    'Коллеги, трахнем по чайку ?',
+    'Утеря – Михаил Санин',
+    'iPhone - говно'
+];
+
 // Функция для управления лоадером
 function showTableLoader(show) {
     const loadingWrapper = document.querySelector('.tpi-cc--no-data-loading-wrapper');
@@ -1246,7 +1287,19 @@ function showTableLoader(show) {
     const tableWrapper = document.querySelector('.tpi-cc--table-wrapper');
     
     if (loadingWrapper) {
-        loadingWrapper.style.display = show ? 'flex' : 'none';
+        if (show) {
+            // Обновляем тексты только если они еще не установлены или прошло достаточно времени
+            const funnyTexts = getRandomFunnyTexts();
+            const leftTextElement = document.getElementById('tpi-cc-funny-text-left');
+            const rightTextElement = document.getElementById('tpi-cc-funny-text-right');
+            
+            if (leftTextElement) leftTextElement.textContent = funnyTexts.left;
+            if (rightTextElement) rightTextElement.textContent = funnyTexts.right;
+            
+            loadingWrapper.style.display = 'flex';
+        } else {
+            loadingWrapper.style.display = 'none';
+        }
     }
     
     if (noDataWrapper) {
@@ -1258,24 +1311,64 @@ function showTableLoader(show) {
     }
 }
 
-// Функция для показа/скрытия лоадера
-// function showLoadingIndicator(show) {
-//     const loadingWrapper = document.querySelector('.tpi-cc--no-data-loading-wrapper');
-//     const noDataWrapper = document.querySelector('.tpi-cc--no-ds-data-wrapper');
-//     const tableWrapper = document.querySelector('.tpi-cc--table-wrapper');
+// Добавьте эту функцию где-нибудь среди других функций (можно после функции showCalendarPreloader):
+function getRandomFunnyTexts() {
+    if (!tpi_cc_funny_text_array || tpi_cc_funny_text_array.length < 2) {
+        return { left: 'Загрузка...', right: 'Пожалуйста, подождите' };
+    }
     
-//     if (loadingWrapper) {
-//         loadingWrapper.style.display = show ? 'flex' : 'none';
-//     }
+    const now = Date.now();
+    const timeSinceLastShow = now - tpi_cc_lastLoaderShowTime;
     
-//     if (noDataWrapper) {
-//         noDataWrapper.style.display = 'none'; // Всегда скрываем при загрузке
-//     }
+    // Если прошло меньше 2 секунд с последнего показа, не меняем тексты
+    if (tpi_cc_lastLoaderShowTime > 0 && timeSinceLastShow < tpi_cc_minLoaderTextChangeInterval) {
+        // Возвращаем текущие тексты (если они есть) или генерируем новые если это первый раз
+        const leftTextElement = document.getElementById('tpi-cc-funny-text-left');
+        const rightTextElement = document.getElementById('tpi-cc-funny-text-right');
+        
+        if (leftTextElement && rightTextElement && 
+            leftTextElement.textContent && rightTextElement.textContent) {
+            return { 
+                left: leftTextElement.textContent, 
+                right: rightTextElement.textContent 
+            };
+        }
+    }
     
-//     if (tableWrapper) {
-//         tableWrapper.style.display = 'none'; // Скрываем таблицу во время загрузки
-//     }
-// }
+    // Создаем копию массива, чтобы не изменять оригинал
+    const texts = [...tpi_cc_funny_text_array];
+    
+    // Получаем случайный индекс для левого текста
+    const leftIndex = Math.floor(Math.random() * texts.length);
+    const leftText = texts[leftIndex];
+    
+    // Удаляем выбранный текст из массива, чтобы правый был другим
+    texts.splice(leftIndex, 1);
+    
+    // Получаем случайный индекс для правого текста из оставшихся
+    const rightIndex = Math.floor(Math.random() * texts.length);
+    const rightText = texts[rightIndex];
+    
+    // Обновляем время последнего показа
+    tpi_cc_lastLoaderShowTime = now;
+    
+    return { left: leftText, right: rightText };
+}
+
+function initializeLoaderTexts() {
+    const leftTextElement = document.getElementById('tpi-cc-funny-text-left');
+    const rightTextElement = document.getElementById('tpi-cc-funny-text-right');
+    
+    if (leftTextElement && rightTextElement) {
+        // Генерируем начальные тексты
+        const funnyTexts = getRandomFunnyTexts();
+        leftTextElement.textContent = funnyTexts.left;
+        rightTextElement.textContent = funnyTexts.right;
+        
+        // Сбрасываем время показа, так как это инициализация при загрузке
+        tpi_cc_lastLoaderShowTime = Date.now();
+    }
+}
 
 // Функция для показа плашки "нет данных"
 function showNoDataScreen(show, selectedDate = null, canWrite = false) {
@@ -2460,6 +2553,7 @@ function createCourierTableRow(courierData, index) {
         <td class="tpi-cc--table-tbody-item">
             <div class="tpi-cc--table-tbody-data">
                 <a href="https://logistics.market.yandex.ru/sorting-center/21972131/sortables?sortableTypes=CART&sortableTypes=COURIER_PALLET&cellName=${courierData.cell}" class="tpi-cc--table-tbody-data-link" tpi-cc-parsing-data="courier-route-cell" target="_blank">
+                    <i class="tpi-cc-i-cell-name">${tpi_cc_i_tag}</i>
                     ${courierData.cell}
                 </a>
             </div>
