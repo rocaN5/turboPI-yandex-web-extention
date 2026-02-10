@@ -1,32 +1,407 @@
-// const encodedConfig = {
-//     apiKey: '41497a6153792d7a43542d5f7045366d66776f644f566569725f44747778346e674a61357559',
-//     authDomain: '6461696c796c6f742e66697265626173656170702e636f6d',
-//     projectId: '6461696c796c6f74',
-//     storageBucket: '6461696c796c6f742e61707073706f742e636f6d',
-//     messagingSenderId: '373335383330333238353939',
-//     appId: '313a3733353833303332383539393a7765623a39663334383638376465643165316330366232333532'
-// };
-
-// function decode(hex) {
-//     let str = '';
-//     for (let i = 0; i < hex.length; i += 2) {
-//         str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
-//     }
-//     return str;
-// }
-
-// const firebaseConfig = {
-//     apiKey: decode(encodedConfig.apiKey),
-//     authDomain: decode(encodedConfig.authDomain),
-//     projectId: decode(encodedConfig.projectId),
-//     storageBucket: decode(encodedConfig.storageBucket),
-//     messagingSenderId: decode(encodedConfig.messagingSenderId),
-//     appId: decode(encodedConfig.appId)
-// };
-
 // Глобальные переменные для Firebase
 let tpiFirebaseInitialized = false;
 let tpiDb = null;
+window.tpiCalendarDatesCache = {};
+window.tpiCalendarMonthCache = {};
+let tpiCalendarDatesCache = {};
+let calendarDatesCache = {};
+let tpiCalendarDataLoaded = false;
+let tpiCalendarPreloadPromise = null;
+let tpiCalendarPreloadComplete = false;
+const DEBUG_CALENDAR = false;
+
+// Функция для предзагрузки данных календаря
+async function preloadCalendarData() {
+    // Если предзагрузка уже завершена, возвращаем resolved Promise
+    if (tpiCalendarPreloadComplete) {
+        return Promise.resolve();
+    }
+    
+    // Если предзагрузка уже идет, возвращаем существующий Promise
+    if (tpiCalendarPreloadPromise) {
+        return tpiCalendarPreloadPromise;
+    }
+    
+    console.log('📅 Запуск оптимизированной предзагрузки данных календаря...');
+    
+    // Создаем новый Promise для отслеживания предзагрузки
+    tpiCalendarPreloadPromise = new Promise(async (resolve, reject) => {
+        try {
+            const now = new Date();
+            const currentHour = now.getHours();
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            // Определяем какие даты нужно проверить (только актуальные)
+            const datesToCheck = [];
+            
+            // Проверяем прошедшие даты (только 30 дней назад, а не 60)
+            const pastStartDate = new Date(today);
+            pastStartDate.setDate(pastStartDate.getDate() - 30);
+            
+            // Проверяем сегодняшнюю дату
+            const todayStr = formatDateToDDMMYYYY(today);
+            datesToCheck.push(todayStr);
+            
+            // Если сейчас после 22:00, проверяем завтрашнюю дату
+            if (currentHour >= 22) {
+                const tomorrow = new Date(today);
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                const tomorrowStr = formatDateToDDMMYYYY(tomorrow);
+                datesToCheck.push(tomorrowStr);
+            }
+            
+            // Для даты послезавтра и дальше - только проверка через быструю логику
+            console.log(`🔍 Проверка ${datesToCheck.length} актуальных дат в Firebase...`);
+            
+            // Инициализируем кэш, если он не существует
+            if (!window.tpiCalendarDatesCache) {
+                window.tpiCalendarDatesCache = {};
+            }
+            
+            // Инициализируем месячный кэш
+            if (!window.tpiCalendarMonthCache) {
+                window.tpiCalendarMonthCache = {};
+            }
+            
+            // Проверяем только актуальные даты (не все подряд)
+            for (const dateStr of datesToCheck) {
+                try {
+                    const result = await tpiCheckDataInFirebase(dateStr);
+                    
+                    // Определяем статус на основе результата проверки
+                    if (result.exists) {
+                        window.tpiCalendarDatesCache[dateStr] = 'has-bd-data';
+                    } else {
+                        // Определяем статус локально без дополнительных запросов
+                        const dateParts = dateStr.split('/');
+                        const checkDate = new Date(
+                            parseInt(dateParts[2]),
+                            parseInt(dateParts[1]) - 1,
+                            parseInt(dateParts[0])
+                        );
+                        checkDate.setHours(0, 0, 0, 0);
+                        
+                        const timeDiff = checkDate.getTime() - today.getTime();
+                        const diffDays = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+                        
+                        let status;
+                        if (diffDays < 0) {
+                            // Прошлые даты без данных
+                            status = 'no-bd-data';
+                        } else if (diffDays === 0) {
+                            // Сегодня без данных
+                            status = 'available-to-write-bd-data';
+                        } else if (diffDays === 1) {
+                            // Завтра
+                            status = (currentHour >= 23) ? 'available-to-write-bd-data' : 'future-date';
+                        } else {
+                            // Будущие даты
+                            status = 'future-date';
+                        }
+                        
+                        window.tpiCalendarDatesCache[dateStr] = status;
+                    }
+                } catch (error) {
+                    console.log(`⚠️ Ошибка загрузки даты ${dateStr}:`, error);
+                    // В случае ошибки используем локальную логику
+                    window.tpiCalendarDatesCache[dateStr] = 'no-bd-data';
+                }
+            }
+            
+            tpiCalendarPreloadComplete = true;
+            tpiCalendarDataLoaded = true;
+            
+            console.log('✅ Данные календаря предзагружены (оптимизированно)');
+            
+            resolve();
+            
+        } catch (error) {
+            console.error('❌ Ошибка предзагрузки календаря:', error);
+            tpiCalendarPreloadComplete = false;
+            tpiCalendarPreloadPromise = null;
+            reject(error);
+        }
+    });
+    
+    return tpiCalendarPreloadPromise;
+}
+
+// Функция для показа/скрытия лоадера предзагрузки календаря
+function showCalendarPreloader(show) {
+    // Можно добавить небольшой лоадер в угол экрана
+    if (show) {
+        console.log('⏳ Идет предзагрузка данных календаря...');
+    } else {
+        console.log('✅ Предзагрузка календаря завершена');
+    }
+}
+
+async function updateCalendarCacheForDate(dateStr) {
+    try {
+        // Проверяем данные в Firebase
+        const result = await tpiCheckDataInFirebase(dateStr);
+        
+        // Определяем правильный статус на основе результата
+        const now = new Date();
+        const currentHour = now.getHours();
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        const dateParts = dateStr.split('/');
+        const checkDate = new Date(
+            parseInt(dateParts[2]),
+            parseInt(dateParts[1]) - 1,
+            parseInt(dateParts[0])
+        );
+        checkDate.setHours(0, 0, 0, 0);
+        
+        const timeDiff = checkDate.getTime() - today.getTime();
+        const diffDays = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+        
+        let status;
+        if (result.exists) {
+            status = 'has-bd-data';
+        } else {
+            if (diffDays < 0) {
+                // Прошлые даты без данных
+                status = 'no-bd-data';
+            } else if (diffDays === 0) {
+                // Сегодня без данных - ВСЕГДА можно записать
+                status = 'available-to-write-bd-data';
+            } else if (diffDays === 1) {
+                // Завтра
+                status = (currentHour >= 23) ? 'available-to-write-bd-data' : 'future-date';
+            } else {
+                // Будущие даты
+                status = 'future-date';
+            }
+        }
+        
+        // Обновляем глобальный кэш
+        window.tpiCalendarDatesCache[dateStr] = status;
+        
+        console.log(`🔄 Обновлен кэш для ${dateStr}: ${status}`);
+        return status;
+        
+    } catch (error) {
+        console.error(`❌ Ошибка обновления кэша для ${dateStr}:`, error);
+        return null;
+    }
+}
+
+function canWriteToDate(targetDate) {
+    const now = new Date();
+    const currentHour = now.getHours();
+    const currentMinutes = now.getMinutes();
+    
+    // Приводим даты к началу дня
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    const dateToCheck = new Date(targetDate);
+    dateToCheck.setHours(0, 0, 0, 0);
+    
+    // Если дата в прошлом (раньше сегодня) - нельзя записывать
+    if (dateToCheck < today) {
+        return false;
+    }
+    
+    // Если сегодняшняя дата - можно записывать всегда (до 23:00 следующего дня)
+    if (dateToCheck.getTime() === today.getTime()) {
+        return true; // ИЗМЕНЕНО: было ограничение по времени
+    }
+    
+    // Если завтрашняя дата
+    if (dateToCheck.getTime() === tomorrow.getTime()) {
+        // Можно записывать на завтра если:
+        // 1. Сейчас после 23:00 сегодняшнего дня
+        // 2. Завтра до 23:00 (по сути это то же самое окно 23:00-23:00)
+        return currentHour >= 23;
+    }
+    
+    // Будущие даты (больше чем завтра) - нельзя
+    return false;
+}
+
+// Функция для получения статуса даты (синхронная, для быстрого отображения)
+function getDateStatusSync(dateStr, targetDate) {
+    const now = new Date();
+    const currentHour = now.getHours();
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    const dateToCheck = new Date(targetDate);
+    dateToCheck.setHours(0, 0, 0, 0);
+    
+    // Вычисляем разницу в днях
+    const timeDiff = dateToCheck.getTime() - today.getTime();
+    const diffDays = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+    
+    // 1. Проверяем глобальный кэш (самый быстрый способ)
+    if (window.tpiCalendarDatesCache && window.tpiCalendarDatesCache[dateStr] !== undefined) {
+        return window.tpiCalendarDatesCache[dateStr];
+    }
+    
+    // 2. Быстрая логика на основе времени
+    if (diffDays < 0) {
+        // Прошлые даты
+        return 'no-bd-data';
+    } else if (diffDays === 0) {
+        // Сегодня - всегда можно записать, если нет данных
+        return 'available-to-write-bd-data'; // ИЗМЕНЕНО: всегда доступно для записи
+    } else if (diffDays === 1) {
+        // Завтра - доступно только после 23:00
+        return currentHour >= 23 ? 'available-to-write-bd-data' : 'future-date';
+    } else {
+        // Будущие даты (больше чем завтра)
+        return 'future-date';
+    }
+}
+
+// Функция для загрузки статусов диапазона дат
+async function loadDateRangeStatuses(startDate, endDate) {
+    const datesToCheck = [];
+    const currentDate = new Date(startDate);
+    
+    // Создаем массив всех дат в диапазоне
+    while (currentDate <= endDate) {
+        const dateStr = formatDateToDDMMYYYY(new Date(currentDate));
+        datesToCheck.push(dateStr);
+        currentDate.setDate(currentDate.getDate() + 1);
+    }
+    
+    console.log(`🔍 Проверка ${datesToCheck.length} дат...`);
+    
+    // Проверяем даты пакетами по 10 штук
+    const batchSize = 10;
+    for (let i = 0; i < datesToCheck.length; i += batchSize) {
+        const batch = datesToCheck.slice(i, i + batchSize);
+        const promises = batch.map(dateStr => tpiCheckDataInFirebase(dateStr));
+        
+        try {
+            const results = await Promise.all(promises);
+            
+            // Сохраняем результаты в кэш
+            results.forEach((result, index) => {
+                const dateStr = batch[index];
+                window.tpiCalendarDatesCache[dateStr] = result.exists ? 'has-bd-data' : 'no-bd-data';
+            });
+            
+            console.log(`📊 Загружено ${Math.min(i + batchSize, datesToCheck.length)}/${datesToCheck.length} дат`);
+        } catch (error) {
+            console.error(`Ошибка загрузки батча ${i/batchSize + 1}:`, error);
+        }
+    }
+}
+
+// Вызываем предзагрузку при инициализации
+setTimeout(() => {
+    preloadCalendarData();
+}, 1000);
+
+function extractCartNumbers(courierData) {
+    const cartNumbers = [];
+    
+    // Проверяем, есть ли уже сохраненные номера
+    if (courierData.cartNumbers && Array.isArray(courierData.cartNumbers)) {
+        return courierData.cartNumbers;
+    }
+    
+    // Извлекаем из HTML, если таблица уже отрисована
+    const rowIndex = courierData._rowIndex;
+    if (rowIndex !== undefined) {
+        const row = document.querySelectorAll('.tpi-cc--table-tbody')[rowIndex];
+        if (row) {
+            const cartButtons = row.querySelectorAll('.tpi-cc-table-tbody-data-cart-id');
+            cartButtons.forEach(btn => {
+                const cartNumber = btn.getAttribute('tpi-data-courier-spec-cell');
+                if (cartNumber && cartNumber.startsWith('CART-')) {
+                    cartNumbers.push(cartNumber);
+                }
+            });
+        }
+    }
+    
+    return cartNumbers;
+}
+
+function extractPalletNumbers(courierData) {
+    const palletNumbers = [];
+    
+    // Проверяем, есть ли уже сохраненные номера
+    if (courierData.palletNumbers && Array.isArray(courierData.palletNumbers)) {
+        return courierData.palletNumbers;
+    }
+    
+    // Извлекаем из HTML, если таблица уже отрисована
+    const rowIndex = courierData._rowIndex;
+    if (rowIndex !== undefined) {
+        const row = document.querySelectorAll('.tpi-cc--table-tbody')[rowIndex];
+        if (row) {
+            const palletButtons = row.querySelectorAll('.tpi-cc-table-tbody-data-pallet-id');
+            palletButtons.forEach(btn => {
+                const palletNumber = btn.getAttribute('tpi-data-courier-spec-cell');
+                if (palletNumber && palletNumber.startsWith('PALLET-')) {
+                    palletNumbers.push(palletNumber);
+                }
+            });
+        }
+    }
+    
+    return palletNumbers;
+}
+
+// Функция для подготовки данных курьера к сохранению (с сохранением сгенерированных номеров)
+function prepareCourierDataForSave(courierData) {
+    const dataToSave = {
+        ...courierData,
+        savedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    
+    // Сохраняем сгенерированные номера CART и PALLET
+    if (courierData.cartNumbers && Array.isArray(courierData.cartNumbers)) {
+        dataToSave.cartNumbers = courierData.cartNumbers;
+    }
+    
+    if (courierData.palletNumbers && Array.isArray(courierData.palletNumbers)) {
+        dataToSave.palletNumbers = courierData.palletNumbers;
+    }
+    
+    // Удаляем временные поля, которые не нужно сохранять
+    delete dataToSave._rowIndex;
+    delete dataToSave._savedCartNumbers;
+    delete dataToSave._savedPalletNumbers;
+    
+    return dataToSave;
+}
+
+// Функция для восстановления сгенерированных номеров при загрузке из Firebase
+function restoreGeneratedNumbers(courierData) {
+    const restoredData = { ...courierData };
+    
+    // Восстанавливаем сохраненные номера CART
+    if (courierData.cartNumbers && Array.isArray(courierData.cartNumbers)) {
+        restoredData._savedCartNumbers = courierData.cartNumbers;
+    }
+    
+    // Восстанавливаем сохраненные номера PALLET
+    if (courierData.palletNumbers && Array.isArray(courierData.palletNumbers)) {
+        restoredData._savedPalletNumbers = courierData.palletNumbers;
+    }
+    
+    // Удаляем служебные поля Firebase
+    delete restoredData.savedAt;
+    
+    return restoredData;
+}
 
 // Инициализация Firebase
 function tpiInitializeFirebase() {
@@ -54,18 +429,18 @@ async function tpiCheckDataInFirebase(selectedDate) {
     try {
         if (!tpiFirebaseInitialized) {
             tpiDb = tpiInitializeFirebase();
-            if (!tpiDb) return false;
+            if (!tpiDb) return { exists: false, hasCartPalletData: false };
         }
         
         // Форматируем дату в формат YYYY-MM-DD
         const dateParts = selectedDate.split('/');
         if (dateParts.length !== 3) {
             console.error('Неверный формат даты:', selectedDate);
-            return false;
+            return { exists: false, hasCartPalletData: false };
         }
         
         const firebaseDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
-        console.log('🔍 TPI Проверка данных в Firebase для даты:', firebaseDate);
+        console.log('🔍 TPI Проверка одной даты в Firebase:', firebaseDate);
         
         // Проверяем существование документа с датой
         const dateDocRef = tpiDb.collection("dates").doc(firebaseDate);
@@ -73,7 +448,7 @@ async function tpiCheckDataInFirebase(selectedDate) {
         
         if (!dateDoc.exists) {
             console.log('📭 TPI Документа с датой не существует');
-            return false;
+            return { exists: false, hasCartPalletData: false };
         }
         
         // Проверяем существование подколлекции cartControl
@@ -83,11 +458,25 @@ async function tpiCheckDataInFirebase(selectedDate) {
         const hasData = !cartControlSnapshot.empty;
         console.log('📊 TPI Найдено записей в cartControl:', cartControlSnapshot.size);
         
-        return hasData;
+        // Проверяем, есть ли данные о CART/PALLET в документах
+        let hasCartPalletData = false;
+        if (hasData) {
+            cartControlSnapshot.forEach(doc => {
+                const data = doc.data();
+                if (data.cartNumbers || data.palletNumbers) {
+                    hasCartPalletData = true;
+                }
+            });
+        }
+        
+        return {
+            exists: hasData,
+            hasCartPalletData: hasCartPalletData
+        };
         
     } catch (error) {
         console.error('💥 TPI Ошибка при проверке данных в Firebase:', error);
-        return false;
+        return { exists: false, hasCartPalletData: false };
     }
 }
 
@@ -117,9 +506,11 @@ async function tpiLoadDataFromFirebase(selectedDate) {
         const couriersData = [];
         snapshot.forEach(doc => {
             const courierData = doc.data();
+            // Восстанавливаем сгенерированные номера CART и PALLET
+            const restoredCourierData = restoreGeneratedNumbers(courierData);
             // Убираем служебные поля
-            delete courierData.savedAt;
-            couriersData.push(courierData);
+            delete restoredCourierData.savedAt;
+            couriersData.push(restoredCourierData);
         });
         
         console.log('✅ TPI Загружено курьеров из Firebase:', couriersData.length);
@@ -183,10 +574,7 @@ async function tpiSaveDataToFirebase(selectedDate, couriersData) {
                 const courierId = courier.externalId || courier.courierId || `courier_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
                 
                 // Подготавливаем данные для сохранения
-                const courierDataToSave = {
-                    ...courier,
-                    savedAt: firebase.firestore.FieldValue.serverTimestamp()
-                };
+                const courierDataToSave = prepareCourierDataForSave(courier);
                 
                 // Сохраняем документ
                 await cartControlRef.doc(courierId).set(courierDataToSave);
@@ -299,6 +687,19 @@ tpi_cc_i_checmark = `
     <path class="tpi-checkmark" d="M43,60 L55,75 L78,45" stroke="url(#circleGradient)" fill="none" stroke-width="4"/>
 </svg>
 `,
+tpi_cc_i_circle_error = `
+<svg stroke="url(#gradientError)" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" class="tpi-cc-i-circle_error">
+    <defs>
+        <linearGradient id="gradientError" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="var(--no-ds-color-1)" />
+            <stop offset="100%" stop-color="var(--no-ds-color-2)" />
+        </linearGradient>
+    </defs>
+    <path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path>
+    <path d="M18.364 5.636l-12.728 12.728"></path>
+</svg>
+`
+,
 tpi_cc_i_filter_default = `
 <svg class="tpi-filter-icon-default" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
     <path d="M8.53039 5.46978L5.00006 1.93945L1.46973 5.46978L2.53039 6.53044L4.25006 4.81077V14.0001H5.75006V4.81077L7.46973 6.53044L8.53039 5.46978Z"></path>
@@ -471,7 +872,7 @@ function checkiIs__onCartControlsPage() {
                 </div>
                 <div class="tpi-cc--no-ds-data-block">
                     <div class="tpi-cc--no-ds-data-icon-wrapper">
-                        <i>${tpi_cc_i_warning}${tpi_cc_i_loading}${tpi_cc_i_checmark}</i>
+                        <i>${tpi_cc_i_warning}${tpi_cc_i_loading}${tpi_cc_i_checmark}${tpi_cc_i_circle_error}</i>
                     </div>
                     <div class="tpi-cc--no-ds-data-info-wrapper">
                         <div class="tpi-cc--no-ds-data-description">
@@ -483,6 +884,11 @@ function checkiIs__onCartControlsPage() {
                 <div class="tpi-cc--no-ds-data-block">
                     <button class="tpi-cc--no-ds-data-start">Начать</button>
                 </div>  
+            </div>
+        </div>
+        <div class="tpi-cc--no-data-loading-wrapper">
+            <div class="tpi-cc--no-data-loader-item">
+                <span class="tpi-cc--no-data-loader-spinner"></span>
             </div>
         </div>
         <div class="tpi-cc--table-wrapper">
@@ -660,6 +1066,20 @@ function checkiIs__onCartControlsPage() {
         // Инициализируем Firebase для TPI
         tpiInitializeFirebase();
 
+        // Сразу скрываем все UI элементы
+        hideAllUI();
+
+        // Показываем лоадер перед первой проверкой данных
+        const loadingWrapper = document.querySelector('.tpi-cc--no-data-loading-wrapper');
+        if (loadingWrapper) {
+            loadingWrapper.style.display = 'flex';
+        }
+
+        // Запускаем проверку данных для текущей даты
+        setTimeout(async () => {
+            await tpiCheckAndLoadData();
+        }, 100);
+
         // Запускаем проверку данных для текущей даты
         setTimeout(async () => {
             await tpiCheckAndLoadData();
@@ -720,16 +1140,19 @@ async function tpiCheckAndLoadData() {
         
         console.log('🔍 TPI Проверка данных для даты:', selectedDate);
         
+        // ВСЕГДА показываем лоадер перед проверкой
+        hideAllUI();
+        
+        // Показываем лоадер
+        const loadingWrapper = document.querySelector('.tpi-cc--no-data-loading-wrapper');
+        if (loadingWrapper) {
+            loadingWrapper.style.display = 'flex';
+        }
+        
         // Очищаем таблицу
         const tpi_cc_tableBody = document.querySelector('.tpi-cc--table-tbody-wrapper');
         if (tpi_cc_tableBody) {
             tpi_cc_tableBody.innerHTML = '';
-        }
-        
-        // Скрываем таблицу
-        const tableWrapper = document.querySelector('.tpi-cc--table-wrapper');
-        if (tableWrapper) {
-            tableWrapper.style.display = 'none';
         }
         
         // Сбрасываем обработчики и данные
@@ -737,122 +1160,243 @@ async function tpiCheckAndLoadData() {
         tpi_cc_currentFilterColumn = null;
         tpi_cc_currentFilterDirection = null;
         
-        // Показываем плашку "нет данных" FLEX
-        const noDataWrapper = document.querySelector('.tpi-cc--no-ds-data-wrapper');
-        if (noDataWrapper) {
-            noDataWrapper.style.display = 'flex';
+        // Проверяем наличие данных в Firebase
+        const firebaseData = await tpiCheckDataInFirebase(selectedDate);
+        
+        // Скрываем лоадер после проверки
+        if (loadingWrapper) {
+            loadingWrapper.style.display = 'none';
         }
         
-        // Восстанавливаем исходное состояние плашки
-        const noDataContainer = document.querySelector('.tpi-cc--no-ds-data-container');
-        if (noDataContainer) {
-            noDataContainer.setAttribute('tpi-current-state', 'ready-to-data-search');
+        if (firebaseData.exists) {
+            // Данные есть в Firebase - загружаем их
+            console.log('✅ TPI Данные найдены в Firebase, загружаем...');
             
-            // Сбрасываем заголовок
-            const titleElement = noDataContainer.querySelector('.tpi-cc--no-ds-data-title p');
+            // Еще раз показываем лоадер на время загрузки данных
+            if (loadingWrapper) {
+                loadingWrapper.style.display = 'flex';
+            }
+            
+            // Загружаем данные
+            await tpiLoadAndDisplayData(selectedDate);
+            
+            // Скрываем лоадер после загрузки
+            if (loadingWrapper) {
+                loadingWrapper.style.display = 'none';
+            }
+        } else {
+            // Данных нет в Firebase - показываем плашку "нет данных"
+            console.log('📭 TPI Данных нет в Firebase, показываем плашку');
+            
+            // Определяем правильный статус для отображения
+            const now = new Date();
+            const currentHour = now.getHours();
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            const dateParts = selectedDate.split('/');
+            const checkDate = new Date(
+                parseInt(dateParts[2]),
+                parseInt(dateParts[1]) - 1,
+                parseInt(dateParts[0])
+            );
+            checkDate.setHours(0, 0, 0, 0);
+            
+            const timeDiff = checkDate.getTime() - today.getTime();
+            const diffDays = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+            
+            let showNoData = true;
+            let canWrite = false;
+            
+            if (diffDays === 0) {
+                // Сегодня - всегда можно записывать
+                canWrite = true;
+                if (window.tpiCalendarDatesCache) {
+                    window.tpiCalendarDatesCache[selectedDate] = 'available-to-write-bd-data';
+                }
+            }   else if (diffDays === 1 && currentHour >= 23) {
+                // Завтра после 23:00 - можно записывать
+                canWrite = true;
+                if (window.tpiCalendarDatesCache) {
+                    window.tpiCalendarDatesCache[selectedDate] = 'available-to-write-bd-data';
+                }
+            } else {
+                if (window.tpiCalendarDatesCache) {
+                    window.tpiCalendarDatesCache[selectedDate] = 'no-bd-data';
+                }
+            }
+            
+            showNoDataScreen(showNoData, selectedDate, canWrite);
+        }
+        
+    } catch (error) {
+        console.log('💥 TPI Ошибка при проверке данных:', error);
+        const loadingWrapper = document.querySelector('.tpi-cc--no-data-loading-wrapper');
+        if (loadingWrapper) {
+            loadingWrapper.style.display = 'none';
+        }
+        showNoDataScreen(true);
+    }
+}
+
+// Функция для управления лоадером
+function showTableLoader(show) {
+    const loadingWrapper = document.querySelector('.tpi-cc--no-data-loading-wrapper');
+    const noDataWrapper = document.querySelector('.tpi-cc--no-ds-data-wrapper');
+    const tableWrapper = document.querySelector('.tpi-cc--table-wrapper');
+    
+    if (loadingWrapper) {
+        loadingWrapper.style.display = show ? 'flex' : 'none';
+    }
+    
+    if (noDataWrapper) {
+        noDataWrapper.style.display = 'none';
+    }
+    
+    if (tableWrapper) {
+        tableWrapper.style.display = 'none';
+    }
+}
+
+// Функция для показа/скрытия лоадера
+// function showLoadingIndicator(show) {
+//     const loadingWrapper = document.querySelector('.tpi-cc--no-data-loading-wrapper');
+//     const noDataWrapper = document.querySelector('.tpi-cc--no-ds-data-wrapper');
+//     const tableWrapper = document.querySelector('.tpi-cc--table-wrapper');
+    
+//     if (loadingWrapper) {
+//         loadingWrapper.style.display = show ? 'flex' : 'none';
+//     }
+    
+//     if (noDataWrapper) {
+//         noDataWrapper.style.display = 'none'; // Всегда скрываем при загрузке
+//     }
+    
+//     if (tableWrapper) {
+//         tableWrapper.style.display = 'none'; // Скрываем таблицу во время загрузки
+//     }
+// }
+
+// Функция для показа плашки "нет данных"
+function showNoDataScreen(show, selectedDate = null, canWrite = false) {
+    const noDataWrapper = document.querySelector('.tpi-cc--no-ds-data-wrapper');
+    const loadingWrapper = document.querySelector('.tpi-cc--no-data-loading-wrapper');
+    const tableWrapper = document.querySelector('.tpi-cc--table-wrapper');
+    const noDataContainer = noDataWrapper.querySelector('.tpi-cc--no-ds-data-container');
+    
+    // Сначала скрываем всё
+    if (noDataWrapper) noDataWrapper.style.display = 'none';
+    if (loadingWrapper) loadingWrapper.style.display = 'none';
+    if (tableWrapper) tableWrapper.style.display = 'none';
+    
+    if (show) {
+        // Показываем только плашку "нет данных"
+        if (noDataWrapper) {
+            noDataWrapper.style.display = 'flex';
+            
+            // Обновляем текст в зависимости от статуса
+            const titleElement = noDataWrapper.querySelector('.tpi-cc--no-ds-data-title p');
+            const descriptionBlock = noDataWrapper.querySelector('.tpi-cc--no-ds-data-description');
+            const startButton = noDataWrapper.querySelector('.tpi-cc--no-ds-data-start');
+            
             if (titleElement) {
-                titleElement.textContent = 'Данных нет';
+                titleElement.textContent = canWrite ? 'Доступно для записи' : 'Данных нет';
             }
             
-            // Восстанавливаем оригинальное описание с правильной датой
-            const descriptionBlock = noDataContainer.querySelector('.tpi-cc--no-ds-data-description');
-            if (descriptionBlock) {
-                descriptionBlock.innerHTML = `
-                    <p class="tpi-cc--no-ds-data-description-block">В базе данных нет записей о дате отгрузки ${selectedDate}, для записи данных нажмите кнопку ниже</p>
-                    <p class="tpi-cc--no-ds-data-description-block-sub">Внимание! Нажав на кнопку вы перезапишите текущую отгрузку и вся несохраненная или поврежденная информация будет утеряна, коридор для записи новых данных - с 23:00:00 по 23:00:00 следующего дня</p>
-                `;
+            noDataContainer.setAttribute('tpi-current-state', 'ready-to-data-search')
+
+            if (descriptionBlock && selectedDate) {
+                if (canWrite) {
+                    descriptionBlock.innerHTML = `
+                        <p class="tpi-cc--no-ds-data-description-block">Дата ${selectedDate} доступна для записи данных, для создания новой отгрузки нажмите кнопку ниже</p>
+                        <p class="tpi-cc--no-ds-data-description-block-sub">Внимание! Нажав на кнопку вы перезапишите текущую отгрузку и вся несохраненная или поврежденная информация будет утеряна</p>
+                    `;
+                } else {
+                    descriptionBlock.innerHTML = `
+                        <p class="tpi-cc--no-ds-data-description-block">В базе данных нет записей о дате отгрузки ${selectedDate}</p>
+                        <p class="tpi-cc--no-ds-data-description-block-sub">Коридор для записи новых данных - с 23:00:00 по 23:00:00 следующего дня</p>
+                    `;
+                }
             }
             
-            // Восстанавливаем кнопку
-            const startButton = noDataContainer.querySelector('.tpi-cc--no-ds-data-start');
+            // Настраиваем кнопку
             if (startButton) {
-                startButton.textContent = 'Начать';
-                startButton.disabled = false;
-                startButton.onclick = null; // Удаляем старые обработчики
+                if (canWrite) {
+                    startButton.textContent = 'Создать отгрузку';
+                    startButton.disabled = false;
+                    startButton.style.display = 'block';
+                } else {
+                    startButton.textContent = 'Недоступно';
+                    startButton.disabled = true;
+                    startButton.style.display = 'block';
+                }
                 
-                // Удаляем старую кнопку и создаем новую
+                // Клонируем кнопку для удаления старых обработчиков
                 const newStartButton = startButton.cloneNode(true);
                 startButton.parentNode.replaceChild(newStartButton, startButton);
                 
-                // Добавляем новый обработчик
-                newStartButton.addEventListener('click', async () => {
-                    if(window.dataCapturingFlag === false){
-                        document.querySelector('.tpi-cc--no-ds-data-title p').innerHTML = "<p>Загрузка</p>";
-                        window.dataCapturingFlag = true;
-                        noDataContainer.setAttribute('tpi-current-state', 'loading-data');
-                        
-                        // Заменяем текст на элементы загрузки
-                        const descriptionBlock = document.querySelector('.tpi-cc--no-ds-data-description');
-                        if (descriptionBlock) {
-                            descriptionBlock.innerHTML = `
-                                <div class="tpi-cc-no-ds-data-loading-item" tpi-cc-search-id="0" tpi-cc-status="waiting">
-                                    <i class="tpi-cc-no-ds-data-loading-item-icon"></i>
-                                    <p>Проверка ключа</p>
-                                </div>
-                                <div class="tpi-cc-no-ds-data-loading-item" tpi-cc-search-id="1" tpi-cc-status="waiting">
-                                    <i class="tpi-cc-no-ds-data-loading-item-icon"></i>
-                                    <p>Поиск маршрутов</p>
-                                </div>
-                                <div class="tpi-cc-no-ds-data-loading-item" tpi-cc-search-id="2" tpi-cc-status="waiting">
-                                    <i class="tpi-cc-no-ds-data-loading-item-icon"></i>
-                                    <p>Расшифровка данных курьеров</p>
-                                </div>
-                                <div class="tpi-cc-no-ds-data-loading-item" tpi-cc-search-id="3" tpi-cc-status="waiting">
-                                    <i class="tpi-cc-no-ds-data-loading-item-icon"></i>
-                                    <p>Запись информации в базу данных</p>
-                                </div>
-                                <div class="tpi-cc-no-ds-data-loading-item" tpi-cc-search-id="4" tpi-cc-status="waiting">
-                                    <i class="tpi-cc-no-ds-data-loading-item-icon"></i>
-                                    <p>Построение и внедрение таблицы в DOM</p>
-                                </div>
-                            `;
-                        }
-                        
-                        await fillCouriersTableAndSaveToFirebase();
-                    } else return;
-                });
+                if (canWrite) {
+                    // Добавляем новый обработчик только если можно записывать
+                    newStartButton.addEventListener('click', async () => {
+                        if(window.dataCapturingFlag === false){
+                            document.querySelector('.tpi-cc--no-ds-data-title p').innerHTML = "<p>Загрузка</p>";
+                            window.dataCapturingFlag = true;
+                            const noDataContainer = document.querySelector('.tpi-cc--no-ds-data-container');
+                            if (noDataContainer) {
+                                noDataContainer.setAttribute('tpi-current-state', 'loading-data');
+                            }
+                            
+                            // Заменяем текст на элементы загрузки
+                            const descriptionBlock = document.querySelector('.tpi-cc--no-ds-data-description');
+                            if (descriptionBlock) {
+                                descriptionBlock.innerHTML = `
+                                    <div class="tpi-cc-no-ds-data-loading-item" tpi-cc-search-id="0" tpi-cc-status="waiting">
+                                        <i class="tpi-cc-no-ds-data-loading-item-icon"></i>
+                                        <p>Проверка ключа</p>
+                                    </div>
+                                    <div class="tpi-cc-no-ds-data-loading-item" tpi-cc-search-id="1" tpi-cc-status="waiting">
+                                        <i class="tpi-cc-no-ds-data-loading-item-icon"></i>
+                                        <p>Поиск маршрутов</p>
+                                    </div>
+                                    <div class="tpi-cc-no-ds-data-loading-item" tpi-cc-search-id="2" tpi-cc-status="waiting">
+                                        <i class="tpi-cc-no-ds-data-loading-item-icon"></i>
+                                        <p>Расшифровка данных курьеров</p>
+                                    </div>
+                                    <div class="tpi-cc-no-ds-data-loading-item" tpi-cc-search-id="3" tpi-cc-status="waiting">
+                                        <i class="tpi-cc-no-ds-data-loading-item-icon"></i>
+                                        <p>Запись информации в базу данных</p>
+                                    </div>
+                                    <div class="tpi-cc-no-ds-data-loading-item" tpi-cc-search-id="4" tpi-cc-status="waiting">
+                                        <i class="tpi-cc-no-ds-data-loading-item-icon"></i>
+                                        <p>Построение и внедрение таблицы в DOM</p>
+                                    </div>
+                                `;
+                            }
+                            
+                            await fillCouriersTableAndSaveToFirebase();
+                        } else return;
+                    });
+                }
             }
         }
-        
-        // Проверяем наличие данных в Firebase
-        const hasDataInFirebase = await tpiCheckDataInFirebase(selectedDate);
-        
-        if (hasDataInFirebase) {
-            // Данные есть в Firebase - загружаем их
-            console.log('✅ TPI Данные найдены в Firebase, загружаем...');
-            await tpiLoadAndDisplayData(selectedDate);
-        } else {
-            // Данных нет в Firebase - оставляем плашку видимой
-            console.log('📭 TPI Данных нет в Firebase, показываем плашку');
-        }
-    } catch (error) {
-        console.error('💥 TPI Ошибка при проверке данных:', error);
     }
 }
 
 // Функция загрузки и отображения данных
 async function tpiLoadAndDisplayData(selectedDate) {
     try {
+        // Показываем лоадер перед загрузкой данных
+        showTableLoader(true);
+        
         const couriersData = await tpiLoadDataFromFirebase(selectedDate);
         
         if (!couriersData || couriersData.length === 0) {
-            return; // Оставляем плашку видимой
+            showNoDataScreen(true, selectedDate);
+            return;
         }
         
         // Сортируем данные по группам в правильном порядке
         const sortedCouriersData = sortCouriersByGroupsForDisplay(couriersData);
-        
-        // Скрываем плашку "нет данных" FLEX
-        const noDataWrapper = document.querySelector('.tpi-cc--no-ds-data-wrapper');
-        if (noDataWrapper) {
-            noDataWrapper.style.display = 'none';
-        }
-        
-        // Показываем таблицу
-        const tableWrapper = document.querySelector('.tpi-cc--table-wrapper');
-        if (tableWrapper) {
-            tableWrapper.style.display = 'block';
-        }
         
         // Заполняем таблицу данными
         const tpi_cc_tableBody = document.querySelector('.tpi-cc--table-tbody-wrapper');
@@ -861,6 +1405,8 @@ async function tpiLoadAndDisplayData(selectedDate) {
             
             // Создаем строки для каждого курьера в правильном порядке
             sortedCouriersData.forEach((courierData, index) => {
+                // Добавляем индекс строки для восстановления номеров
+                courierData._rowIndex = index;
                 const row = createCourierTableRow(courierData, index);
                 tpi_cc_tableBody.appendChild(row);
             });
@@ -872,8 +1418,17 @@ async function tpiLoadAndDisplayData(selectedDate) {
             tpi_cc_filteringColumnData();
         }
         
+        // Показываем таблицу, скрываем лоадер
+        showTableLoader(false);
+        const tableWrapper = document.querySelector('.tpi-cc--table-wrapper');
+        if (tableWrapper) {
+            tableWrapper.style.display = 'block';
+        }
+        
     } catch (error) {
         console.error('💥 TPI Ошибка при загрузке данных из Firebase:', error);
+        showTableLoader(false);
+        showNoDataScreen(true, selectedDate);
     }
 }
 
@@ -1518,6 +2073,16 @@ function couriersDataCapturing(){
     })
 }
 
+function hideAllUI() {
+    const noDataWrapper = document.querySelector('.tpi-cc--no-ds-data-wrapper');
+    const loadingWrapper = document.querySelector('.tpi-cc--no-data-loading-wrapper');
+    const tableWrapper = document.querySelector('.tpi-cc--table-wrapper');
+    
+    if (noDataWrapper) noDataWrapper.style.display = 'none';
+    if (loadingWrapper) loadingWrapper.style.display = 'none';
+    if (tableWrapper) tableWrapper.style.display = 'none';
+}
+
 function updateLoadingStatus(stepId, status) {
     const loadingItem = document.querySelector(`[tpi-cc-search-id="${stepId}"]`);
     if (loadingItem) {
@@ -1786,15 +2351,29 @@ function createCourierTableRow(courierData, index) {
     // Создаем HTML для кнопок CART (только для обычных курьеров, не для null ячеек)
     let cartButtonsHTML = '';
     if (!isNullCell && !isKGT) {
-        // Для обычных курьеров - 4 кнопки CART
-        for (let i = 1; i <= 4; i++) {
-            const cartNumber = `${cellNumber}${i}`;
-            cartButtonsHTML += `
-                <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-cart-id" tpi-data-courier-spec-cell="CART-${cartNumber}">
-                    <i class="tpi-cc-table-tbody-data-cart-icon">${tpi_cc_i_cart}</i>
-                    -${cartNumber}
-                </button>
-            `;
+        // Проверяем, есть ли сохраненные номера CART
+        if (courierData._savedCartNumbers && courierData._savedCartNumbers.length > 0) {
+            // Используем сохраненные номера
+            courierData._savedCartNumbers.forEach(cartNumber => {
+                const cartId = cartNumber.replace('CART-', '');
+                cartButtonsHTML += `
+                    <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-cart-id" tpi-data-courier-spec-cell="${cartNumber}">
+                        <i class="tpi-cc-table-tbody-data-cart-icon">${tpi_cc_i_cart}</i>
+                        -${cartId}
+                    </button>
+                `;
+            });
+        } else {
+            // Генерируем новые номера CART
+            for (let i = 1; i <= 4; i++) {
+                const cartNumber = `${cellNumber}${i}`;
+                cartButtonsHTML += `
+                    <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-cart-id" tpi-data-courier-spec-cell="CART-${cartNumber}">
+                        <i class="tpi-cc-table-tbody-data-cart-icon">${tpi_cc_i_cart}</i>
+                        -${cartNumber}
+                    </button>
+                `;
+            }
         }
     }
     
@@ -1810,26 +2389,41 @@ function createCourierTableRow(courierData, index) {
     // Создаем HTML для кнопок PALLET (для обычных курьеров и КГТ, не для null ячеек)
     let palletButtonsHTML = '';
     if (!isNullCell) {
-        if (isKGT) {
-            // Для КГТ - одна кнопка PALLET с номером ячейки (например, "1" из "KGT-1")
-            const kgtNumber = courierData.cell.replace('KGT-', '').replace('kgt-', '');
-            palletButtonsHTML += `
-                <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-pallet-id" tpi-data-courier-spec-cell="PALLET-${kgtNumber}">
-                    <i class="tpi-cc-table-tbody-data-pallet-icon">${tpi_cc_i_pallet}</i>
-                    -${kgtNumber}
-                </button>
-            `;
-        } else {
-            // Для обычных курьеров - 2 кнопки PALLET со случайными номерами
-            const palletNumbers = generateRandomPalletNumbers(2, index);
-            palletNumbers.forEach(palletNumber => {
+        // Проверяем, есть ли сохраненные номера PALLET
+        if (courierData._savedPalletNumbers && courierData._savedPalletNumbers.length > 0) {
+            // Используем сохраненные номера
+            courierData._savedPalletNumbers.forEach(palletNumber => {
+                const palletId = palletNumber.replace('PALLET-', '');
                 palletButtonsHTML += `
-                    <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-pallet-id" tpi-data-courier-spec-cell="PALLET-${palletNumber}">
+                    <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-pallet-id" tpi-data-courier-spec-cell="${palletNumber}">
                         <i class="tpi-cc-table-tbody-data-pallet-icon">${tpi_cc_i_pallet}</i>
-                        -${palletNumber}
+                        -${palletId}
                     </button>
                 `;
             });
+        } else {
+            // Генерируем новые номера PALLET
+            if (isKGT) {
+                // Для КГТ - одна кнопка PALLET с номером ячейки
+                const kgtNumber = courierData.cell.replace('KGT-', '').replace('kgt-', '');
+                palletButtonsHTML += `
+                    <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-pallet-id" tpi-data-courier-spec-cell="PALLET-${kgtNumber}">
+                        <i class="tpi-cc-table-tbody-data-pallet-icon">${tpi_cc_i_pallet}</i>
+                        -${kgtNumber}
+                    </button>
+                `;
+            } else {
+                // Для обычных курьеров - 2 кнопки PALLET со случайными номерами
+                const palletNumbers = generateRandomPalletNumbers(2, index);
+                palletNumbers.forEach(palletNumber => {
+                    palletButtonsHTML += `
+                        <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-pallet-id" tpi-data-courier-spec-cell="PALLET-${palletNumber}">
+                            <i class="tpi-cc-table-tbody-data-pallet-icon">${tpi_cc_i_pallet}</i>
+                            -${palletNumber}
+                        </button>
+                    `;
+                });
+            }
         }
     }
     
@@ -2009,12 +2603,11 @@ async function fillCouriersTableAndSaveToFirebase() {
         // Обновляем статус загрузки
         updateLoadingStatus(0, 'in-progress');
         
-        // Шаг 0: Проверка ключа (реальное выполнение)
+        // Шаг 0: Проверка ключа
         if (!tpiUserTOKEN) {
             throw new Error('Токен не найден');
         }
         
-        // Минимум 1.5 секунды для статуса
         await new Promise(resolve => setTimeout(resolve, 1500));
         updateLoadingStatus(0, 'complete');
         
@@ -2025,10 +2618,25 @@ async function fillCouriersTableAndSaveToFirebase() {
         const data = await tpi_getCouriersAndCells(selectedDate);
         
         if (!data || data.length === 0) {
-            throw new Error('Нет данных о курьерах для выбранной даты');
+            // ПОКАЗЫВАЕМ ОШИБКУ В UI
+            const noDataContainer = document.querySelector('.tpi-cc--no-ds-data-container');
+            if (noDataContainer) {
+                noDataContainer.setAttribute('tpi-current-state', 'error');
+                
+                document.querySelector('.tpi-cc--no-ds-data-title p p').innerText = "Ошибка"
+
+                const descriptionBlock = document.querySelector('.tpi-cc--no-ds-data-description');
+                if (descriptionBlock) {
+                    descriptionBlock.innerHTML = `
+                        <p class="tpi-cc--no-ds-data-description-block">Данные курьеров за выбранную дату ещё не существуют</p>
+                        <p class="tpi-cc--no-ds-data-description-block-sub">Пожалуйста попробуйте позже, когда данные курьеров будут сформированы в ПИ</p>
+                        <p class="tpi-cc--no-ds-data-description-block-sub">Окно для записи данных - с 23:00 по МСК, убедитесь, что на вашем ПК стоит верное время</p>
+                    `;
+                }
+            }
+            return;
         }
         
-        // Минимум 1.5 секунды для статуса
         await new Promise(resolve => setTimeout(resolve, 1500));
         updateLoadingStatus(1, 'complete');
         
@@ -2038,18 +2646,75 @@ async function fillCouriersTableAndSaveToFirebase() {
         // Сортируем курьеров по группам в правильном порядке
         const sortedCouriersData = sortCouriersByGroupsForDisplay(data);
         
-        // Минимум 1.5 секунды для статуса
         await new Promise(resolve => setTimeout(resolve, 1500));
         updateLoadingStatus(2, 'complete');
         
         // Шаг 3: Запись информации в базу данных
         updateLoadingStatus(3, 'in-progress');
         
-        // Сохраняем данные в Firebase
-        const saveResult = await tpiSaveDataToFirebase(selectedDate, sortedCouriersData);
+        // ВАЖНО: Теперь перед сохранением в Firebase мы добавляем сгенерированные номера CART и PALLET
+        // к данным каждого курьера, чтобы они сохранились в БД
+        
+        const couriersWithGeneratedNumbers = sortedCouriersData.map((courier, index) => {
+            // Создаем копию объекта курьера
+            const courierWithNumbers = { ...courier };
+            
+            // Генерируем номера CART (только для обычных курьеров, не для null ячеек и не для КГТ)
+            const isKGT = courier.cell.toUpperCase().startsWith('KGT');
+            const isNullCell = courier.cell === 'null';
+            
+            if (!isNullCell && !isKGT) {
+                // Извлекаем номер из ячейки
+                let cellNumber = "000";
+                if (courier.cell && courier.cell !== 'null' && courier.cell !== 'Нет ячейки') {
+                    const match = courier.cell.match(/\d+/);
+                    cellNumber = match ? match[0].padStart(3, '0') : "000";
+                }
+                
+                // Генерируем 4 номера CART
+                const cartNumbers = [];
+                for (let i = 1; i <= 4; i++) {
+                    const cartNumber = `CART-${cellNumber}${i}`;
+                    cartNumbers.push(cartNumber);
+                }
+                
+                // Добавляем в данные курьера
+                courierWithNumbers.cartNumbers = cartNumbers;
+            }
+            
+            // Генерируем номера PALLET
+            if (!isNullCell) {
+                const palletNumbers = [];
+                if (isKGT) {
+                    // Для КГТ - один номер PALLET с номером ячейки
+                    const kgtNumber = courier.cell.replace('KGT-', '').replace('kgt-', '');
+                    palletNumbers.push(`PALLET-${kgtNumber}`);
+                } else {
+                    // Для обычных курьеров - 2 случайных номера PALLET
+                    const randomPalletNumbers = generateRandomPalletNumbers(2, index);
+                    randomPalletNumbers.forEach(number => {
+                        palletNumbers.push(`PALLET-${number}`);
+                    });
+                }
+                
+                // Добавляем в данные курьера
+                courierWithNumbers.palletNumbers = palletNumbers;
+            }
+            
+            return courierWithNumbers;
+        });
+        
+        // Сохраняем данные ВМЕСТЕ с номерами CART/PALLET в Firebase
+        const saveResult = await tpiSaveDataToFirebase(selectedDate, couriersWithGeneratedNumbers);
         
         if (!saveResult) {
             throw new Error('Не удалось сохранить данные в Firebase');
+        }
+        
+        // ОБНОВЛЯЕМ КЭШ КАЛЕНДАРЯ ДЛЯ ЭТОЙ ДАТЫ
+        if (window.tpiCalendarDatesCache) {
+            window.tpiCalendarDatesCache[selectedDate] = 'has-bd-data';
+            updateCalendarDateStatus(selectedDate, 'has-bd-data');
         }
         
         // Задержка 3 секунды для имитации записи в БД
@@ -2059,7 +2724,6 @@ async function fillCouriersTableAndSaveToFirebase() {
         // Шаг 4: Построение и внедрение таблицы в DOM
         updateLoadingStatus(4, 'in-progress');
         
-        // Минимум 1.5 секунды для статуса
         await new Promise(resolve => setTimeout(resolve, 1500));
         
         // ВАЖНО: Сначала меняем статус на complete
@@ -2080,11 +2744,20 @@ async function fillCouriersTableAndSaveToFirebase() {
 
         await new Promise(resolve => setTimeout(resolve, 600));
         
-        // Заполняем таблицу отсортированными данными
+        // Обновляем статус даты в календаре
+        updateCalendarDateStatus(selectedDate, 'has-bd-data');
+
+        // Очищаем таблицу и заполняем ее данными с сохраненными номерами
         const tpi_cc_tableBody = document.querySelector('.tpi-cc--table-tbody-wrapper');
         tpi_cc_tableBody.innerHTML = '';
         
-        sortedCouriersData.forEach((courier, index) => {
+        // Теперь при создании строк таблицы будут использоваться сохраненные номера из couriersWithGeneratedNumbers
+        couriersWithGeneratedNumbers.forEach((courier, index) => {
+            // Добавляем сохраненные номера в данные курьера для правильного отображения
+            courier._savedCartNumbers = courier.cartNumbers || [];
+            courier._savedPalletNumbers = courier.palletNumbers || [];
+            courier._rowIndex = index;
+            
             const row = createCourierTableRow(courier, index);
             tpi_cc_tableBody.appendChild(row);
         });
@@ -2099,10 +2772,33 @@ async function fillCouriersTableAndSaveToFirebase() {
         cartPallet_btnActions();
         tpi_cc_filteringColumnData();
         
+        console.log('✅ Данные успешно сохранены в Firebase с номерами CART/PALLET');
+        
     } catch (error) {
         console.log('💥 Ошибка при заполнении таблицы и сохранении в Firebase:', error);
         updateLoadingStatus(0, 'error');
-        tpiNotification.show('Ошибка', "error", "Не удалось сохранить данные: " + error.message);
+        
+        // ПОКАЗЫВАЕМ ОШИБКУ В UI
+        const noDataContainer = document.querySelector('.tpi-cc--no-ds-data-container');
+        if (noDataContainer) {
+            noDataContainer.setAttribute('tpi-current-state', 'error');
+            
+            const descriptionBlock = document.querySelector('.tpi-cc--no-ds-data-description');
+            if (descriptionBlock) {
+                descriptionBlock.innerHTML = `
+                    <p class="tpi-cc--no-ds-data-description-block">Данные курьеров за выбранную дату ещё не существуют</p>
+                    <p class="tpi-cc--no-ds-data-description-block-sub">Пожалуйста попробуйте позже, когда данные курьеров будут сформированы в ПИ</p>
+                    <p class="tpi-cc--no-ds-data-description-block-sub">Окно для записи данных - с 23:00 по МСК, убедитесь, что у вас стоит верное время</p>
+                `;
+            }
+            
+            // Скрываем кнопку "Начать"
+            const startButton = document.querySelector('.tpi-cc--no-ds-data-start');
+            if (startButton) {
+                startButton.style.display = 'none';
+            }
+        }
+        
         window.dataCapturingFlag = false;
     }
 }
@@ -2245,6 +2941,94 @@ function update_ActionProcessContainer(){
 // B-   CALENDAR
 // B-
 // B-
+
+// Функция для массовой проверки существования данных в Firebase
+async function tpiCheckMultipleDatesInFirebase(dateStrings) {
+    try {
+        if (!tpiFirebaseInitialized) {
+            tpiDb = tpiInitializeFirebase();
+            if (!tpiDb) return {};
+        }
+        
+        console.log(`🔍 Массовая проверка ${dateStrings.length} дат в Firebase...`);
+        
+        const results = {};
+        const batchSize = 10; // Firestore ограничения
+        
+        // Разбиваем даты на батчи
+        for (let i = 0; i < dateStrings.length; i += batchSize) {
+            const batch = dateStrings.slice(i, i + batchSize);
+            
+            // Создаем массив промисов для каждой даты в батче
+            const promises = batch.map(async (dateStr) => {
+                try {
+                    const dateParts = dateStr.split('/');
+                    if (dateParts.length !== 3) {
+                        return { dateStr, exists: false };
+                    }
+                    
+                    const firebaseDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+                    const dateDocRef = tpiDb.collection("dates").doc(firebaseDate);
+                    
+                    // Проверяем существование документа с датой
+                    const dateDoc = await dateDocRef.get();
+                    
+                    if (!dateDoc.exists) {
+                        return { dateStr, exists: false };
+                    }
+                    
+                    // Проверяем существование подколлекции cartControl
+                    const cartControlRef = dateDocRef.collection("cartControl");
+                    const cartControlSnapshot = await cartControlRef.get();
+                    
+                    return { 
+                        dateStr, 
+                        exists: !cartControlSnapshot.empty,
+                        hasData: !cartControlSnapshot.empty,
+                        count: cartControlSnapshot.size
+                    };
+                    
+                } catch (error) {
+                    console.error(`💥 Ошибка проверки даты ${dateStr}:`, error);
+                    return { dateStr, exists: false };
+                }
+            });
+            
+            try {
+                // Выполняем все промисы в батче параллельно
+                const batchResults = await Promise.all(promises);
+                
+                // Обрабатываем результаты
+                batchResults.forEach(result => {
+                    results[result.dateStr] = { 
+                        exists: result.exists,
+                        hasCartPalletData: false // Упрощаем, не проверяем подробно
+                    };
+                });
+                
+            } catch (error) {
+                console.error('💥 Ошибка при выполнении батча:', error);
+                // В случае ошибки помечаем все даты батча как несуществующие
+                batch.forEach(dateStr => {
+                    results[dateStr] = { exists: false, hasCartPalletData: false };
+                });
+            }
+            
+            // Пауза между батчами
+            if (i + batchSize < dateStrings.length) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+        }
+        
+        console.log(`✅ Массовая проверка завершена, проверено ${Object.keys(results).length} дат`);
+        return results;
+        
+    } catch (error) {
+        console.error('💥 Ошибка при массовой проверке данных в Firebase:', error);
+        return {};
+    }
+}
+
 function initializeDatePicker() {
     const searchDateButton = document.querySelector('.tpi-cc-search-date');
     const selectedDateElement = document.getElementById('tpi-cc-seleceted-date');
@@ -2267,26 +3051,52 @@ function initializeDatePicker() {
     // Переменные для хранения выбранной даты
     let selectedDate = new Date(today);
     
-    // Функция для открытия календаря
-    function openCalendar() {
-        // Обновляем календарь с текущей выбранной датой
-        createCalendar(calendarContainer, new Date(), selectedDate);
-        
-        // Показываем текущий календарь
-        calendarContainer.style.display = 'block';
-        
-        // Закрываем все выпадающие списки при открытии календаря
-        closeAllDropdowns();
-        
-        // Ждем 1мс для начала анимации
-        setTimeout(() => {
-            calendarContainer.setAttribute('tpi-current-animation', 'shown');
-            searchDateButton.setAttribute('tpi-current-state', 'active');
-        }, 1);
-        
-        // Генерируем событие открытия календаря
-        const calendarOpenedEvent = new CustomEvent('tpi-calendar-opened');
-        document.dispatchEvent(calendarOpenedEvent);
+    // Функция для открытия календаря с ожиданием предзагрузки
+    async function openCalendar() {
+        try {
+            // Показываем лоадер в календаре
+            calendarContainer.innerHTML = `
+                <div class="tpi-cc-calendar-loading">
+                    <div class="tpi-cc-calendar-loading-spinner"></div>
+                    <p>Загрузка данных календаря...</p>
+                </div>
+            `;
+            calendarContainer.style.display = 'block';
+            
+            // Ждем завершения предзагрузки данных календаря
+            await preloadCalendarData();
+            
+            // Получаем выбранную дату
+            const selectedDateStr = searchDateButton.getAttribute('tpi-cc-selected-date-value');
+            
+            // Обновляем календарь с текущей выбранной датой
+            await createCalendar(calendarContainer, new Date(), selectedDate, selectedDateStr);
+            
+            // Показываем календарь с анимацией
+            setTimeout(() => {
+                calendarContainer.setAttribute('tpi-current-animation', 'shown');
+                searchDateButton.setAttribute('tpi-current-state', 'active');
+            }, 1);
+            
+            // Генерируем событие открытия календаря
+            const calendarOpenedEvent = new CustomEvent('tpi-calendar-opened');
+            document.dispatchEvent(calendarOpenedEvent);
+            
+        } catch (error) {
+            console.error('Ошибка открытия календаря:', error);
+            calendarContainer.innerHTML = `
+                <div class="tpi-cc-calendar-error">
+                    <p>Не удалось загрузить календарь</p>
+                    <button class="tpi-cc-calendar-retry">Повторить</button>
+                </div>
+            `;
+            
+            // Добавляем обработчик для кнопки повтора
+            const retryButton = calendarContainer.querySelector('.tpi-cc-calendar-retry');
+            if (retryButton) {
+                retryButton.addEventListener('click', openCalendar);
+            }
+        }
     }
     
     // Добавьте эту функцию для закрытия всех выпадающих списков
@@ -2319,7 +3129,8 @@ function initializeDatePicker() {
     }
     
     // Создаем календарь с передачей выбранной даты
-    createCalendar(calendarContainer, today, selectedDate);
+    const initialDateStr = searchDateButton.getAttribute('tpi-cc-selected-date-value');
+    createCalendar(calendarContainer, today, selectedDate, initialDateStr);
     
     // Обработчик клика на кнопку
     searchDateButton.addEventListener('click', function(event) {
@@ -2375,45 +3186,247 @@ function initializeDatePicker() {
     // Проверяем данные при изменении даты
     document.addEventListener('tpi-date-changed', async function(event) {
         if (event.detail && event.detail.date) {
-            // Обновляем UI немедленно
+            // Немедленно показываем лоадер
+            showTableLoader(true);
+            
+            // Немедленно очищаем таблицу
             const tpi_cc_tableBody = document.querySelector('.tpi-cc--table-tbody-wrapper');
             if (tpi_cc_tableBody) {
                 tpi_cc_tableBody.innerHTML = '';
             }
             
-            const tableWrapper = document.querySelector('.tpi-cc--table-wrapper');
-            if (tableWrapper) {
-                tableWrapper.style.display = 'none';
-            }
-            
-            const noDataWrapper = document.querySelector('.tpi-cc--no-ds-data-wrapper');
-            if (noDataWrapper) {
-                noDataWrapper.style.display = 'flex'; // FLEX!
-            }
-            
-            // Сбрасываем состояние плашки
-            const noDataContainer = document.querySelector('.tpi-cc--no-ds-data-container');
-            if (noDataContainer) {
-                noDataContainer.setAttribute('tpi-current-state', 'ready-to-data-search');
-            }
-            
             // Сбрасываем флаг загрузки
             window.dataCapturingFlag = false;
             
-            // Ждем 100ms для обновления UI и проверяем данные
-            setTimeout(async () => {
-                await tpiCheckAndLoadData();
-            }, 100);
+            // Сразу запускаем проверку данных (без задержки)
+            await tpiCheckAndLoadData();
         }
     });
 }
 
+function updateCalendarDateStatus(dateStr, status) {
+    const calendarDays = document.querySelectorAll('.tpi-cc-calendar-day:not(.empty)');
+    if (!calendarDays.length) return;
+    
+    const dateParts = dateStr.split('/');
+    const targetDate = new Date(
+        parseInt(dateParts[2]),
+        parseInt(dateParts[1]) - 1,
+        parseInt(dateParts[0])
+    );
+    
+    calendarDays.forEach(dayElement => {
+        const day = parseInt(dayElement.textContent);
+        const calendarDate = new Date(
+            targetDate.getFullYear(),
+            targetDate.getMonth(),
+            day
+        );
+        
+        if (calendarDate.getTime() === targetDate.getTime()) {
+            // Удаляем все статусные классы
+            dayElement.classList.remove(
+                'tpi-cc-has-bd-data',
+                'tpi-cc-no-bd-data',
+                'tpi-cc-available-to-write-bd-data',
+                'tpi-cc-future-date'
+            );
+            
+            // Добавляем новый статус
+            if (status === 'has-bd-data') {
+                dayElement.classList.add('tpi-cc-has-bd-data');
+                dayElement.title = 'В базе данных есть записи';
+            } else if (status === 'available-to-write-bd-data') {
+                dayElement.classList.add('tpi-cc-available-to-write-bd-data');
+                dayElement.title = 'Можно записать данные в базу';
+            }
+        }
+    });
+}
+
+function getDateStatusForCalendar(dateStr, targetDate) {
+    const now = new Date();
+    const currentHour = now.getHours();
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    const dateToCheck = new Date(targetDate);
+    dateToCheck.setHours(0, 0, 0, 0);
+    
+    // Вычисляем разницу в днях
+    const timeDiff = dateToCheck.getTime() - today.getTime();
+    const diffDays = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+    
+    // 1. Проверяем глобальный кэш (самый быстрый способ)
+    if (window.tpiCalendarDatesCache && window.tpiCalendarDatesCache[dateStr] !== undefined) {
+        return window.tpiCalendarDatesCache[dateStr];
+    }
+    
+    // 2. Быстрая логика на основе времени
+    if (diffDays < 0) {
+        // Прошлые даты
+        return 'no-bd-data';
+    } else if (diffDays === 0) {
+        // Сегодня - всегда можно записать, если нет данных
+        return 'available-to-write-bd-data'; // Всегда доступно
+    } else if (diffDays === 1) {
+        // Завтра - доступно только после 23:00
+        return currentHour >= 23 ? 'available-to-write-bd-data' : 'future-date';
+    } else {
+        // Будущие даты (больше чем завтра)
+        return 'future-date';
+    }
+}
+
+// Асинхронная функция для проверки статусов дат в конкретном месяце с прогрессом
+async function checkMonthDatesStatus(year, month) {
+    const monthKey = `${year}-${month}`;
+    
+    // Если месяц уже проверялся, используем кэш
+    if (window.tpiCalendarMonthCache && window.tpiCalendarMonthCache[monthKey]) {
+        if (DEBUG_CALENDAR) {
+            console.log(`📅 Используем кэшированные данные для месяца ${monthKey}`);
+        }
+        return window.tpiCalendarMonthCache[monthKey];
+    }
+    
+    if (DEBUG_CALENDAR) {
+        console.log(`📅 Проверяем актуальные даты в месяце ${monthKey}...`);
+    }
+    
+    const monthStatuses = {};
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const currentHour = new Date().getHours();
+    
+    // Получаем первый и последний день месяца
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    
+    // Собираем все даты месяца
+    const allDatesInMonth = [];
+    let currentDate = new Date(firstDay);
+    
+    while (currentDate <= lastDay) {
+        const dateStr = formatDateToDDMMYYYY(new Date(currentDate));
+        allDatesInMonth.push(dateStr);
+        currentDate.setDate(currentDate.getDate() + 1);
+    }
+    
+    // Сначала проверяем глобальный кэш для каждой даты
+    const datesToCheck = [];
+    
+    allDatesInMonth.forEach(dateStr => {
+        // Проверяем глобальный кэш
+        if (window.tpiCalendarDatesCache && window.tpiCalendarDatesCache[dateStr] !== undefined) {
+            monthStatuses[dateStr] = window.tpiCalendarDatesCache[dateStr];
+        } else {
+            datesToCheck.push(dateStr);
+        }
+    });
+    
+    // Если есть даты для проверки, делаем массовый запрос
+    if (datesToCheck.length > 0) {
+        if (DEBUG_CALENDAR) {
+            console.log(`🔍 Проверяем ${datesToCheck.length} дат в месяце массовым запросом...`);
+        }
+        
+        // Используем массовую проверку
+        const firebaseResults = await tpiCheckMultipleDatesInFirebase(datesToCheck);
+        
+        // Обрабатываем результаты
+        datesToCheck.forEach(dateStr => {
+            const result = firebaseResults[dateStr] || { exists: false, hasCartPalletData: false };
+            
+            const dateParts = dateStr.split('/');
+            const checkDate = new Date(
+                parseInt(dateParts[2]),
+                parseInt(dateParts[1]) - 1,
+                parseInt(dateParts[0])
+            );
+            checkDate.setHours(0, 0, 0, 0);
+            
+            const timeDiff = checkDate.getTime() - today.getTime();
+            const diffDays = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+            
+            let status;
+            if (result.exists) {
+                status = 'has-bd-data';
+            } else {
+                if (diffDays < 0) {
+                    status = 'no-bd-data';
+                } else if (diffDays === 0) {
+                    status = 'available-to-write-bd-data';
+                } else if (diffDays === 1) {
+                    status = (currentHour >= 23) ? 'available-to-write-bd-data' : 'future-date';
+                } else {
+                    status = 'future-date';
+                }
+            }
+            
+            monthStatuses[dateStr] = status;
+            
+            // Обновляем глобальный кэш
+            if (window.tpiCalendarDatesCache) {
+                window.tpiCalendarDatesCache[dateStr] = status;
+            }
+        });
+    }
+    
+    // Заполняем оставшиеся даты (которые уже были в кэше)
+    allDatesInMonth.forEach(dateStr => {
+        if (!monthStatuses[dateStr] && window.tpiCalendarDatesCache && window.tpiCalendarDatesCache[dateStr]) {
+            monthStatuses[dateStr] = window.tpiCalendarDatesCache[dateStr];
+        }
+    });
+    
+    // Сохраняем результат в кэш месяца
+    if (window.tpiCalendarMonthCache) {
+        window.tpiCalendarMonthCache[monthKey] = monthStatuses;
+    }
+    
+    if (DEBUG_CALENDAR) {
+        console.log(`✅ Проверка месяца ${monthKey} завершена`);
+    }
+    
+    return monthStatuses;
+}
+
+function applyStatusToDayElement(dayElement, status) {
+    // Удаляем все статусные классы
+    dayElement.classList.remove(
+        'tpi-cc-has-bd-data',
+        'tpi-cc-no-bd-data',
+        'tpi-cc-available-to-write-bd-data',
+        'tpi-cc-future-date'
+    );
+    
+    // Добавляем новый класс в зависимости от статуса
+    if (status === 'has-bd-data') {
+        dayElement.classList.add('tpi-cc-has-bd-data');
+        dayElement.title = 'В базе данных есть записи';
+    } else if (status === 'no-bd-data') {
+        dayElement.classList.add('tpi-cc-no-bd-data');
+        dayElement.title = 'В базе данных нет записей';
+    } else if (status === 'available-to-write-bd-data') {
+        dayElement.classList.add('tpi-cc-available-to-write-bd-data');
+        dayElement.title = 'Можно записать данные в базу';
+    } else if (status === 'future-date') {
+        dayElement.classList.add('tpi-cc-future-date');
+        dayElement.title = 'Дата недоступна';
+    }
+}
+
 // Функция для создания календаря
-function createCalendar(container, currentDisplayDate, currentSelectedDate) {
+function createCalendar(container, currentDisplayDate, currentSelectedDate, selectedDateStr) {
     let currentMonth = currentDisplayDate.getMonth();
     let currentYear = currentDisplayDate.getFullYear();
     
-    function renderCalendar() {
+    async function renderCalendar() {
         container.innerHTML = '';
         
         // Заголовок календаря
@@ -2424,14 +3437,16 @@ function createCalendar(container, currentDisplayDate, currentSelectedDate) {
         const prevButton = document.createElement('button');
         prevButton.innerHTML = tpi_cc_i_chevron_left;
         prevButton.className = 'tpi-cc-calendar-nav';
-        prevButton.addEventListener('click', (e) => {
+        prevButton.addEventListener('click', async (e) => {
             e.stopPropagation();
+            
             currentMonth--;
             if (currentMonth < 0) {
                 currentMonth = 11;
                 currentYear--;
             }
-            renderCalendar();
+            
+            await renderCalendar();
         });
         
         // Отображение текущего месяца и года
@@ -2443,14 +3458,16 @@ function createCalendar(container, currentDisplayDate, currentSelectedDate) {
         const nextButton = document.createElement('button');
         nextButton.innerHTML = tpi_cc_i_chevron_right;
         nextButton.className = 'tpi-cc-calendar-nav';
-        nextButton.addEventListener('click', (e) => {
+        nextButton.addEventListener('click', async (e) => {
             e.stopPropagation();
+            
             currentMonth++;
             if (currentMonth > 11) {
                 currentMonth = 0;
                 currentYear++;
             }
-            renderCalendar();
+            
+            await renderCalendar();
         });
         
         header.appendChild(prevButton);
@@ -2472,15 +3489,17 @@ function createCalendar(container, currentDisplayDate, currentSelectedDate) {
         
         container.appendChild(weekDaysRow);
         
-        // Дни месяца
+        // Дни месяца - ОТРИСОВЫВАЕМ СРАЗУ
         const daysGrid = document.createElement('div');
         daysGrid.className = 'tpi-cc-calendar-days';
         
-        // Получаем первый день месяца и количество дней
         const firstDay = new Date(currentYear, currentMonth, 1);
         const lastDay = new Date(currentYear, currentMonth + 1, 0);
         const daysInMonth = lastDay.getDate();
         const firstDayIndex = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
+        
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
         
         // Пустые ячейки для первых дней
         for (let i = 0; i < firstDayIndex; i++) {
@@ -2489,11 +3508,8 @@ function createCalendar(container, currentDisplayDate, currentSelectedDate) {
             daysGrid.appendChild(emptyCell);
         }
         
-        // Дни месяца
-        const today = new Date();
-        const isCurrentMonth = today.getMonth() === currentMonth && today.getFullYear() === currentYear;
-        const isSelectedMonth = currentSelectedDate.getMonth() === currentMonth && 
-                               currentSelectedDate.getFullYear() === currentYear;
+        // Создаем элементы дней БЕЗ статусов (только числа)
+        const dayElements = {};
         
         for (let day = 1; day <= daysInMonth; day++) {
             const dayElement = document.createElement('div');
@@ -2501,12 +3517,31 @@ function createCalendar(container, currentDisplayDate, currentSelectedDate) {
             dayElement.className = 'tpi-cc-calendar-day';
             
             const cellDate = new Date(currentYear, currentMonth, day);
+            const dateStr = formatDateToDDMMYYYY(cellDate);
+            
+            // Сохраняем ссылку на элемент
+            dayElements[dateStr] = dayElement;
+            
+            // Показываем индикатор загрузки для дат, которых нет в кэше
+            if (!window.tpiCalendarDatesCache || window.tpiCalendarDatesCache[dateStr] === undefined) {
+                dayElement.classList.add('tpi-cc-calendar-loading');
+            }
             
             // Проверяем, является ли этот день сегодняшним
-            const isToday = isCurrentMonth && day === today.getDate();
+            const isToday = cellDate.getTime() === today.getTime();
             
             // Проверяем, является ли этот день выбранным
-            const isSelected = isSelectedMonth && day === currentSelectedDate.getDate();
+            let isSelected = false;
+            if (selectedDateStr) {
+                const selectedDateParts = selectedDateStr.split('/');
+                const selectedDate = new Date(
+                    parseInt(selectedDateParts[2]),
+                    parseInt(selectedDateParts[1]) - 1,
+                    parseInt(selectedDateParts[0])
+                );
+                selectedDate.setHours(0, 0, 0, 0);
+                isSelected = cellDate.getTime() === selectedDate.getTime();
+            }
             
             // Подсвечиваем сегодняшний день (если он не выбран)
             if (isToday && !isSelected) {
@@ -2518,9 +3553,34 @@ function createCalendar(container, currentDisplayDate, currentSelectedDate) {
                 dayElement.classList.add('selected');
             }
             
+            // Сохраняем дату в элементе
+            dayElement.dataset.date = dateStr;
+            dayElement.dataset.cellDate = cellDate.toISOString();
+            
             // Добавляем обработчик выбора даты
-            dayElement.addEventListener('click', (e) => {
+            dayElement.addEventListener('click', async (e) => {
                 e.stopPropagation();
+                
+                // Получаем текущий статус даты
+                const currentStatus = window.tpiCalendarDatesCache ? window.tpiCalendarDatesCache[dateStr] : null;
+                
+                // Проверяем, можно ли выбрать эту дату
+                const canSelect = currentStatus !== 'no-bd-data' && 
+                                  currentStatus !== 'future-date' &&
+                                  !dayElement.classList.contains('tpi-cc-calendar-loading');
+                
+                if (!canSelect) {
+                    // Показываем подсказку почему нельзя выбрать
+                    if (currentStatus === 'no-bd-data') {
+                        console.log('Нельзя выбрать прошлую дату без данных');
+                    } else if (currentStatus === 'future-date') {
+                        console.log('Эта дата еще недоступна для записи');
+                    } else if (dayElement.classList.contains('tpi-cc-calendar-loading')) {
+                        console.log('Данные все еще загружаются...');
+                    }
+                    return;
+                }
+                
                 const newSelectedDate = new Date(currentYear, currentMonth, day);
                 
                 // Обновляем глобальную переменную выбранной даты
@@ -2536,7 +3596,7 @@ function createCalendar(container, currentDisplayDate, currentSelectedDate) {
                 searchDateButton.setAttribute('tpi-cc-selected-date-value', formattedDate);
                 
                 // Пересоздаем календарь с новой выбранной датой
-                createCalendar(container, new Date(currentYear, currentMonth, 1), newSelectedDate);
+                await createCalendar(container, new Date(currentYear, currentMonth, 1), newSelectedDate, formattedDate);
                 
                 // Триггерим событие изменения даты
                 const dateChangeEvent = new CustomEvent('tpi-date-changed', {
@@ -2552,9 +3612,116 @@ function createCalendar(container, currentDisplayDate, currentSelectedDate) {
         }
         
         container.appendChild(daysGrid);
+        
+        // ЗАПУСКАЕМ АСИНХРОННУЮ ПРОВЕРКУ СТАТУСОВ ПОСЛЕ ОТРИСОВКИ
+        setTimeout(async () => {
+            try {
+                // Получаем статусы для текущего месяца
+                const monthStatuses = await checkMonthDatesStatus(currentYear, currentMonth);
+                
+                // Применяем статусы к элементам
+                Object.keys(monthStatuses).forEach(dateStr => {
+                    const dayElement = dayElements[dateStr];
+                    if (dayElement) {
+                        // Убираем индикатор загрузки
+                        dayElement.classList.remove('tpi-cc-calendar-loading');
+                        
+                        // Применяем статус
+                        const status = monthStatuses[dateStr];
+                        applyStatusToDayElement(dayElement, status);
+                    }
+                });
+                
+            } catch (error) {
+                console.error('Ошибка при проверке статусов дат:', error);
+                
+                // В случае ошибки убираем индикаторы загрузки
+                Object.values(dayElements).forEach(dayElement => {
+                    dayElement.classList.remove('tpi-cc-calendar-loading');
+                });
+            }
+        }, 0);
     }
     
     renderCalendar();
+}
+
+function updateDayElementStatus(dayElement, status) {
+    // Удаляем все статусные классы
+    dayElement.classList.remove(
+        'tpi-cc-has-bd-data',
+        'tpi-cc-no-bd-data',
+        'tpi-cc-available-to-write-bd-data',
+        'tpi-cc-future-date'
+    );
+    
+    // Добавляем новый класс
+    if (status === 'has-bd-data') {
+        dayElement.classList.add('tpi-cc-has-bd-data');
+        dayElement.title = 'В базе данных есть записи';
+    } else if (status === 'no-bd-data') {
+        dayElement.classList.add('tpi-cc-no-bd-data');
+        dayElement.title = 'В базе данных нет записей';
+    } else if (status === 'available-to-write-bd-data') {
+        dayElement.classList.add('tpi-cc-available-to-write-bd-data');
+        dayElement.title = 'Можно записать данные в базу';
+    } else if (status === 'future-date') {
+        dayElement.classList.add('tpi-cc-future-date');
+        dayElement.title = 'Дата недоступна';
+    }
+}
+
+function updateCalendarCacheForDate(dateStr) {
+    // Обновляем глобальный кэш
+    tpiCalendarDatesCache[dateStr] = 'has-bd-data';
+    
+    // Также обновляем локальный кэш если он существует
+    if (typeof calendarDatesCache !== 'undefined') {
+        // Находим ключ для этой даты в локальном кэше
+        const dateParts = dateStr.split('/');
+        if (dateParts.length === 3) {
+            const date = new Date(
+                parseInt(dateParts[2]),
+                parseInt(dateParts[1]) - 1,
+                parseInt(dateParts[0])
+            );
+            const cacheKey = `${dateStr}-${date.getFullYear()}-${date.getMonth()}`;
+            calendarDatesCache[cacheKey] = 'has-bd-data';
+        }
+    }
+    
+    // Находим и обновляем элемент в DOM если он существует
+    updateCalendarDayStatus(dateStr, 'has-bd-data');
+}
+
+
+function updateCalendarDayStatus(dateStr, status) {
+    const dayElement = document.querySelector(`.tpi-cc-calendar-day[data-date="${dateStr}"]`);
+    if (!dayElement) return;
+    
+    // Удаляем все статусные классы
+    dayElement.classList.remove(
+        'tpi-cc-has-bd-data',
+        'tpi-cc-no-bd-data',
+        'tpi-cc-available-to-write-bd-data',
+        'tpi-cc-future-date',
+        'tpi-cc-calendar-pending'
+    );
+    
+    // Добавляем новый класс
+    if (status === 'has-bd-data') {
+        dayElement.classList.add('tpi-cc-has-bd-data');
+        dayElement.title = 'В базе данных есть записи';
+    } else if (status === 'no-bd-data') {
+        dayElement.classList.add('tpi-cc-no-bd-data');
+        dayElement.title = 'В базе данных нет записей';
+    } else if (status === 'available-to-write-bd-data') {
+        dayElement.classList.add('tpi-cc-available-to-write-bd-data');
+        dayElement.title = 'Можно записать данные в базу';
+    } else if (status === 'future-date') {
+        dayElement.classList.add('tpi-cc-future-date');
+        dayElement.title = 'Дата недоступна';
+    }
 }
 
 // Вспомогательные функции
@@ -4106,3 +5273,9 @@ function updateFilterCounters(total, filtered) {
         }
     }
 }
+
+preloadCalendarData().then(() => {
+    console.log('✅ Предзагрузка календаря завершена');
+}).catch(error => {
+    console.error('❌ Ошибка предзагрузки календаря:', error);
+});
