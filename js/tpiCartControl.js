@@ -9,8 +9,12 @@ let tpiCalendarDataLoaded = false;
 let tpiCalendarPreloadPromise = null;
 let tpiCalendarPreloadComplete = false;
 let tpi_cc_lastLoaderShowTime = 0; 
-const tpi_cc_minLoaderTextChangeInterval = 2300; 
+const tpi_cc_minLoaderTextChangeInterval = 1000; 
 const DEBUG_CALENDAR = false;
+let tpi_cc_originalRowOrder = [];
+let tpi_cc_currentFilterColumn = null;
+let tpi_cc_currentFilterDirection = null;
+let tpi_cc_tableSortInitialized = false;
 
 // Функция для предзагрузки данных календаря
 async function preloadCalendarData() {
@@ -778,6 +782,26 @@ tpi_cc_i_tag = `
     <path d="M416 64H257.6L76.5 251.6c-8 8-12.3 18.5-12.5 29-.3 11.3 3.9 22.6 12.5 31.2l123.7 123.6c8 8 20.8 12.5 28.8 12.5s22.8-3.9 31.4-12.5L448 256V96l-32-32zm-30.7 102.7c-21.7 6.1-41.3-10-41.3-30.7 0-17.7 14.3-32 32-32 20.7 0 36.8 19.6 30.7 41.3-2.9 10.3-11.1 18.5-21.4 21.4z"></path>
 </svg>
 `,
+tpi_cc_i_box_outline = `
+<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <path d="M8.186 1.113a.5.5 0 0 0-.372 0L1.846 3.5l2.404.961L10.404 2zm3.564 1.426L5.596 5 8 5.961 14.154 3.5zm3.25 1.7-6.5 2.6v7.922l6.5-2.6V4.24zM7.5 14.762V6.838L1 4.239v7.923zM7.443.184a1.5 1.5 0 0 1 1.114 0l7.129 2.852A.5.5 0 0 1 16 3.5v8.662a1 1 0 0 1-.629.928l-7.185 2.874a.5.5 0 0 1-.372 0L.63 13.09a1 1 0 0 1-.63-.928V3.5a.5.5 0 0 1 .314-.464z"></path>
+</svg>
+`,
+tpi_cc_i_box_filled = `
+<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <path fill-rule="evenodd" d="M15.528 2.973a.75.75 0 0 1 .472.696v8.662a.75.75 0 0 1-.472.696l-7.25 2.9a.75.75 0 0 1-.557 0l-7.25-2.9A.75.75 0 0 1 0 12.331V3.669a.75.75 0 0 1 .471-.696L7.443.184l.01-.003.268-.108a.75.75 0 0 1 .558 0l.269.108.01.003zM10.404 2 4.25 4.461 1.846 3.5 1 3.839v.4l6.5 2.6v7.922l.5.2.5-.2V6.84l6.5-2.6v-.4l-.846-.339L8 5.961 5.596 5l6.154-2.461z"></path>
+</svg>
+`,
+tpi_cc_i_pen_outline = `
+<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M17.8492 11.6983L17.1421 10.9912L7.24264 20.8907H3V16.648L14.3137 5.33432L19.9706 10.9912C20.3611 11.3817 20.3611 12.0149 19.9706 12.4054L12.8995 19.4765L11.4853 18.0622L17.8492 11.6983ZM15.7279 9.57696L14.3137 8.16274L5 17.4765V18.8907H6.41421L15.7279 9.57696ZM18.5563 2.50589L21.3848 5.33432C21.7753 5.72484 21.7753 6.35801 21.3848 6.74853L19.9706 8.16274L15.7279 3.9201L17.1421 2.50589C17.5327 2.11537 18.1658 2.11537 18.5563 2.50589Z"></path>
+</svg>
+`,
+tpi_cc_i_pen_filled = `
+<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M17.8492 11.805L17.1421 11.0979L7.24264 20.9974H3V16.7547L14.3137 5.44101L19.9706 11.0979C20.3611 11.4884 20.3611 12.1216 19.9706 12.5121L12.8995 19.5831L11.4853 18.1689L17.8492 11.805ZM18.5563 2.61258L21.3848 5.44101C21.7753 5.83153 21.7753 6.4647 21.3848 6.85522L19.9706 8.26943L15.7279 4.02679L17.1421 2.61258C17.5327 2.22206 18.1658 2.22206 18.5563 2.61258Z"></path>
+</svg>
+`,
 tpi_cc_liquid_glass = `
 <svg style="display: none;">
   <filter id="container-glass" x="0%" y="0%" width="100%" height="100%">
@@ -819,7 +843,15 @@ function checkiIs__onCartControlsPage() {
         <div class="tpi-cc--wrapper-title">
             Управление MK
         </div>
-
+        <div class="tpi-cc-graph-panel">
+            <div class="tpi-cc-graph-wrapper">
+                <div class="tpi-cc-graph-wrapper-title">
+                    <p>График отгруженных заказов</p>
+                </div>
+                <div class="tpi-cc-graph-items-wrapper">
+                </div>
+            </div>
+        </div>
         <div class="tpi-cc-filters-panel">
             <div class="tpi-cc-filters-wrapper">
                 <div class="tpi-cc-filters-wrapper-title">
@@ -1254,7 +1286,7 @@ async function tpiCheckAndLoadData() {
 
 const tpi_cc_funny_text_array = [
     'Что-то загружаем',
-    'Ильященко - черт ;)',
+    'Ильяшенко - черт ;)',
     'Продам гараж',
     'Дима устал придумывать текст',
     'Делаем всё сразом',
@@ -1277,6 +1309,20 @@ const tpi_cc_funny_text_array = [
     'Брат дай чуаркод по братски',
     'Коллеги, трахнем по чайку ?',
     'Утеря – Михаил Санин',
+    'Включаем дуйчики на двойку',
+    'Стрижём Ильяшенко',
+    'Идём на четвертый склад',
+    'Забираем у Валеры чайник',
+    'Играем в муравьёв',
+    'QR код возле ворот, на улице',
+    'Ищем на СЦ, вернёмся с ОС',
+    'Кидаем аномалии в хранение',
+    'Покупаем новые джогеры',
+    'Ищем третьего за стол',
+    'Переупаковал 5 заказов - устал',
+    'Делаем жёсткий ППС',
+    'Делаем ППС по братски',
+    'Олени не прошли в плановую ТС',
     'iPhone - говно'
 ];
 
@@ -1299,6 +1345,10 @@ function showTableLoader(show) {
             loadingWrapper.style.display = 'flex';
         } else {
             loadingWrapper.style.display = 'none';
+            
+            const funnyTexts = getRandomFunnyTexts();
+            const leftTextElement = document.getElementById('tpi-cc-funny-text-left');
+            const rightTextElement = document.getElementById('tpi-cc-funny-text-right');
         }
     }
     
@@ -1491,6 +1541,9 @@ async function tpiLoadAndDisplayData(selectedDate) {
         // Сортируем данные по группам в правильном порядке
         const sortedCouriersData = sortCouriersByGroupsForDisplay(couriersData);
         
+        // Сбрасываем состояние сортировки перед заполнением новой таблицы
+        resetTableSortState();
+        
         // Заполняем таблицу данными
         const tpi_cc_tableBody = document.querySelector('.tpi-cc--table-tbody-wrapper');
         if (tpi_cc_tableBody) {
@@ -1508,7 +1561,9 @@ async function tpiLoadAndDisplayData(selectedDate) {
             saveOriginalRowOrder();
             initializeAllFilters();
             cartPallet_btnActions();
-            tpi_cc_filteringColumnData();
+            if (!tpi_cc_tableSortInitialized) {
+                tpi_cc_filteringColumnData();
+            }
         }
         
         // Показываем таблицу, скрываем лоадер
@@ -1517,6 +1572,17 @@ async function tpiLoadAndDisplayData(selectedDate) {
         if (tableWrapper) {
             tableWrapper.style.display = 'block';
         }
+
+        setTimeout(async () => {
+            try {
+                const result = await updateTableDataFromAPI(selectedDate);
+                if (result && result.updatedCount > 0) {
+                    console.log(`✅ Таблица обновлена: ${result.updatedCount} записей`);
+                }
+            } catch (error) {
+                console.error('⚠️ Ошибка при обновлении таблицы:', error);
+            }
+        }, 1500);
         
     } catch (error) {
         console.error('💥 TPI Ошибка при загрузке данных из Firebase:', error);
@@ -2378,7 +2444,13 @@ function generateRandomPalletNumbers(count, seed) {
     }
     
     return numbers;
+}
+
+function tpiClearUsedPalletNumbers() {
+    if (window.tpiUsedPalletNumbers) {
+        window.tpiUsedPalletNumbers.clear();
     }
+}
 
 function getProgressColor(percent) {
     let r, g, b;
@@ -2581,7 +2653,7 @@ function createCourierTableRow(courierData, index) {
         <td class="tpi-cc--table-tbody-item">
             <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-data-sort-progress-container">
                     <p class="tpi-cc--table-tbody-data-sort-progress" tpi-cc-parsing-data="courier-sorting-progress">
-                        ${sortCount} из ${courierData.ordersPlanned || 0}
+                        <a class="tpi-cc--table-tbody-data-link" traget="_blank" href="https://logistics.market.yandex.ru/sorting-center/21972131/sortables?routeId=${courierData.routeId}&searchRouteIdInOldRoutes=true&crossDockOnly=true&sortableStatusesLeafs=SHIPPED_DIRECT&sortableTypes=PLACE&sortableTypes=TOTE&sortableTypes=PALLET&sortableTypes=XDOC_PALLET&sortableTypes=XDOC_BOX"><i>${tpi_cc_i_box_outline}</i>${sortCount || 0}</a> из <a class="tpi-cc--table-tbody-data-link" traget="_blank" href="https://logistics.market.yandex.ru/sorting-center/21972131/sortables?routeId=${courierData.routeId}&searchRouteIdInOldRoutes=true&sortableStatusesLeafs=&sortableTypes=PLACE&sortableTypes=TOTE&sortableTypes=PALLET&sortableTypes=XDOC_PALLET&sortableTypes=XDOC_BOX&crossDockOnly=true"><i>${tpi_cc_i_box_filled}</i>${courierData.ordersPlanned || 0}</a>
                     </p>
                 <div class="tpi-cc--table-tbody-data-sort-progress-circle-wrapper">
                     <p class="tpi-cc--table-tbody-data-sort-progress-circle-value" tpi-cc-parsing-data="courier-sorting-progress-percent">
@@ -2602,7 +2674,7 @@ function createCourierTableRow(courierData, index) {
         <td class="tpi-cc--table-tbody-item">
             <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-data-sort-progress-container">
                 <p class="tpi-cc--table-tbody-data-sort-progress" tpi-cc-parsing-data="courier-prepared-progress">
-                    ${courierData.sortablesPrepared || 0} из ${courierData.sortablesInCell || 0}
+                    <span><i>${tpi_cc_i_pen_outline}</i>${courierData.sortablesPrepared || 0}</span> из <span><i>${tpi_cc_i_pen_filled}</i>${courierData.sortablesInCell || 0}</span>
                 </p>
                 <div class="tpi-cc--table-tbody-data-sort-progress-circle-wrapper">
                     <p class="tpi-cc--table-tbody-data-sort-progress-circle-value" tpi-cc-parsing-data="courier-prepared-progress-percent">
@@ -2776,6 +2848,8 @@ async function fillCouriersTableAndSaveToFirebase() {
                 courierWithNumbers.cartNumbers = cartNumbers;
             }
             
+            tpiClearUsedPalletNumbers();
+
             // Генерируем номера PALLET
             if (!isNullCell) {
                 const palletNumbers = [];
@@ -2817,7 +2891,7 @@ async function fillCouriersTableAndSaveToFirebase() {
         
         // Шаг 4: Построение и внедрение таблицы в DOM
         updateLoadingStatus(4, 'in-progress');
-        
+        resetTableSortState();
         await new Promise(resolve => setTimeout(resolve, 1500));
         
         // ВАЖНО: Сначала меняем статус на complete
@@ -2844,7 +2918,7 @@ async function fillCouriersTableAndSaveToFirebase() {
         // Очищаем таблицу и заполняем ее данными с сохраненными номерами
         const tpi_cc_tableBody = document.querySelector('.tpi-cc--table-tbody-wrapper');
         tpi_cc_tableBody.innerHTML = '';
-        
+        tpiClearUsedPalletNumbers();
         // Теперь при создании строк таблицы будут использоваться сохраненные номера из couriersWithGeneratedNumbers
         couriersWithGeneratedNumbers.forEach((courier, index) => {
             // Добавляем сохраненные номера в данные курьера для правильного отображения
@@ -2898,13 +2972,28 @@ async function fillCouriersTableAndSaveToFirebase() {
 }
 
 function tpi_cc_filteringColumnData() {
-    const table = document.querySelector('table.tpi-cc--table-data-output');
-    if (!table) {
-        tpiNotification.show('Ошибка', "error", "Не смог найти таблицу");
+    // Проверяем, была ли уже инициализирована сортировка
+    if (tpi_cc_tableSortInitialized) {
+        console.log('📌 Сортировка таблицы уже инициализирована, пропускаем');
         return;
     }
     
-    table.addEventListener('click', (event) => {
+    const table = document.querySelector('table.tpi-cc--table-data-output');
+    if (!table) {
+        console.warn('⚠️ Не смог найти таблицу для инициализации сортировки');
+        return;
+    }
+    
+    console.log('✅ Инициализация сортировки таблицы');
+    
+    // Удаляем все существующие обработчики перед добавлением нового
+    const oldHandler = table._tpiSortHandler;
+    if (oldHandler) {
+        table.removeEventListener('click', oldHandler);
+    }
+    
+    // Функция-обработчик для сортировки
+    function handleTableClick(event) {
         const headerItem = event.target.closest('.tpi-cc--table-thead-item');
         if (!headerItem) return;
         if (headerItem.hasAttribute('tpi-cc-filters-not-allowed')) {
@@ -2915,43 +3004,56 @@ function tpi_cc_filteringColumnData() {
         if (!targetDiv) return;
         
         const currentState = targetDiv.getAttribute('tpi-current-state');
+        const columnIndex = Array.from(headerItem.parentElement.children).indexOf(headerItem);
         let nextState = null;
+        
+        // Проверяем, нажимаем ли мы на тот же столбец
+        const isSameColumn = tpi_cc_currentFilterColumn === columnIndex;
         
         if (!currentState) {
             nextState = 'filtered-down';
+            tpi_cc_currentFilterDirection = 'down';
         } else if (currentState === 'filtered-down') {
             nextState = 'filtered-up';
+            tpi_cc_currentFilterDirection = 'up';
         }
         
+        // Сбрасываем все фильтры перед применением нового
         document.querySelectorAll('div.tpi-cc--table-thead-data[tpi-current-state]').forEach(div => {
             div.removeAttribute('tpi-current-state');
         });
         
+        // Сбрасываем визуальные эффекты
         document.querySelectorAll('td.tpi-cc--table-tbody-item[tpi-current-state]').forEach(td => {
             td.removeAttribute('tpi-current-state');
         });
         
         if (nextState) {
+            // Устанавливаем новый фильтр
             targetDiv.setAttribute('tpi-current-state', nextState);
+            tpi_cc_currentFilterColumn = columnIndex;
             
-            const thIndex = Array.from(headerItem.parentElement.children).indexOf(headerItem);
+            // Сортируем таблицу по выбранному столбцу
+            sortTableByColumnMove(columnIndex, nextState);
             
-            const tableBodyRows = table.querySelectorAll('tbody tr');
-            
-            tableBodyRows.forEach((row, rowIndex) => {
-                const cells = row.querySelectorAll('td.tpi-cc--table-tbody-item');
-                if (cells.length > thIndex) {
-                    const cell = cells[thIndex];
-                    
-                    if (rowIndex === tableBodyRows.length - 1) {
-                        cell.setAttribute('tpi-current-state', 'filtered-last');
-                    } else {
-                        cell.setAttribute('tpi-current-state', 'filtered');
-                    }
-                }
-            });
+        } else {
+            // Если фильтр снят
+            tpi_cc_currentFilterColumn = null;
+            tpi_cc_currentFilterDirection = null;
+            // Восстанавливаем исходный порядок
+            restoreOriginalRowOrder();
         }
-    });
+    }
+    
+    // Сохраняем обработчик для возможного удаления
+    table._tpiSortHandler = handleTableClick;
+    
+    // Вешаем обработчик события только один раз
+    table.addEventListener('click', handleTableClick);
+    
+    // Помечаем, что сортировка инициализирована
+    tpi_cc_tableSortInitialized = true;
+    console.log('✅ Обработчик сортировки таблицы добавлен');
 }
 
 function toggle_ActionProcessContainer(state){
@@ -4642,11 +4744,6 @@ function updateDropdownCounts(dropdownContainer) {
 // C-
 // C-
 
-// Глобальная переменная для хранения исходного порядка строк
-let tpi_cc_originalRowOrder = [];
-let tpi_cc_currentFilterColumn = null;
-let tpi_cc_currentFilterDirection = null;
-
 // Сохраняем исходный порядок строк с их обработчиками
 function saveOriginalRowOrder() {
     const tableBody = document.querySelector('.tpi-cc--table-tbody-wrapper');
@@ -4657,13 +4754,22 @@ function saveOriginalRowOrder() {
 
 // Модифицированная функция фильтрации с сохранением обработчиков
 function tpi_cc_filteringColumnData() {
-    const table = document.querySelector('table.tpi-cc--table-data-output');
-    if (!table) {
-        tpiNotification.show('Ошибка', "error", "Не смог найти таблицу");
+    // Проверяем, была ли уже инициализирована сортировка
+    if (tpi_cc_tableSortInitialized) {
+        console.log('📌 Сортировка таблицы уже инициализирована, пропускаем');
         return;
     }
     
-    table.addEventListener('click', (event) => {
+    const table = document.querySelector('table.tpi-cc--table-data-output');
+    if (!table) {
+        console.warn('⚠️ Не смог найти таблицу для инициализации сортировки');
+        return;
+    }
+    
+    console.log('✅ Инициализация сортировки таблицы');
+    
+    // Функция-обработчик для сортировки
+    function handleTableClick(event) {
         const headerItem = event.target.closest('.tpi-cc--table-thead-item');
         if (!headerItem) return;
         if (headerItem.hasAttribute('tpi-cc-filters-not-allowed')) {
@@ -4713,7 +4819,21 @@ function tpi_cc_filteringColumnData() {
             // Восстанавливаем исходный порядок
             restoreOriginalRowOrder();
         }
-    });
+    }
+    
+    // Вешаем обработчик события только один раз
+    table.addEventListener('click', handleTableClick);
+    
+    // Помечаем, что сортировка инициализирована
+    tpi_cc_tableSortInitialized = true;
+    console.log('✅ Обработчик сортировки таблицы добавлен');
+}
+
+function resetTableSortState() {
+    tpi_cc_tableSortInitialized = false;
+    tpi_cc_currentFilterColumn = null;
+    tpi_cc_currentFilterDirection = null;
+    tpi_cc_originalRowOrder = [];
 }
 
 // Новая функция сортировки, которая перемещает строки, а не пересоздает их
@@ -5373,3 +5493,751 @@ preloadCalendarData().then(() => {
 }).catch(error => {
     console.error('❌ Ошибка предзагрузки календаря:', error);
 });
+
+// C-
+// C-
+// C- Обновление данных в таблице при загрузке из БД
+// C-
+// C-
+
+// Функция для получения свежих данных из API без расшифровки имен
+async function getFreshCouriersData(selectedDate) {
+    try {
+        // Формируем URL для запроса
+        const url = new URL('https://logistics.market.yandex.ru/api/resolve/');
+        url.searchParams.append('r', 'sortingCenter/routes/resolveGetRoutesFullInfo:resolveGetRoutesFullInfo');
+
+        // ВАЖНО: Используем выбранную дату из календаря
+        if (!selectedDate) {
+            console.log('❌ Не указана дата для запроса API');
+            return null;
+        }
+
+        // Преобразуем DD/MM/YYYY в YYYY-MM-DD для API
+        const dateParts = selectedDate.split('/');
+        if (dateParts.length !== 3) {
+            console.log('❌ Неверный формат даты:', selectedDate);
+            return null;
+        }
+
+        const currentDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+        console.log(`📅 Запрашиваем данные API для даты: ${currentDate} (выбранная: ${selectedDate})`);
+        
+        const requestBody = {
+            "params": [{
+                "sortingCenterId": 21972131,
+                "type": "OUTGOING_COURIER",
+                "sort": "",
+                "hasCarts": false,
+                "category": "COURIER",
+                "date": currentDate,
+                "recipientName": "",
+                "page": 0,
+                "size": 200
+            }],
+            "path": `/sorting-center/21972131/routes?type=OUTGOING_COURIER&sort=&hasCarts=false&category=COURIER&date=${currentDate}&recipientName=`
+        };
+
+        const response = await fetch(url.toString(), {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-Market-Core-Service': '<UNKNOWN>',
+                'sk': tpiUserTOKEN
+            },
+            body: JSON.stringify(requestBody)
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        
+        if (data && data.results && data.results.length > 0) {
+            const result = data.results[0];
+            
+            if (result.error) {
+                console.log('❌ Ошибка API:', result.error.message);
+                return null;
+            }
+            
+            if (result.data && result.data.content && result.data.content.length > 0) {
+                const routes = result.data.content;
+                
+                // Формируем упрощенные данные (без расшифровки имен)
+                const couriersData = routes.map((route, index) => {
+                    // Берем ID курьера из разных возможных мест
+                    let courierId = null;
+                    if (route.courier && route.courier.externalId) {
+                        courierId = route.courier.externalId;
+                    } else if (route.courier && route.courier.id) {
+                        courierId = route.courier.id;
+                    }
+                    
+                    // Определяем ячейку
+                    let mainCell = 'Нет ячейки';
+                    if (route.cells && route.cells.length > 0) {
+                        mainCell = route.cells[0]?.number || 'Нет ячейки';
+                    } else if (route.cell && route.cell.number) {
+                        mainCell = route.cell.number;
+                    } else {
+                        mainCell = 'null';
+                    }
+                    
+                    return {
+                        courierId: courierId,
+                        externalId: route.courier?.externalId || null,
+                        cell: mainCell,
+                        status: route.status || 'Неизвестно',
+                        ordersLeft: route.ordersLeft || 0,
+                        ordersSorted: route.ordersSorted || 0,
+                        ordersShipped: route.ordersShipped || 0,
+                        ordersPlanned: route.ordersPlanned || 0,
+                        sortablesInCell: route.sortablesInCell || 0,
+                        sortablesPrepared: route.sortablesPrepared || 0,
+                        courierArrivesAt: route.courierArrivesAt || null,
+                        startedAt: route.startedAt || null,
+                        finishedAt: route.finishedAt || null,
+                        routeId: route.id || null,
+                        hasCells: route.cells && route.cells.length > 0
+                    };
+                });
+                
+                console.log(`📊 Получено ${couriersData.length} записей из API за дату ${selectedDate}`);
+                return couriersData;
+                
+            } else {
+                console.log(`❌ Нет данных о маршрутах за дату ${selectedDate}`);
+                return null;
+            }
+        } else {
+            console.log('❌ Неверный формат ответа API');
+            return null;
+        }
+    } catch (error) {
+        console.error('💥 Ошибка при получении данных из API:', error);
+        return null;
+    }
+}
+
+// Функция для сохранения ОБНОВЛЕННЫХ данных в Firebase
+async function saveUpdatedTableData(selectedDate) {
+    try {
+        // Сначала загружаем текущие данные из Firebase
+        const currentData = await tpiLoadDataFromFirebase(selectedDate);
+        if (!currentData || currentData.length === 0) {
+            console.log('❌ Нет текущих данных в Firebase для сравнения');
+            return false;
+        }
+        
+        // Создаем мапу текущих данных по externalId
+        const currentDataMap = new Map();
+        currentData.forEach(item => {
+            const key = item.externalId || item.courierId;
+            if (key) {
+                currentDataMap.set(key, item);
+            }
+        });
+        
+        // Получаем обновленные строки из таблицы
+        const updatedRows = document.querySelectorAll('.tpi-cc--table-tbody[data-updated="true"]');
+        
+        if (updatedRows.length === 0) {
+            console.log('✅ Нет измененных данных для сохранения');
+            return false;
+        }
+        
+        console.log(`🔄 Найдено ${updatedRows.length} строк с изменениями`);
+        
+        // Создаем массив для обновленных данных
+        const updatedCouriersData = [];
+        
+        // Используем обычный цикл for для возможности использования await
+        for (const row of updatedRows) {
+            try {
+                const courierId = row.getAttribute('data-courier-id');
+                if (!courierId) continue;
+                
+                // Находим текущие данные этого курьера
+                const currentCourierData = currentDataMap.get(courierId);
+                if (!currentCourierData) {
+                    console.log(`⚠️ Курьер ${courierId} не найден в текущих данных Firebase`);
+                    continue;
+                }
+                
+                // Создаем копию текущих данных
+                const updatedData = { ...currentCourierData };
+                let hasChanges = false;
+                
+                // 1. Обновляем статус если изменился
+                const newStatus = row.getAttribute('data-status');
+                if (newStatus && updatedData.status !== newStatus) {
+                    updatedData.status = newStatus;
+                    hasChanges = true;
+                    console.log(`  📝 Статус ${courierId}: ${currentCourierData.status} -> ${newStatus}`);
+                }
+                
+                // 2. Обновляем ordersSorted если изменился (берем большее значение из таблицы)
+                const newOrdersSorted = parseInt(row.getAttribute('data-orders-sorted') || '0');
+                if (newOrdersSorted > 0) {
+                    // Берем большее значение из текущих данных
+                    const currentSorted = updatedData.ordersSorted || 0;
+                    const currentShipped = updatedData.ordersShipped || 0;
+                    const currentMax = Math.max(currentSorted, currentShipped);
+                    
+                    if (newOrdersSorted > currentMax) {
+                        updatedData.ordersSorted = newOrdersSorted;
+                        // Если новое значение больше текущего shipped, обновляем и его
+                        if (newOrdersSorted > currentShipped) {
+                            updatedData.ordersShipped = newOrdersSorted;
+                        }
+                        hasChanges = true;
+                        console.log(`  📝 ordersSorted ${courierId}: ${currentMax} -> ${newOrdersSorted}`);
+                    }
+                }
+                
+                // 3. Обновляем ordersPlanned если изменился
+                const newOrdersPlanned = row.getAttribute('data-orders-planned');
+                if (newOrdersPlanned) {
+                    const newPlanned = parseInt(newOrdersPlanned);
+                    const currentPlanned = updatedData.ordersPlanned || 0;
+                    if (newPlanned !== currentPlanned) {
+                        updatedData.ordersPlanned = newPlanned;
+                        hasChanges = true;
+                        console.log(`  📝 ordersPlanned ${courierId}: ${currentPlanned} -> ${newPlanned}`);
+                    }
+                }
+                
+                // 4. Обновляем sortablesPrepared всегда если изменился
+                const newSortablesPrepared = row.getAttribute('data-sortables-prepared');
+                if (newSortablesPrepared) {
+                    const newPrepared = parseInt(newSortablesPrepared);
+                    const currentPrepared = updatedData.sortablesPrepared || 0;
+                    if (newPrepared !== currentPrepared) {
+                        updatedData.sortablesPrepared = newPrepared;
+                        hasChanges = true;
+                        console.log(`  📝 sortablesPrepared ${courierId}: ${currentPrepared} -> ${newPrepared}`);
+                    }
+                }
+                
+                // 5. Обновляем sortablesInCell всегда если изменился
+                const newSortablesInCell = row.getAttribute('data-sortables-in-cell');
+                if (newSortablesInCell) {
+                    const newInCell = parseInt(newSortablesInCell);
+                    const currentInCell = updatedData.sortablesInCell || 0;
+                    if (newInCell !== currentInCell) {
+                        updatedData.sortablesInCell = newInCell;
+                        hasChanges = true;
+                        console.log(`  📝 sortablesInCell ${courierId}: ${currentInCell} -> ${newInCell}`);
+                    }
+                }
+                
+                // 6. Обновляем finishedAt если изменился
+                const newFinishedAt = row.getAttribute('data-finished-at');
+                if (newFinishedAt) {
+                    const currentFinishedAt = updatedData.finishedAt;
+                    if (currentFinishedAt !== newFinishedAt) {
+                        updatedData.finishedAt = newFinishedAt;
+                        hasChanges = true;
+                        console.log(`  📝 finishedAt ${courierId}: ${currentFinishedAt} -> ${newFinishedAt}`);
+                    }
+                }
+                
+                // Добавляем в массив только если есть изменения
+                if (hasChanges) {
+                    updatedCouriersData.push(updatedData);
+                    console.log(`  ✅ Курьер ${courierId} добавлен в список обновлений`);
+                } else {
+                    console.log(`  ⏭️ Курьер ${courierId} без изменений, пропускаем`);
+                }
+                
+            } catch (error) {
+                console.error(`Ошибка при обработке строки:`, error);
+            }
+        }
+        
+        if (updatedCouriersData.length === 0) {
+            console.log('✅ Нет фактических изменений для сохранения');
+            return false;
+        }
+        
+        console.log(`💾 Сохраняем ${updatedCouriersData.length} из ${updatedRows.length} обновленных записей`);
+        
+        // Обновляем данные в Firebase ТОЛЬКО для измененных курьеров
+        const saveResult = await updatePartialDataInFirebase(selectedDate, updatedCouriersData);
+        
+        // Очищаем флаги обновления после сохранения
+        if (saveResult) {
+            updatedRows.forEach(row => {
+                row.removeAttribute('data-updated');
+                row.removeAttribute('data-updated-at');
+                row.removeAttribute('data-courier-id');
+                row.removeAttribute('data-status');
+                row.removeAttribute('data-orders-sorted');
+                row.removeAttribute('data-orders-planned');
+                row.removeAttribute('data-sortables-prepared');
+                row.removeAttribute('data-sortables-in-cell');
+                row.removeAttribute('data-finished-at');
+            });
+            
+            console.log('✅ Флаги обновления очищены');
+        }
+        
+        return saveResult;
+        
+    } catch (error) {
+        console.error('💥 Ошибка при сохранении обновленных данных:', error);
+        return false;
+    }
+}
+
+// Функция для обновления данных в таблице из API без перезагрузки всей таблицы
+async function updateTableDataFromAPI(selectedDate) {
+    try {
+        console.log('🔄 Обновление данных таблицы из API...');
+        
+        if (!tpiUserTOKEN) {
+            console.log('❌ Токен не найден');
+            return;
+        }
+        
+        // Получаем свежие данные из API (без расшифровки имен)
+        const freshData = await getFreshCouriersData(selectedDate);
+        
+        if (!freshData || freshData.length === 0) {
+            console.log('❌ Не удалось получить данные из API');
+            return;
+        }
+        
+        console.log(`✅ Получено ${freshData.length} записей из API`);
+        
+        // Создаем мапу для быстрого поиска по ID курьера
+        const freshDataMap = new Map();
+        freshData.forEach(item => {
+            if (item.externalId) {
+                freshDataMap.set(item.externalId, item);
+            } else if (item.courierId) {
+                freshDataMap.set(item.courierId, item);
+            }
+        });
+        
+        // Получаем все строки таблицы
+        const tableRows = document.querySelectorAll('.tpi-cc--table-tbody');
+        let updatedCount = 0;
+        let savedToFirebase = false;
+        
+        // Проходим по каждой строке таблицы
+        tableRows.forEach((row, rowIndex) => {
+            // Находим ID курьера в строке
+            const courierIdElement = row.querySelector('p[tpi-cc-parsing-data="courier-personal-id"]');
+            if (!courierIdElement) return;
+            
+            const courierId = courierIdElement.textContent.trim();
+            const freshCourierData = freshDataMap.get(courierId);
+            
+            if (!freshCourierData) return;
+            
+            // Обновляем данные в строке
+            const rowUpdated = updateRowData(row, freshCourierData, rowIndex);
+            
+            if (rowUpdated) {
+                updatedCount++;
+            }
+        });
+        
+        // Если были обновления, сохраняем в Firebase
+        if (updatedCount > 0) {
+            console.log(`🔄 Обновлено ${updatedCount} строк`);
+            savedToFirebase = await saveUpdatedTableData(selectedDate);
+            
+            if (savedToFirebase) {
+                console.log('✅ Данные успешно сохранены в Firebase');
+                tpiNotification.show('Обновление', 'success', `Обновлено ${updatedCount} записей`);
+            }
+        } else {
+            console.log('✅ Данные уже актуальны');
+        }
+        
+        return { updatedCount, savedToFirebase };
+        
+    } catch (error) {
+        console.error('💥 Ошибка при обновлении данных таблицы:', error);
+        return null;
+    }
+}
+
+// Функция для получения свежих данных из API без расшифровки имен
+async function getFreshCouriersData(selectedDate) {
+    try {
+        // Формируем URL для запроса
+        const url = new URL('https://logistics.market.yandex.ru/api/resolve/');
+        url.searchParams.append('r', 'sortingCenter/routes/resolveGetRoutesFullInfo:resolveGetRoutesFullInfo');
+
+        // Форматируем дату для API
+        let targetDate;
+        if (selectedDate) {
+            const dateParts = selectedDate.split('/');
+            if (dateParts.length === 3) {
+                targetDate = new Date(`${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`);
+            } else {
+                targetDate = new Date();
+            }
+        } else {
+            targetDate = new Date();
+        }
+
+        const year = targetDate.getFullYear();
+        const month = String(targetDate.getMonth() + 1).padStart(2, '0');
+        const day = String(targetDate.getDate()).padStart(2, '0');
+        const currentDate = `${year}-${month}-${day}`;
+        
+        const requestBody = {
+            "params": [{
+                "sortingCenterId": 21972131,
+                "type": "OUTGOING_COURIER",
+                "sort": "",
+                "hasCarts": false,
+                "category": "COURIER",
+                "date": currentDate,
+                "recipientName": "",
+                "page": 0,
+                "size": 200
+            }],
+            "path": `/sorting-center/21972131/routes?type=OUTGOING_COURIER&sort=&hasCarts=false&category=COURIER&date=${currentDate}&recipientName=`
+        };
+
+        const response = await fetch(url.toString(), {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-Market-Core-Service': '<UNKNOWN>',
+                'sk': tpiUserTOKEN
+            },
+            body: JSON.stringify(requestBody)
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        
+        if (data && data.results && data.results.length > 0) {
+            const result = data.results[0];
+            
+            if (result.error) {
+                console.log('❌ Ошибка API:', result.error.message);
+                return null;
+            }
+            
+            if (result.data && result.data.content && result.data.content.length > 0) {
+                const routes = result.data.content;
+                
+                // Формируем упрощенные данные (без расшифровки имен)
+                const couriersData = routes.map((route, index) => {
+                    // Берем ID курьера из разных возможных мест
+                    let courierId = null;
+                    if (route.courier && route.courier.externalId) {
+                        courierId = route.courier.externalId;
+                    } else if (route.courier && route.courier.id) {
+                        courierId = route.courier.id;
+                    }
+                    
+                    // Определяем ячейку
+                    let mainCell = 'Нет ячейки';
+                    if (route.cells && route.cells.length > 0) {
+                        mainCell = route.cells[0]?.number || 'Нет ячейки';
+                    } else if (route.cell && route.cell.number) {
+                        mainCell = route.cell.number;
+                    } else {
+                        mainCell = 'null';
+                    }
+                    
+                    return {
+                        courierId: courierId,
+                        externalId: route.courier?.externalId || null,
+                        cell: mainCell,
+                        status: route.status || 'Неизвестно',
+                        ordersLeft: route.ordersLeft || 0,
+                        ordersSorted: route.ordersSorted || 0,
+                        ordersShipped: route.ordersShipped || 0,
+                        ordersPlanned: route.ordersPlanned || 0,
+                        sortablesInCell: route.sortablesInCell || 0,
+                        sortablesPrepared: route.sortablesPrepared || 0,
+                        courierArrivesAt: route.courierArrivesAt || null,
+                        startedAt: route.startedAt || null,
+                        finishedAt: route.finishedAt || null,
+                        routeId: route.id || null,
+                        hasCells: route.cells && route.cells.length > 0
+                    };
+                });
+                
+                console.log(`📊 Получено ${couriersData.length} записей из API`);
+                return couriersData;
+                
+            } else {
+                console.log('❌ Нет данных о маршрутах');
+                return null;
+            }
+        } else {
+            console.log('❌ Неверный формат ответа');
+            return null;
+        }
+    } catch (error) {
+        console.error('💥 Ошибка при получении данных:', error);
+        return null;
+    }
+}
+
+// Функция обновления данных в строке таблицы
+function updateRowData(row, freshData, rowIndex) {
+    let updated = false;
+    const courierId = freshData.externalId || freshData.courierId;
+    
+    // 1. Обновление статуса маршрута (только если статус другой)
+    const statusElement = row.querySelector('div.tpi-cc-table-tbody-data-route-status');
+    if (statusElement) {
+        const currentStatus = statusElement.getAttribute('tpi-cc-route-status');
+        const newStatus = freshData.status ? freshData.status.toLowerCase() : 'unknown';
+        
+        if (currentStatus !== newStatus) {
+            // Обновляем атрибут и текст
+            statusElement.setAttribute('tpi-cc-route-status', newStatus);
+            
+            const statusTextElement = statusElement.querySelector('p[tpi-cc-parsing-data="courier-route-status"]');
+            if (statusTextElement) {
+                statusTextElement.textContent = getRouteStatusText(freshData.status);
+            }
+            
+            updated = true;
+            console.log(`🔄 Обновлен статус для курьера ${courierId}: ${currentStatus} -> ${newStatus}`);
+        }
+    }
+    
+    // 2. Обновление прогресса сортировки (только если новое значение больше)
+    const sortProgressElement = row.querySelector('p.tpi-cc--table-tbody-data-sort-progress[tpi-cc-parsing-data="courier-sorting-progress"]');
+    if (sortProgressElement && freshData.ordersPlanned > 0) {
+        // Извлекаем текущие значения из текста
+        const currentText = sortProgressElement.textContent.trim();
+        const match = currentText.match(/(\d+)\s+из\s+(\d+)/);
+        
+        if (match) {
+            const currentSorted = parseInt(match[1]);
+            const currentPlanned = parseInt(match[2]);
+            
+            // Берем БОЛЬШЕЕ значение из ordersSorted и ordersShipped
+            const apiSorted = freshData.ordersSorted || 0;
+            const apiShipped = freshData.ordersShipped || 0;
+            const newSorted = Math.max(apiSorted, apiShipped);
+            
+            // Обновляем только если новое значение сортировки БОЛЬШЕ ИЛИ изменилось общее количество заказов
+            if (newSorted > currentSorted || freshData.ordersPlanned !== currentPlanned) {
+                // ИСПРАВЛЕНО: используем freshData.routeId, а не courierData.routeId
+                sortProgressElement.innerHTML = `<a class="tpi-cc--table-tbody-data-link" target="_blank" href="https://logistics.market.yandex.ru/sorting-center/21972131/sortables?routeId=${freshData.routeId || ''}&searchRouteIdInOldRoutes=true&crossDockOnly=true&sortableStatusesLeafs=SHIPPED_DIRECT&sortableTypes=PLACE&sortableTypes=TOTE&sortableTypes=PALLET&sortableTypes=XDOC_PALLET&sortableTypes=XDOC_BOX"><i>${tpi_cc_i_box_outline}</i>${newSorted}</a> из <a class="tpi-cc--table-tbody-data-link" target="_blank" href="https://logistics.market.yandex.ru/sorting-center/21972131/sortables?routeId=${freshData.routeId || ''}&searchRouteIdInOldRoutes=true&sortableStatusesLeafs=&sortableTypes=PLACE&sortableTypes=TOTE&sortableTypes=PALLET&sortableTypes=XDOC_PALLET&sortableTypes=XDOC_BOX&crossDockOnly=true"><i>${tpi_cc_i_box_filled}</i>${freshData.ordersPlanned || 0}</a>`;
+                
+                // Также обновляем процент
+                const sortPercent = freshData.ordersPlanned > 0 ? Math.round((newSorted / freshData.ordersPlanned) * 100) : 0;
+                const percentElement = row.querySelector('p.tpi-cc--table-tbody-data-sort-progress-circle-value[tpi-cc-parsing-data="courier-sorting-progress-percent"]');
+                if (percentElement) {
+                    percentElement.textContent = `${sortPercent}%`;
+                }
+                
+                // Обновляем круговой прогресс
+                const circleElement = row.querySelector('circle[tpi-cc-parsing-data="courier-sorting-progress-circle"]');
+                if (circleElement) {
+                    const dashArray = 125.6;
+                    const dashOffset = dashArray - (dashArray * sortPercent / 100);
+                    circleElement.style.stroke = getProgressColor(sortPercent);
+                    circleElement.setAttribute('stroke-dashoffset', dashOffset);
+                }
+                
+                updated = true;
+                console.log(`🔄 Обновлен прогресс сортировки для курьера ${courierId}: ${currentSorted}/${currentPlanned} -> ${newSorted}/${freshData.ordersPlanned} (sorted: ${apiSorted}, shipped: ${apiShipped})`);
+            }
+        }
+    }
+    
+    // 3. Обновление прогресса подготовки (всегда обновляем, даже если данные меньше)
+    const preparedProgressElement = row.querySelector('p.tpi-cc--table-tbody-data-sort-progress[tpi-cc-parsing-data="courier-prepared-progress"]');
+    if (preparedProgressElement && freshData.sortablesInCell > 0) {
+        const newPrepared = freshData.sortablesPrepared || 0;
+        const newInCell = freshData.sortablesInCell || 0;
+        
+        // Извлекаем текущие значения
+        const currentText = preparedProgressElement.textContent.trim();
+        const match = currentText.match(/(\d+)\s+из\s+(\d+)/);
+        
+        let currentPrepared = 0;
+        let currentInCell = 0;
+        
+        if (match) {
+            currentPrepared = parseInt(match[1]);
+            currentInCell = parseInt(match[2]);
+        }
+        
+        // Обновляем всегда, если данные изменились
+        if (currentPrepared !== newPrepared || currentInCell !== newInCell) {
+            // ИСПРАВЛЕНО: используем freshData вместо courierData
+            preparedProgressElement.innerHTML = `<span><i>${tpi_cc_i_pen_outline}</i>${newPrepared}</span> из <span><i>${tpi_cc_i_pen_filled}</i>${newInCell}</span>`;
+            
+            // Обновляем процент
+            const preparedPercent = newInCell > 0 ? Math.round((newPrepared / newInCell) * 100) : 0;
+            const percentElement = row.querySelector('p.tpi-cc--table-tbody-data-sort-progress-circle-value[tpi-cc-parsing-data="courier-prepared-progress-percent"]');
+            if (percentElement) {
+                percentElement.textContent = `${preparedPercent}%`;
+            }
+            
+            // Обновляем круговой прогресс
+            const circleElement = row.querySelector('circle[tpi-cc-parsing-data="courier-prepared-progress-circle"]');
+            if (circleElement) {
+                const dashArray = 125.6;
+                const dashOffset = dashArray - (dashArray * preparedPercent / 100);
+                circleElement.style.stroke = getProgressColor(preparedPercent);
+                circleElement.setAttribute('stroke-dashoffset', dashOffset);
+            }
+            
+            updated = true;
+            console.log(`🔄 Обновлен прогресс подготовки для курьера ${courierId}: ${currentPrepared}/${currentInCell} -> ${newPrepared}/${newInCell}`);
+        }
+    }
+    
+    // 4. Обновление времени окончания сортировки (только если в таблице null)
+    const endTimeElement = row.querySelector('p[tpi-cc-time-type="end"]');
+    const endDateElement = row.querySelector('p[tpi-cc-date-type="end"]');
+    
+    // Проверяем, что в таблице сейчас null
+    const currentEndTime = endTimeElement ? endTimeElement.textContent.trim() : null;
+    const currentEndDate = endDateElement ? endDateElement.textContent.trim() : null;
+    
+    if (freshData.finishedAt && 
+        ((currentEndTime === 'null' || !currentEndTime) ||
+         (currentEndDate === 'null' || !currentEndDate))) {
+        
+        const endTime = cc_formatTime(freshData.finishedAt);
+        const endDate = cc_formatDate(freshData.finishedAt);
+        
+        if (endTime && endTimeElement && (currentEndTime === 'null' || !currentEndTime)) {
+            endTimeElement.textContent = endTime;
+            updated = true;
+            console.log(`🔄 Обновлено время окончания для курьера ${courierId}: null -> ${endTime}`);
+        }
+        
+        if (endDate && endDateElement && (currentEndDate === 'null' || !currentEndDate)) {
+            endDateElement.textContent = endDate;
+            updated = true;
+            console.log(`🔄 Обновлена дата окончания для курьера ${courierId}: null -> ${endDate}`);
+        }
+    }
+    
+    // 5. Сохраняем флаг обновления и данные ТОЛЬКО если были изменения
+    if (updated) {
+        // Сохраняем обновленные данные в data-атрибуты строки
+        row.setAttribute('data-updated', 'true');
+        row.setAttribute('data-updated-at', new Date().toISOString());
+        row.setAttribute('data-courier-id', courierId);
+        
+        // Сохраняем ТОЛЬКО измененные данные
+        if (freshData.status) {
+            row.setAttribute('data-status', freshData.status);
+        }
+        
+        if (freshData.ordersSorted !== undefined) {
+            row.setAttribute('data-orders-sorted', freshData.ordersSorted);
+        }
+        
+        if (freshData.ordersPlanned !== undefined) {
+            row.setAttribute('data-orders-planned', freshData.ordersPlanned);
+        }
+        
+        if (freshData.sortablesPrepared !== undefined) {
+            row.setAttribute('data-sortables-prepared', freshData.sortablesPrepared);
+        }
+        
+        if (freshData.sortablesInCell !== undefined) {
+            row.setAttribute('data-sortables-in-cell', freshData.sortablesInCell);
+        }
+        
+        if (freshData.finishedAt) {
+            row.setAttribute('data-finished-at', freshData.finishedAt);
+        }
+    }
+    
+    return updated;
+}
+
+async function updatePartialDataInFirebase(selectedDate, updatedCouriersData) {
+    try {
+        if (!tpiFirebaseInitialized) {
+            tpiDb = tpiInitializeFirebase();
+            if (!tpiDb) return false;
+        }
+        
+        // Форматируем дату в формат YYYY-MM-DD
+        const dateParts = selectedDate.split('/');
+        const firebaseDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+        
+        console.log(`💾 Частичное обновление ${updatedCouriersData.length} записей в Firebase для даты:`, firebaseDate);
+        
+        const dateDocRef = tpiDb.collection("dates").doc(firebaseDate);
+        const dateDoc = await dateDocRef.get();
+        
+        if (!dateDoc.exists) {
+            console.log('❌ Документ даты не существует');
+            return false;
+        }
+        
+        const cartControlRef = dateDocRef.collection("cartControl");
+        let successCount = 0;
+        let errorCount = 0;
+        
+        // Обновляем только измененные записи
+        for (const courier of updatedCouriersData) {
+            try {
+                // Используем courier-personal-id как ID документа
+                const courierId = courier.externalId || courier.courierId;
+                if (!courierId) {
+                    console.log('⚠️ Пропускаем курьера без ID');
+                    continue;
+                }
+                
+                // Подготавливаем данные для обновления
+                const updateData = {};
+                
+                // Добавляем только измененные поля
+                if (courier.status !== undefined) updateData.status = courier.status;
+                if (courier.ordersSorted !== undefined) updateData.ordersSorted = courier.ordersSorted;
+                if (courier.ordersPlanned !== undefined) updateData.ordersPlanned = courier.ordersPlanned;
+                if (courier.sortablesPrepared !== undefined) updateData.sortablesPrepared = courier.sortablesPrepared;
+                if (courier.sortablesInCell !== undefined) updateData.sortablesInCell = courier.sortablesInCell;
+                if (courier.finishedAt !== undefined) updateData.finishedAt = courier.finishedAt;
+                
+                // Добавляем поле обновления
+                updateData.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
+                
+                // Обновляем документ
+                await cartControlRef.doc(courierId).update(updateData);
+                successCount++;
+                
+                console.log(`  ✅ Обновлен курьер ${courierId}`);
+                
+            } catch (error) {
+                console.error(`❌ Ошибка при обновлении курьера ${courier.courier}:`, error);
+                errorCount++;
+            }
+        }
+        
+        console.log(`✅ Частичное обновление завершено: ${successCount} успешно, ${errorCount} с ошибками`);
+        return successCount > 0;
+        
+    } catch (error) {
+        console.error('💥 Ошибка при частичном обновлении данных в Firebase:', error);
+        return false;
+    }
+}
