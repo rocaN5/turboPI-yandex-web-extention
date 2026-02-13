@@ -15,6 +15,8 @@ let tpi_cc_originalRowOrder = [];
 let tpi_cc_currentFilterColumn = null;
 let tpi_cc_currentFilterDirection = null;
 let tpi_cc_tableSortInitialized = false;
+window.tpi_getRoutesSummary = tpi_getRoutesSummary;
+let tpiChartInstance = null;
 
 // Функция для предзагрузки данных календаря
 async function preloadCalendarData() {
@@ -1109,6 +1111,27 @@ tpi_cc_liquid_glass = `
     </feDisplacementMap>
   </filter>
 </svg>
+`,
+tpi_cc_i_boxes = `
+<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 16 16"  xmlns="http://www.w3.org/2000/svg">
+    <path d="M7.752.066a.5.5 0 0 1 .496 0l3.75 2.143a.5.5 0 0 1 .252.434v3.995l3.498 2A.5.5 0 0 1 16 9.07v4.286a.5.5 0 0 1-.252.434l-3.75 2.143a.5.5 0 0 1-.496 0l-3.502-2-3.502 2.001a.5.5 0 0 1-.496 0l-3.75-2.143A.5.5 0 0 1 0 13.357V9.071a.5.5 0 0 1 .252-.434L3.75 6.638V2.643a.5.5 0 0 1 .252-.434zM4.25 7.504 1.508 9.071l2.742 1.567 2.742-1.567zM7.5 9.933l-2.75 1.571v3.134l2.75-1.571zm1 3.134 2.75 1.571v-3.134L8.5 9.933zm.508-3.996 2.742 1.567 2.742-1.567-2.742-1.567zm2.242-2.433V3.504L8.5 5.076V8.21zM7.5 8.21V5.076L4.75 3.504v3.134zM5.258 2.643 8 4.21l2.742-1.567L8 1.076zM15 9.933l-2.75 1.571v3.134L15 13.067zM3.75 14.638v-3.134L1 9.933v3.134z"></path>
+</svg>
+`,
+tpi_cc_i_truck = `
+<svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" style="fill: none;">
+    <path d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"></path>
+    <path stroke-linecap="round" stroke-linejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"></path>
+</svg>
+`,
+tpi_cc_i_circle_checmark = `
+<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+    <path d="M256 48a208 208 0 1 1 0 416 208 208 0 1 1 0-416zm0 464A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-111 111-47-47c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l64 64c9.4 9.4 24.6 9.4 33.9 0L369 209z"></path>
+</svg>
+`,
+tpi_cc_i_circle_xmark = `
+<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+    <path d="M256 48a208 208 0 1 1 0 416 208 208 0 1 1 0-416zm0 464A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c-9.4 9.4-9.4 24.6 0 33.9l47 47-47 47c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l47-47 47 47c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-47-47 47-47c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-47 47-47-47c-9.4-9.4-24.6-9.4-33.9 0z"></path>
+</svg>
 `
 
 function checkiIs__onCartControlsPage() {
@@ -1143,6 +1166,36 @@ function checkiIs__onCartControlsPage() {
                     <p>График отгруженных заказов</p>
                 </div>
                 <div class="tpi-cc-graph-items-wrapper">
+                    <div class="tpi-cc-graph-container"></div>
+                    <div class="tpi-cc-graph-loader" style="display: none;">
+                        <div class="tpi-cc-graph-loader-spinner"></div>
+                        <p>Загрузка данных для графика...</p>
+                    </div>
+                    <div class="tpi-cc-graph-item-devider"></div>
+                    <div class="tpi-cc-graph-item">
+                        <ul class="tpi-cc-graph-total-list">
+                            <li class="tpi-cc-graph-total-item">
+                                <i class="tpi-cc-graph-total-item-icon">${tpi_cc_i_boxes}</i>
+                                <p class="tpi-cc-graph-total-item-title">Всего заказов:</p>
+                                <p class="tpi-cc-graph-total-item-value" id="tpi-cc-total-orderes">0</p>
+                            </li>
+                            <li class="tpi-cc-graph-total-item">
+                                <i class="tpi-cc-graph-total-item-icon">${tpi_cc_i_truck}</i>
+                                <p class="tpi-cc-graph-total-item-title">Отгружено:</p>
+                                <p class="tpi-cc-graph-total-item-value" id="tpi-cc-total-orderes-shipped">0</p>
+                            </li>
+                            <li class="tpi-cc-graph-total-item">
+                                <i class="tpi-cc-graph-total-item-icon" style="padding: 1px;">${tpi_cc_i_circle_checmark}</i>
+                                <p class="tpi-cc-graph-total-item-title">Принято:</p>
+                                <p class="tpi-cc-graph-total-item-value" id="tpi-cc-total-orderes-accepted">0</p>
+                            </li>
+                            <li class="tpi-cc-graph-total-item">
+                                <i class="tpi-cc-graph-total-item-icon" style="padding: 1px;">${tpi_cc_i_circle_xmark}</i>
+                                <p class="tpi-cc-graph-total-item-title">Не отгружено:</p>
+                                <p class="tpi-cc-graph-total-item-value" id="tpi-cc-total-orderes-missed">0</p>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1430,6 +1483,10 @@ function checkiIs__onCartControlsPage() {
             observer.disconnect();
             observer = null;
         }
+        
+        // 🔥 ДОБАВЛЯЕМ ВЫЗОВ ИНИЦИАЛИЗАЦИИ ГРАФИКА ЗДЕСЬ
+        // Инициализируем график один раз при загрузке страницы
+        initializeChartOnce();
     }
 
 
@@ -1501,7 +1558,7 @@ async function tpiCheckAndLoadData() {
         
         // Проверяем наличие данных в Firebase
         const firebaseData = await tpiCheckDataInFirebase(selectedDate);
-        
+        // const summaryData = await tpi_getRoutesSummary(selectedDate);
         // Скрываем лоадер после проверки
         if (loadingWrapper) {
             loadingWrapper.style.display = 'none';
@@ -6600,4 +6657,524 @@ async function updatePartialDataInFirebase(selectedDate, updatedCouriersData) {
         console.error('💥 Ошибка при частичном обновлении данных в Firebase:', error);
         return false;
     }
+}
+
+// C-
+// C-
+// C-       Получаем общие данные о маршрутах от YM API
+// C-
+// C-
+
+async function tpi_getRoutesSummary(selectedDate = null) {
+    try {
+        // Формируем URL для запроса
+        const url = new URL('https://logistics.market.yandex.ru/api/resolve/');
+        url.searchParams.append('r', 'sortingCenter/routes/resolveGetRoutesSummary:resolveGetRoutesSummary');
+
+        // Определяем дату для запроса
+        let targetDate;
+        let dateForLog;
+        
+        if (selectedDate) {
+            // Используем выбранную дату из формата DD/MM/YYYY
+            const dateParts = selectedDate.split('/');
+            if (dateParts.length === 3) {
+                targetDate = new Date(`${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`);
+                dateForLog = selectedDate;
+            } else {
+                targetDate = new Date();
+                dateForLog = 'текущая';
+            }
+        } else {
+            targetDate = new Date();
+            dateForLog = 'текущая';
+        }
+
+        const year = targetDate.getFullYear();
+        const month = String(targetDate.getMonth() + 1).padStart(2, '0');
+        const day = String(targetDate.getDate()).padStart(2, '0');
+        const currentDate = `${year}-${month}-${day}`;
+
+        const requestBody = {
+            "params": [{
+                "sortingCenterId": "21972131",
+                "date": currentDate,
+                "type": "OUTGOING_COURIER",
+                "category": "COURIER"
+            }],
+            "path": `/sorting-center/21972131/routes?type=OUTGOING_COURIER&sort=&hasCarts=false&category=COURIER&date=${currentDate}`
+        };
+
+        console.log(`🟡 Запрос сводных данных за дату: ${currentDate} (${dateForLog})`);
+
+        const response = await fetch(url.toString(), {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-Market-Core-Service': '<UNKNOWN>',
+                'sk': tpiUserTOKEN
+            },
+            body: JSON.stringify(requestBody)
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        
+        if (data && data.results && data.results.length > 0) {
+            const result = data.results[0];
+            
+            if (result.error) {
+                console.log(`❌ Ошибка API для даты ${currentDate}:`, result.error.message);
+                return null;
+            }
+            
+            if (result.data) {
+                // 🟡 Выводим все полученные данные с датой
+                console.log(`🟡 ДАННЫЕ ЗА ДАТУ ${currentDate}:`);
+                console.log(`🟡   status: ${result.data.status}`);
+                console.log(`🟡   ordersPlanned: ${result.data.ordersPlanned}`);
+                console.log(`🟡   ordersAccepted: ${result.data.ordersAccepted}`);
+                console.log(`🟡   ordersShipped: ${result.data.ordersShipped}`);
+                console.log(`🟡   ordersLeft: ${result.data.ordersLeft}`);
+                console.log(`🟡   startedAt: ${result.data.startedAt}`);
+                
+                return result.data;
+            }
+        }
+        
+        console.log(`❌ Нет данных за дату ${currentDate}`);
+        return null;
+        
+    } catch (error) {
+        console.error(`💥 Ошибка при получении сводных данных за дату ${currentDate || 'неизвестную'}:`, error);
+        return null;
+    }
+}
+
+//C- Функция для получения данных за последние 30 дней
+async function tpi_getLast20DaysStats() {
+    try {
+        const graphContainer = document.querySelector('.tpi-cc-graph-container');
+        const loader = document.querySelector('.tpi-cc-graph-loader');
+        if (loader) loader.style.display = 'flex';
+        if (graphContainer) graphContainer.style.display = 'none';
+        
+        const dates = [];
+        const ordersShippedData = [];
+        const allDaysData = [];
+        
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        const promises = [];
+        const dateMap = new Map();
+        
+        for (let i = 19; i >= 0; i--) {
+            const date = new Date(today);
+            date.setDate(date.getDate() - i);
+            const formattedDate = formatDateToDDMMYYYY(date);
+            
+            const months = ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
+            const parts = formattedDate.split('/');
+            const day = parts[0];
+            const month = parseInt(parts[1]) - 1;
+            const displayDate = `${day} ${months[month]}`;
+            
+            dates.push(displayDate);
+            dateMap.set(displayDate, {
+                fullDate: formattedDate,
+                index: dates.length - 1
+            });
+        }
+        
+        for (let i = 19; i >= 0; i--) {
+            const date = new Date(today);
+            date.setDate(date.getDate() - i);
+            const formattedDate = formatDateToDDMMYYYY(date);
+            
+            const promise = tpi_getRoutesSummary(formattedDate)
+                .then(summaryData => {
+                    if (summaryData) {
+                        return {
+                            fullDate: formattedDate,
+                            ordersShipped: summaryData.ordersShipped || 0,
+                            fullData: summaryData
+                        };
+                    } else {
+                        return {
+                            fullDate: formattedDate,
+                            ordersShipped: 0,
+                            fullData: null
+                        };
+                    }
+                })
+                .catch(error => {
+                    return {
+                        fullDate: formattedDate,
+                        ordersShipped: 0,
+                        fullData: null
+                    };
+                });
+            
+            promises.push(promise);
+        }
+        
+        const results = await Promise.all(promises);
+        
+        const orderedData = new Array(20).fill(null);
+        
+        results.forEach(result => {
+            const months = ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
+            const parts = result.fullDate.split('/');
+            const day = parts[0];
+            const month = parseInt(parts[1]) - 1;
+            const displayDate = `${day} ${months[month]}`;
+            
+            const mapEntry = dateMap.get(displayDate);
+            if (mapEntry) {
+                orderedData[mapEntry.index] = {
+                    value: result.ordersShipped,
+                    fullData: result.fullData,
+                    fullDate: result.fullDate
+                };
+            }
+        });
+        
+        ordersShippedData.length = 0;
+        allDaysData.length = 0;
+        orderedData.forEach(item => {
+            if (item) {
+                ordersShippedData.push(item);
+                allDaysData.push(item.fullData);
+            } else {
+                ordersShippedData.push({
+                    value: 0,
+                    fullData: null,
+                    fullDate: 'Нет данных'
+                });
+                allDaysData.push(null);
+            }
+        });
+        
+        return { dates, ordersShippedData, allDaysData };
+        
+    } catch (error) {
+        return { dates: [], ordersShippedData: [], allDaysData: [] };
+    }
+}
+//C- Функция для инициализации графика
+async function initializeChart() {
+    const graphContainer = document.querySelector('.tpi-cc-graph-container');
+    const loader = document.querySelector('.tpi-cc-graph-loader');
+    
+    if (!graphContainer) return;
+    
+    if (!loader && graphContainer.parentNode) {
+        const newLoader = document.createElement('div');
+        newLoader.className = 'tpi-cc-graph-loader';
+        newLoader.innerHTML = `
+            <div class="tpi-cc-graph-loader-spinner"></div>
+            <p>Загрузка данных для графика...</p>
+        `;
+        graphContainer.parentNode.insertBefore(newLoader, graphContainer);
+    }
+    
+    const { dates, ordersShippedData, allDaysData } = await tpi_getLast20DaysStats();
+    
+    const loaderElement = document.querySelector('.tpi-cc-graph-loader');
+    if (loaderElement) loaderElement.style.display = 'none';
+    graphContainer.style.display = 'block';
+    
+    let totalOrdersPlanned = 0, totalOrdersShipped = 0, totalOrdersLeft = 0, totalOrdersAccepted = 0, totalAcceptedButNotShipped = 0;
+    if (allDaysData && allDaysData.length > 0) {
+        allDaysData.forEach(dayData => {
+            if (dayData) {
+                totalOrdersPlanned += dayData.ordersPlanned || 0;
+                totalOrdersShipped += dayData.ordersShipped || 0;
+                totalOrdersLeft += dayData.ordersLeft || 0;
+                totalOrdersAccepted += dayData.ordersAccepted || 0;
+                totalAcceptedButNotShipped += (dayData.ordersAccepted || 0) - (dayData.ordersShipped || 0);
+            }
+        });
+    }
+    
+    const totalOrdersElement = document.getElementById('tpi-cc-total-orderes');
+    const totalShippedElement = document.getElementById('tpi-cc-total-orderes-shipped');
+    const totalAcceptedElement = document.getElementById('tpi-cc-total-orderes-accepted');
+    const totalMissedElement = document.getElementById('tpi-cc-total-orderes-missed');
+    if (totalOrdersElement) totalOrdersElement.textContent = totalOrdersPlanned;
+    if (totalShippedElement) totalShippedElement.textContent = totalOrdersShipped;
+    if (totalAcceptedElement) totalAcceptedElement.textContent = totalOrdersAccepted;
+    if (totalMissedElement) totalMissedElement.textContent = Math.max(0, totalAcceptedButNotShipped);
+    
+    if (dates.length === 0 || ordersShippedData.length === 0) {
+        graphContainer.innerHTML = '<div class="tpi-cc-graph-error">Нет данных для отображения графика</div>';
+        return;
+    }
+    
+    if (tpiChartInstance) tpiChartInstance.dispose();
+    tpiChartInstance = echarts.init(graphContainer);
+    
+    const weekDaysShort = ['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс'];
+    const dayOfWeekLabels = dates.map(dateStr => {
+        const months = {'янв':0, 'фев':1, 'мар':2, 'апр':3, 'май':4, 'июн':5, 'июл':6, 'авг':7, 'сен':8, 'окт':9, 'ноя':10, 'дек':11};
+        const parts = dateStr.split(' ');
+        if (parts.length === 2) {
+            const day = parseInt(parts[0], 10);
+            const monthAbbr = parts[1];
+            const monthIndex = months[monthAbbr];
+            const tempDate = new Date(2025, monthIndex, day);
+            if (!isNaN(tempDate.getTime())) {
+                const dayIndex = tempDate.getDay(); // 0 = вс, 1 = пн, ..., 6 = сб
+                return weekDaysShort[(dayIndex + 6) % 7];
+            }
+        }
+        return '';
+    });
+    
+    const option = {
+        title: { show: false },
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: { type: 'shadow' },
+            position: point => [point[0] + 15, point[1] - 40],
+            transitionDuration: 0.2,
+            hideDelay: 50,
+            showDelay: 0,
+            className: 'tpi-cc-chart-tooltip',
+            formatter: params => {
+                const data = params[0].data;
+                const fullData = data.fullData;
+                const date = data.fullDate;
+                if (!fullData) return `${date}<br/>Нет данных за эту дату`;
+                const formatDateTime = dt => {
+                    if (!dt) return 'N/A';
+                    try {
+                        const d = new Date(dt);
+                        return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getFullYear()).slice(-2)} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')}`;
+                    } catch { return dt; }
+                };
+                return `
+                    <div style="font-weight: bold; margin-bottom: 5px;">${date}</div>
+                    <div>Статус: ${fullData.status || 'N/A'}</div>
+                    <div>Отгружено: ${fullData.ordersShipped || 0}</div>
+                    <div>К отгрузке: ${fullData.ordersPlanned || 0}</div>
+                    <div>Принято на СЦ: ${fullData.ordersAccepted || 0}</div>
+                    <div>Осталось отгрузить: ${fullData.ordersLeft || 0}</div>
+                    <div>Начало сортировки: ${formatDateTime(fullData.startedAt)}</div>
+                `;
+            },
+            backgroundColor: '#00000094',
+            borderColor: '#fc0',
+            textStyle: { color: '#fff', fontSize: 12 },
+            padding: [10, 15],
+            extraCssText: 'box-shadow: 0 4px 12px #0000004D; border-radius: 6px;',
+            enterable: false,
+            alwaysShowContent: false
+        },
+        grid: {
+            left: '5%',
+            right: '5%',
+            bottom: '15%',
+            top: '10%',
+            containLabel: false
+        },
+        xAxis: {
+            type: 'category',
+            data: dates,
+            axisTick: { alignWithLabel: true, length: 5 },
+            axisLabel: {
+                rotate: 0,
+                fontSize: 10,
+                color: '#666',
+                margin: 15,
+                fontWeight: '500',
+                interval: 0
+            },
+            axisLine: { lineStyle: { color: '#ddd' } }
+        },
+        yAxis: {
+            type: 'value',
+            name: 'Отгружено',
+            nameTextStyle: { color: '#666', fontSize: 11, fontWeight: '500' },
+            splitLine: { lineStyle: { color: '#eee', type: 'dashed' } },
+            axisLabel: { fontSize: 10, color: '#666' }
+        },
+        series: [
+            {
+                name: 'Отгружено',
+                type: 'bar',
+                data: ordersShippedData,
+                itemStyle: {
+                    color: {
+                        type: 'linear',
+                        x: 0,
+                        y: 0,
+                        x2: 0,
+                        y2: 1,
+                        colorStops: [
+                            { offset: 0, color: '#ffcc00' },
+                            { offset: 1, color: '#ffae00' }
+                        ]
+                    },
+                    borderRadius: [8, 8, 0, 0],
+                    borderColor: '#ff8b00',
+                    borderWidth: 1
+                },
+                barWidth: '70%',
+                label: {
+                    show: true,
+                    position: 'top',
+                    formatter: params => params.data.value,
+                    fontSize: 10,
+                    fontWeight: 'bold',
+                    color: '#212121'
+                },
+                emphasis: {
+                    itemStyle: { color: '#ffaa00' },
+                    shadowBlur: 10,
+                    shadowColor: '#ffaa00'
+                },
+                animation: false
+            }
+        ],
+        animation: false
+    };
+    
+    tpiChartInstance.setOption(option);
+    
+    // Флаг для контроля обновления графики
+    let needsGraphicUpdate = true;
+    let resizeTimer = null;
+    
+    function addWeekdayGraphics() {
+        if (!tpiChartInstance) return;
+        
+        const graphics = [];
+        const categoryCount = dates.length;
+        
+        for (let i = 0; i < categoryCount; i++) {
+            const dayText = dayOfWeekLabels[i];
+            if (!dayText) continue;
+            
+            // Получаем координату центра категории
+            const point = tpiChartInstance.convertToPixel({ xAxisIndex: 0 }, i);
+            if (!point) continue;
+            
+            // Получаем высоту столбца (значение) для определения нижней границы
+            const value = ordersShippedData[i].value;
+            const yZero = tpiChartInstance.convertToPixel({ yAxisIndex: 0 }, 0);
+            
+            if (yZero === null) continue;
+            
+            // Нижняя часть столбца: примерно yZero
+            const x = point - 5;
+            const y = yZero - 15; // чуть выше нулевой линии
+            
+            graphics.push({
+                type: 'text',
+                left: x,
+                top: y,
+                style: {
+                    text: dayText,
+                    fill: '#212121',
+                    font: 'bold 10px Arial, sans-serif',
+                    textAlign: 'center',
+                    textVerticalAlign: 'bottom'
+                },
+                z: 100
+            });
+        }
+        
+        tpiChartInstance.setOption({ graphic: graphics });
+        needsGraphicUpdate = false;
+    }
+    
+    // Первоначальное добавление графики
+    addWeekdayGraphics();
+    
+    // Слушаем событие rendered, но обновляем графику только при необходимости
+    tpiChartInstance.on('rendered', () => {
+        if (needsGraphicUpdate) {
+            addWeekdayGraphics();
+        }
+    });
+    
+    // Оптимизированный обработчик изменения размера с debounce
+    const debouncedResize = () => {
+        if (resizeTimer) clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            if (tpiChartInstance) {
+                tpiChartInstance.resize();
+                needsGraphicUpdate = true;
+                addWeekdayGraphics();
+            }
+        }, 100);
+    };
+    window.addEventListener('resize', debouncedResize);
+    
+    graphContainer.addEventListener('mouseleave', () => {
+        if (tpiChartInstance) setTimeout(() => tpiChartInstance.dispatchAction({ type: 'hideTip' }), 100);
+    });
+    
+    const graphItem = document.querySelector('.tpi-cc-graph-item');
+    const graphDivider = document.querySelector('.tpi-cc-graph-item-devider');
+    if (graphItem) graphItem.style.visibility = 'visible';
+    if (graphDivider) graphDivider.style.visibility = 'visible';
+}
+
+function disposeChart() {
+    if (tpiChartInstance) {
+        tpiChartInstance.dispose();
+        tpiChartInstance = null;
+    }
+}
+
+// Добавляем вызов очистки при уходе со страницы
+window.addEventListener('beforeunload', function() {
+    disposeChart();
+});
+
+// Также очищаем при скрытии страницы (для SPA)
+document.addEventListener('visibilitychange', function() {
+    if (document.hidden && tpiChartInstance) {
+        // Можно ничего не делать или задиспоузить
+    }
+});
+
+function initializeChartOnce() {
+    const graphItem = document.querySelector('.tpi-cc-graph-item');
+    const graphDivider = document.querySelector('.tpi-cc-graph-item-devider');
+    if (graphItem) graphItem.style.visibility = 'hidden';
+    if (graphDivider) graphDivider.style.visibility = 'hidden';
+    
+    if (window.tpiChartInitialized) {
+        return;
+    }
+    
+    const checkECharts = setInterval(() => {
+        if (typeof echarts !== 'undefined' && document.querySelector('.tpi-cc-graph-container')) {
+            clearInterval(checkECharts);
+            setTimeout(() => {
+                initializeChart();
+                window.tpiChartInitialized = true;
+            }, 500);
+        }
+    }, 200);
+    
+    setTimeout(() => {
+        clearInterval(checkECharts);
+        if (!window.tpiChartInitialized) {
+            const graphContainer = document.querySelector('.tpi-cc-graph-container');
+            if (graphContainer) {
+                graphContainer.innerHTML = '<div class="tpi-cc-graph-error">Ошибка загрузки библиотеки графиков</div>';
+            }
+        }
+    }, 5000);
 }
