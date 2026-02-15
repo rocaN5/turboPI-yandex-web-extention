@@ -2938,7 +2938,7 @@ function createCourierTableRow(courierData, index) {
     if (onlineTransferActId) {
         // Если есть onlineTransferActId - создаем активную ссылку
         eappLinkHtml = `
-            <a class="tpi-cc--dcoument-eapp" href="/api/sorting-center/21972131/online-transfer-act/${onlineTransferActId}/download" target="_blank">
+            <a class="tpi-cc--dcoument-eapp" href="/api/sorting-center/21972131/online-transfer-act/${onlineTransferActId}/download" target="_blank" title="ЭАПП курьера">
                 <i class="tpi-cc--table-tbody-data-icon">${tpi_cc_i_courier_eapp}</i>
             </a>
         `;
@@ -3071,7 +3071,7 @@ function createCourierTableRow(courierData, index) {
         printBlockHtml = `
             <div class="tpi-cc--table-body-print-container">
                 ${eappLinkHtml}
-                <a class="tpi-cc--dcoument-app" href="/api/sorting-center/21972131/routes/${courierData.routeId || ''}/transferAct/ALL?date=${selectedDateFormatted}" target="_blank">
+                <a class="tpi-cc--dcoument-app" href="/api/sorting-center/21972131/routes/${courierData.routeId || ''}/transferAct/ALL?date=${selectedDateFormatted}" target="_blank"  title="АПП курьера">
                     <i class="tpi-cc--table-tbody-data-icon">${tpi_cc_i_courier_app}</i>
                 </a>
                 <button class="tpi-cc--print-current-row">
@@ -3084,7 +3084,7 @@ function createCourierTableRow(courierData, index) {
         printBlockHtml = `
             <div class="tpi-cc--table-body-print-container">
                 ${eappLinkHtml}
-                <a class="tpi-cc--dcoument-app" href="/api/sorting-center/21972131/routes/${courierData.routeId || ''}/transferAct/ALL?date=${selectedDateFormatted}" target="_blank">
+                <a class="tpi-cc--dcoument-app" href="/api/sorting-center/21972131/routes/${courierData.routeId || ''}/transferAct/ALL?date=${selectedDateFormatted}" target="_blank"  title="АПП курьера">
                     <i class="tpi-cc--table-tbody-data-icon">${tpi_cc_i_courier_app}</i>
                 </a>
             </div>
@@ -6922,17 +6922,40 @@ async function initializeChart() {
     tpiChartInstance = echarts.init(graphContainer);
     
     const weekDaysShort = ['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс'];
-    const dayOfWeekLabels = dates.map(dateStr => {
+    const dayOfWeekLabels = dates.map((dateStr, index) => {
         const months = {'янв':0, 'фев':1, 'мар':2, 'апр':3, 'май':4, 'июн':5, 'июл':6, 'авг':7, 'сен':8, 'окт':9, 'ноя':10, 'дек':11};
         const parts = dateStr.split(' ');
+        
         if (parts.length === 2) {
             const day = parseInt(parts[0], 10);
             const monthAbbr = parts[1];
             const monthIndex = months[monthAbbr];
-            const tempDate = new Date(2025, monthIndex, day);
+            
+            // ИСПРАВЛЕНИЕ: используем фактические данные из ordersShippedData
+            if (ordersShippedData[index] && ordersShippedData[index].fullDate) {
+                const fullDateStr = ordersShippedData[index].fullDate; // формат DD/MM/YYYY
+                const dateParts = fullDateStr.split('/');
+                
+                if (dateParts.length === 3) {
+                    const year = parseInt(dateParts[2], 10);
+                    const month = parseInt(dateParts[1], 10) - 1;
+                    const dayOfMonth = parseInt(dateParts[0], 10);
+                    
+                    const actualDate = new Date(year, month, dayOfMonth);
+                    if (!isNaN(actualDate.getTime())) {
+                        const dayIndex = actualDate.getDay(); // 0 = вс, 1 = пн, ..., 6 = сб
+                        const adjustedIndex = dayIndex === 0 ? 6 : dayIndex - 1;
+                        return weekDaysShort[adjustedIndex];
+                    }
+                }
+            }
+            
+            // Запасной вариант с текущим годом, если нет данных
+            const tempDate = new Date(new Date().getFullYear(), monthIndex, day);
             if (!isNaN(tempDate.getTime())) {
-                const dayIndex = tempDate.getDay(); // 0 = вс, 1 = пн, ..., 6 = сб
-                return weekDaysShort[(dayIndex + 6) % 7];
+                const dayIndex = tempDate.getDay();
+                const adjustedIndex = dayIndex === 0 ? 6 : dayIndex - 1;
+                return weekDaysShort[adjustedIndex];
             }
         }
         return '';
@@ -7019,11 +7042,11 @@ async function initializeChart() {
                         x2: 0,
                         y2: 1,
                         colorStops: [
-                            { offset: 0, color: '#ffcc00' },
-                            { offset: 1, color: '#ffae00' }
+                            { offset: 0, color: '#ffae00' },
+                            { offset: 1, color: '#ffcc00' }
                         ]
                     },
-                    borderRadius: [8, 8, 0, 0],
+                    borderRadius: [12, 12, 0, 0],
                     borderColor: '#ff8b00',
                     borderWidth: 1
                 },
@@ -7079,12 +7102,12 @@ async function initializeChart() {
             
             graphics.push({
                 type: 'text',
-                left: x,
+                left: x - 2,
                 top: y,
                 style: {
                     text: dayText,
                     fill: '#212121',
-                    font: 'bold 10px Arial, sans-serif',
+                    font: 'bold 12px Arial, sans-serif',
                     textAlign: 'center',
                     textVerticalAlign: 'bottom'
                 },
