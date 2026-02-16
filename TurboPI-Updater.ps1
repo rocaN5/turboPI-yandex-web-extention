@@ -1,5 +1,5 @@
 Add-Type -AssemblyName PresentationFramework
-Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName System.Windows.Forms  # для DoEvents
 
 # ---------------- SYSTEM ----------------
 $ProgressPreference = 'SilentlyContinue'
@@ -20,7 +20,7 @@ $xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="TurboPI Updater"
-        Height="580"
+        Height="600"
         Width="500"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
@@ -201,9 +201,10 @@ $xaml = @"
                              Background="#2d2d2d"/>
 
                 <TextBlock x:Name="StatusText"
-                           Foreground="#ffcc00"
-                           FontWeight="Bold"
-                           TextAlignment="Center"
+                           Foreground="Gray"
+                           FontSize="14" 
+                           FontWeight="Bold" 
+                           TextAlignment="center"
                            Margin="0,0,0,15"/>
 
                 <!-- Кнопки по центру -->
@@ -228,7 +229,8 @@ $xaml = @"
                            FontWeight="Bold"
                            FontSize="14"
                            TextAlignment="Center"
-                           HorizontalAlignment="Center"/>
+                           HorizontalAlignment="Center"
+                           Text="Проверка обновлений..."/>
 
             </StackPanel>
 
@@ -272,56 +274,52 @@ function Parse-Version($v) {
 
 # ---------------- DOWNLOAD WITH REAL PROGRESS ----------------
 function Download-File($url, $destination) {
-    try {
-        $webClient = New-Object System.Net.WebClient
-        
-        # Подписываемся на событие прогресса
-        $webClient.DownloadProgressChanged += {
-            param($sender, $e)
-            $percent = $e.ProgressPercentage
-            $window.Dispatcher.Invoke({
-                $ProgressBar.Value = $percent
-                $StatusText.Text = "Скачивание... $percent%"
-                $StatusText.Foreground = "#ffcc00"
-                $StatusText.UpdateLayout()
-                $ProgressBar.UpdateLayout()
-            }, [System.Windows.Threading.DispatcherPriority]::Normal)
-        }
-        
-        $window.Dispatcher.Invoke({
-            $StatusText.Text = "Начинаем загрузку..."
-            $StatusText.Foreground = "#ffcc00"
-        }, [System.Windows.Threading.DispatcherPriority]::Normal)
-        
-        # Асинхронная загрузка
-        $downloadTask = $webClient.DownloadFileTaskAsync($url, $destination)
-        
-        # Ожидаем завершения
-        while (-not $downloadTask.IsCompleted) {
+    $request  = [System.Net.HttpWebRequest]::Create($url)
+    $response = $request.GetResponse()
+    $total    = $response.ContentLength
+    
+    $startTime = Get-Date
+    $stream   = $response.GetResponseStream()
+    $file     = [System.IO.File]::Create($destination)
+
+    $buffer = New-Object byte[] 8192
+    $read   = 0
+    $sum    = 0
+
+    while (($read = $stream.Read($buffer, 0, $buffer.Length)) -gt 0) {
+        $file.Write($buffer, 0, $read)
+        $sum += $read
+
+        if ($total -gt 0) {
+            $percent = [math]::Round(($sum / $total) * 100, 0)
+            $ProgressBar.Value = $percent
+            
+            $elapsed = (Get-Date) - $startTime
+            $downloadedMB = [math]::Round($sum / 1MB, 2)
+            $totalMB = [math]::Round($total / 1MB, 2)
+            
+            # Защита от деления на ноль в начале загрузки
+            if ($percent -gt 0) {
+                $totalSeconds = $elapsed.TotalSeconds * (100 / $percent)
+                $remainingSeconds = $totalSeconds - $elapsed.TotalSeconds
+                if ($remainingSeconds -lt 0) { $remainingSeconds = 0 }
+                $remainingTime = [timespan]::FromSeconds($remainingSeconds)
+                $timeString = "{0:hh}:{0:mm}:{0:ss}" -f $remainingTime
+            } else {
+                $timeString = "--:--:--"
+            }
+            
+            $StatusText.Text = "Осталось: $timeString | Загружено: ${downloadedMB}MB / ${totalMB}MB"
+            
+            # Принудительно обновляем интерфейс и обрабатываем сообщения
+            $window.Dispatcher.Invoke([Action]{}, [System.Windows.Threading.DispatcherPriority]::Render)
             [System.Windows.Forms.Application]::DoEvents()
-            Start-Sleep -Milliseconds 100
         }
-        
-        if ($downloadTask.Exception) {
-            throw $downloadTask.Exception
-        }
-        
-        $window.Dispatcher.Invoke({
-            $ProgressBar.Value = 100
-            $StatusText.Text = "Загрузка завершена!"
-            $StatusText.Foreground = "#4CAF50"
-            $ProgressBar.UpdateLayout()
-        }, [System.Windows.Threading.DispatcherPriority]::Normal)
-        
-        $webClient.Dispose()
     }
-    catch {
-        $window.Dispatcher.Invoke({
-            $StatusText.Text = "Ошибка загрузки: $_"
-            $StatusText.Foreground = "#FF4444"
-        }, [System.Windows.Threading.DispatcherPriority]::Normal)
-        throw
-    }
+
+    $file.Close()
+    $stream.Close()
+    $response.Close()
 }
 
 # ---------------- UPDATE ----------------
@@ -330,7 +328,6 @@ function Start-Update {
         $UpdateButton.IsEnabled = $false
         $ProgressBar.Value = 0
         $StatusText.Text = "Начинаем обновление..."
-        $StatusText.Foreground = "#ffcc00"
         $UpdateStatusText.Text = ""
 
         $zipUrl  = "https://github.com/$repoOwner/$repoName/archive/refs/heads/$branch.zip"
@@ -343,10 +340,7 @@ function Start-Update {
         Download-File $zipUrl $tempZip
 
         $StatusText.Text = "Распаковка..."
-        $StatusText.Foreground = "#ffcc00"
-        $window.Dispatcher.Invoke({
-            $ProgressBar.Value = 100
-        }, [System.Windows.Threading.DispatcherPriority]::Normal)
+        $ProgressBar.Value = 100
 
         Expand-Archive $tempZip -DestinationPath $tempDir -Force
 
@@ -368,17 +362,12 @@ del "%~f0"
 "@
 
         Set-Content $batchFile $batchContent -Encoding ASCII
-        
-        $StatusText.Text = "Запуск обновления..."
-        $StatusText.Foreground = "#ffcc00"
-        Start-Sleep -Milliseconds 500
-        
         Start-Process $batchFile -WindowStyle Hidden
+
         $window.Close()
     }
     catch {
         $StatusText.Text = "Ошибка обновления: $_"
-        $StatusText.Foreground = "#FF4444"
         $UpdateButton.IsEnabled = $true
         $UpdateStatusText.Text = "Ошибка при обновлении!"
         $UpdateStatusText.Foreground = "#FF4444"
@@ -402,7 +391,6 @@ function Get-RemoteManifest {
     catch { return $null }
 }
 
-# Инициализация
 $local  = Get-LocalManifest
 $remote = Get-RemoteManifest
 
@@ -429,8 +417,8 @@ if ($local -and $remote) {
         $UpdateStatusText.Text = "Доступно обновление !"
         $UpdateStatusText.Foreground = "#4CAF50"
         $UpdateButton.IsEnabled = $true
-        $StatusText.Text = "Нажмите 'Обновить' для установки"
-        $StatusText.Foreground = "#ffcc00"
+        $StatusText.Text = "Доступна новая версия!"
+        $StatusText.Foreground = "#4CAF50"
     }
     else {
         $UpdateStatusText.Text = "Обновлений нет"
@@ -443,11 +431,10 @@ if ($local -and $remote) {
     $UpdateStatusText.Text = "Не удалось проверить обновления"
     $UpdateStatusText.Foreground = "#FF4444"
     $StatusText.Text = "Ошибка подключения к GitHub"
-    $StatusText.Foreground = "#FF4444"
+        $StatusText.Foreground = "#FF4444"
 }
 
 $UpdateButton.Add_Click({ Start-Update })
 $ExitButton.Add_Click({ $window.Close() })
 
-# Показываем окно
 $window.ShowDialog() | Out-Null
