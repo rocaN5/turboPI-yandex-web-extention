@@ -1,6 +1,7 @@
 Add-Type -AssemblyName PresentationFramework
 Add-Type -AssemblyName System.Windows.Forms
-Add-Type -AssemblyName System.Drawing  # для создания ярлыков
+Add-Type -AssemblyName System.Drawing
+Add-Type -AssemblyName PresentationCore
 
 # ---------------- SYSTEM ----------------
 $ProgressPreference = 'SilentlyContinue'
@@ -17,30 +18,24 @@ $manifestPath = Join-Path $rootPath "manifest.json"
 $iconPath     = Join-Path $rootPath "img\piTurboIcon.png"
 $exePath      = [System.Diagnostics.Process]::GetCurrentProcess().MainModule.FileName
 $exeName      = [System.IO.Path]::GetFileName($exePath)
+$desktopPath  = [System.Environment]::GetFolderPath('Desktop')
+$shortcutPath = Join-Path $desktopPath "TurboPI Updater.lnk"
 
-# ---------------- CREATE DESKTOP SHORTCUT ----------------
-function Create-DesktopShortcut {
+# ---------------- CREATE SHORTCUT ----------------
+function Create-Shortcut {
     try {
-        $desktopPath = [System.Environment]::GetFolderPath('Desktop')
-        $shortcutPath = Join-Path $desktopPath "TurboPI Updater.lnk"
-        
-        # Проверяем, существует ли уже ярлык
         if (-not (Test-Path $shortcutPath)) {
-            $wshShell = New-Object -ComObject WScript.Shell
-            $shortcut = $wshShell.CreateShortcut($shortcutPath)
+            $shell = New-Object -ComObject WScript.Shell
+            $shortcut = $shell.CreateShortcut($shortcutPath)
             $shortcut.TargetPath = $exePath
-            $shortcut.WorkingDirectory = $rootPath
             $shortcut.Description = "TurboPI Extension Updater"
+            $shortcut.WorkingDirectory = $rootPath
             
-            # Устанавливаем иконку, если есть
-            if (Test-Path $iconPath) {
-                $shortcut.IconLocation = $iconPath
+            if (Test-Path $exePath) {
+                $shortcut.IconLocation = "$exePath,0"
             }
             
             $shortcut.Save()
-            
-            # Освобождаем COM-объект
-            [System.Runtime.Interopservices.Marshal]::ReleaseComObject($wshShell) | Out-Null
         }
     }
     catch {
@@ -48,8 +43,7 @@ function Create-DesktopShortcut {
     }
 }
 
-# Вызываем создание ярлыка при запуске
-Create-DesktopShortcut
+Create-Shortcut
 
 # ---------------- UI ----------------
 $xaml = @"
@@ -60,7 +54,8 @@ $xaml = @"
         Width="500"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
-        Background="#121212">
+        Background="#121212"
+        Topmost="True">
 
     <Window.Resources>
         <Style x:Key="ModernButton" TargetType="Button">
@@ -119,17 +114,6 @@ $xaml = @"
                 <Trigger Property="IsEnabled" Value="False">
                     <Setter Property="Background" Value="#666666"/>
                     <Setter Property="Foreground" Value="#999999"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-        
-        <Style x:Key="HyperlinkStyle" TargetType="Hyperlink">
-            <Setter Property="Foreground" Value="#ffcc00"/>
-            <Setter Property="TextDecorations" Value="None"/>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Foreground" Value="#ffd633"/>
-                    <Setter Property="TextDecorations" Value="Underline"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
@@ -238,20 +222,53 @@ $xaml = @"
                     </StackPanel>
                 </Border>
 
-                <ProgressBar x:Name="ProgressBar"
-                             Height="18"
-                             Margin="0,0,0,10"
-                             Minimum="0"
-                             Maximum="100"
-                             Value="0"
-                             Foreground="#ffcc00"
-                             Background="#2d2d2d"/>
+                <!-- Детальный прогресс -->
+                <Border Background="#1e1e1e"
+                        CornerRadius="12"
+                        Padding="15"
+                        Margin="0,0,0,20">
+                    <StackPanel>
+                        <TextBlock x:Name="CurrentOperationText"
+                                   Foreground="#ffcc00"
+                                   FontSize="12"
+                                   FontWeight="Bold"
+                                   Text="Ожидание..."
+                                   Margin="0,0,0,5"/>
+                        
+                        <ProgressBar x:Name="ProgressBar"
+                                     Height="18"
+                                     Margin="0,0,0,8"
+                                     Minimum="0"
+                                     Maximum="100"
+                                     Value="0"
+                                     Foreground="#ffcc00"
+                                     Background="#2d2d2d"/>
+                        
+                        <TextBlock x:Name="ProgressDetailsText"
+                                   Foreground="#999999"
+                                   FontSize="11"
+                                   TextAlignment="Center"
+                                   Text="0%"/>
+                        
+                        <!-- Анимированная полоска прогресса -->
+                        <Border Height="4"
+                                Background="#2d2d2d"
+                                CornerRadius="2"
+                                Margin="0,5,0,0">
+                            <Border x:Name="AnimatedProgressBar"
+                                    Width="0"
+                                    Background="#ffcc00"
+                                    CornerRadius="2"
+                                    HorizontalAlignment="Left"/>
+                        </Border>
+                    </StackPanel>
+                </Border>
 
                 <TextBlock x:Name="StatusText"
                            Foreground="Gray"
                            FontSize="14" 
                            FontWeight="Bold" 
-                           TextAlignment="center"
+                           TextAlignment="Center"
                            Margin="0,0,0,15"/>
 
                 <!-- Кнопки по центру -->
@@ -278,40 +295,38 @@ $xaml = @"
                            TextAlignment="Center"
                            HorizontalAlignment="Center"
                            Text="Проверка обновлений..."
-                           Margin="0,0,0,10"/>
+                           Margin="0,0,0,15"/>
 
                 <!-- Информация о разработчике -->
-                <Border Background="#1a1a1a"
-                        CornerRadius="8"
-                        Padding="10"
-                        Margin="0,10,0,0">
-                    <StackPanel Orientation="Horizontal" 
-                                HorizontalAlignment="Center">
-                        <TextBlock Text="Разработчик: " 
-                                   Foreground="#e8e8e8" 
-                                   FontSize="12"
-                                   VerticalAlignment="Center"/>
-                        <TextBlock Margin="0,0,0,0" 
-                                   VerticalAlignment="Center">
-                            <Hyperlink x:Name="DeveloperLink"
-                                      NavigateUri="https://rocan5.github.io/contacts/"
-                                      Style="{StaticResource HyperlinkStyle}"
-                                      FontSize="12">
-                                @sheva_r6
-                            </Hyperlink>
-                        </TextBlock>
-                    </StackPanel>
-                </Border>
-
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Center"
+                            Margin="0,10,0,0">
+                    <TextBlock Text="Разработчик: "
+                               Foreground="#e8e8e8"
+                               FontSize="12"
+                               VerticalAlignment="Center"/>
+                    <TextBlock x:Name="DeveloperLink"
+                               Text="@sheva_r6"
+                               Foreground="#ffcc00"
+                               FontSize="12"
+                               FontWeight="Bold"
+                               Cursor="Hand"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
             </StackPanel>
-
         </Border>
     </Grid>
 </Window>
 "@
 
 $reader = [System.Xml.XmlReader]::Create([System.IO.StringReader]$xaml)
-$window = [Windows.Markup.XamlReader]::Load($reader)
+try {
+    $window = [Windows.Markup.XamlReader]::Load($reader)
+}
+catch {
+    [System.Windows.Forms.MessageBox]::Show("Ошибка загрузки интерфейса: $_", "Ошибка", "OK", "Error")
+    exit
+}
 
 # Получаем элементы управления
 $LocalVersion        = $window.FindName("LocalVersion")
@@ -319,17 +334,20 @@ $LocalVersionName    = $window.FindName("LocalVersionName")
 $RemoteVersion       = $window.FindName("RemoteVersion")
 $RemoteVersionName   = $window.FindName("RemoteVersionName")
 $ProgressBar         = $window.FindName("ProgressBar")
+$AnimatedProgressBar = $window.FindName("AnimatedProgressBar")
+$CurrentOperationText= $window.FindName("CurrentOperationText")
+$ProgressDetailsText = $window.FindName("ProgressDetailsText")
 $StatusText          = $window.FindName("StatusText")
 $UpdateStatusText    = $window.FindName("UpdateStatusText")
 $UpdateButton        = $window.FindName("UpdateButton")
 $ExitButton          = $window.FindName("ExitButton")
 $DeveloperLink       = $window.FindName("DeveloperLink")
 
-# Обработчик для ссылки разработчика
-$DeveloperLink.Add_Click({
-    param($sender, $e)
-    Start-Process $sender.NavigateUri
-})
+# Проверяем, что все элементы найдены
+if (-not $ProgressBar -or -not $UpdateButton) {
+    [System.Windows.Forms.MessageBox]::Show("Не удалось загрузить элементы интерфейса", "Ошибка", "OK", "Error")
+    exit
+}
 
 # ---------------- VERSION PARSER ----------------
 function Parse-Version($v) {
@@ -350,50 +368,91 @@ function Parse-Version($v) {
     }
 }
 
-# ---------------- DOWNLOAD WITH REAL PROGRESS ----------------
-function Download-File($url, $destination) {
+# ---------------- SMOOTH PROGRESS ----------------
+function Update-SmoothProgress {
+    param($TargetPercent, $Operation, $Details)
+    
+    $currentValue = $ProgressBar.Value
+    
+    # Плавно анимируем изменение процентов
+    while ($currentValue -lt $TargetPercent) {
+        $currentValue += [Math]::Min(2, $TargetPercent - $currentValue)
+        
+        $window.Dispatcher.Invoke([Action]{
+            $ProgressBar.Value = $currentValue
+            if ($AnimatedProgressBar -and $ProgressBar.ActualWidth -gt 0) {
+                $AnimatedProgressBar.Width = ($currentValue / 100) * $ProgressBar.ActualWidth
+            }
+            $ProgressDetailsText.Text = "$([Math]::Round($currentValue, 0))%"
+            if ($Operation) { $CurrentOperationText.Text = $Operation }
+            if ($Details) { $StatusText.Text = $Details }
+        }, [System.Windows.Threading.DispatcherPriority]::Normal)
+        
+        Start-Sleep -Milliseconds 20
+        [System.Windows.Forms.Application]::DoEvents()
+    }
+    
+    # Финальное обновление
+    $window.Dispatcher.Invoke([Action]{
+        $ProgressBar.Value = $TargetPercent
+        if ($AnimatedProgressBar -and $ProgressBar.ActualWidth -gt 0) {
+            $AnimatedProgressBar.Width = ($TargetPercent / 100) * $ProgressBar.ActualWidth
+        }
+        $ProgressDetailsText.Text = "$TargetPercent%"
+    }, [System.Windows.Threading.DispatcherPriority]::Normal)
+}
+
+# ---------------- DOWNLOAD WITH PROGRESS ----------------
+function Download-File {
+    param($url, $destination)
+    
+    # Получаем размер файла
+    try {
+        $request = [System.Net.HttpWebRequest]::Create($url)
+        $request.Method = "HEAD"
+        $response = $request.GetResponse()
+        $totalBytes = $response.ContentLength
+        $response.Close()
+    }
+    catch {
+        $totalBytes = 0
+    }
+    
+    # Создаем WebClient
     $webClient = New-Object System.Net.WebClient
     
-    # Подписываемся на событие прогресса
-    $progressHandler = {
-        param($sender, $e)
-        if ($e.TotalBytesToReceive -gt 0) {
-            $percent = [math]::Round(($e.BytesReceived / $e.TotalBytesToReceive) * 100, 0)
-            $ProgressBar.Dispatcher.Invoke([Action]{
-                $ProgressBar.Value = $percent
-                
-                $downloadedMB = [math]::Round($e.BytesReceived / 1MB, 2)
-                $totalMB = [math]::Round($e.TotalBytesToReceive / 1MB, 2)
-                
-                $StatusText.Text = "Загружено: ${downloadedMB}MB / ${totalMB}MB ($percent%)"
-            }, [System.Windows.Threading.DispatcherPriority]::Background)
+    # Регистрируем событие прогресса
+    $webClient.add_DownloadProgressChanged({
+        $percent = [math]::Round(($_.BytesReceived / $_.TotalBytesToReceive) * 100, 0)
+        $downloadedMB = [math]::Round($_.BytesReceived / 1MB, 2)
+        $totalMB = [math]::Round($_.TotalBytesToReceive / 1MB, 2)
+        
+        $window.Dispatcher.Invoke([Action]{
+            # Плавно обновляем прогресс
+            $currentValue = $ProgressBar.Value
+            $step = [Math]::Max(1, $percent - $currentValue)
             
-            # Даем интерфейсу время обновиться
-            Start-Sleep -Milliseconds 10
-        }
-    }
-    
-    # Регистрируем событие
-    Register-ObjectEvent -InputObject $webClient -EventName DownloadProgressChanged -Action $progressHandler | Out-Null
+            for ($i = 1; $i -le $step; $i++) {
+                $newValue = $currentValue + $i
+                $ProgressBar.Value = $newValue
+                if ($AnimatedProgressBar -and $ProgressBar.ActualWidth -gt 0) {
+                    $AnimatedProgressBar.Width = ($newValue / 100) * $ProgressBar.ActualWidth
+                }
+                $ProgressDetailsText.Text = "$newValue%"
+                $CurrentOperationText.Text = "Скачивание обновления..."
+                $StatusText.Text = "Загружено: ${downloadedMB}MB / ${totalMB}MB"
+                
+                Start-Sleep -Milliseconds 5
+                [System.Windows.Forms.Application]::DoEvents()
+            }
+        }, [System.Windows.Threading.DispatcherPriority]::Normal)
+    })
     
     try {
-        # Скачиваем файл асинхронно
-        $downloadTask = $webClient.DownloadFileTaskAsync($url, $destination)
-        
-        # Ждем завершения скачивания, но позволяем интерфейсу обновляться
-        while (-not $downloadTask.IsCompleted) {
-            [System.Windows.Forms.Application]::DoEvents()
-            Start-Sleep -Milliseconds 100
-        }
-        
-        # Проверяем на ошибки
-        if ($downloadTask.Exception) {
-            throw $downloadTask.Exception.InnerException
-        }
+        Update-SmoothProgress -TargetPercent 0 -Operation "Скачивание обновления..." -Details "Подключение к GitHub..."
+        $webClient.DownloadFile($url, $destination)
     }
     finally {
-        # Отписываемся от события
-        Get-EventSubscriber | Where-Object {$_.SourceObject -eq $webClient} | Unregister-Event
         $webClient.Dispose()
     }
 }
@@ -401,10 +460,12 @@ function Download-File($url, $destination) {
 # ---------------- UPDATE ----------------
 function Start-Update {
     try {
-        $UpdateButton.Dispatcher.Invoke([Action]{ $UpdateButton.IsEnabled = $false })
-        $ProgressBar.Dispatcher.Invoke([Action]{ $ProgressBar.Value = 0 })
-        $StatusText.Dispatcher.Invoke([Action]{ $StatusText.Text = "Начинаем обновление..." })
-        $UpdateStatusText.Dispatcher.Invoke([Action]{ $UpdateStatusText.Text = "" })
+        $window.Dispatcher.Invoke([Action]{
+            $UpdateButton.IsEnabled = $false
+            $ExitButton.IsEnabled = $false
+        })
+        
+        Update-SmoothProgress -TargetPercent 0 -Operation "Подготовка..." -Details "Начинаем обновление..."
 
         $zipUrl  = "https://github.com/$repoOwner/$repoName/archive/refs/heads/$branch.zip"
         $tempZip = Join-Path $env:TEMP "turboPI_update.zip"
@@ -413,21 +474,40 @@ function Start-Update {
         Remove-Item $tempZip -Force -ErrorAction SilentlyContinue
         Remove-Item $tempDir -Recurse -Force -ErrorAction SilentlyContinue
 
+        # Скачивание с прогрессом
         Download-File $zipUrl $tempZip
 
-        $StatusText.Dispatcher.Invoke([Action]{ 
-            $StatusText.Text = "Распаковка..."
-            $ProgressBar.Value = 100
-        })
+        # Распаковка с прогрессом
+        Update-SmoothProgress -TargetPercent 100 -Operation "Распаковка..." -Details "Извлечение файлов..."
+        
+        # Создаем директорию и распаковываем
+        New-Item -ItemType Directory -Path $tempDir -Force | Out-Null
+        
+        # Используем Shell.Application для распаковки
+        $shell = New-Object -ComObject Shell.Application
+        $zip = $shell.NameSpace($tempZip)
+        $dest = $shell.NameSpace($tempDir)
+        
+        # Копируем файлы
+        $items = $zip.Items()
+        $totalItems = $items.Count
+        $currentItem = 0
+        
+        foreach ($item in $items) {
+            $dest.CopyHere($item, 0x14)
+            $currentItem++
+            $percent = if ($totalItems -gt 0) { [math]::Round(($currentItem / $totalItems) * 100, 0) } else { 100 }
+            Update-SmoothProgress -TargetPercent $percent -Operation "Распаковка..." -Details "Извлечение файлов... $percent%"
+            Start-Sleep -Milliseconds 20
+        }
 
-        Expand-Archive $tempZip -DestinationPath $tempDir -Force
+        $source = Join-Path $tempDir "$repoName-$branch"
 
-        $source  = Join-Path $tempDir "$repoName-$branch"
-
+        # Создание bat файла для обновления
         $batchFile = Join-Path $env:TEMP "turboPI_updater.cmd"
-
         $batchContent = @"
 @echo off
+chcp 65001 > nul
 timeout /t 2 /nobreak > nul
 taskkill /IM "$exeName" /F > nul 2>&1
 xcopy "$source\*" "$rootPath\" /E /Y /Q > nul
@@ -438,17 +518,28 @@ del "%~f0"
 "@
 
         Set-Content $batchFile $batchContent -Encoding ASCII
+        
+        # Финальная анимация
+        for ($i = 90; $i -le 100; $i += 2) {
+            Update-SmoothProgress -TargetPercent $i -Operation "Завершение..." -Details "Обновление готово к установке... $i%"
+            Start-Sleep -Milliseconds 30
+        }
+        
+        Update-SmoothProgress -TargetPercent 100 -Operation "Завершение..." -Details "Обновление готово к установке!"
         Start-Process $batchFile -WindowStyle Hidden
 
         $window.Dispatcher.Invoke([Action]{ $window.Close() })
     }
     catch {
-        $StatusText.Dispatcher.Invoke([Action]{ 
+        $window.Dispatcher.Invoke([Action]{
             $StatusText.Text = "Ошибка обновления: $_"
+            $StatusText.Foreground = "#FF4444"
             $UpdateStatusText.Text = "Ошибка при обновлении!"
             $UpdateStatusText.Foreground = "#FF4444"
+            $UpdateButton.IsEnabled = $true
+            $ExitButton.IsEnabled = $true
+            Update-SmoothProgress -TargetPercent 0 -Operation "Ошибка" -Details $_
         })
-        $UpdateButton.Dispatcher.Invoke([Action]{ $UpdateButton.IsEnabled = $true })
     }
 }
 
@@ -469,9 +560,11 @@ function Get-RemoteManifest {
     catch { return $null }
 }
 
+# Загружаем данные
 $local  = Get-LocalManifest
 $remote = Get-RemoteManifest
 
+# Обновляем UI
 if ($local) {
     $LocalVersion.Text = $local.version
     $LocalVersionName.Text = $local.version_name
@@ -482,6 +575,7 @@ if ($remote) {
     $RemoteVersionName.Text = $remote.version_name
 }
 
+# Сравниваем версии
 if ($local -and $remote) {
     $l = Parse-Version $local.version_name
     $r = Parse-Version $remote.version_name
@@ -492,7 +586,7 @@ if ($local -and $remote) {
         ($r.Major -eq $l.Major -and $r.Minor -eq $l.Minor -and $r.Patch -gt $l.Patch) -or
         ($r.Major -eq $l.Major -and $r.Minor -eq $l.Minor -and $r.Patch -eq $l.Patch -and $r.Dev -gt $l.Dev)
     ) {
-        $UpdateStatusText.Text = "Доступно обновление !"
+        $UpdateStatusText.Text = "Доступно обновление!"
         $UpdateStatusText.Foreground = "#4CAF50"
         $UpdateButton.IsEnabled = $true
         $StatusText.Text = "Доступна новая версия!"
@@ -512,7 +606,13 @@ if ($local -and $remote) {
     $StatusText.Foreground = "#FF4444"
 }
 
+# ---------------- EVENTS ----------------
 $UpdateButton.Add_Click({ Start-Update })
 $ExitButton.Add_Click({ $window.Close() })
+
+# Обработчик клика по ссылке разработчика
+$DeveloperLink.Add_MouseLeftButtonDown({
+    Start-Process "https://rocan5.github.io/contacts/"
+})
 
 $window.ShowDialog() | Out-Null
