@@ -17,6 +17,9 @@ let tpi_cc_currentFilterDirection = null;
 let tpi_cc_tableSortInitialized = false;
 window.tpi_getRoutesSummary = tpi_getRoutesSummary;
 let tpiChartInstance = null;
+window.tpi_cc_claimTableData_toPrint = tpi_cc_claimTableData_toPrint;
+window.tpi_cc_generateQRcodes_toPrint = tpi_cc_generateQRcodes_toPrint;
+window.tpi_cc_generatePDFlabels_toPrint = tpi_cc_generatePDFlabels_toPrint;
 
 // Функция для предзагрузки данных календаря
 async function preloadCalendarData() {
@@ -1132,6 +1135,26 @@ tpi_cc_i_circle_xmark = `
 <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
     <path d="M256 48a208 208 0 1 1 0 416 208 208 0 1 1 0-416zm0 464A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c-9.4 9.4-9.4 24.6 0 33.9l47 47-47 47c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l47-47 47 47c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-47-47 47-47c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-47 47-47-47c-9.4-9.4-24.6-9.4-33.9 0z"></path>
 </svg>
+`,
+tpi_cc_i_ring_loader = `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" class="tpi-cc-print-all-icon-loading">
+    <radialGradient id="a12" cx=".66" fx=".66" cy=".3125" fy=".3125" gradientTransform="scale(1.5)">
+        <stop offset="0" stop-color="#000000"></stop>
+        <stop offset=".3" stop-color="#000000" stop-opacity=".9"></stop>
+        <stop offset=".6" stop-color="#000000" stop-opacity=".6"></stop>
+        <stop offset=".8" stop-color="#000000" stop-opacity=".3"></stop>
+        <stop offset="1" stop-color="#000000" stop-opacity="0"></stop>
+    </radialGradient>
+    <circle transform-origin="center" fill="none" stroke="url(#a12)" stroke-width="26" stroke-linecap="round" stroke-dasharray="200 1000" stroke-dashoffset="0" cx="100" cy="100" r="70">
+        <animateTransform type="rotate" attributeName="transform" calcMode="spline" dur="1" values="360;0" keyTimes="0;1" keySplines="0 0 1 1" repeatCount="indefinite"></animateTransform>
+    </circle>
+    <circle transform-origin="center" fill="none" opacity=".2" stroke="#000000" stroke-width="26" stroke-linecap="round" cx="100" cy="100" r="70"></circle>
+</svg>
+`,
+tpi_cc_i_print_all = `
+<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" class="tpi-cc-print-all-icon-static">
+    <path d="M5 1a2 2 0 0 0-2 2v1h10V3a2 2 0 0 0-2-2zm6 8H5a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1"></path><path d="M0 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-1v-2a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2H2a2 2 0 0 1-2-2zm2.5 1a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1"></path>
+</svg>
 `
 
 function checkiIs__onCartControlsPage() {
@@ -1245,6 +1268,10 @@ function checkiIs__onCartControlsPage() {
                     <div class="tpi-cc-filters-item">
                         <button class="tpi-cc-filters-reset">Сбросить фильтры</button>
                     </div>
+                    <button class="tpi-cc-print-all" tpi-cc-printing-state="static">
+                        <p class="tpi-cc-print-all-text">Распечатать все</p>
+                        <i class="tpi-cc-print-all-icon">${tpi_cc_i_print_all}${tpi_cc_i_ring_loader}</i>
+                    </button>
                 </div>
             </div>
         </div>
@@ -2848,8 +2875,6 @@ function canShowPrintButton() {
     const currentHour = now.getHours();
     
     // Проверяем условия:
-    // 1. Выбранная дата должна быть сегодняшней
-    // 2. Текущее время должно быть до 23:00
     const isToday = selectedDate.getTime() === currentDate.getTime();
     const isBefore23 = currentHour < 23;
     
@@ -3114,7 +3139,7 @@ function createCourierTableRow(courierData, index) {
         </td>
         <td class="tpi-cc--table-tbody-item">
             <div class="tpi-cc--table-tbody-data">
-                <a href="https://logistics.market.yandex.ru/sorting-center/21972131/sortables?sortableTypes=CART&sortableTypes=COURIER_PALLET&cellName=${courierData.cell}" class="tpi-cc--table-tbody-data-link" tpi-cc-parsing-data="courier-route-cell" target="_blank">
+                <a href="https://logistics.market.yandex.ru/sorting-center/21972131/sortables?sortableTypes=CART&sortableTypes=COURIER_PALLET&cellName=${courierData.cell}" class="tpi-cc--table-tbody-data-link" tpi-cc-parsing-data="courier-route-cell" courier-spec-cell="${courierData.cell}" target="_blank">
                     <i class="tpi-cc-i-cell-name">${tpi_cc_i_tag}</i>
                     ${courierData.cell}
                 </a>
@@ -7201,3 +7226,356 @@ function initializeChartOnce() {
         }
     }, 5000);
 }
+
+//C-
+//C-
+//C- QR Коды /// CБОР ДАННЫХ ИЗ ТАБЛИЦЫ /// ГЕНЕРАЦИЯ PDF
+//C-
+//C-
+
+
+// Функция для загрузки шрифта в формате base64
+async function loadFontAsBase64(path) {
+    const response = await fetch(path);
+    const buffer = await response.arrayBuffer();
+    let binary = '';
+    const bytes = new Uint8Array(buffer);
+    const chunk = 0x8000;
+    for (let i = 0; i < bytes.length; i += chunk) {
+        binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
+    }
+    return btoa(binary);
+}
+
+// Функция для генерации QR-кодов с использованием qrcode.min.js
+async function tpi_cc_generateQRcodes_toPrint(cartNumbers, palletNumbers) {
+    const allQRPromises = [];
+    const qrCodes = [];
+    
+    // Собираем все номера для генерации QR-кодов в правильном порядке
+    // Сначала все CART номера по порядку из каждой строки
+    if (cartNumbers && cartNumbers.length > 0) {
+        // Транспонируем массив: сначала все первые CART номера, потом все вторые и т.д.
+        const maxCartLength = Math.max(...cartNumbers.map(arr => arr.length));
+        
+        for (let i = 0; i < maxCartLength; i++) {
+            cartNumbers.forEach((courierCarts, courierIndex) => {
+                if (i < courierCarts.length) {
+                    allQRPromises.push({
+                        type: 'CART',
+                        value: courierCarts[i],
+                        courierIndex: courierIndex,
+                        order: i
+                    });
+                }
+            });
+        }
+    }
+    
+    // Затем все PALLET номера по порядку из каждой строки
+    if (palletNumbers && palletNumbers.length > 0) {
+        const maxPalletLength = Math.max(...palletNumbers.map(arr => arr.length));
+        
+        for (let i = 0; i < maxPalletLength; i++) {
+            palletNumbers.forEach((courierPallets, courierIndex) => {
+                if (i < courierPallets.length) {
+                    allQRPromises.push({
+                        type: 'PALLET',
+                        value: courierPallets[i],
+                        courierIndex: courierIndex,
+                        order: i
+                    });
+                }
+            });
+        }
+    }
+    
+    console.log(`🔄 Всего для генерации QR-кодов: ${allQRPromises.length} шт.`);
+    
+    // Генерируем QR-коды
+    for (let i = 0; i < allQRPromises.length; i++) {
+        const item = allQRPromises[i];
+        try {
+            // Создаем временный контейнер для QR-кода
+            const qrContainer = document.createElement("div");
+            
+            // Генерируем QR-код
+            new QRCode(qrContainer, {
+                text: item.value,
+                width: 200,
+                height: 200,
+                correctLevel: QRCode.CorrectLevel.M
+            });
+            
+            // Ждем генерации и получаем DataURL
+            const qrDataURL = await new Promise(resolve => {
+                setTimeout(() => {
+                    const img = qrContainer.querySelector("img");
+                    if (img) {
+                        resolve(img.src);
+                    } else {
+                        const canvas = qrContainer.querySelector("canvas");
+                        resolve(canvas ? canvas.toDataURL() : null);
+                    }
+                }, 100);
+            });
+            
+            if (qrDataURL) {
+                qrCodes.push({
+                    ...item,
+                    qrDataURL
+                });
+            }
+            
+        } catch (error) {
+            console.error(`❌ Ошибка генерации QR для ${item.value}:`, error);
+        }
+    }
+    
+    return qrCodes;
+}
+
+// Функция для сбора данных из таблицы
+function tpi_cc_claimTableData_toPrint() {
+    const tableData = [];
+    const rows = document.querySelectorAll('.tpi-cc--table-tbody');
+    
+    rows.forEach(row => {
+        // 1) Получаем ФИО курьера
+        const courierNameElement = row.querySelector('p[tpi-cc-parsing-data="courier-full-name"]');
+        const courierName = courierNameElement ? courierNameElement.textContent.trim() : 'Не указано';
+        
+        // 2) Получаем ячейку курьера
+        const cellElement = row.querySelector('a[tpi-cc-parsing-data="courier-route-cell"]');
+        const cellValue = cellElement ? cellElement.textContent.trim() : 'Нет ячейки';
+        const cellAttribute = cellElement ? cellElement.getAttribute('courier-spec-cell') : '';
+        
+        // 3) Получаем все CART номера
+        const cartElements = row.querySelectorAll('.tpi-cc--table-tbody-data-carts .tpi-cc-table-tbody-data-cart-id[tpi-data-courier-spec-cell]');
+        const cartNumbers = Array.from(cartElements).map(el => el.getAttribute('tpi-data-courier-spec-cell'));
+        
+        // 4) Получаем все PALLET номера
+        const palletElements = row.querySelectorAll('.tpi-cc--table-tbody-data-pallets .tpi-cc-table-tbody-data-pallet-id[tpi-data-courier-spec-cell]');
+        const palletNumbers = Array.from(palletElements).map(el => el.getAttribute('tpi-data-courier-spec-cell'));
+        
+        if (cartNumbers.length > 0 || palletNumbers.length > 0) {
+            tableData.push({
+                courierName,
+                cell: {
+                    value: cellValue,
+                    attribute: cellAttribute
+                },
+                cartNumbers,
+                palletNumbers
+            });
+        }
+    });
+    
+    console.log(`📊 Собрано данных для ${tableData.length} курьеров`);
+    return tableData;
+}
+
+// Функция для создания PDF с этикетками
+async function tpi_cc_generatePDFlabels_toPrint() {
+
+    const printButton = document.querySelector('.tpi-cc-print-all');
+    const printText = document.querySelector('.tpi-cc-print-all-text');
+    const originalText = printText ? printText.textContent : 'Распечатать все';
+
+    try {
+
+        if (printButton) {
+            printButton.setAttribute('tpi-cc-printing-state', 'loading');
+        }
+
+        if (printText) printText.textContent = 'Генерация: 0%';
+
+        const tableData = tpi_cc_claimTableData_toPrint();
+        if (!tableData || tableData.length === 0) {
+            throw new Error('Нет данных для печати');
+        }
+
+        const allCartNumbers = tableData.map(item => item.cartNumbers);
+        const allPalletNumbers = tableData.map(item => item.palletNumbers);
+
+        const qrCodes = await tpi_cc_generateQRcodes_toPrint(allCartNumbers, allPalletNumbers);
+        if (!qrCodes || qrCodes.length === 0) {
+            throw new Error('Не удалось сгенерировать QR-коды');
+        }
+
+        if (printText) printText.textContent = 'Генерация: 100%';
+
+        const { jsPDF } = window.jspdf;
+
+        const pdf = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4'
+        });
+
+        // ===== Подключаем шрифты =====
+        const fontPaths = {
+            regular: chrome.runtime.getURL('fonts/Roboto-Regular.ttf'),
+            bold: chrome.runtime.getURL('fonts/Roboto-Bold.ttf'),
+            black: chrome.runtime.getURL('fonts/Roboto-Black.ttf')
+        };
+
+        pdf.addFileToVFS("Roboto-Regular.ttf", await loadFontAsBase64(fontPaths.regular));
+        pdf.addFont("Roboto-Regular.ttf", "Roboto", "normal");
+
+        pdf.addFileToVFS("Roboto-Bold.ttf", await loadFontAsBase64(fontPaths.bold));
+        pdf.addFont("Roboto-Bold.ttf", "Roboto", "bold");
+
+        pdf.addFileToVFS("Roboto-Black.ttf", await loadFontAsBase64(fontPaths.black));
+        pdf.addFont("Roboto-Black.ttf", "Roboto", "black");
+
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+
+        for (let i = 0; i < qrCodes.length; i++) {
+
+            if (i > 0) pdf.addPage();
+
+            const qr = qrCodes[i];
+            const courierInfo = tableData[qr.courierIndex];
+
+            // ====== MK-131 (крупно справа) ======
+            pdf.setFont("Roboto", "black");
+            pdf.setFontSize(120);
+            const cellX = courierInfo.cell.value.startsWith('KGT') ? 52 + 10 : 52;
+            pdf.text(courierInfo.cell.value, cellX, 88);
+            
+            // ====== QR справа ======
+            if (qr.qrDataURL) {
+                pdf.addImage(qr.qrDataURL, 'PNG', 84, 105, 90, 90);
+            }
+
+            // ====== Левый вертикальный блок ======
+            const blockX = 5;
+            const blockY = 90;
+            const blockWidth = 45;
+            const blockHeight = 110;
+
+            // Рамка
+            pdf.setLineWidth(0.2);
+            pdf.rect(blockX, blockY, blockWidth, blockHeight);
+
+            // Черная шапка
+            pdf.setFillColor(0, 0, 0);
+            pdf.rect(blockX, blockY, blockWidth, 12, 'F');
+
+            pdf.setTextColor(255, 255, 255);
+            pdf.setFont("Roboto", "bold");
+            pdf.setFontSize(16);
+
+            const labelTitle = qr.type === 'PALLET'
+                ? 'Номер PALLET:'
+                : 'Номер CART:';
+
+            pdf.text(labelTitle, blockX + (qr.type === 'PALLET' ? 2 : 4), blockY + 8);
+
+            // Возвращаем цвет текста
+            pdf.setTextColor(0, 0, 0);
+
+            // ====== Номер (только число, без CART-) ======
+            const pureNumber = qr.value.replace(/[^0-9]/g, '');
+
+            pdf.setFont("Roboto", "black");
+            pdf.setFontSize(100);
+
+            const digitCount = pureNumber.length;
+
+            let textX = 40;  // центрируем по X
+            let textY = 192.5;   // центрируем по Y
+
+            // Корректировка в зависимости от количества цифр
+            switch(digitCount) {
+                case 1:
+                    textX = 40;
+                    textY = 192.5 - 30;
+                    break;
+                case 2:
+                    textX = 40;
+                    textY = 192.5 - 20;
+                    break;
+                case 3:
+                    textX = 40;
+                    textY = 192.5 - 10;
+                    break;
+                case 4:
+
+                    break;
+                default:
+                    const extraDigits = digitCount - 4;
+                    textX = 40 - (extraDigits * 1.5);
+                    textY = 192.5 - (extraDigits * 1);
+            }
+
+            pdf.text(
+                pureNumber,
+                textX,
+                textY,
+                {
+                    angle: 90
+                    // Не используем align и baseline, чтобы не ломать логику
+                }
+            );
+
+            // ====== Иконка тележки (слева сверху) ======
+            pdf.setFontSize(40);
+            pdf.text("🛒", 30, 60);
+
+            // ====== ФИО ======
+            const trimmedName = courierInfo.courierName.replace(/\s+/g, '');
+            const fioParts = trimmedName.split(/(?=[А-ЯЁA-Z])/);
+
+            pdf.setFont("Roboto", "bold");
+            pdf.setFontSize(65);
+
+            let fioY = 230;
+
+            fioParts.forEach(part => {
+                pdf.text(part, 5, fioY);
+                fioY += 26;
+            });
+
+            const progress = Math.round(50 + ((i + 1) / qrCodes.length) * 50);
+            if (printText) printText.textContent = `Генерация: ${progress}%`;
+        }
+
+        if (printText) printText.textContent = 'Генерация: 100%';
+
+        const now = new Date();
+        const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
+        pdf.save(`etiketki_${dateStr}.pdf`);
+
+        if (printButton) printButton.removeAttribute('tpi-cc-printing-state');
+        if (printText) printText.textContent = originalText;
+
+    } catch (error) {
+
+        console.error('❌ Ошибка создания PDF:', error);
+
+        if (printButton) printButton.removeAttribute('tpi-cc-printing-state');
+        if (printText) printText.textContent = originalText;
+    }
+}
+
+// Добавляем обработчик события на кнопку печати
+document.addEventListener('click', function(event) {
+    const printAllButton = event.target.closest('.tpi-cc-print-all');
+    if (printAllButton) {
+        event.preventDefault();
+        event.stopPropagation();
+        tpi_cc_generatePDFlabels_toPrint();
+    }
+});
+
+
+// Экспортируем функции в глобальную область видимости
+window.tpi_cc_claimTableData_toPrint = tpi_cc_claimTableData_toPrint;
+window.tpi_cc_generateQRcodes_toPrint = tpi_cc_generateQRcodes_toPrint;
+window.tpi_cc_generatePDFlabels_toPrint = tpi_cc_generatePDFlabels_toPrint;
+
+

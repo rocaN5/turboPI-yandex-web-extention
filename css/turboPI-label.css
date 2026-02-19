@@ -655,9 +655,9 @@ button.miniRadar{
     color: rgb(0, 0, 0);
     font-size: 0.9rem;
     font-weight: 800;
-    box-shadow: rgb(0, 0, 0) 0px 0px 10px 0px, rgb(0, 0, 0) 0px 0px 10px 0px;
+    box-shadow: #000000 0px 0px 10px 0px, #000000 0px 0px 10px 0px;
     cursor: pointer;
-    background: rgb(255, 204, 0);
+    background: #ffcc00;
     padding: 10px;
     border-radius: 10px;
     border: none;

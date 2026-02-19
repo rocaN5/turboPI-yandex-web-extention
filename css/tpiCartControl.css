@@ -1412,6 +1412,7 @@ p.tpi-cc--table-tbody-data-courier-print-text {
     width: 100%;
     display: flex;
     gap: 16px;
+    flex-wrap: wrap;
 }
 
 .tpi-cc-filters-item{
@@ -2615,4 +2616,82 @@ li.tpi-cc-graph-total-item {
 
 .tpi-cc-graph-container .echarts-grid [class*="yAxis"] {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+button.tpi-cc-print-all {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 170px;
+    padding: 0px 10px;
+    gap: 12px;
+    background: #fc0;
+    border-radius: 10px;
+    margin-left: auto;
+    border: 0;
+    cursor: pointer;
+    user-select: none;
+    color: #212121;
+    box-shadow: 0px 0px 0px 2px inset #0000001c;
+
+    i.tpi-cc-print-all-icon {
+        width: 18px;
+        height: 18px;
+        color: currentColor;
+    }
+    i.tpi-cc-print-all-icon svg{
+        fill: currentColor;
+        animation: tpi-cc-print-all-icon 350ms ease-in-out forwards;
+    }
+    p.tpi-cc-print-all-text {
+        margin: 0;
+        font-weight: 800;
+        color: currentColor;
+    }
+
+    &[tpi-cc-printing-state="loading"]{
+        background-image: repeating-linear-gradient(-45deg, #e8e8e8, #e8e8e8 6px, #d1d1d1 0, #d1d1d1 12px);
+        background-size: 119px;
+        background-position: 0%;
+        animation: tpi-cc-printing-state-loading 2s infinite linear;
+        filter: unset !important;
+        cursor: wait;
+    }
+
+    svg.tpi-cc-print-all-icon-loading{
+        display: none;
+    }
+
+    &[tpi-cc-printing-state="loading"] svg.tpi-cc-print-all-icon-static{
+        display: none;
+    }
+
+    &[tpi-cc-printing-state="loading"] svg.tpi-cc-print-all-icon-loading{
+        display: flex;
+    }
+
+    &:not([tpi-cc-printing-state="loading"]):hover,
+    &:not([tpi-cc-printing-state="loading"]):focus-visible{
+        outline: 0;
+        filter: brightness(.95);
+    }
+            
+    &:not([tpi-cc-printing-state="loading"]):active{
+        filter: brightness(.85);
+        transform: scale(.97);
+    }
+}
+
+@keyframes tpi-cc-print-all-icon {
+    from{opacity: 0; transform: scale(0);}
+    to{opacity: 1; transform: scale(1);}
+}
+
+@keyframes tpi-cc-printing-state-loading{
+    from{
+        background-position: 0%;
+    }
+    to{
+        background-position: 100%;
+    }
 }
