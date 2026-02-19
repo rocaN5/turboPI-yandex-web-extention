@@ -50,7 +50,7 @@ $xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="TurboPI Updater"
-        Height="680"
+        Height="720"
         Width="500"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
@@ -249,24 +249,12 @@ $xaml = @"
                                    FontSize="11"
                                    TextAlignment="Center"
                                    Text="0%"/>
-                        
-                        <!-- Анимированная полоска прогресса -->
-                        <Border Height="4"
-                                Background="#2d2d2d"
-                                CornerRadius="2"
-                                Margin="0,5,0,0">
-                            <Border x:Name="AnimatedProgressBar"
-                                    Width="0"
-                                    Background="#ffcc00"
-                                    CornerRadius="2"
-                                    HorizontalAlignment="Left"/>
-                        </Border>
                     </StackPanel>
                 </Border>
 
                 <TextBlock x:Name="StatusText"
                            Foreground="Gray"
-                           FontSize="14" 
+                           FontSize="16" 
                            FontWeight="Bold" 
                            TextAlignment="Center"
                            Margin="0,0,0,15"/>
@@ -287,15 +275,6 @@ $xaml = @"
                             Height="40"
                             Style="{StaticResource ModernButton}"/>
                 </StackPanel>
-
-                <!-- Статус обновления -->
-                <TextBlock x:Name="UpdateStatusText"
-                           FontWeight="Bold"
-                           FontSize="14"
-                           TextAlignment="Center"
-                           HorizontalAlignment="Center"
-                           Text="Проверка обновлений..."
-                           Margin="0,0,0,15"/>
 
                 <!-- Информация о разработчике -->
                 <StackPanel Orientation="Horizontal"
@@ -334,11 +313,9 @@ $LocalVersionName    = $window.FindName("LocalVersionName")
 $RemoteVersion       = $window.FindName("RemoteVersion")
 $RemoteVersionName   = $window.FindName("RemoteVersionName")
 $ProgressBar         = $window.FindName("ProgressBar")
-$AnimatedProgressBar = $window.FindName("AnimatedProgressBar")
 $CurrentOperationText= $window.FindName("CurrentOperationText")
 $ProgressDetailsText = $window.FindName("ProgressDetailsText")
 $StatusText          = $window.FindName("StatusText")
-$UpdateStatusText    = $window.FindName("UpdateStatusText")
 $UpdateButton        = $window.FindName("UpdateButton")
 $ExitButton          = $window.FindName("ExitButton")
 $DeveloperLink       = $window.FindName("DeveloperLink")
@@ -380,9 +357,6 @@ function Update-SmoothProgress {
         
         $window.Dispatcher.Invoke([Action]{
             $ProgressBar.Value = $currentValue
-            if ($AnimatedProgressBar -and $ProgressBar.ActualWidth -gt 0) {
-                $AnimatedProgressBar.Width = ($currentValue / 100) * $ProgressBar.ActualWidth
-            }
             $ProgressDetailsText.Text = "$([Math]::Round($currentValue, 0))%"
             if ($Operation) { $CurrentOperationText.Text = $Operation }
             if ($Details) { $StatusText.Text = $Details }
@@ -395,9 +369,6 @@ function Update-SmoothProgress {
     # Финальное обновление
     $window.Dispatcher.Invoke([Action]{
         $ProgressBar.Value = $TargetPercent
-        if ($AnimatedProgressBar -and $ProgressBar.ActualWidth -gt 0) {
-            $AnimatedProgressBar.Width = ($TargetPercent / 100) * $ProgressBar.ActualWidth
-        }
         $ProgressDetailsText.Text = "$TargetPercent%"
     }, [System.Windows.Threading.DispatcherPriority]::Normal)
 }
@@ -435,9 +406,6 @@ function Download-File {
             for ($i = 1; $i -le $step; $i++) {
                 $newValue = $currentValue + $i
                 $ProgressBar.Value = $newValue
-                if ($AnimatedProgressBar -and $ProgressBar.ActualWidth -gt 0) {
-                    $AnimatedProgressBar.Width = ($newValue / 100) * $ProgressBar.ActualWidth
-                }
                 $ProgressDetailsText.Text = "$newValue%"
                 $CurrentOperationText.Text = "Скачивание обновления..."
                 $StatusText.Text = "Загружено: ${downloadedMB}MB / ${totalMB}MB"
@@ -534,8 +502,6 @@ del "%~f0"
         $window.Dispatcher.Invoke([Action]{
             $StatusText.Text = "Ошибка обновления: $_"
             $StatusText.Foreground = "#FF4444"
-            $UpdateStatusText.Text = "Ошибка при обновлении!"
-            $UpdateStatusText.Foreground = "#FF4444"
             $UpdateButton.IsEnabled = $true
             $ExitButton.IsEnabled = $true
             Update-SmoothProgress -TargetPercent 0 -Operation "Ошибка" -Details $_
@@ -586,23 +552,17 @@ if ($local -and $remote) {
         ($r.Major -eq $l.Major -and $r.Minor -eq $l.Minor -and $r.Patch -gt $l.Patch) -or
         ($r.Major -eq $l.Major -and $r.Minor -eq $l.Minor -and $r.Patch -eq $l.Patch -and $r.Dev -gt $l.Dev)
     ) {
-        $UpdateStatusText.Text = "Доступно обновление!"
-        $UpdateStatusText.Foreground = "#4CAF50"
-        $UpdateButton.IsEnabled = $true
         $StatusText.Text = "Доступна новая версия!"
         $StatusText.Foreground = "#4CAF50"
+        $UpdateButton.IsEnabled = $true
     }
     else {
-        $UpdateStatusText.Text = "Обновлений нет"
-        $UpdateStatusText.Foreground = "#ffcc00"
+        $StatusText.Text = "Обновлений нет !"
+        $StatusText.Foreground = "#2bff00"
         $UpdateButton.IsEnabled = $false
-        $StatusText.Text = "Установлена актуальная версия"
-        $StatusText.Foreground = "#ffcc00"
     }
 } elseif (-not $remote) {
-    $UpdateStatusText.Text = "Не удалось проверить обновления"
-    $UpdateStatusText.Foreground = "#FF4444"
-    $StatusText.Text = "Ошибка подключения к GitHub"
+    $StatusText.Text = "Ошибка подключения"
     $StatusText.Foreground = "#FF4444"
 }
 
