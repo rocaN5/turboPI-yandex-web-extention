@@ -541,19 +541,11 @@ if ($remote) {
     $RemoteVersionName.Text = $remote.version_name
 }
 
-# Сравниваем версии
+# Простое сравнение - если version_name отличаются, значит есть обновление
 if ($local -and $remote) {
-    $l = Parse-Version $local.version_name
-    $r = Parse-Version $remote.version_name
-
-    if (
-        $r.Major -gt $l.Major -or
-        ($r.Major -eq $l.Major -and $r.Minor -gt $l.Minor) -or
-        ($r.Major -eq $l.Major -and $r.Minor -eq $l.Minor -and $r.Patch -gt $l.Patch) -or
-        ($r.Major -eq $l.Major -and $r.Minor -eq $l.Minor -and $r.Patch -eq $l.Patch -and $r.Dev -gt $l.Dev)
-    ) {
+    if ($local.version_name -ne $remote.version_name) {
         $StatusText.Text = "Доступна новая версия!"
-        $StatusText.Foreground = "#4CAF50"
+        $StatusText.Foreground = "#ccff00"
         $UpdateButton.IsEnabled = $true
     }
     else {
