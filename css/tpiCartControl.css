@@ -1286,6 +1286,7 @@ button.tpi-cc--print-current-row {
     border: 0;
     cursor: pointer;
     background: #fc0;
+    box-shadow: #0000001c 0px 0px 0px 2px inset;
 
     i.tpi-cc--table-tbody-data-icon{
         width: 1rem;
@@ -1299,6 +1300,40 @@ button.tpi-cc--print-current-row {
     }
             
     &:active{
+        filter: brightness(.85);
+        transform: scale(.97);
+    }
+
+
+
+    &[tpi-cc-printing-state="loading"]{
+        background-image: repeating-linear-gradient(-45deg, #e8e8e8, #e8e8e8 6px, #d1d1d1 0, #d1d1d1 12px);
+        background-size: 119px;
+        background-position: 0%;
+        animation: tpi-cc-printing-state-loading 2s infinite linear;
+        filter: unset !important;
+        cursor: wait;
+    }
+
+    svg.tpi-cc-print-all-icon-loading{
+        display: none;
+    }
+
+    &[tpi-cc-printing-state="loading"] svg.tpi-cc-print-current-row-icon-static{
+        display: none;
+    }
+
+    &[tpi-cc-printing-state="loading"] svg.tpi-cc-print-all-icon-loading{
+        display: flex;
+    }
+
+    &:not([tpi-cc-printing-state="loading"]):hover,
+    &:not([tpi-cc-printing-state="loading"]):focus-visible{
+        outline: 0;
+        filter: brightness(.95);
+    }
+            
+    &:not([tpi-cc-printing-state="loading"]):active{
         filter: brightness(.85);
         transform: scale(.97);
     }
@@ -1317,6 +1352,7 @@ div.tpi-cc--dcoument-eapp{
     background: #e8e8e8;
     padding: 8px;
     color: #212121;
+    box-shadow: #0000001c 0px 0px 0px 2px inset;
     i.tpi-cc--table-tbody-data-icon{
         width: 1rem;
         height: 1rem;
@@ -1371,6 +1407,7 @@ p.tpi-cc--table-tbody-data-courier-print-text {
     gap: 20px;
     padding: 16px 20px;
     color: #000;
+    container-type: inline-size;
     border: 1px solid #e8e8e8;
     border-radius: 20px;
     position: relative;
@@ -2169,6 +2206,12 @@ p.tpi-cc-dropdown-label-name{
     color: #212121;
     min-width: 100px;
 }
+/* 
+.tpi-cc-data-flex-wraper{
+    display: flex;
+    min-height: 50px;
+    gap: 20px;
+} */
 
 .tpi-cc-data-item-container {
     gap: .5ch;
@@ -2623,6 +2666,7 @@ button.tpi-cc-print-all {
     align-items: center;
     justify-content: center;
     min-width: 170px;
+    min-height: 50px;
     padding: 0px 10px;
     gap: 12px;
     background: #fc0;
@@ -2693,5 +2737,19 @@ button.tpi-cc-print-all {
     }
     to{
         background-position: 100%;
+    }
+}
+
+/* Для свернутого сайдбара */
+body:has(div.menuContainer-noHover___JTvWc[data-e2e="sidebar-next"]) .tpi-cc-print-all {
+    @media screen and (max-width: 1240px) {
+        margin-left: 0 !important;
+    }
+}
+
+/* Для развернутого сайдбара */
+body:has(div.menuContainer-expanded___Gukjt[data-e2e="sidebar-next"]) .tpi-cc-print-all {
+    @media screen and (max-width: 1552px) {
+        margin-left: 0 !important;
     }
 }
