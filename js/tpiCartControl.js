@@ -744,9 +744,21 @@ async function tpiCheckDataInFirebase(selectedDate) {
         };
         
     } catch (error) {
-        console.error('💥 TPI Ошибка при проверке данных в Firebase:', error);
+        console.log('💥 TPI Ошибка при проверке данных в Firebase:', error);
+        makeErrorMessage()
         return { exists: false, hasCartPalletData: false };
     }
+}
+
+function makeErrorMessage(){
+    const no_data_storage_container = document.querySelector('tpi-cc--no-ds-data-container')
+    const no_data_storage_title = document.querySelector('.tpi-cc--no-ds-data-title p')
+    const no_data_storage_description = document.querySelector('p.tpi-cc--no-ds-data-description-block')
+    const no_data_storage_description_sub = document.querySelector('p.tpi-cc--no-ds-data-description-block-sub')
+    no_data_storage_container.setAttribute('tpi-current-state', error)
+    no_data_storage_title.innerText = `Ошибка загрузки базы данных`
+    no_data_storage_description.innerText = `Во время загрузки информации из базы данных произошла ошибка, пожалуйста перезагрузите страницу или подождите несколько минут`
+    no_data_storage_description_sub.innerText = `Чаще всего данная проблема связана с проблемным соединением (интернет), если на пк работает VPN, обязательно выключите его!`
 }
 
 // Функция для загрузки данных из Firebase
@@ -1012,11 +1024,6 @@ tpi_cc_i_filter_down = `
     <path d="M240 96h64a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16h-64a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16zm0 128h128a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16H240a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16zm256 192H240a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h256a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm-256-64h192a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16H240a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16zm-64 0h-48V48a16 16 0 0 0-16-16H80a16 16 0 0 0-16 16v304H16c-14.19 0-21.37 17.24-11.29 27.31l80 96a16 16 0 0 0 22.62 0l80-96C197.35 369.26 190.22 352 176 352z"></path>
 </svg>
 `,
-tpi_cc_i_print_row = `
-<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
-    <path d="M5 1a2 2 0 0 0-2 2v1h10V3a2 2 0 0 0-2-2zm6 8H5a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1"></path><path d="M0 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-1v-2a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2H2a2 2 0 0 1-2-2zm2.5 1a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1"></path>
-</svg>
-`,
 tpi_cc_i_search = `
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="tpi-search-icon">
     <circle class="glass" cx="10.5" cy="10.5" r="7.5" fill="none" stroke="currentcolor" stroke-width="1.5"/>
@@ -1136,19 +1143,15 @@ tpi_cc_i_circle_xmark = `
     <path d="M256 48a208 208 0 1 1 0 416 208 208 0 1 1 0-416zm0 464A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c-9.4 9.4-9.4 24.6 0 33.9l47 47-47 47c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l47-47 47 47c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-47-47 47-47c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-47 47-47-47c-9.4-9.4-24.6-9.4-33.9 0z"></path>
 </svg>
 `,
-tpi_cc_i_ring_loader = `
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" class="tpi-cc-print-all-icon-loading">
-    <radialGradient id="a12" cx=".66" fx=".66" cy=".3125" fy=".3125" gradientTransform="scale(1.5)">
-        <stop offset="0" stop-color="#000000"></stop>
-        <stop offset=".3" stop-color="#000000" stop-opacity=".9"></stop>
-        <stop offset=".6" stop-color="#000000" stop-opacity=".6"></stop>
-        <stop offset=".8" stop-color="#000000" stop-opacity=".3"></stop>
-        <stop offset="1" stop-color="#000000" stop-opacity="0"></stop>
-    </radialGradient>
-    <circle transform-origin="center" fill="none" stroke="url(#a12)" stroke-width="26" stroke-linecap="round" stroke-dasharray="200 1000" stroke-dashoffset="0" cx="100" cy="100" r="70">
-        <animateTransform type="rotate" attributeName="transform" calcMode="spline" dur="1" values="360;0" keyTimes="0;1" keySplines="0 0 1 1" repeatCount="indefinite"></animateTransform>
-    </circle>
-    <circle transform-origin="center" fill="none" opacity=".2" stroke="#000000" stroke-width="26" stroke-linecap="round" cx="100" cy="100" r="70"></circle>
+tpi_cc_i_clock_loader = `
+<svg fill="#585858" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="tpi-cc-print-all-icon-loading">
+    <path d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,20a9,9,0,1,1,9-9A9,9,0,0,1,12,21Z"></path>
+    <rect x="11" y="6" rx="1" width="2" height="7">
+        <animateTransform attributeName="transform" type="rotate" dur="9s" values="0 12 12;360 12 12" repeatCount="indefinite"></animateTransform>
+    </rect>
+    <rect x="11" y="11" rx="1" width="2" height="9">
+        <animateTransform attributeName="transform" type="rotate" dur="0.75s" values="0 12 12;360 12 12" repeatCount="indefinite"></animateTransform>
+    </rect>
 </svg>
 `,
 tpi_cc_i_print_all = `
@@ -1156,9 +1159,38 @@ tpi_cc_i_print_all = `
     <path d="M5 1a2 2 0 0 0-2 2v1h10V3a2 2 0 0 0-2-2zm6 8H5a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1"></path><path d="M0 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-1v-2a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2H2a2 2 0 0 1-2-2zm2.5 1a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1"></path>
 </svg>
 `,
+tpi_cc_i_print_row = `
+<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg" class="tpi-cc-print-all-icon-static">
+    <path d="M64 80c-8.8 0-16 7.2-16 16l0 320c0 8.8 7.2 16 16 16l320 0c8.8 0 16-7.2 16-16l0-320c0-8.8-7.2-16-16-16L64 80zM0 96C0 60.7 28.7 32 64 32l320 0c35.3 0 64 28.7 64 64l0 320c0 35.3-28.7 64-64 64L64 480c-35.3 0-64-28.7-64-64L0 96zM337 209L209 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L303 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"></path>
+</svg>
+`,
 tpi_cc_i_print_current_row = `
 <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" class="tpi-cc-print-current-row-icon-static">
     <path d="M5 1a2 2 0 0 0-2 2v1h10V3a2 2 0 0 0-2-2zm6 8H5a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1"></path><path d="M0 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-1v-2a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2H2a2 2 0 0 1-2-2zm2.5 1a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1"></path>
+</svg>
+`,
+tpi_cc_i_circle_1 = `
+<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+    <path d="M224,128a96,96,0,1,1-96-96A96,96,0,0,1,224,128Z" opacity="0.2"></path>
+    <path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216ZM140,80v96a8,8,0,0,1-16,0V95l-11.56,7.71a8,8,0,1,1-8.88-13.32l24-16A8,8,0,0,1,140,80Z"></path>
+</svg>
+`,
+tpi_cc_i_circle_2 = `
+<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+    <path d="M224,128a96,96,0,1,1-96-96A96,96,0,0,1,224,128Z" opacity="0.2"></path>
+    <path d="M153.56,123.26,120,168h32a8,8,0,0,1,0,16H104a8,8,0,0,1-6.4-12.8l43.17-57.56a16,16,0,1,0-27.86-15,8,8,0,0,1-15.09-5.34,32,32,0,1,1,55.74,29.93ZM232,128A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"></path>
+</svg>
+`,
+tpi_cc_i_circle_3 = `
+<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+    <path d="M224,128a96,96,0,1,1-96-96A96,96,0,0,1,224,128Z" opacity="0.2"></path>
+    <path d="M160,152a36,36,0,0,1-61.71,25.19A8,8,0,1,1,109.71,166,20,20,0,1,0,124,132a8,8,0,0,1-6.55-12.59L136.63,92H104a8,8,0,0,1,0-16h48a8,8,0,0,1,6.55,12.59l-21,30A36.07,36.07,0,0,1,160,152Zm72-24A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"></path>
+</svg>
+`,
+tpi_cc_i_circle_4 = `
+<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+    <path d="M224,128a96,96,0,1,1-96-96A96,96,0,0,1,224,128Z" opacity="0.2"></path>
+    <path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm32-72h-8V80a8,8,0,0,0-14.31-4.91l-56,72A8,8,0,0,0,88,160h48v16a8,8,0,0,0,16,0V160h8a8,8,0,0,0,0-16Zm-24,0H104.36L136,103.32Z"></path>
 </svg>
 `
 
@@ -1273,10 +1305,33 @@ function checkiIs__onCartControlsPage() {
                             <p class="tpi-cc-data-item-title" id="tpi-cc-data-filtered-couriers">Фильтр: <span>0</span></p>
                         </div>
                     </div>
-                    <button class="tpi-cc-print-all" tpi-cc-printing-state="static">
-                        <p class="tpi-cc-print-all-text">Распечатать все</p>
-                        <i class="tpi-cc-print-all-icon">${tpi_cc_i_print_all}${tpi_cc_i_ring_loader}</i>
-                    </button>
+                    <div class="tpi-cc-print-items-wrapper">
+                        <div class="tpi-cc-print-row">
+                            <p class="tpi-cc-print-row-title">
+                                <span class="tpi-cc-print-row-title-span">В</span>
+                                <span class="tpi-cc-print-row-title-span">ы</span>
+                                <span class="tpi-cc-print-row-title-span">б</span>
+                                <span class="tpi-cc-print-row-title-span">р</span>
+                                <span class="tpi-cc-print-row-title-span">а</span>
+                                <span class="tpi-cc-print-row-title-span">т</span>
+                                <span class="tpi-cc-print-row-title-span">ь</span>
+                                <span class="tpi-cc-print-row-title-span">р</span>
+                                <span class="tpi-cc-print-row-title-span">я</span>
+                                <span class="tpi-cc-print-row-title-span">д</span>
+                            </p>
+                            <i class="tpi-cc-print-row-icon">${tpi_cc_i_print_row}${tpi_cc_i_clock_loader}</i>
+                            <div class="tpi-cc-print-row-data">
+                                <button class="tpi-print-row-button" tpi-cc-printing-row-index="1">${tpi_cc_i_circle_1}</button>
+                                <button class="tpi-print-row-button" tpi-cc-printing-row-index="2">${tpi_cc_i_circle_2}</button>
+                                <button class="tpi-print-row-button" tpi-cc-printing-row-index="3">${tpi_cc_i_circle_3}</button>
+                                <button class="tpi-print-row-button" tpi-cc-printing-row-index="4">${tpi_cc_i_circle_4}</button>
+                            </div>
+                        </div>
+                        <button class="tpi-cc-print-all" tpi-cc-printing-state="static">
+                            <p class="tpi-cc-print-all-text">Распечатать все</p>
+                            <i class="tpi-cc-print-all-icon">${tpi_cc_i_print_all}${tpi_cc_i_clock_loader}</i>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1448,9 +1503,9 @@ function checkiIs__onCartControlsPage() {
                         </div>
                     </div>
                 </div>
-                <button class="tpi-cc-process-manager-button" tpi-cc-action="print">
+                <button class="tpi-cc-process-manager-button" tpi-cc-action="print" tpi-cc-printing-state="static">
                     <p>Печать</p>
-                    <i class="tpi-cc-progress-action-icon">${tpi_cc_i_courier_print}</i>
+                    <i class="tpi-cc-progress-action-icon">${tpi_cc_i_print_all}${tpi_cc_i_clock_loader}</i>
                 </button>
                 <button class="tpi-cc-process-manager-button" tpi-cc-action="delete">
                     <p>Удалить</p>
@@ -1953,6 +2008,7 @@ async function tpiLoadAndDisplayData(selectedDate) {
             if (!tpi_cc_tableSortInitialized) {
                 tpi_cc_filteringColumnData();
             }
+            initializePrintRowHighlight();
         }
         
         // Показываем таблицу, скрываем лоадер
@@ -2904,7 +2960,7 @@ function updatePrintButtonsVisibility() {
                 if (appLink) {
                     const printButtonHtml = `
                         <button class="tpi-cc--print-current-row">
-                            <i class="tpi-cc--table-tbody-data-icon">${tpi_cc_i_print_current_row}${tpi_cc_i_ring_loader}</i>
+                            <i class="tpi-cc--table-tbody-data-icon">${tpi_cc_i_print_current_row}${tpi_cc_i_clock_loader}</i>
                         </button>
                     `;
                     appLink.insertAdjacentHTML('afterend', printButtonHtml);
@@ -3108,7 +3164,7 @@ function createCourierTableRow(courierData, index) {
                     <i class="tpi-cc--table-tbody-data-icon">${tpi_cc_i_courier_app}</i>
                 </a>
                 <button class="tpi-cc--print-current-row">
-                    <i class="tpi-cc--table-tbody-data-icon">${tpi_cc_i_print_current_row}${tpi_cc_i_ring_loader}</i>
+                    <i class="tpi-cc--table-tbody-data-icon">${tpi_cc_i_print_current_row}${tpi_cc_i_clock_loader}</i>
                 </button>
             </div>
         `;
@@ -3537,6 +3593,7 @@ async function fillCouriersTableAndSaveToFirebase() {
         initializeAllFilters();
         cartPallet_btnActions();
         tpi_cc_filteringColumnData();
+        initializePrintRowHighlight();
         
     } catch (error) {
         console.log('💥 Ошибка при заполнении таблицы и сохранении в Firebase:', error);
@@ -5510,9 +5567,8 @@ function restoreOriginalRowOrder() {
     
     // Восстанавливаем фильтры
     applyAllFilters();
-    
-    // Восстанавливаем обработчики событий
     restoreEventListeners();
+    initializePrintRowHighlight();
 }
 
 function removeNoResultsMessage() {
@@ -5591,7 +5647,8 @@ function restoreEventListeners() {
         // Удаляем старые обработчики
         const newBtn = btn.cloneNode(true);
         btn.parentNode.replaceChild(newBtn, btn);
-        
+        initializePrintRowHighlight();
+
         // Добавляем новый обработчик
         newBtn.addEventListener('click', () => {
             if (newBtn.hasAttribute('tpi-cc-selected-courier-cell')) {
@@ -6477,6 +6534,7 @@ async function updateTableDataFromAPI(selectedDate) {
             if (savedToFirebase) {
                 console.log('✅ Данные успешно сохранены в Firebase');
                 tpiNotification.show('Обновление', 'success', `Обновлено ${updatedCount} записей`);
+                initializePrintRowHighlight();
             }
         } else {
             console.log('✅ Данные уже актуальны');
@@ -7853,7 +7911,7 @@ async function tpi_cc_generatePDFlabels_toPrint() {
         const now = new Date();
         const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
-        pdf.save(`etiketki_${dateStr}.pdf`);
+        pdf.save(`Все_курьеры_${dateStr}.pdf`);
 
         if (printButton) printButton.removeAttribute('tpi-cc-printing-state');
         if (printText) printText.textContent = originalText;
@@ -8261,3 +8319,120 @@ document.addEventListener('click', function(event) {
         }
     }, 50);
 });
+
+// D-
+// D-
+// D-   Кнопка выделить ряд
+// D-
+// D-
+
+function initializePrintRowHighlight() {
+    const printRowButtons = document.querySelectorAll('.tpi-print-row-button');
+    
+    printRowButtons.forEach(button => {
+        // Удаляем старые обработчики, если они есть
+        button.removeEventListener('mouseenter', handlePrintButtonMouseEnter);
+        button.removeEventListener('mouseleave', handlePrintButtonMouseLeave);
+        button.removeEventListener('click', handlePrintButtonClick);
+        
+        // Добавляем новые обработчики
+        button.addEventListener('mouseenter', handlePrintButtonMouseEnter);
+        button.addEventListener('mouseleave', handlePrintButtonMouseLeave);
+        button.addEventListener('click', handlePrintButtonClick);
+    });
+}
+
+// Обработчик наведения мыши на кнопку печати
+function handlePrintButtonMouseEnter(event) {
+    const button = event.currentTarget;
+    const rowIndex = button.getAttribute('tpi-cc-printing-row-index');
+    
+    if (!rowIndex) return;
+    
+    // Находим все строки таблицы
+    const rows = document.querySelectorAll('.tpi-cc--table-tbody');
+    
+    rows.forEach(row => {
+        // Находим кнопки CART и PALLET в строке с нужным индексом (nth-child)
+        const cartButtons = row.querySelectorAll('.tpi-cc-table-tbody-data-cart-id');
+        const palletButtons = row.querySelectorAll('.tpi-cc-table-tbody-data-pallet-id');
+        
+        // Подсвечиваем кнопку CART с нужным индексом (1-based)
+        if (cartButtons.length >= rowIndex) {
+            const targetCartButton = cartButtons[parseInt(rowIndex) - 1];
+            if (targetCartButton) {
+                targetCartButton.setAttribute('tpi-cc-highlighted_row', '');
+            }
+        }
+        
+        // Подсвечиваем кнопку PALLET с нужным индексом (1-based)
+        if (palletButtons.length >= rowIndex) {
+            const targetPalletButton = palletButtons[parseInt(rowIndex) - 1];
+            if (targetPalletButton) {
+                targetPalletButton.setAttribute('tpi-cc-highlighted_row', '');
+            }
+        }
+    });
+}
+
+// Обработчик ухода мыши с кнопки печати
+function handlePrintButtonMouseLeave(event) {
+    // Убираем подсветку со всех кнопок
+    const highlightedButtons = document.querySelectorAll('[tpi-cc-highlighted_row]');
+    highlightedButtons.forEach(btn => {
+        btn.removeAttribute('tpi-cc-highlighted_row');
+    });
+}
+
+// Обработчик клика на кнопку печати
+function handlePrintButtonClick(event) {
+    const button = event.currentTarget;
+    const rowIndex = button.getAttribute('tpi-cc-printing-row-index');
+    
+    if (!rowIndex) return;
+    
+    // Находим все строки таблицы
+    const rows = document.querySelectorAll('.tpi-cc--table-tbody');
+    
+    rows.forEach(row => {
+        // Находим кнопки CART и PALLET в строке с нужным индексом
+        const cartButtons = row.querySelectorAll('.tpi-cc-table-tbody-data-cart-id');
+        const palletButtons = row.querySelectorAll('.tpi-cc-table-tbody-data-pallet-id');
+        
+        // Выделяем кнопку CART с нужным индексом
+        if (cartButtons.length >= rowIndex) {
+            const targetCartButton = cartButtons[parseInt(rowIndex) - 1];
+            if (targetCartButton) {
+                targetCartButton.setAttribute('tpi-cc-selected-courier-cell', '');
+            }
+        }
+        
+        // Выделяем кнопку PALLET с нужным индексом
+        if (palletButtons.length >= rowIndex) {
+            const targetPalletButton = palletButtons[parseInt(rowIndex) - 1];
+            if (targetPalletButton) {
+                targetPalletButton.setAttribute('tpi-cc-selected-courier-cell', '');
+            }
+        }
+    });
+    
+    // Обновляем контейнер действий после выделения
+    update_ActionProcessContainer();
+}
+
+// Функция для очистки подсветки всех строк
+function clearAllHighlights() {
+    const highlightedButtons = document.querySelectorAll('[tpi-cc-highlighted_row]');
+    highlightedButtons.forEach(btn => {
+        btn.removeAttribute('tpi-cc-highlighted_row');
+    });
+}
+
+// Функция для очистки выделения всех кнопок
+function clearAllSelections() {
+    const selectedButtons = document.querySelectorAll('[tpi-cc-selected-courier-cell]');
+    selectedButtons.forEach(btn => {
+        btn.removeAttribute('tpi-cc-selected-courier-cell');
+    });
+    update_ActionProcessContainer();
+}

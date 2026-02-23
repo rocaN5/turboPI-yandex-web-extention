@@ -397,12 +397,14 @@ button.tpi-cc--table-tbody-data-button.tpi-cc-table-tbody-data-cart-id{
     }
 
     &:hover::before,
-    &:focus-visible::before{
+    &:focus-visible::before,
+    &[tpi-cc-highlighted_row]::before{
         transform: scale(.95);
         transition: 200ms cubic-bezier(.17,.73,0,1.32);
     }
 
-    &:hover{
+    &:hover,
+    &[tpi-cc-highlighted_row]{
         color: #fff;
         cursor: pointer;
     }
@@ -638,7 +640,7 @@ p.tpi-cc--table-tbody-data-sort-progress {
 .tpi-cc-process-manager-wrapper{
     position: sticky;
     bottom: 16px;
-    z-index: 10;
+    z-index: 999;
     justify-content: center;
     align-items: center;
     margin-top: 20px;
@@ -699,13 +701,40 @@ p.tpi-cc--table-tbody-data-sort-progress {
     gap: 10px;
     align-items: center;
 
-    &:hover{
+    &[tpi-cc-printing-state="loading"]{
+        background-image: repeating-linear-gradient(-45deg, #e8e8e8, #e8e8e8 6px, #d1d1d1 0, #d1d1d1 12px);
+        background-position: 0%;
+        background-size: 122px;
+        animation: 1s linear infinite reverse tpi-cc-printing-state-loading;
+        filter: unset !important;
+        cursor: wait;
+    }
+
+    svg.tpi-cc-print-all-icon-loading{
+        display: none;
+    }
+
+    &[tpi-cc-printing-state="loading"] svg.tpi-cc-print-all-icon-static{
+        display: none;
+    }
+
+    &[tpi-cc-printing-state="loading"] svg.tpi-cc-print-all-icon-loading{
+        display: flex;
+    }
+
+    &:not([tpi-cc-printing-state="loading"]):hover,
+    &:not([tpi-cc-printing-state="loading"]):focus-visible{
+        outline: 0;
         filter: brightness(.95);
     }
             
-    &:active{
+    &:not([tpi-cc-printing-state="loading"]):active{
         filter: brightness(.85);
         transform: scale(.97);
+    }
+
+    &[tpi-cc-printing-state="loading"] p{
+        color: #585858;
     }
 
     p{
@@ -2660,7 +2689,193 @@ li.tpi-cc-graph-total-item {
 .tpi-cc-graph-container .echarts-grid [class*="yAxis"] {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
+/*@                 */
+/*@                 */
+/*@     Print row   */
+/*@                 */
+/*@                 */
 
+.tpi-cc-print-items-wrapper{
+    display: flex;
+    gap: 10px;
+    margin-left: auto;
+    align-items: center;
+    background: transparent;
+}
+
+.tpi-cc-print-row{
+    height: 40px;
+    background: #e8e8e8;
+    border-radius: 10px;
+    box-shadow: #0000001c 0px 0px 0px 2px inset;
+    padding: 0 10px;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    cursor: pointer;
+    gap: 10px;
+    overflow: hidden;
+    position: relative;
+    transition: 150ms ease-out;
+    &[sheva_r6]{cursor: none;}
+
+    &[tpi-cc-printing-state="loading"]{
+        background-image: repeating-linear-gradient(-45deg, #e8e8e8, #e8e8e8 6px, #d1d1d1 0, #d1d1d1 12px);
+        background-size: 119px;
+        background-position: 0%;
+        animation: tpi-cc-printing-state-loading 1s infinite linear;
+        filter: unset !important;
+        cursor: wait;
+    }
+
+    i.tpi-cc-print-row-icon:has(svg.tpi-cc-print-all-icon-static){
+        padding: 2px;
+    }
+
+    svg.tpi-cc-print-all-icon-loading{
+        display: none;
+    }
+
+    &[tpi-cc-printing-state="loading"] svg.tpi-cc-print-all-icon-static{
+        display: none;
+    }
+
+    &[tpi-cc-printing-state="loading"] svg.tpi-cc-print-all-icon-loading{
+        display: flex;
+    }
+
+    &:not([tpi-cc-printing-state="loading"]):hover,
+    &:not([tpi-cc-printing-state="loading"]):focus-visible{
+        outline: 0;
+        filter: brightness(.95);
+    }
+    &:not([tpi-cc-printing-state="loading"]):hover span.tpi-cc-print-row-title-span,
+    &:not([tpi-cc-printing-state="loading"]):hover i.tpi-cc-print-row-icon,
+    &:not([tpi-cc-printing-state="loading"]):focus-visible span.tpi-cc-print-row-title-span,
+    &:not([tpi-cc-printing-state="loading"]):focus-visible i.tpi-cc-print-row-icon,
+    &:not([tpi-cc-printing-state="loading"]):has(button:hover) span.tpi-cc-print-row-title-span,
+    &:not([tpi-cc-printing-state="loading"]):has(button:hover) i.tpi-cc-print-row-icon,
+    &:not([tpi-cc-printing-state="loading"]):has(button:focus-visible) span.tpi-cc-print-row-title-span,
+    &:not([tpi-cc-printing-state="loading"]):has(button:focus-visible) i.tpi-cc-print-row-icon{
+        transform: translateY(-35px);
+    }
+    &:not([tpi-cc-printing-state="loading"]):hover button.tpi-print-row-button,
+    &:not([tpi-cc-printing-state="loading"]):focus-visible button.tpi-print-row-button,
+    &:not([tpi-cc-printing-state="loading"]):focus-visible button.tpi-print-row-button,
+    &:not([tpi-cc-printing-state="loading"]):has(button:hover) button.tpi-print-row-button,
+    &:not([tpi-cc-printing-state="loading"]):has(button:focus-visible) button.tpi-print-row-button{
+        transform: translateY(0px) !important;
+    }
+
+    i.tpi-cc-print-row-icon{
+        width: 18px;
+        height: 18px;
+        color: currentcolor;
+        transition: transform 300ms ease-in-out 125ms;
+    }
+}
+
+.tpi-cc-print-row p.tpi-cc-print-row-title{
+    margin: 0;
+    font-weight: 500;
+    color: #212121;
+    display: flex;
+    &[sheva_r6]{cursor: none;}
+
+    span.tpi-cc-print-row-title-span:nth-child(1){
+        transition: transform 300ms ease-in-out 125ms, color 100ms ease-in-out;
+    }
+    span.tpi-cc-print-row-title-span:nth-child(2){
+        transition: transform 300ms ease-in-out 100ms, color 100ms ease-in-out;
+    }
+    span.tpi-cc-print-row-title-span:nth-child(3){
+        transition: transform 300ms ease-in-out 75ms, color 100ms ease-in-out;
+    }
+    span.tpi-cc-print-row-title-span:nth-child(4){
+        transition: transform 300ms ease-in-out 50ms, color 100ms ease-in-out;
+    }
+    span.tpi-cc-print-row-title-span:nth-child(5){
+        transition: transform 300ms ease-in-out 25ms, color 100ms ease-in-out;
+    }
+    span.tpi-cc-print-row-title-span:nth-child(6){
+        transition: transform 300ms ease-in-out 0ms, color 100ms ease-in-out;
+    }
+    span.tpi-cc-print-row-title-span:nth-child(7){
+        transition: transform 300ms ease-in-out 25ms, color 100ms ease-in-out;
+    }
+    span.tpi-cc-print-row-title-span:nth-child(8){
+        transition: transform 300ms ease-in-out 50ms, color 100ms ease-in-out;
+        margin-left: .4ch;
+    }
+    span.tpi-cc-print-row-title-span:nth-child(9){
+        transition: transform 300ms ease-in-out 75ms, color 100ms ease-in-out;
+    }
+    span.tpi-cc-print-row-title-span:nth-child(10){
+        transition: transform 300ms ease-in-out 100ms, color 100ms ease-in-out;
+    }
+}
+
+.tpi-cc-print-row-data {
+    display: flex;
+    gap: 6px;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    pointer-events: none;
+    &[sheva_r6]{cursor: none;}
+
+    button.tpi-print-row-button {
+        cursor: pointer;
+        width: 25px;
+        height: 25px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: 0;
+        border-radius: 5px;
+        padding: 3px;
+        transform: translateY(35px);
+        pointer-events: all;
+        font-weight: 800;
+        background: #212121 ;
+        color: #fff;
+        box-shadow: #ffffff63 0px 0px 0px 2px inset;
+    }
+
+    button.tpi-print-row-button:hover,
+    button.tpi-print-row-button:focus-visible{
+        background: #fc0;
+        box-shadow: #0000001c 0px 0px 0px 2px inset;
+        outline: 0;
+        color: #212121;
+    }
+    
+    button.tpi-print-row-button:active{
+        background: #fc0;
+        filter: brightness(.85);
+        scale: .75;
+    }
+
+    button.tpi-print-row-button:nth-child(1){
+        transition: all 200ms ease-in-out, transform 300ms ease-in-out 100ms, opacity 300ms ease-in-out 100ms;
+    }
+    button.tpi-print-row-button:nth-child(2){
+        transition: all 200ms ease-in-out, transform 300ms ease-in-out 100ms, opacity 300ms ease-in-out 100ms;
+    }
+    button.tpi-print-row-button:nth-child(3){
+        transition: all 200ms ease-in-out, transform 300ms ease-in-out 100ms, opacity 300ms ease-in-out 100ms;
+    }
+    button.tpi-print-row-button:nth-child(4){
+        transition: all 200ms ease-in-out, transform 300ms ease-in-out 100ms, opacity 300ms ease-in-out 100ms;
+    }
+}
+
+/*@                 */
+/*@                 */
+/*@     Print row   */
+/*@                 */
+/*@                 */
 button.tpi-cc-print-all {
     display: flex;
     align-items: center;
@@ -2671,12 +2886,16 @@ button.tpi-cc-print-all {
     gap: 12px;
     background: #fc0;
     border-radius: 10px;
-    margin-left: auto;
+    /* margin-left: auto; */
     border: 0;
     cursor: pointer;
     user-select: none;
     color: #212121;
     box-shadow: 0px 0px 0px 2px inset #0000001c;
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+    --tpi-cc-printing-progress: 0%;
 
     i.tpi-cc-print-all-icon {
         width: 18px;
@@ -2692,6 +2911,22 @@ button.tpi-cc-print-all {
         font-weight: 800;
         color: currentColor;
     }
+
+    /* &[tpi-cc-printing-state="loading"]::before {
+        content: '';
+        display: flex;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: var(--tpi-cc-printing-progress);
+        height: 100%;
+        background: #fc0;
+        z-index: -1;
+        border-radius: 10px;
+        transition: 300ms;
+        background-size: 119px;
+        opacity: .9;
+    } */
 
     &[tpi-cc-printing-state="loading"]{
         background-image: repeating-linear-gradient(-45deg, #e8e8e8, #e8e8e8 6px, #d1d1d1 0, #d1d1d1 12px);
@@ -2741,15 +2976,16 @@ button.tpi-cc-print-all {
 }
 
 /* Для свернутого сайдбара */
-body:has(div.menuContainer-noHover___JTvWc[data-e2e="sidebar-next"]) .tpi-cc-print-all {
-    @media screen and (max-width: 1240px) {
+body:has(div.menuContainer-noHover___JTvWc[data-e2e="sidebar-next"]) .tpi-cc-print-items-wrapper {
+    @media screen and (max-width: 1543px) {
         margin-left: 0 !important;
     }
 }
 
 /* Для развернутого сайдбара */
-body:has(div.menuContainer-expanded___Gukjt[data-e2e="sidebar-next"]) .tpi-cc-print-all {
-    @media screen and (max-width: 1552px) {
+body:has(div.menuContainer-expanded___Gukjt[data-e2e="sidebar-next"]) .tpi-cc-print-items-wrapper {
+    @media screen and (max-width: 1700px) {
         margin-left: 0 !important;
     }
 }
+
