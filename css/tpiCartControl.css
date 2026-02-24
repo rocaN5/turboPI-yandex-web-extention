@@ -370,7 +370,23 @@ button.tpi-cc--table-tbody-data-button.tpi-cc-table-tbody-data-cart-id{
     display: flex;
     align-items: center;
     gap: 0;
-    &:hover{
+
+    &:not[tpi-cc-day-passed]:disabled:hover{
+        cursor: wait;
+        filter: brightness(.9);
+    }
+
+    &[tpi-cc-day-passed]{
+        background: #d5ffc1 !important;
+        color: #018700 !important;
+    }
+
+    &[tpi-cc-day-passed]:hover{
+        cursor: not-allowed;
+        filter: brightness(.9);
+    }
+    
+    &:not(:disabled):hover{
         color: #fff;
         z-index: 2;
     }
@@ -391,20 +407,20 @@ button.tpi-cc--table-tbody-data-button.tpi-cc-table-tbody-data-cart-id{
         transition: 50ms ease-in-out;
         transform: scale(0);
     }
-    &:focus-visible{
+    &:not(:disabled):focus-visible{
         color: #fff;
         outline: none;
     }
 
-    &:hover::before,
-    &:focus-visible::before,
-    &[tpi-cc-highlighted_row]::before{
+    &:not(:disabled):hover::before,
+    &:not(:disabled):focus-visible::before,
+    &:not(:disabled)[tpi-cc-highlighted_row]::before{
         transform: scale(.95);
         transition: 200ms cubic-bezier(.17,.73,0,1.32);
     }
 
-    &:hover,
-    &[tpi-cc-highlighted_row]{
+    &:not(:disabled):hover,
+    &:not(:disabled)[tpi-cc-highlighted_row]{
         color: #fff;
         cursor: pointer;
     }
@@ -483,6 +499,11 @@ button.tpi-cc--table-tbody-data-button.tpi-cc-table-tbody-data-pallet-id{
     &[tpi-cc-selected-courier-cell]:focus-visible::before{
         animation: tpi-cc-selected-pallet 500ms ease-in-out alternate infinite 750ms;
     }
+    
+    &[tpi-cc-day-passed]{
+        background: #f8ffc1 !important;
+        color: #778700 !important;
+    }
 }
 
 @keyframes tpi-cc-selected-pallet {
@@ -503,6 +524,10 @@ div.tpi-cc--carts-control-buttons-wrapper{
     display: flex;
     gap: 1ch;
     align-items: center;
+
+    &:has(button:disabled){
+        display: none;
+    }
 }
 
 button.tpi-cc--table-tbody-add-cart,
@@ -570,6 +595,11 @@ button.tpi-cc--table-tbody-add-pallet{
     &:active::before{
         box-shadow: 0px 0px 0px 2px;
         filter: brightness(.95);
+    }
+
+    &[tpi-cc-day-passed],
+    &:disabled{
+        display: none;
     }
 }
 
@@ -700,6 +730,25 @@ p.tpi-cc--table-tbody-data-sort-progress {
     display: flex;
     gap: 10px;
     align-items: center;
+    position: relative;
+    overflow: hidden;
+
+    .tpi-cc-print-selected-progress-bar {
+        position: absolute;
+        display: flex;
+        width: 0%;
+        height: 100%;
+        border-radius: 8px;
+        left: 0;
+        top: 0;
+        box-shadow: #0000001c 0px 0px 0px 2px inset, 0px 0px 10px 0px #000000bf;
+        background: #ffcc00c7;
+        transition: width 100ms linear;
+    }
+    
+    &:not([tpi-cc-printing-state="loading"]) .tpi-cc-print-selected-progress-bar{
+        display: none;
+    }
 
     &[tpi-cc-printing-state="loading"]{
         background-image: repeating-linear-gradient(-45deg, #e8e8e8, #e8e8e8 6px, #d1d1d1 0, #d1d1d1 12px);
@@ -708,10 +757,12 @@ p.tpi-cc--table-tbody-data-sort-progress {
         animation: 1s linear infinite reverse tpi-cc-printing-state-loading;
         filter: unset !important;
         cursor: wait;
+        color: #000;
     }
 
     svg.tpi-cc-print-all-icon-loading{
         display: none;
+        fill: currentColor !important;
     }
 
     &[tpi-cc-printing-state="loading"] svg.tpi-cc-print-all-icon-static{
@@ -733,17 +784,29 @@ p.tpi-cc--table-tbody-data-sort-progress {
         transform: scale(.97);
     }
 
-    &[tpi-cc-printing-state="loading"] p{
-        color: #585858;
+    &[tpi-cc-printing-state="loading"] p.tpi-cc-progress-action-icon{
+        margin-left: auto;
     }
 
-    p{
+     &[tpi-cc-printing-state="loading"] p.tpi-cc-process-manager-text{
+        min-width: 47px;
+        text-align: center;
+        color: currentColor;
+     }
+
+    p.tpi-cc-process-manager-text{
         margin: 0;
+        z-index: 0;
+    }
+
+    span{
+        display: none;
     }
 
     i.tpi-cc-progress-action-icon{
         width: 1rem;
         height: 1rem;
+        z-index: 0;
     }
     i.tpi-cc-progress-action-icon svg{
         width: 100%;
@@ -751,6 +814,11 @@ p.tpi-cc--table-tbody-data-sort-progress {
     }
     &[tpi-cc-action="delete"]{
         background: #e8e8e8;
+    }
+
+    &[tpi-cc-action="print"]{
+        width: 106px;
+        max-width: 106px;
     }
 }
 .tpi-cc-process-manager-block .tpi-cc-process-manager-close{
@@ -2703,7 +2771,7 @@ li.tpi-cc-graph-total-item {
     background: transparent;
 }
 
-.tpi-cc-print-row{
+div.tpi-cc-print-row{
     height: 40px;
     background: #e8e8e8;
     border-radius: 10px;
@@ -2843,15 +2911,22 @@ li.tpi-cc-graph-total-item {
         box-shadow: #ffffff63 0px 0px 0px 2px inset;
     }
 
-    button.tpi-print-row-button:hover,
-    button.tpi-print-row-button:focus-visible{
+    button.tpi-print-row-button:not(:disabled):hover,
+    button.tpi-print-row-button:not(:disabled):focus-visible{
         background: #fc0;
         box-shadow: #0000001c 0px 0px 0px 2px inset;
         outline: 0;
         color: #212121;
     }
+
     
-    button.tpi-print-row-button:active{
+    button.tpi-print-row-button:disabled:hover,
+    button.tpi-print-row-button:disabled:focus-visible{
+        cursor: wait;
+        filter: brightness(1.1);
+    }
+    
+    button.tpi-print-row-button:not(:disabled):active{
         background: #fc0;
         filter: brightness(.85);
         scale: .75;
@@ -2910,23 +2985,25 @@ button.tpi-cc-print-all {
         margin: 0;
         font-weight: 800;
         color: currentColor;
+        z-index: 0;
     }
 
-    /* &[tpi-cc-printing-state="loading"]::before {
-        content: '';
-        display: flex;
+    .tpi-cc-print-all-progress-bar {
         position: absolute;
+        display: flex;
+        width: 0%;
+        height: 100%;
+        border-radius: 10px;
         left: 0;
         top: 0;
-        width: var(--tpi-cc-printing-progress);
-        height: 100%;
-        background: #fc0;
-        z-index: -1;
-        border-radius: 10px;
-        transition: 300ms;
-        background-size: 119px;
-        opacity: .9;
-    } */
+        box-shadow: #0000001c 0px 0px 0px 2px inset, 0px 0px 10px 0px #000000bf;
+        background: #ffcc00c7;
+        transition: width 100ms linear;
+    }
+
+    &:not([tpi-cc-printing-state="loading"]) .tpi-cc-print-all-progress-bar{
+        display: none;
+    }
 
     &[tpi-cc-printing-state="loading"]{
         background-image: repeating-linear-gradient(-45deg, #e8e8e8, #e8e8e8 6px, #d1d1d1 0, #d1d1d1 12px);
@@ -2939,6 +3016,7 @@ button.tpi-cc-print-all {
 
     svg.tpi-cc-print-all-icon-loading{
         display: none;
+        z-index: 0;
     }
 
     &[tpi-cc-printing-state="loading"] svg.tpi-cc-print-all-icon-static{
@@ -2988,4 +3066,3 @@ body:has(div.menuContainer-expanded___Gukjt[data-e2e="sidebar-next"]) .tpi-cc-pr
         margin-left: 0 !important;
     }
 }
-

@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Яндекс Турбо ПИ",
   "version": "3.19.7",
-  "version_name": "3.19.7_dev34",
+  "version_name": "3.19.7_dev35",
   "description": "Расширение для получения дополнительной информации из ПИ 💛",
   "permissions": [
     "activeTab",
@@ -25,6 +25,7 @@
         "libs/echarts.min.js",
         
         "js/tokenSAVE.js",
+        "js/tpiTooltips.js",
         "js/anomalyBoard.js",
         "js/turboPI-label.js",
         "js/predBrak.js",
@@ -43,6 +44,7 @@
       ],
       "css": [
         "css/styles.css",
+        "css/tpiTooltips.css",
         "css/turboPI-label.css",
         "css/strokesToOreders.css",
         "css/strokeToOrders_v2.css",

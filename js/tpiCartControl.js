@@ -1217,6 +1217,7 @@ function checkiIs__onCartControlsPage() {
 
         overlay.innerHTML = 
         `
+        <div class="tpi-tooltip-by-sheva_r6"></div>
         <div class="tpi-cc--wrapper-title">
             Управление MK
         </div>
@@ -1264,24 +1265,24 @@ function checkiIs__onCartControlsPage() {
                 <div class="tpi-cc-filters-wrapper-title">
                     <p>Фильтры</p>
                     <div class="tpi-cc-filters-item">
-                        <button class="tpi-cc-filters-reset">Сбросить фильтры</button>
+                        <button class="tpi-cc-filters-reset" tpi-tooltip-data="Кнопка для сброса всех фильтров в таблице">Сбросить фильтры</button>
                     </div>
                 </div>
                 <div class="tpi-cc-filters-items-wrapper">
                     <div class="tpi-cc-filters-item">
-                        <button class="tpi-cc-search-date">
+                        <button class="tpi-cc-search-date" tpi-tooltip-data="Календарь для выбора даты отгрузки">
                             <div class="tpi-cc-search-icon">${tpi_cc_i_calendar}</div>
                             <div class="tpi-cc-search-label-title" id="tpi-cc-seleceted-date">Дата</div>
                         </button>
                     </div>
-                    <div class="tpi-cc-filters-item">
+                    <div class="tpi-cc-filters-item" tpi-tooltip-data="Поиск курьера по его ФИО">
                         <label for="tpi-cc-search-courier-name" class="tpi-cc-search-label">
                             <div class="tpi-cc-search-icon">${tpi_cc_i_search}</div>
                             <div class="tpi-cc-search-label-title">ФИО курьера</div>
                             <input type="text" id="tpi-cc-search-courier-name" placeholder="Введите ФИО курьера" autocomplete="off">
                         </label>
                     </div>
-                    <div class="tpi-cc-filters-item">
+                    <div class="tpi-cc-filters-item" tpi-tooltip-data="Поиск курьера по его ячейке">
                         <label for="tpi-cc-search-courier-cell" class="tpi-cc-search-label">
                             <div class="tpi-cc-search-icon">${tpi_cc_i_search}</div>
                             <div class="tpi-cc-search-label-title">Имя ячейки</div>
@@ -1289,24 +1290,24 @@ function checkiIs__onCartControlsPage() {
                         </label>
                     </div>
                     <div class="tpi-cc-filters-item">
-                        <label for="tpi-cc-search-courier-status" class="tpi-cc-search-label tpi-cc-search-dropdown">
+                        <label for="tpi-cc-search-courier-status" class="tpi-cc-search-label tpi-cc-search-dropdown" tpi-tooltip-data="Поиск курьера по статусу его маршрута">
                             <div class="tpi-cc-search-label-title">Статус курьера</div>
                             <input type="text" id="tpi-cc-search-courier-status" placeholder="Выберите статус курьера" autocomplete="off" value="Выбраны все">
                             <div class="tpi-cc-search-icon">${tpi_cc_i_chevron_down}</div>
                         </label>
                     </div>
                     <div class="tpi-cc-data-item">
-                        <div class="tpi-cc-data-item-container">
+                        <div class="tpi-cc-data-item-container" tpi-tooltip-data="Всего курьеров к отгрузке">
                             <i class="tpi-cc-data-item-icon">${tpi_cc_i_couriersTotal}</i>
                             <p class="tpi-cc-data-item-title" id="tpi-cc-data-total-couriers">Всего: <span>0</span></p>
                         </div>
-                        <div class="tpi-cc-data-item-container">
+                        <div class="tpi-cc-data-item-container" tpi-tooltip-data="Всего курьеров с учётом фильтров">
                             <i class="tpi-cc-data-item-icon">${tpi_cc_i_couriersFiltered}</i>
                             <p class="tpi-cc-data-item-title" id="tpi-cc-data-filtered-couriers">Фильтр: <span>0</span></p>
                         </div>
                     </div>
                     <div class="tpi-cc-print-items-wrapper">
-                        <div class="tpi-cc-print-row">
+                        <div class="tpi-cc-print-row" tpi-tooltip-data="Кнопки для выбора всех CART или PALLET у курьеров в ряду выбранной кнопки">
                             <p class="tpi-cc-print-row-title">
                                 <span class="tpi-cc-print-row-title-span">В</span>
                                 <span class="tpi-cc-print-row-title-span">ы</span>
@@ -1327,7 +1328,8 @@ function checkiIs__onCartControlsPage() {
                                 <button class="tpi-print-row-button" tpi-cc-printing-row-index="4">${tpi_cc_i_circle_4}</button>
                             </div>
                         </div>
-                        <button class="tpi-cc-print-all" tpi-cc-printing-state="static">
+                        <button class="tpi-cc-print-all" tpi-cc-printing-state="static" tpi-tooltip-data="Кнопка для печати всех CART или PALLET">
+                            <div class="tpi-cc-print-all-progress-bar"></div>
                             <p class="tpi-cc-print-all-text">Распечатать все</p>
                             <i class="tpi-cc-print-all-icon">${tpi_cc_i_print_all}${tpi_cc_i_clock_loader}</i>
                         </button>
@@ -1374,7 +1376,7 @@ function checkiIs__onCartControlsPage() {
                         <th class="tpi-cc--table-thead-item">
                             <div class="tpi-cc--table-thead-data">
                                 <p>Данные курьера</p>
-                                <i class="tpi-cc--table-thead-filter">
+                                <i class="tpi-cc--table-thead-filter" tpi-tooltip-data="Отфильтровать по данному столбцу">
                                     ${tpi_cc_i_filter_default}
                                     ${tpi_cc_i_filter_up}
                                     ${tpi_cc_i_filter_down}
@@ -1384,7 +1386,7 @@ function checkiIs__onCartControlsPage() {
                         <th class="tpi-cc--table-thead-item">
                             <div class="tpi-cc--table-thead-data">
                                 <p>Ячейка</p>
-                                <i class="tpi-cc--table-thead-filter">
+                                <i class="tpi-cc--table-thead-filter" tpi-tooltip-data="Отфильтровать по данному столбцу">
                                     ${tpi_cc_i_filter_default}
                                     ${tpi_cc_i_filter_up}
                                     ${tpi_cc_i_filter_down}
@@ -1394,7 +1396,7 @@ function checkiIs__onCartControlsPage() {
                         <th class="tpi-cc--table-thead-item" tpi-cc-filters-not-allowed>
                             <div class="tpi-cc--table-thead-data">
                                 <p>Номер CART</p>
-                                <i class="tpi-cc--table-thead-filter">
+                                <i class="tpi-cc--table-thead-filter" tpi-tooltip-data="Отфильтровать по данному столбцу">
                                     ${tpi_cc_i_filter_default}
                                     ${tpi_cc_i_filter_up}
                                     ${tpi_cc_i_filter_down}
@@ -1404,7 +1406,7 @@ function checkiIs__onCartControlsPage() {
                         <th class="tpi-cc--table-thead-item" tpi-cc-filters-not-allowed>
                             <div class="tpi-cc--table-thead-data">
                                 <p>Номер PALLET</p>
-                                <i class="tpi-cc--table-thead-filter">
+                                <i class="tpi-cc--table-thead-filter" tpi-tooltip-data="Отфильтровать по данному столбцу">
                                     ${tpi_cc_i_filter_default}
                                     ${tpi_cc_i_filter_up}
                                     ${tpi_cc_i_filter_down}
@@ -1414,7 +1416,7 @@ function checkiIs__onCartControlsPage() {
                         <th class="tpi-cc--table-thead-item">
                             <div class="tpi-cc--table-thead-data">
                                 <p>Cтатус</p>
-                                <i class="tpi-cc--table-thead-filter">
+                                <i class="tpi-cc--table-thead-filter" tpi-tooltip-data="Отфильтровать по данному столбцу">
                                     ${tpi_cc_i_filter_default}
                                     ${tpi_cc_i_filter_up}
                                     ${tpi_cc_i_filter_down}
@@ -1424,7 +1426,7 @@ function checkiIs__onCartControlsPage() {
                         <th class="tpi-cc--table-thead-item">
                             <div class="tpi-cc--table-thead-data">
                                 <p>Прогресс сортировки</p>
-                                <i class="tpi-cc--table-thead-filter">
+                                <i class="tpi-cc--table-thead-filter" tpi-tooltip-data="Отфильтровать по данному столбцу">
                                     ${tpi_cc_i_filter_default}
                                     ${tpi_cc_i_filter_up}
                                     ${tpi_cc_i_filter_down}
@@ -1434,7 +1436,7 @@ function checkiIs__onCartControlsPage() {
                         <th class="tpi-cc--table-thead-item">
                             <div class="tpi-cc--table-thead-data">
                                 <p>Прогресс подготовки</p>
-                                <i class="tpi-cc--table-thead-filter">
+                                <i class="tpi-cc--table-thead-filter" tpi-tooltip-data="Отфильтровать по данному столбцу">
                                     ${tpi_cc_i_filter_default}
                                     ${tpi_cc_i_filter_up}
                                     ${tpi_cc_i_filter_down}
@@ -1444,7 +1446,7 @@ function checkiIs__onCartControlsPage() {
                         <th class="tpi-cc--table-thead-item">
                             <div class="tpi-cc--table-thead-data">
                                 <p>Начало<br>сортировки</p>
-                                <i class="tpi-cc--table-thead-filter">
+                                <i class="tpi-cc--table-thead-filter" tpi-tooltip-data="Отфильтровать по данному столбцу">
                                     ${tpi_cc_i_filter_default}
                                     ${tpi_cc_i_filter_up}
                                     ${tpi_cc_i_filter_down}
@@ -1454,7 +1456,7 @@ function checkiIs__onCartControlsPage() {
                         <th class="tpi-cc--table-thead-item">
                             <div class="tpi-cc--table-thead-data">
                                 <p>Конец<br>сортировки</p>
-                                <i class="tpi-cc--table-thead-filter">
+                                <i class="tpi-cc--table-thead-filter" tpi-tooltip-data="Отфильтровать по данному столбцу">
                                     ${tpi_cc_i_filter_default}
                                     ${tpi_cc_i_filter_up}
                                     ${tpi_cc_i_filter_down}
@@ -1464,7 +1466,7 @@ function checkiIs__onCartControlsPage() {
                         <th class="tpi-cc--table-thead-item">
                             <div class="tpi-cc--table-thead-data">
                                 <p>Прибытие<br>курьера</p>
-                                <i class="tpi-cc--table-thead-filter">
+                                <i class="tpi-cc--table-thead-filter" tpi-tooltip-data="Отфильтровать по данному столбцу">
                                     ${tpi_cc_i_filter_default}
                                     ${tpi_cc_i_filter_up}
                                     ${tpi_cc_i_filter_down}
@@ -1474,7 +1476,7 @@ function checkiIs__onCartControlsPage() {
                         <th class="tpi-cc--table-thead-item" tpi-cc-filters-not-allowed>
                             <div class="tpi-cc--table-thead-data">
                                 <p>Печать и<br>Документы</p>
-                                <i class="tpi-cc--table-thead-filter">
+                                <i class="tpi-cc--table-thead-filter" tpi-tooltip-data="Отфильтровать по данному столбцу">
                                     ${tpi_cc_i_filter_default}
                                     ${tpi_cc_i_filter_up}
                                     ${tpi_cc_i_filter_down}
@@ -1503,15 +1505,17 @@ function checkiIs__onCartControlsPage() {
                         </div>
                     </div>
                 </div>
-                <button class="tpi-cc-process-manager-button" tpi-cc-action="print" tpi-cc-printing-state="static">
-                    <p>Печать</p>
+                <button class="tpi-cc-process-manager-button" tpi-cc-action="print" tpi-cc-printing-state="static" tpi-tooltip-data="Кнопка для печати всех выбранных CART и PALLET">
+                    <div class="tpi-cc-print-selected-progress-bar"></div>
+                    <p class="tpi-cc-process-manager-text">Печать</p>
+                    <span>Печать</span>
                     <i class="tpi-cc-progress-action-icon">${tpi_cc_i_print_all}${tpi_cc_i_clock_loader}</i>
                 </button>
-                <button class="tpi-cc-process-manager-button" tpi-cc-action="delete">
-                    <p>Удалить</p>
+                <button class="tpi-cc-process-manager-button" tpi-cc-action="delete" tpi-tooltip-data="Кнопка для удаления всех выбранных CART и PALLET">
+                    <p class="tpi-cc-process-manager-text">Удалить</p>
                     <i class="tpi-cc-progress-action-icon">${tpi_cc_i_courier_delete}</i>
                 </button>
-                <button class="tpi-cc-process-manager-close">
+                <button class="tpi-cc-process-manager-close" tpi-tooltip-data="Отменить выделение">
                     <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path d="M13.44 12 21 19.56 19.56 21 12 13.44 4.44 21 3 19.56 10.56 12 3 4.44 4.44 3 12 10.56 19.56 3 21 4.44 13.44 12Z" fill="#000"></path>
                     </svg>
@@ -1602,6 +1606,7 @@ checkiIs__onCartControlsPage()
 
 function addCartsControlsListeners(){
     waitForTokenAndRun();
+    initTooltips();
     couriersDataCapturing();
     tpi_cc_filteringColumnData()
     initializeDatePicker();
@@ -2930,24 +2935,63 @@ function canShowPrintButton() {
     );
     selectedDate.setHours(0, 0, 0, 0);
     
-    // Получаем текущую дату и время
+    // Получаем текущую дату
     const now = new Date();
     const currentDate = new Date();
     currentDate.setHours(0, 0, 0, 0);
     
-    // Текущий час
-    const currentHour = now.getHours();
+    // Получаем дату следующего дня
+    const nextDate = new Date(currentDate);
+    nextDate.setDate(nextDate.getDate() + 1);
+    nextDate.setHours(0, 0, 0, 0);
     
     // Проверяем условия:
     const isToday = selectedDate.getTime() === currentDate.getTime();
-    const isBefore23 = currentHour < 23;
+    const isTomorrow = selectedDate.getTime() === nextDate.getTime();
     
-    return isToday && isBefore23;
+    // Текущий час
+    const currentHour = now.getHours();
+    
+    return (isToday && currentHour < 23) || isTomorrow;
 }
 
 // Функция для обновления отображения кнопок печати при изменении даты
 function updatePrintButtonsVisibility() {
     const showPrintButton = canShowPrintButton();
+    const printWrapper = document.querySelector('.tpi-cc-print-items-wrapper');
+    
+    if (printWrapper) {
+        printWrapper.style.display = showPrintButton ? 'flex' : 'none';
+    }
+    
+    // Обновляем состояние всех кнопок .tpi-cc--table-tbody-data-button
+    const cartPallet_buttons = document.querySelectorAll('.tpi-cc--table-tbody-data-button');
+    cartPallet_buttons.forEach(button => {
+        if (!showPrintButton) {
+            // Если не показываем кнопки печати, добавляем атрибут и disabled
+            button.setAttribute('tpi-cc-day-passed', 'true');
+            button.setAttribute('tpi-tooltip-data', "Уже отгружен, взаимодействий нет");
+            button.disabled = true;
+        } else {
+            // Иначе убираем атрибут и disabled
+            button.removeAttribute('tpi-cc-day-passed');
+            button.disabled = false;
+        }
+    });
+    
+    const addCartPallet_button = document.querySelectorAll('.tpi-cc--carts-control-buttons-wrapper button');
+    addCartPallet_button.forEach(button => {
+        if (!showPrintButton) {
+            button.setAttribute('tpi-cc-day-passed', 'true');
+            button.setAttribute('tpi-tooltip-data', "Уже отгружен, взаимодействий нет");
+            button.disabled = true;
+        } else {
+            // Иначе убираем атрибут и disabled
+            button.removeAttribute('tpi-cc-day-passed');
+            button.disabled = false;
+        }
+    });
+    
     const printButtonsContainers = document.querySelectorAll('.tpi-cc--table-body-print-container');
     
     printButtonsContainers.forEach(container => {
@@ -2973,6 +3017,49 @@ function updatePrintButtonsVisibility() {
             }
         }
     });
+}
+
+function updateDateAndInterface() {
+    const searchDateButton = document.querySelector('.tpi-cc-search-date');
+    if (!searchDateButton) return;
+    
+    const now = new Date();
+    const currentHour = now.getHours();
+    
+    // Получаем текущую дату
+    const currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0);
+    
+    // Получаем завтрашнюю дату
+    const tomorrowDate = new Date(currentDate);
+    tomorrowDate.setDate(tomorrowDate.getDate() + 1);
+    
+    // Определяем, какую дату ставить при загрузке
+    let targetDate = currentDate;
+    
+    // Если сейчас 23:00 или позже, ставим завтрашнюю дату
+    if (currentHour >= 23) {
+        targetDate = tomorrowDate;
+    }
+    
+    // Форматируем целевую дату в формат DD/MM/YYYY
+    const targetDay = String(targetDate.getDate()).padStart(2, '0');
+    const targetMonth = String(targetDate.getMonth() + 1).padStart(2, '0');
+    const targetYear = targetDate.getFullYear();
+    const targetFormatted = `${targetDay}/${targetMonth}/${targetYear}`;
+    
+    // Устанавливаем дату в атрибут и текст
+    searchDateButton.setAttribute('tpi-cc-selected-date-value', targetFormatted);
+    
+    const selectedDateElement = document.getElementById('tpi-cc-seleceted-date');
+    if (selectedDateElement) {
+        selectedDateElement.textContent = targetFormatted;
+    }
+    
+    console.log(`📅 Установлена дата при загрузке: ${targetFormatted} (час: ${currentHour})`);
+    
+    // Обновляем интерфейс на основе установленной даты
+    updatePrintButtonsVisibility();
 }
 
 function createCourierTableRow(courierData, index) {
@@ -3027,14 +3114,14 @@ function createCourierTableRow(courierData, index) {
     if (onlineTransferActId) {
         // Если есть onlineTransferActId - создаем активную ссылку
         eappLinkHtml = `
-            <a class="tpi-cc--dcoument-eapp" href="/api/sorting-center/21972131/online-transfer-act/${onlineTransferActId}/download" target="_blank" title="ЭАПП курьера">
+            <a class="tpi-cc--dcoument-eapp" href="/api/sorting-center/21972131/online-transfer-act/${onlineTransferActId}/download" target="_blank" tpi-tooltip-data="ЭАПП курьера">
                 <i class="tpi-cc--table-tbody-data-icon">${tpi_cc_i_courier_eapp}</i>
             </a>
         `;
     } else {
         // Если нет onlineTransferActId - создаем disabled ссылку
         eappLinkHtml = `
-            <div class="tpi-cc--dcoument-eapp" disabled>
+            <div class="tpi-cc--dcoument-eapp" disabled tpi-tooltip-data="ЭАПП нет в БД, но не факт, что его нет вообще">
                 <i class="tpi-cc--table-tbody-data-icon">${tpi_cc_i_courier_eapp}</i>
             </div>
         `;
@@ -3074,7 +3161,7 @@ function createCourierTableRow(courierData, index) {
             courierData._savedCartNumbers.forEach(cartNumber => {
                 const cartId = cartNumber.replace('CART-', '');
                 cartButtonsHTML += `
-                    <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-cart-id" tpi-data-courier-spec-cell="${cartNumber}">
+                    <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-cart-id" tpi-data-courier-spec-cell="${cartNumber}" tpi-tooltip-data="Нажмите, чтобы выбрать этот CART">
                         <i class="tpi-cc-table-tbody-data-cart-icon">${tpi_cc_i_cart}</i>
                         -${cartId}
                     </button>
@@ -3085,7 +3172,7 @@ function createCourierTableRow(courierData, index) {
             for (let i = 1; i <= 4; i++) {
                 const cartNumber = `${cellNumber}${i}`;
                 cartButtonsHTML += `
-                    <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-cart-id" tpi-data-courier-spec-cell="CART-${cartNumber}">
+                    <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-cart-id" tpi-data-courier-spec-cell="CART-${cartNumber}" tpi-tooltip-data="Нажмите, чтобы выбрать этот CART">
                         <i class="tpi-cc-table-tbody-data-cart-icon">${tpi_cc_i_cart}</i>
                         -${cartNumber}
                     </button>
@@ -3097,7 +3184,7 @@ function createCourierTableRow(courierData, index) {
     // Кнопка добавления CART (всегда показываем)
     const addCartButton = `
         <div class="tpi-cc--carts-control-buttons-wrapper">
-            <button class="tpi-cc--table-tbody-add-cart" tpi-state-change="tpi-add-cart">
+            <button class="tpi-cc--table-tbody-add-cart" tpi-state-change="tpi-add-cart" tpi-tooltip-data="Добавить CART курьеру">
                 <i>${tpi_cc_i_cart_add}</i>
             </button>
         </div>
@@ -3112,7 +3199,7 @@ function createCourierTableRow(courierData, index) {
             courierData._savedPalletNumbers.forEach(palletNumber => {
                 const palletId = palletNumber.replace('PALLET-', '');
                 palletButtonsHTML += `
-                    <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-pallet-id" tpi-data-courier-spec-cell="${palletNumber}">
+                    <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-pallet-id" tpi-data-courier-spec-cell="${palletNumber}" tpi-tooltip-data="Нажмите, чтобы выбрать этот PALLET">
                         <i class="tpi-cc-table-tbody-data-pallet-icon">${tpi_cc_i_pallet}</i>
                         -${palletId}
                     </button>
@@ -3124,7 +3211,7 @@ function createCourierTableRow(courierData, index) {
                 // Для КГТ - одна кнопка PALLET с номером ячейки
                 const kgtNumber = courierData.cell.replace('KGT-', '').replace('kgt-', '');
                 palletButtonsHTML += `
-                    <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-pallet-id" tpi-data-courier-spec-cell="PALLET-${kgtNumber}">
+                    <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-pallet-id" tpi-data-courier-spec-cell="PALLET-${kgtNumber}" tpi-tooltip-data="Нажмите, чтобы выбрать этот PALLET">
                         <i class="tpi-cc-table-tbody-data-pallet-icon">${tpi_cc_i_pallet}</i>
                         -${kgtNumber}
                     </button>
@@ -3134,7 +3221,7 @@ function createCourierTableRow(courierData, index) {
                 const palletNumbers = generateRandomPalletNumbers(2, index);
                 palletNumbers.forEach(palletNumber => {
                     palletButtonsHTML += `
-                        <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-pallet-id" tpi-data-courier-spec-cell="PALLET-${palletNumber}">
+                        <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-pallet-id" tpi-data-courier-spec-cell="PALLET-${palletNumber}" tpi-tooltip-data="Нажмите, чтобы выбрать этот PALLET">
                             <i class="tpi-cc-table-tbody-data-pallet-icon">${tpi_cc_i_pallet}</i>
                             -${palletNumber}
                         </button>
@@ -3147,53 +3234,39 @@ function createCourierTableRow(courierData, index) {
     // Кнопка добавления PALLET (всегда показываем)
     const addPalletButton = `
         <div class="tpi-cc--carts-control-buttons-wrapper">
-            <button class="tpi-cc--table-tbody-add-pallet" tpi-state-change="tpi-add-pallet">
+            <button class="tpi-cc--table-tbody-add-pallet" tpi-state-change="tpi-add-pallet" tpi-tooltip-data="Добавить PALLET курьеру">
                 <i>${tpi_cc_i_cart_add}</i>
             </button>
         </div>
     `;
     
     // Формируем HTML для блока печати в зависимости от условий
-    let printBlockHtml = '';
-    if (showPrintButton) {
-        // Если можно показывать кнопку печати - отображаем полный блок
-        printBlockHtml = `
-            <div class="tpi-cc--table-body-print-container">
-                ${eappLinkHtml}
-                <a class="tpi-cc--dcoument-app" href="/api/sorting-center/21972131/routes/${courierData.routeId || ''}/transferAct/ALL?date=${selectedDateFormatted}" target="_blank"  title="АПП курьера">
-                    <i class="tpi-cc--table-tbody-data-icon">${tpi_cc_i_courier_app}</i>
-                </a>
-                <button class="tpi-cc--print-current-row">
-                    <i class="tpi-cc--table-tbody-data-icon">${tpi_cc_i_print_current_row}${tpi_cc_i_clock_loader}</i>
-                </button>
-            </div>
-        `;
-    } else {
-        // Если нельзя показывать кнопку печати - отображаем только ссылки на документы
-        printBlockHtml = `
-            <div class="tpi-cc--table-body-print-container">
-                ${eappLinkHtml}
-                <a class="tpi-cc--dcoument-app" href="/api/sorting-center/21972131/routes/${courierData.routeId || ''}/transferAct/ALL?date=${selectedDateFormatted}" target="_blank"  title="АПП курьера">
-                    <i class="tpi-cc--table-tbody-data-icon">${tpi_cc_i_courier_app}</i>
-                </a>
-            </div>
-        `;
-    }
+let printBlockHtml = `
+        <div class="tpi-cc--table-body-print-container">
+            ${eappLinkHtml}
+            <a class="tpi-cc--dcoument-app" href="/api/sorting-center/21972131/routes/${courierData.routeId || ''}/transferAct/ALL?date=${selectedDateFormatted}" target="_blank" tpi-tooltip-data="АПП курьера">
+                <i class="tpi-cc--table-tbody-data-icon">${tpi_cc_i_courier_app}</i>
+            </a>
+            <button class="tpi-cc--print-current-row" tpi-tooltip-data="Кнопка для печати всех CART и PALLET у данного курьера">
+                <i class="tpi-cc--table-tbody-data-icon">${tpi_cc_i_print_current_row}${tpi_cc_i_clock_loader}</i>
+            </button>
+        </div>
+    `;
     
     row.innerHTML = `
         <td class="tpi-cc--table-tbody-item">
             <div class="tpi-cc--table-tbody-data-courier">
                 <div class="tpi-cc--sortable-data-wrapper tpi-cc--courier-id-data-wrapper">
-                    <a href="https://logistics.market.yandex.ru/sorting-center/21972131/routes?type=OUTGOING_COURIER&sort=&hasCarts=false&category=COURIER&id=21972131&page=1&pageSize=50&recipientName=${courierData.externalId}" target="_blank" class="tpi-cc--table-tbody-data-link">
+                    <a href="https://logistics.market.yandex.ru/sorting-center/21972131/routes?type=OUTGOING_COURIER&sort=&hasCarts=false&category=COURIER&id=21972131&page=1&pageSize=50&recipientName=${courierData.externalId}" target="_blank" class="tpi-cc--table-tbody-data-link" tpi-tooltip-data="Ссылка на курьера в «Отгрузки по маршрутам»">
                         <i>${tpi_cc_i_courier}</i>
                         <p class="tpi-cc--sortable-data-courier" tpi-cc-parsing-data="courier-full-name">${courierData.courier}</p>
                     </a>
                     <div class="tpi-cc--table-tbody-data-courier-extra-info-wrapper">
-                        <div class="tpi-cc--table-tbody-data-courier-extra-info">
+                        <div class="tpi-cc--table-tbody-data-courier-extra-info" tpi-tooltip-data="ID Маршрута курьера за текущую дату (каждый день разный)">
                             <i>${tpi_cc_i_courier_route_id}</i>
                             <p tpi-cc-parsing-data="courier-route-id">${courierData.routeId || 'Нет данных'}</p>
                         </div>
-                        <div class="tpi-cc--table-tbody-data-courier-extra-info">
+                        <div class="tpi-cc--table-tbody-data-courier-extra-info" tpi-tooltip-data="Персональный ID курьера">
                             <i>${tpi_cc_i_courier_id}</i>
                             <p tpi-cc-parsing-data="courier-personal-id">${courierData.externalId || courierData.courierId || 'Нет данных'}</p>
                         </div>
@@ -3203,7 +3276,7 @@ function createCourierTableRow(courierData, index) {
         </td>
         <td class="tpi-cc--table-tbody-item">
             <div class="tpi-cc--table-tbody-data">
-                <a href="https://logistics.market.yandex.ru/sorting-center/21972131/sortables?sortableTypes=CART&sortableTypes=COURIER_PALLET&cellName=${courierData.cell}" class="tpi-cc--table-tbody-data-link" tpi-cc-parsing-data="courier-route-cell" courier-spec-cell="${courierData.cell}" target="_blank">
+                <a href="https://logistics.market.yandex.ru/sorting-center/21972131/sortables?sortableTypes=CART&sortableTypes=COURIER_PALLET&cellName=${courierData.cell}" class="tpi-cc--table-tbody-data-link" tpi-cc-parsing-data="courier-route-cell" courier-spec-cell="${courierData.cell}" target="_blank" tpi-tooltip-data="Ссылка на активные CART и PALLET курьера">
                     <i class="tpi-cc-i-cell-name">${tpi_cc_i_tag}</i>
                     ${courierData.cell}
                 </a>
@@ -3223,7 +3296,7 @@ function createCourierTableRow(courierData, index) {
         </td>
         <td class="tpi-cc--table-tbody-item">
             <div class="tpi-cc--table-tbody-data">
-                <div class="tpi-cc-table-tbody-data-route-status" tpi-cc-route-status="${courierData.status.toLowerCase()}">
+                <div class="tpi-cc-table-tbody-data-route-status" tpi-cc-route-status="${courierData.status.toLowerCase()}" tpi-tooltip-data="Текущий статус маршрута курьера">
                     <i></i>
                     <p tpi-cc-parsing-data="courier-route-status">${routeStatusText}</p>
                 </div>
@@ -3232,9 +3305,9 @@ function createCourierTableRow(courierData, index) {
         <td class="tpi-cc--table-tbody-item">
             <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-data-sort-progress-container">
                     <p class="tpi-cc--table-tbody-data-sort-progress" tpi-cc-parsing-data="courier-sorting-progress">
-                        <a class="tpi-cc--table-tbody-data-link" target="_blank" href="https://logistics.market.yandex.ru/sorting-center/21972131/sortables?routeId=${courierData.routeId}&searchRouteIdInOldRoutes=true&crossDockOnly=true&sortableStatusesLeafs=SHIPPED_DIRECT&sortableTypes=PLACE&sortableTypes=TOTE&sortableTypes=PALLET&sortableTypes=XDOC_PALLET&sortableTypes=XDOC_BOX"><i>${tpi_cc_i_box_outline}</i>${sortCount || 0}</a> из <a class="tpi-cc--table-tbody-data-link" target="_blank" href="https://logistics.market.yandex.ru/sorting-center/21972131/sortables?routeId=${courierData.routeId}&searchRouteIdInOldRoutes=true&sortableStatusesLeafs=&sortableTypes=PLACE&sortableTypes=TOTE&sortableTypes=PALLET&sortableTypes=XDOC_PALLET&sortableTypes=XDOC_BOX&crossDockOnly=true"><i>${tpi_cc_i_box_filled}</i>${courierData.ordersPlanned || 0}</a>
+                        <a class="tpi-cc--table-tbody-data-link" target="_blank" href="https://logistics.market.yandex.ru/sorting-center/21972131/sortables?routeId=${courierData.routeId}&searchRouteIdInOldRoutes=true&crossDockOnly=true&sortableStatusesLeafs=SHIPPED_DIRECT&sortableTypes=PLACE&sortableTypes=TOTE&sortableTypes=PALLET&sortableTypes=XDOC_PALLET&sortableTypes=XDOC_BOX" tpi-tooltip-data="Ссылка на отсортированные заказы курьеру"><i>${tpi_cc_i_box_outline}</i>${sortCount || 0}</a> из <a class="tpi-cc--table-tbody-data-link" target="_blank" href="https://logistics.market.yandex.ru/sorting-center/21972131/sortables?routeId=${courierData.routeId}&searchRouteIdInOldRoutes=true&sortableStatusesLeafs=&sortableTypes=PLACE&sortableTypes=TOTE&sortableTypes=PALLET&sortableTypes=XDOC_PALLET&sortableTypes=XDOC_BOX&crossDockOnly=true" tpi-tooltip-data="Ссылка на назначенные заказы курьеру"><i>${tpi_cc_i_box_filled}</i>${courierData.ordersPlanned || 0}</a>
                     </p>
-                <div class="tpi-cc--table-tbody-data-sort-progress-circle-wrapper">
+                <div class="tpi-cc--table-tbody-data-sort-progress-circle-wrapper" tpi-tooltip-data="Прогресс сортировки заказов курьеру">
                     <p class="tpi-cc--table-tbody-data-sort-progress-circle-value" tpi-cc-parsing-data="courier-sorting-progress-percent">
                         ${sortPercent}%
                     </p>
@@ -3253,9 +3326,9 @@ function createCourierTableRow(courierData, index) {
         <td class="tpi-cc--table-tbody-item">
             <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-data-sort-progress-container">
                 <p class="tpi-cc--table-tbody-data-sort-progress" tpi-cc-parsing-data="courier-prepared-progress">
-                    <span><i>${tpi_cc_i_pen_outline}</i>${courierData.sortablesPrepared || 0}</span> из <span><i>${tpi_cc_i_pen_filled}</i>${courierData.sortablesInCell || 0}</span>
+                    <span tpi-tooltip-data="Количество подготовленных заказов"><i>${tpi_cc_i_pen_outline}</i>${courierData.sortablesPrepared || 0}</span> из <span tpi-tooltip-data="Общее количество заказов для подготовки"><i>${tpi_cc_i_pen_filled}</i>${courierData.sortablesInCell || 0}</span>
                 </p>
-                <div class="tpi-cc--table-tbody-data-sort-progress-circle-wrapper">
+                <div class="tpi-cc--table-tbody-data-sort-progress-circle-wrapper" tpi-tooltip-data="Прогресс подготовки заказов у курьреа">
                     <p class="tpi-cc--table-tbody-data-sort-progress-circle-value" tpi-cc-parsing-data="courier-prepared-progress-percent">
                         ${preparedPercent}%
                     </p>
@@ -3871,11 +3944,26 @@ function initializeDatePicker() {
     
     if (!searchDateButton) return;
     
-    // Устанавливаем текущую дату по умолчанию
+    // Устанавливаем дату с учетом времени суток
+    const now = new Date();
+    const currentHour = now.getHours();
+    
     const today = new Date();
-    const formattedToday = formatDateToDDMMYYYY(today);
-    selectedDateElement.textContent = formattedToday;
-    searchDateButton.setAttribute('tpi-cc-selected-date-value', formattedToday);
+    today.setHours(0, 0, 0, 0);
+    
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    let targetDate = today;
+    if (currentHour >= 23) {
+        targetDate = tomorrow;
+    }
+    
+    const formattedTarget = formatDateToDDMMYYYY(targetDate);
+    selectedDateElement.textContent = formattedTarget;
+    searchDateButton.setAttribute('tpi-cc-selected-date-value', formattedTarget);
+    
+    console.log(`📅 Начальная дата календаря: ${formattedTarget} (час: ${currentHour})`);
     
     // Создаем и добавляем контейнер календаря
     const calendarContainer = document.createElement('div');
@@ -3885,7 +3973,7 @@ function initializeDatePicker() {
     searchDateButton.parentNode.appendChild(calendarContainer);
     
     // Переменные для хранения выбранной даты
-    let selectedDate = new Date(today);
+    let selectedDate = targetDate;
     
     // Функция для открытия календаря с ожиданием предзагрузки
     async function openCalendar() {
@@ -4086,10 +4174,10 @@ function updateCalendarDateStatus(dateStr, status) {
             // Добавляем новый статус
             if (status === 'has-bd-data') {
                 dayElement.classList.add('tpi-cc-has-bd-data');
-                dayElement.title = 'В базе данных есть записи';
+                dayElement.setAttribute('tpi-tooltip-data', 'Записи есть')
             } else if (status === 'available-to-write-bd-data') {
                 dayElement.classList.add('tpi-cc-available-to-write-bd-data');
-                dayElement.title = 'Можно записать данные в базу';
+                dayElement.setAttribute('tpi-tooltip-data', 'Доступно для записи')
             }
         }
     });
@@ -4259,16 +4347,16 @@ function applyStatusToDayElement(dayElement, status) {
     // Добавляем новый класс в зависимости от статуса
     if (status === 'has-bd-data') {
         dayElement.classList.add('tpi-cc-has-bd-data');
-        dayElement.title = 'В базе данных есть записи';
+        dayElement.setAttribute('tpi-tooltip-data', 'Записи есть')
     } else if (status === 'no-bd-data') {
         dayElement.classList.add('tpi-cc-no-bd-data');
-        dayElement.title = 'В базе данных нет записей';
+        dayElement.setAttribute('tpi-tooltip-data', 'Нет записей')
     } else if (status === 'available-to-write-bd-data') {
         dayElement.classList.add('tpi-cc-available-to-write-bd-data');
-        dayElement.title = 'Можно записать данные в базу';
+        dayElement.setAttribute('tpi-tooltip-data', 'Доступно для записи')
     } else if (status === 'future-date') {
         dayElement.classList.add('tpi-cc-future-date');
-        dayElement.title = 'Дата недоступна';
+        dayElement.setAttribute('tpi-tooltip-data', 'Дата недоступна')
     }
 }
 
@@ -4330,11 +4418,16 @@ function createCalendar(container, currentDisplayDate, currentSelectedDate, sele
         const daysOfWeek = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
         const weekDaysRow = document.createElement('div');
         weekDaysRow.className = 'tpi-cc-calendar-weekdays';
-        
+
         daysOfWeek.forEach(day => {
             const dayElement = document.createElement('div');
             dayElement.textContent = day;
             dayElement.className = 'tpi-cc-calendar-weekday';
+            
+            if (day === 'Пн') {
+                dayElement.setAttribute('tpi-tooltip-data', 'Угадайте, кто же чёрт ?)');
+            }
+            
             weekDaysRow.appendChild(dayElement);
         });
         
@@ -4510,16 +4603,16 @@ function updateDayElementStatus(dayElement, status) {
     // Добавляем новый класс
     if (status === 'has-bd-data') {
         dayElement.classList.add('tpi-cc-has-bd-data');
-        dayElement.title = 'В базе данных есть записи';
+        dayElement.setAttribute('tpi-tooltip-data', 'Записи есть')
     } else if (status === 'no-bd-data') {
         dayElement.classList.add('tpi-cc-no-bd-data');
-        dayElement.title = 'В базе данных нет записей';
+        dayElement.setAttribute('tpi-tooltip-data', 'Нет записей')
     } else if (status === 'available-to-write-bd-data') {
         dayElement.classList.add('tpi-cc-available-to-write-bd-data');
-        dayElement.title = 'Можно записать данные в базу';
+        dayElement.setAttribute('tpi-tooltip-data', 'Доступно для записи')
     } else if (status === 'future-date') {
         dayElement.classList.add('tpi-cc-future-date');
-        dayElement.title = 'Дата недоступна';
+        dayElement.setAttribute('tpi-tooltip-data', 'Дата недоступна')
     }
 }
 
@@ -4563,16 +4656,16 @@ function updateCalendarDayStatus(dateStr, status) {
     // Добавляем новый класс
     if (status === 'has-bd-data') {
         dayElement.classList.add('tpi-cc-has-bd-data');
-        dayElement.title = 'В базе данных есть записи';
+        dayElement.setAttribute('tpi-tooltip-data', 'Записи есть')
     } else if (status === 'no-bd-data') {
         dayElement.classList.add('tpi-cc-no-bd-data');
-        dayElement.title = 'В базе данных нет записей';
+        dayElement.setAttribute('tpi-tooltip-data', 'Нет записей')
     } else if (status === 'available-to-write-bd-data') {
         dayElement.classList.add('tpi-cc-available-to-write-bd-data');
-        dayElement.title = 'Можно записать данные в базу';
+        dayElement.setAttribute('tpi-tooltip-data', 'Доступно для записи')
     } else if (status === 'future-date') {
         dayElement.classList.add('tpi-cc-future-date');
-        dayElement.title = 'Дата недоступна';
+        dayElement.setAttribute('tpi-tooltip-data', 'Дата недоступна')
     }
 }
 
@@ -7609,771 +7702,6 @@ function tpi_cc_claimTableData_toPrint() {
 //A-
 //A-
 
-// Добавляем обработчик события на кнопку печати
-// document.addEventListener('click', function(event) {
-//     const printAllButton = event.target.closest('.tpi-cc-print-all');
-//     if (printAllButton) {
-//         event.preventDefault();
-//         event.stopPropagation();
-//         tpi_cc_generatePDFlabels_toPrint();
-//     }
-// });
-// // Глобальный обработчик для кнопок печати (делегирование событий)
-// document.addEventListener('click', function(event) {
-//     const printButton = event.target.closest('.tpi-cc--print-current-row');
-//     if (!printButton) return;
-    
-//     // Предотвращаем всплытие и стандартное поведение
-//     event.preventDefault();
-//     event.stopPropagation();
-    
-//     console.log('🖨️ Глобальный обработчик: нажата кнопка печати');
-    
-//     // Проверяем, не выполняется ли уже печать
-//     if (printButton.hasAttribute('tpi-cc-printing-state')) {
-//         console.log('⏳ Печать уже выполняется');
-//         return;
-//     }
-    
-//     // Устанавливаем состояние загрузки
-//     printButton.setAttribute('tpi-cc-printing-state', 'loading');
-    
-//     // Запускаем печать с небольшой задержкой
-//     setTimeout(async () => {
-//         try {
-//             // Находим родительскую строку
-//             const row = printButton.closest('.tpi-cc--table-tbody');
-//             if (!row) {
-//                 console.error('❌ Строка не найдена');
-//                 return;
-//             }
-            
-//             // Собираем данные из строки
-//             const courierNameElement = row.querySelector('p[tpi-cc-parsing-data="courier-full-name"]');
-//             const cellElement = row.querySelector('a[tpi-cc-parsing-data="courier-route-cell"]');
-            
-//             // Получаем CART номера
-//             const cartElements = row.querySelectorAll('.tpi-cc--table-tbody-data-carts .tpi-cc-table-tbody-data-cart-id[tpi-data-courier-spec-cell]');
-//             const cartNumbers = Array.from(cartElements).map(el => el.getAttribute('tpi-data-courier-spec-cell'));
-            
-//             // Получаем PALLET номера
-//             const palletElements = row.querySelectorAll('.tpi-cc--table-tbody-data-pallets .tpi-cc-table-tbody-data-pallet-id[tpi-data-courier-spec-cell]');
-//             const palletNumbers = Array.from(palletElements).map(el => el.getAttribute('tpi-data-courier-spec-cell'));
-            
-//             // Формируем данные курьера
-//             const courierData = {
-//                 courierName: courierNameElement ? courierNameElement.textContent.trim() : 'Не указано',
-//                 cell: {
-//                     value: cellElement ? cellElement.textContent.trim() : 'Нет ячейки',
-//                     attribute: cellElement ? cellElement.getAttribute('courier-spec-cell') : ''
-//                 },
-//                 cartNumbers,
-//                 palletNumbers
-//             };
-            
-//             // Если нет номеров для печати, показываем уведомление
-//             if (cartNumbers.length === 0 && palletNumbers.length === 0) {
-//                 console.log('⚠️ Нет номеров для печати');
-//                 if (typeof tpiNotification !== 'undefined') {
-//                     tpiNotification.show('Нет номеров', 'warning', 'У курьера нет CART или PALLET номеров для печати');
-//                 }
-//                 printButton.removeAttribute('tpi-cc-printing-state');
-//                 return;
-//             }
-            
-//             // Генерируем PDF
-//             await tpi_cc_generatePDFlabels_forCourier(courierData, 0);
-            
-//         } catch (error) {
-//             console.error('❌ Ошибка при печати:', error);
-//         } finally {
-//             // Снимаем состояние загрузки
-//             printButton.removeAttribute('tpi-cc-printing-state');
-//         }
-//     }, 50);
-// });
-
-// // Функция для создания PDF с этикетками
-// async function tpi_cc_generatePDFlabels_toPrint() {
-
-//     const printButton = document.querySelector('.tpi-cc-print-all');
-//     const printText = document.querySelector('.tpi-cc-print-all-text');
-//     const originalText = printText ? printText.textContent : 'Распечатать все';
-
-//     try {
-//         if (printButton) {
-//             printButton.setAttribute('tpi-cc-printing-state', 'loading');
-//         }
-
-//         if (printText) printText.textContent = 'Генерация: 0%';
-
-//         const tableData = tpi_cc_claimTableData_toPrint();
-//         if (!tableData || tableData.length === 0) {
-//             throw new Error('Нет данных для печати');
-//         }
-
-//         const allCartNumbers = tableData.map(item => item.cartNumbers);
-//         const allPalletNumbers = tableData.map(item => item.palletNumbers);
-
-//         // Собираем все элементы для генерации QR-кодов
-//         const allQRPromises = [];
-        
-//         // Сначала все CART номера
-//         if (allCartNumbers && allCartNumbers.length > 0) {
-//             const maxCartLength = Math.max(...allCartNumbers.map(arr => arr.length));
-//             for (let i = 0; i < maxCartLength; i++) {
-//                 allCartNumbers.forEach((courierCarts, courierIndex) => {
-//                     if (i < courierCarts.length) {
-//                         allQRPromises.push({
-//                             type: 'CART',
-//                             value: courierCarts[i],
-//                             courierIndex: courierIndex,
-//                             order: i
-//                         });
-//                     }
-//                 });
-//             }
-//         }
-        
-//         // Затем все PALLET номера
-//         if (allPalletNumbers && allPalletNumbers.length > 0) {
-//             const maxPalletLength = Math.max(...allPalletNumbers.map(arr => arr.length));
-//             for (let i = 0; i < maxPalletLength; i++) {
-//                 allPalletNumbers.forEach((courierPallets, courierIndex) => {
-//                     if (i < courierPallets.length) {
-//                         allQRPromises.push({
-//                             type: 'PALLET',
-//                             value: courierPallets[i],
-//                             courierIndex: courierIndex,
-//                             order: i
-//                         });
-//                     }
-//                 });
-//             }
-//         }
-
-//         console.log(`🔄 Всего для генерации QR-кодов: ${allQRPromises.length} шт.`);
-        
-//         const qrCodes = [];
-//         const totalQRCount = allQRPromises.length;
-
-//         // Генерируем QR-коды с обновлением прогресса
-//         for (let i = 0; i < allQRPromises.length; i++) {
-//             const item = allQRPromises[i];
-            
-//             try {
-//                 // Создаем временный контейнер для QR-кода
-//                 const qrContainer = document.createElement("div");
-                
-//                 // Генерируем QR-код
-//                 new QRCode(qrContainer, {
-//                     text: item.value,
-//                     width: 200,
-//                     height: 200,
-//                     correctLevel: QRCode.CorrectLevel.M
-//                 });
-                
-//                 // Ждем генерации и получаем DataURL
-//                 const qrDataURL = await new Promise(resolve => {
-//                     setTimeout(() => {
-//                         const img = qrContainer.querySelector("img");
-//                         if (img) {
-//                             resolve(img.src);
-//                         } else {
-//                             const canvas = qrContainer.querySelector("canvas");
-//                             resolve(canvas ? canvas.toDataURL() : null);
-//                         }
-//                     }, 100);
-//                 });
-                
-//                 if (qrDataURL) {
-//                     qrCodes.push({
-//                         ...item,
-//                         qrDataURL
-//                     });
-//                 }
-                
-//             } catch (error) {
-//                 console.error(`❌ Ошибка генерации QR для ${item.value}:`, error);
-//             }
-
-//             // Обновляем прогресс после каждого QR-кода
-//             const progress = Math.round(((i + 1) / totalQRCount) * 100);
-//             if (printText) {
-//                 printText.textContent = `Генерация: ${progress}%`;
-//             }
-            
-//             // Небольшая задержка для плавности обновления UI
-//             await new Promise(resolve => setTimeout(resolve, 10));
-//         }
-
-//         if (!qrCodes || qrCodes.length === 0) {
-//             throw new Error('Не удалось сгенерировать QR-коды');
-//         }
-
-//         // Здесь продолжается создание PDF (остальная часть функции остается без изменений)
-//         const { jsPDF } = window.jspdf;
-
-//         const pdf = new jsPDF({
-//             orientation: 'portrait',
-//             unit: 'mm',
-//             format: 'a4'
-//         });
-
-//         // ===== Подключаем шрифты =====
-//         const fontPaths = {
-//             regular: chrome.runtime.getURL('fonts/Roboto-Regular.ttf'),
-//             bold: chrome.runtime.getURL('fonts/Roboto-Bold.ttf'),
-//             black: chrome.runtime.getURL('fonts/Roboto-Black.ttf')
-//         };
-
-//         pdf.addFileToVFS("Roboto-Regular.ttf", await loadFontAsBase64(fontPaths.regular));
-//         pdf.addFont("Roboto-Regular.ttf", "Roboto", "normal");
-
-//         pdf.addFileToVFS("Roboto-Bold.ttf", await loadFontAsBase64(fontPaths.bold));
-//         pdf.addFont("Roboto-Bold.ttf", "Roboto", "bold");
-
-//         pdf.addFileToVFS("Roboto-Black.ttf", await loadFontAsBase64(fontPaths.black));
-//         pdf.addFont("Roboto-Black.ttf", "Roboto", "black");
-
-//         for (let i = 0; i < qrCodes.length; i++) {
-
-//             if (i > 0) pdf.addPage();
-
-//             const qr = qrCodes[i];
-//             const courierInfo = tableData[qr.courierIndex];
-
-//             // ====== MK-131 (крупно справа) ======
-//             pdf.setFont("Roboto", "black");
-//             pdf.setFontSize(120);
-//             const cellX = courierInfo.cell.value.startsWith('KGT') ? 52 + 10 : 52;
-//             pdf.text(courierInfo.cell.value, cellX, 88);
-            
-//             // ====== QR справа ======
-//             if (qr.qrDataURL) {
-//                 pdf.addImage(qr.qrDataURL, 'PNG', 84, 105, 90, 90);
-//             }
-
-//             // ====== Левый вертикальный блок ======
-//             const blockX = 5;
-//             const blockY = 90;
-//             const blockWidth = 45;
-//             const blockHeight = 110;
-
-//             // Рамка
-//             pdf.setLineWidth(0.2);
-//             pdf.rect(blockX, blockY, blockWidth, blockHeight);
-
-//             // Черная шапка
-//             pdf.setFillColor(0, 0, 0);
-//             pdf.rect(blockX, blockY, blockWidth, 12, 'F');
-
-//             pdf.setTextColor(255, 255, 255);
-//             pdf.setFont("Roboto", "bold");
-//             pdf.setFontSize(16);
-
-//             const labelTitle = qr.type === 'PALLET'
-//                 ? 'Номер PALLET:'
-//                 : 'Номер CART:';
-
-//             pdf.text(labelTitle, blockX + (qr.type === 'PALLET' ? 2 : 4), blockY + 8);
-
-//             // Возвращаем цвет текста
-//             pdf.setTextColor(0, 0, 0);
-
-//             // ====== Номер (только число, без CART-) ======
-//             const pureNumber = qr.value.replace(/[^0-9]/g, '');
-
-//             pdf.setFont("Roboto", "black");
-//             pdf.setFontSize(100);
-
-//             const digitCount = pureNumber.length;
-
-//             let textX = 40;
-//             let textY = 192.5;
-
-//             // Корректировка в зависимости от количества цифр
-//             switch(digitCount) {
-//                 case 1:
-//                     textX = 40;
-//                     textY = 192.5 - 30;
-//                     break;
-//                 case 2:
-//                     textX = 40;
-//                     textY = 192.5 - 20;
-//                     break;
-//                 case 3:
-//                     textX = 40;
-//                     textY = 192.5 - 10;
-//                     break;
-//                 case 4:
-//                     break;
-//                 default:
-//                     const extraDigits = digitCount - 4;
-//                     textX = 40 - (extraDigits * 1.5);
-//                     textY = 192.5 - (extraDigits * 1);
-//             }
-
-//             pdf.text(
-//                 pureNumber,
-//                 textX,
-//                 textY,
-//                 {
-//                     angle: 90
-//                 }
-//             );
-
-//             // ====== Иконка над текстом ======
-//             const svgString = qr.type === 'PALLET' ? tpi_cc_i_pallet : tpi_cc_i_cart;
-            
-//             // Создаем временный canvas с высоким разрешением
-//             const canvas = document.createElement('canvas');
-//             canvas.width = 240;
-//             canvas.height = 240;
-//             const ctx = canvas.getContext('2d');
-//             ctx.scale(4, 4);
-            
-//             // Создаем изображение из SVG
-//             const img = new Image();
-//             const svgBlob = new Blob([svgString], {type: 'image/svg+xml;charset=utf-8'});
-//             const url = URL.createObjectURL(svgBlob);
-            
-//             await new Promise((resolve) => {
-//                 img.onload = function() {
-//                     ctx.drawImage(img, 0, 0, 60, 60);
-//                     URL.revokeObjectURL(url);
-                    
-//                     // Добавляем PNG в PDF
-//                     const pngData = canvas.toDataURL('image/png');
-//                     const iconX = blockX + (blockWidth - 40) / 2;
-//                     const iconY = blockY - 40;
-//                     const iconWidth = 40;
-//                     const iconHeight = 40;
-                    
-//                     pdf.addImage(pngData, 'PNG', iconX, iconY, iconWidth, iconHeight);
-//                     resolve();
-//                 };
-//                 img.src = url;
-//             });
-
-//             // ====== Обработка ФИО ======
-//             let processedName = courierInfo.courierName;
-
-//             // Проверяем, начинается ли с "СЦ Воронеж"
-//             if (processedName.startsWith('СЦ Воронеж')) {
-//                 const remainingText = processedName.replace('СЦ Воронеж', '').trim();
-//                 const fioParts = ['СЦ', 'Воронеж'];
-                
-//                 if (remainingText) {
-//                     fioParts.push(remainingText);
-//                 }
-                
-//                 const cleanedParts = fioParts.map(part => part.replace(/\s+/g, ''));
-                
-//                 pdf.setFont("Roboto", "bold");
-//                 pdf.setFontSize(65);
-                
-//                 let fioY = 230;
-                
-//                 cleanedParts.forEach(part => {
-//                     if (part.trim()) {
-//                         pdf.text(part, 5, fioY);
-//                         fioY += 26;
-//                     }
-//                 });
-//             } else {
-//                 const fioParts = processedName.split(/(?=[А-ЯЁA-Z])/).filter(part => part.trim());
-                
-//                 const filteredParts = fioParts.filter(part => {
-//                     const upperPart = part.toUpperCase();
-//                     return !upperPart.includes('НОВЫЙ');
-//                 });
-                
-//                 pdf.setFont("Roboto", "bold");
-//                 pdf.setFontSize(65);
-                
-//                 let fioY = 230;
-                
-//                 filteredParts.forEach(part => {
-//                     if (part.trim()) {
-//                         pdf.text(part, 5, fioY);
-//                         fioY += 26;
-//                     }
-//                 });
-//             }
-//         }
-
-//         if (printText) printText.textContent = 'Генерация: 100%';
-
-//         const now = new Date();
-//         const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-
-//         pdf.save(`Все_курьеры_${dateStr}.pdf`);
-
-//         if (printButton) printButton.removeAttribute('tpi-cc-printing-state');
-//         if (printText) printText.textContent = originalText;
-
-//     } catch (error) {
-
-//         console.error('❌ Ошибка создания PDF:', error);
-
-//         if (printButton) printButton.removeAttribute('tpi-cc-printing-state');
-//         if (printText) printText.textContent = originalText;
-//     }
-// }
-
-// async function tpi_cc_generatePDFlabels_forCourier(courierData, courierIndex, printButton) {
-//     try {
-//         // Проверяем, не выполняется ли уже печать (если передан printButton)
-//         if (printButton && printButton.hasAttribute('tpi-cc-printing-state')) {
-//             console.log('⏳ Печать уже выполняется');
-//             return;
-//         }
-
-//         // Устанавливаем состояние загрузки, если передан printButton
-//         if (printButton) {
-//             printButton.setAttribute('tpi-cc-printing-state', 'loading');
-//         }
-
-//         // Получаем данные для печати
-//         const cartNumbers = courierData.cartNumbers || [];
-//         const palletNumbers = courierData.palletNumbers || [];
-        
-//         if (cartNumbers.length === 0 && palletNumbers.length === 0) {
-//             throw new Error('Нет CART или PALLET номеров для печати');
-//         }
-
-//         // Формируем массивы для генерации QR-кодов
-//         const allCartNumbers = [cartNumbers];
-//         const allPalletNumbers = [palletNumbers];
-
-//         // Генерируем QR-коды
-//         const qrCodes = await tpi_cc_generateQRcodes_toPrint(allCartNumbers, allPalletNumbers);
-        
-//         if (!qrCodes || qrCodes.length === 0) {
-//             throw new Error('Не удалось сгенерировать QR-коды');
-//         }
-
-//         // Создаем PDF
-//         const { jsPDF } = window.jspdf;
-//         const pdf = new jsPDF({
-//             orientation: 'portrait',
-//             unit: 'mm',
-//             format: 'a4'
-//         });
-
-//         const pageWidth = pdf.internal.pageSize.getWidth();
-//         const pageHeight = pdf.internal.pageSize.getHeight();
-
-//         // ===== Подключаем шрифты с проверкой контекста =====
-//         try {
-//             // Проверяем, доступен ли chrome.runtime
-//             if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.id) {
-//                 const fontPaths = {
-//                     regular: chrome.runtime.getURL('fonts/Roboto-Regular.ttf'),
-//                     bold: chrome.runtime.getURL('fonts/Roboto-Bold.ttf'),
-//                     black: chrome.runtime.getURL('fonts/Roboto-Black.ttf')
-//                 };
-
-//                 pdf.addFileToVFS("Roboto-Regular.ttf", await loadFontAsBase64(fontPaths.regular));
-//                 pdf.addFont("Roboto-Regular.ttf", "Roboto", "normal");
-
-//                 pdf.addFileToVFS("Roboto-Bold.ttf", await loadFontAsBase64(fontPaths.bold));
-//                 pdf.addFont("Roboto-Bold.ttf", "Roboto", "bold");
-
-//                 pdf.addFileToVFS("Roboto-Black.ttf", await loadFontAsBase64(fontPaths.black));
-//                 pdf.addFont("Roboto-Black.ttf", "Roboto", "black");
-//             } else {
-//                 console.log('⚠️ Контекст расширения недоступен, используем стандартные шрифты');
-//                 pdf.setFont("helvetica", "bold");
-//             }
-//         } catch (fontError) {
-//             console.log('⚠️ Ошибка загрузки шрифтов, используем стандартные:', fontError);
-//             pdf.setFont("helvetica", "bold");
-//         }
-
-//         // Генерируем страницы для каждого QR-кода курьера
-//         for (let i = 0; i < qrCodes.length; i++) {
-//             if (i > 0) pdf.addPage();
-
-//             const qr = qrCodes[i];
-            
-//             if (qr.type === 'PALLET') {
-//                 // ===== ДИЗАЙН ДЛЯ PALLET =====
-                
-//                 // Квадрат как был (отступ справа 5мм, размер 50х50)
-//                 const squareSize = 50;
-//                 const squareX = pageWidth - squareSize - 5; // отступ справа 5мм
-//                 const squareY = 10;
-                
-//                 // Заливка квадрата белым цветом
-//                 pdf.setFillColor(240, 240, 240);
-//                 pdf.roundedRect(squareX, squareY, squareSize, squareSize, 3, 3, 'F');
-                
-//                 // Добавляем черную рамку 2px с скругленными углами
-//                 pdf.setDrawColor(0, 0, 0);
-//                 pdf.setLineWidth(0.35); // 2px ≈ 0.7mm
-                
-//                 pdf.roundedRect(squareX, squareY, squareSize, squareSize, 3, 3, 'S');
-                
-//                 // QR-код в центре
-//                 if (qr.qrDataURL) {
-//                     const qrSize = 100;
-//                     const qrX = (pageWidth - qrSize) / 2;
-//                     const qrY = (pageHeight - qrSize) / 2 - 20;
-//                     pdf.addImage(qr.qrDataURL, 'PNG', qrX, qrY, qrSize, qrSize);
-//                 }
-                
-//                 // Ячейка 
-//                 pdf.setFontSize(100);
-//                 pdf.setFont("Roboto", "black");
-//                 pdf.text(courierData.cell.value, 5, 45, { align: 'left' });
-                
-//                 // Номер PALLET крупно под QR
-//                 const pureNumber = qr.value;
-//                 pdf.setTextColor(0, 0, 0);
-//                 pdf.setFont("Roboto", "black");
-//                 pdf.setFontSize(35);
-//                 pdf.text(`${pureNumber}`, 6, 58, { align: 'left' });
-                
-//             } else {
-//                 // ===== ДИЗАЙН ДЛЯ CART (как было) =====
-                
-//                 // ====== Ячейка (крупно справа) ======
-//                 pdf.setFont("Roboto", "black");
-//                 pdf.setFontSize(120);
-//                 const cellX = courierData.cell.value.startsWith('KGT') ? 52 + 10 : 52;
-//                 pdf.text(courierData.cell.value, cellX, 88);
-                
-//                 // ====== QR справа ======
-//                 if (qr.qrDataURL) {
-//                     pdf.addImage(qr.qrDataURL, 'PNG', 84, 105, 90, 90);
-//                 }
-
-//                 // ====== Левый вертикальный блок ======
-//                 const blockX = 5;
-//                 const blockY = 90;
-//                 const blockWidth = 45;
-//                 const blockHeight = 110;
-
-//                 // Рамка
-//                 pdf.setLineWidth(0.2);
-//                 pdf.rect(blockX, blockY, blockWidth, blockHeight);
-
-//                 // Черная шапка
-//                 pdf.setFillColor(0, 0, 0);
-//                 pdf.rect(blockX, blockY, blockWidth, 12, 'F');
-
-//                 pdf.setTextColor(255, 255, 255);
-//                 pdf.setFont("Roboto", "bold");
-//                 pdf.setFontSize(16);
-//                 pdf.text('Номер CART:', blockX + 4, blockY + 8);
-
-//                 // Возвращаем цвет текста
-//                 pdf.setTextColor(0, 0, 0);
-
-//                 // ====== Номер (только число, без CART-) ======
-//                 const pureNumberCart = qr.value.replace(/[^0-9]/g, '');
-
-//                 pdf.setFont("Roboto", "black");
-//                 pdf.setFontSize(100);
-
-//                 const digitCount = pureNumberCart.length;
-
-//                 let textX = 40;
-//                 let textY = 192.5;
-
-//                 // Корректировка в зависимости от количества цифр
-//                 switch(digitCount) {
-//                     case 1:
-//                         textX = 40;
-//                         textY = 192.5 - 30;
-//                         break;
-//                     case 2:
-//                         textX = 40;
-//                         textY = 192.5 - 20;
-//                         break;
-//                     case 3:
-//                         textX = 40;
-//                         textY = 192.5 - 10;
-//                         break;
-//                     case 4:
-//                         break;
-//                     default:
-//                         const extraDigits = digitCount - 4;
-//                         textX = 40 - (extraDigits * 1.5);
-//                         textY = 192.5 - (extraDigits * 1);
-//                 }
-
-//                 pdf.text(pureNumberCart, textX, textY, { angle: 90 });
-//             }
-
-//             // ====== Иконка (общая для обоих типов, но с разными позициями) ======
-//             const svgString = qr.type === 'PALLET' ? tpi_cc_i_pallet : tpi_cc_i_cart;
-            
-//             // Создаем временный canvas с высоким разрешением
-//             const canvas = document.createElement('canvas');
-//             canvas.width = 240;
-//             canvas.height = 240;
-//             const ctx = canvas.getContext('2d');
-//             ctx.scale(4, 4);
-            
-//             // Создаем изображение из SVG
-//             const img = new Image();
-//             const svgBlob = new Blob([svgString], {type: 'image/svg+xml;charset=utf-8'});
-//             const url = URL.createObjectURL(svgBlob);
-            
-//             await new Promise((resolve) => {
-//                 img.onload = function() {
-//                     ctx.drawImage(img, 0, 0, 60, 60);
-//                     URL.revokeObjectURL(url);
-                    
-//                     const pngData = canvas.toDataURL('image/png');
-                    
-//                     if (qr.type === 'PALLET') {
-//                         // Иконка вверху справа для PALLET (внутри квадрата)
-//                         pdf.addImage(pngData, 'PNG', pageWidth - 45, 15, 30, 35);
-//                     } else {
-//                         // Иконка над левым блоком для CART
-//                         const blockX = 5;
-//                         const blockY = 90;
-//                         const blockWidth = 45;
-//                         const iconX = blockX + (blockWidth - 40) / 2;
-//                         const iconY = blockY - 40;
-                        
-//                         pdf.addImage(pngData, 'PNG', iconX, iconY, 40, 40);
-//                     }
-//                     resolve();
-//                 };
-//                 img.src = url;
-//             });
-//         }
-
-//         // ====== ОТОБРАЖЕНИЕ ФИО КУРЬЕРА В PDF ======
-//         const totalPages = pdf.internal.getNumberOfPages();
-
-//         for (let i = 1; i <= totalPages; i++) {
-//             pdf.setPage(i);
-            
-//             // Определяем тип текущей страницы
-//             const pageType = i <= qrCodes.length ? qrCodes[i-1].type : 'CART';
-            
-//             // Обработка ФИО
-//             let processedName = courierData.courierName;
-            
-//             // Определяем выравнивание и отступ в зависимости от типа страницы
-//             let textAlign, textX;
-//             if (pageType === 'PALLET') {
-//                 textAlign = 'right';
-//                 textX = pageWidth - 5; // Фиксированный отступ для всех строк PALLET
-//             } else {
-//                 textAlign = 'left';
-//                 textX = 5;
-//             }
-
-//             // Проверяем, начинается ли с "СЦ Воронеж"
-//             if (processedName.startsWith('СЦ Воронеж')) {
-//                 const remainingText = processedName.replace('СЦ Воронеж', '').trim();
-                
-//                 const fioParts = ['СЦ', 'Воронеж'];
-                
-//                 if (remainingText) {
-//                     fioParts.push(remainingText);
-//                 }
-                
-//                 // Удаляем все пробелы из каждой части
-//                 const cleanedParts = fioParts.map(part => part.replace(/\s+/g, ''));
-                
-//                 pdf.setFont("Roboto", "bold");
-//                 pdf.setFontSize(65);
-                
-//                 let fioY = 230;
-                
-//                 cleanedParts.forEach(part => {
-//                     if (part.trim()) {
-//                         if (textAlign === 'right') {
-//                             pdf.text(part, textX, fioY, { align: 'right' });
-//                         } else {
-//                             pdf.text(part, textX, fioY);
-//                         }
-//                         fioY += 26;
-//                     }
-//                 });
-//             } else {
-//                 // Для остальных случаев
-//                 const fioParts = processedName.split(/(?=[А-ЯЁA-Z])/).filter(part => part.trim());
-                
-//                 const filteredParts = fioParts.filter(part => {
-//                     const upperPart = part.toUpperCase();
-//                     return !upperPart.includes('НОВЫЙ');
-//                 });
-                
-//                 // Удаляем все пробелы из каждой части
-//                 const cleanedParts = filteredParts.map(part => part.replace(/\s+/g, ''));
-                
-//                 pdf.setFont("Roboto", "bold");
-//                 pdf.setFontSize(65);
-                
-//                 let fioY = 230;
-                
-//                 cleanedParts.forEach(part => {
-//                     if (part.trim()) {
-//                         if (textAlign === 'right') {
-//                             pdf.text(part, textX, fioY, { align: 'right' });
-//                         } else {
-//                             pdf.text(part, textX, fioY);
-//                         }
-//                         fioY += 26;
-//                     }
-//                 });
-//             }
-//         }
-
-//         // Формируем имя файла
-//         const nameParts = courierData.courierName.split(' ');
-//         let fileName = '';
-        
-//         if (nameParts.length >= 1) {
-//             fileName = nameParts[0];
-            
-//             if (nameParts.length >= 2) {
-//                 const firstName = nameParts[1].charAt(0).toUpperCase();
-//                 fileName += `_${firstName}.`;
-                
-//                 if (nameParts.length >= 3) {
-//                     const lastName = nameParts[2].charAt(0).toUpperCase();
-//                     fileName += `${lastName}.`;
-//                 }
-//             }
-//         } else {
-//             fileName = courierData.courierName.replace(/\s+/g, '_');
-//         }
-        
-//         fileName = fileName.replace(/[^а-яА-ЯёЁa-zA-Z._]/g, '');
-        
-//         const now = new Date();
-//         const day = String(now.getDate()).padStart(2, '0');
-//         const month = String(now.getMonth() + 1).padStart(2, '0');
-//         const year = now.getFullYear();
-//         const dateStr = `${day}.${month}.${year}`;
-        
-//         fileName = `${fileName}_${dateStr}`;
-        
-//         if (!fileName || fileName === '_' + dateStr) {
-//             fileName = `courier_${dateStr}`;
-//         }
-
-//         console.log('💾 Сохраняем файл:', fileName + '.pdf');
-//         pdf.save(`${fileName}.pdf`);
-
-//     } catch (error) {
-//         console.error('❌ Ошибка создания PDF для курьера:', error);
-//     } finally {
-//         if (printButton) {
-//             printButton.removeAttribute('tpi-cc-printing-state');
-//         }
-//     }
-// }
 
 // Единый обработчик для всех кнопок печати
 document.addEventListener('click', async function(event) {
@@ -8384,12 +7712,14 @@ document.addEventListener('click', async function(event) {
         event.stopPropagation();
         
         const printText = printAllButton.querySelector('.tpi-cc-print-all-text');
+        const progBlock = document.querySelector('.tpi-cc-print-all-progress-bar')
         const data = tpi_cc_claimTableData_toPrint();
         
         await tpi_cc_generatePDFlabels(data, {
             printButton: printAllButton,
             progressText: printText,
-            isSingleCourier: false
+            isSingleCourier: false,
+            progressBlock: progBlock
         });
         return;
     }
@@ -8400,6 +7730,35 @@ document.addEventListener('click', async function(event) {
         event.preventDefault();
         event.stopPropagation();
 
+        // Добавляем получение прогресс-бара
+        const progBlock = document.querySelector('.tpi-cc-print-selected-progress-bar');
+        let printText = document.querySelector('.tpi-cc-process-manager-button[tpi-cc-action="print"] p.tpi-cc-process-manager-text')
+            
+        // БЛОКИРУЕМ ВСЕ КНОПКИ В ПРОЦЕСС-МЕНЕДЖЕРЕ (включая кнопку закрытия)
+        const processManagerButtons = document.querySelectorAll('.tpi-cc-process-manager-button');
+        const closeButton = document.querySelector('.tpi-cc-process-manager-close');
+        const selectRowsButtons = document.querySelectorAll('.tpi-print-row-button')
+        
+        processManagerButtons.forEach(btn => {
+            btn.style.pointerEvents = 'none';
+            btn.disabled = true;
+        });
+        
+        // Блокируем кнопку закрытия отдельно
+        if (closeButton && selectRowsButtons) {
+            closeButton.style.pointerEvents = 'none';
+            closeButton.disabled = true;
+            selectRowsButtons.forEach(btn => {
+                btn.disabled = true;
+            })
+        }
+        
+        // БЛОКИРУЕМ ВСЕ КНОПКИ CART И PALLET В ТАБЛИЦЕ
+        const allTableButtons = document.querySelectorAll('.tpi-cc--table-tbody-data-button');
+        allTableButtons.forEach(btn => {
+            btn.disabled = true;
+        });
+
         // Собираем выбранные номера CART и PALLET
         const selectedCartButtons = document.querySelectorAll('.tpi-cc-table-tbody-data-cart-id[tpi-cc-selected-courier-cell]');
         const selectedPalletButtons = document.querySelectorAll('.tpi-cc-table-tbody-data-pallet-id[tpi-cc-selected-courier-cell]');
@@ -8408,6 +7767,21 @@ document.addEventListener('click', async function(event) {
             if (typeof tpiNotification !== 'undefined') {
                 tpiNotification.show('Нет выделенных', 'warning', 'Не выбрано ни одного CART или PALLET номера');
             }
+            // РАЗБЛОКИРУЕМ КНОПКИ ПРИ ОШИБКЕ
+            processManagerButtons.forEach(btn => {
+                btn.style.pointerEvents = '';
+                btn.disabled = false;
+            });
+            if (closeButton && selectRowsButtons) {
+                closeButton.style.pointerEvents = '';
+                closeButton.disabled = false;
+                selectRowsButtons.forEach(btn => {
+                    btn.disabled = false;
+                })
+            }
+            allTableButtons.forEach(btn => {
+                btn.disabled = false;
+            });
             return;
         }
 
@@ -8456,10 +7830,31 @@ document.addEventListener('click', async function(event) {
 
         const data = Array.from(rowsMap.values());
         
-        await tpi_cc_generatePDFlabels(data, {
-            printButton: processPrintButton,
-            isSingleCourier: data.length === 1
-        });
+        try {
+            await tpi_cc_generatePDFlabels(data, {
+                printButton: processPrintButton,
+                isSingleCourier: data.length === 1,
+                progressText: printText,
+                progressBlock: progBlock
+            });
+        } finally {
+            // РАЗБЛОКИРУЕМ ВСЕ КНОПКИ ПОСЛЕ ЗАВЕРШЕНИЯ
+            processManagerButtons.forEach(btn => {
+                btn.style.pointerEvents = '';
+                btn.disabled = false;
+            });
+            if (closeButton && selectRowsButtons) {
+                closeButton.style.pointerEvents = '';
+                closeButton.disabled = false;
+                selectRowsButtons.forEach(btn => {
+                    btn.disabled = false;
+                })
+            }
+            allTableButtons.forEach(btn => {
+                btn.style.pointerEvents = '';
+                btn.disabled = false;
+            });
+        }
         return;
     }
 
@@ -8522,13 +7917,15 @@ async function tpi_cc_generatePDFlabels(data, options = {}) {
     const {
         printButton = null,
         progressText = null,
-        isSingleCourier = false
+        isSingleCourier = false,
+        progressBlock = null
     } = options;
 
     try {
         // Устанавливаем состояние загрузки для кнопки
         if (printButton) {
             printButton.setAttribute('tpi-cc-printing-state', 'loading');
+            printButton.disabled = true;
         }
 
         // Приводим данные к массиву, если это не массив
@@ -8605,8 +8002,11 @@ async function tpi_cc_generatePDFlabels(data, options = {}) {
         const totalQRCount = allQRPromises.length;
 
         // Обновляем прогресс, если есть текстовый элемент
-        if (progressText) {
-            progressText.textContent = 'Генерация: 0%';
+        if (progressText && progressBlock) {
+            // Определяем, от какой кнопки пришел вызов
+            const isProcessButton = printButton && printButton.closest('.tpi-cc-process-manager-button');
+            progressText.textContent = isProcessButton ? '0%' : 'Генерация: 0%';
+            progressBlock.style.width = '0%';
         }
 
         // Генерируем QR-коды с обновлением прогресса
@@ -8651,8 +8051,10 @@ async function tpi_cc_generatePDFlabels(data, options = {}) {
 
             // Обновляем прогресс после каждого QR-кода
             const progress = Math.round(((i + 1) / totalQRCount) * 100);
-            if (progressText) {
-                progressText.textContent = `Генерация: ${progress}%`;
+            if (progressText && progressBlock) {
+                const isProcessButton = printButton && printButton.closest('.tpi-cc-process-manager-button');
+                progressText.textContent = isProcessButton ? `${progress}%` : `Генерация: ${progress}%`;
+                progressBlock.style.width = `${progress}%`;
             }
             
             // Небольшая задержка для плавности обновления UI
@@ -8718,12 +8120,12 @@ async function tpi_cc_generatePDFlabels(data, options = {}) {
                 
                 // Заливка квадрата серым
                 pdf.setFillColor(240, 240, 240);
-                pdf.roundedRect(squareX, squareY, squareSize, squareSize, 3, 3, 'F');
+                pdf.roundedRect(squareX, squareY, squareSize, squareSize, 10, 10, 'F');
                 
                 // Черная рамка
                 pdf.setDrawColor(0, 0, 0);
                 pdf.setLineWidth(0.35);
-                pdf.roundedRect(squareX, squareY, squareSize, squareSize, 3, 3, 'S');
+                pdf.roundedRect(squareX, squareY, squareSize, squareSize, 10, 10, 'S');
                 
                 // QR-код в центре
                 if (qr.qrDataURL) {
@@ -8941,11 +8343,17 @@ async function tpi_cc_generatePDFlabels(data, options = {}) {
         fileName = `${fileName}_${dateStr}`;
         
         if (!fileName || fileName === '_' + dateStr || fileName === 'Курьер_' + dateStr) {
-            fileName = `couriers_${dateStr}`;
+            fileName = `Курьеры_${dateStr}`;
         }
 
-        if (progressText) {
-            progressText.textContent = 'Генерация: 100%';
+        if (progressText && progressBlock) {
+            const isProcessButton = printButton && printButton.closest('.tpi-cc-process-manager-button');
+            progressText.textContent = isProcessButton ? '100%' : 'Генерация: 100%';
+            progressBlock.style.width = '100%';
+            setTimeout(() => {
+                progressText.textContent = isProcessButton ? 'Печать' : 'Распечатать все';
+                progressBlock.style.width = '0%';
+            }, 300);
         }
 
         pdf.save(`${fileName}.pdf`);
@@ -8955,9 +8363,15 @@ async function tpi_cc_generatePDFlabels(data, options = {}) {
         if (typeof tpiNotification !== 'undefined') {
             tpiNotification.show('Ошибка', 'error', 'Не удалось создать PDF');
         }
+        if (progressText && progressBlock) {
+            const isProcessButton = printButton && printButton.closest('.tpi-cc-process-manager-button');
+            progressText.textContent = isProcessButton ? 'Печать' : 'Распечатать все';
+            progressBlock.style.width = '0%';
+        }
     } finally {
         if (printButton) {
             printButton.removeAttribute('tpi-cc-printing-state');
+            printButton.disabled = false;
         }
     }
 }
