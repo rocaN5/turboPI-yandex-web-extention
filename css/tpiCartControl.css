@@ -1339,7 +1339,7 @@ button.tpi-cc--print-current-row {
         background-image: repeating-linear-gradient(-45deg, #e8e8e8, #e8e8e8 6px, #d1d1d1 0, #d1d1d1 12px);
         background-size: 119px;
         background-position: 0%;
-        animation: tpi-cc-printing-state-loading 2s infinite linear;
+        animation: tpi-cc-printing-state-loading reverse 2s infinite linear;
         filter: unset !important;
         cursor: wait;
     }
