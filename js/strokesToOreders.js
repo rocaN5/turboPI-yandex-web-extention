@@ -710,7 +710,7 @@ function checkiIs__onStrokeToOrdersPage() {
         newOverlay.setAttribute('tpi-sto-version-selected', stoSelectedVersion === 'new' ? true : false)
         newOverlay.innerHTML = `
             <div class="tpi-sto--section" style="height: fit-content;">
-                <div class="tpi-sto--section-title" tpi-tooltip-data="TEST">
+                <div class="tpi-sto--section-title">
                     <p>Строки в заказы</p>
                     <button class="tpi-sto--switch-version">${tpiIcon__version}</button>
                 </div>
@@ -897,7 +897,7 @@ function checkiIs__onStrokeToOrdersPage() {
                             <tbody class="tpi-sto--table-tbody-wrapper">
                                 ${temp__tr_first}
                                 <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data">
+                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="Вторая приёмка завершена, прямой поток">
                                         <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
                                             <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="second-accept-complete" tpi-sto-status-direction="forward"></i>
                                         </div>
@@ -909,7 +909,7 @@ function checkiIs__onStrokeToOrdersPage() {
                                 ${temp__tr_second}
                                 ${temp__tr_first}
                                 <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data">
+                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="Вторая приемка завершена, возвратный поток">
                                         <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
                                             <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="second-accept-complete" tpi-sto-status-direction="return"></i>
                                         </div>
