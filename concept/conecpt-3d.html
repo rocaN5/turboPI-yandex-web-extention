@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>3D Box - Прозрачная паллета + камера</title>
+<style>
+body{
+    margin:0;
+    background:#e8e8e8;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:20px;
+    font-family:Arial;
+}
+canvas{ 
+    border-radius:14px; 
+    box-shadow:0 10px 25px rgba(0,0,0,0.1);
+    cursor: grab;
+}
+canvas:active { 
+    cursor: grabbing; 
+}
+.controls{ 
+    margin-top:20px; 
+    display:flex; 
+    gap:20px; 
+    background:white; 
+    padding:15px 25px; 
+    border-radius:40px; 
+    box-shadow:0 4px 10px rgba(0,0,0,0.1);
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.controls label{ 
+    font-weight:bold; 
+    color:#444;
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+input[type=range]{ width:160px; }
+.fps-counter {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    background: rgba(0,0,0,0.7);
+    color: #0f0;
+    font-family: monospace;
+    font-size: 16px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255,255,255,0.2);
+    z-index: 100;
+    pointer-events: none;
+}
+</style>
+</head>
+<body style="position:relative;">
+
+<div class="fps-counter" id="fps">FPS: <span id="fpsValue">60</span></div>
+
+<canvas id="c" width="800" height="550"></canvas>
+
+<div class="controls">
+<label>X <input type="range" id="sizeX" min="80" max="400" value="300"></label>
+<label>Y <input type="range" id="sizeY" min="80" max="400" value="300"></label>
+<label>Z <input type="range" id="sizeZ" min="80" max="400" value="300"></label>
+<label style="margin-left:20px">
+    <input type="checkbox" id="palletCheck" checked> Паллета
+</label>
+</div>
+
+<script>
+const canvas = document.getElementById("c");
+const ctx = canvas.getContext("2d");
+
+// Размеры куба (300x300x300 мм)
+let cubeWidth = 300, cubeHeight = 300, cubeDepth = 300;
+let showPallet = true;
+
+let cameraAngleX = 0.3;
+let cameraAngleY = 0.8;
+let cameraDistance = 1200;
+
+let interacting = false;
+const autoSpeed = 0.005;
+
+let fps = 60;
+let lastFrameTime = performance.now();
+let frameCount = 0;
+
+// Центр сцены по Y
+let sceneCenterY = 0;
+
+// Элементы управления
+document.getElementById('sizeX').oninput = e => {
+    cubeWidth = +e.target.value;
+    updateSceneCenter();
+};
+document.getElementById('sizeY').oninput = e => {
+    cubeHeight = +e.target.value;
+    updateSceneCenter();
+};
+document.getElementById('sizeZ').oninput = e => {
+    cubeDepth = +e.target.value;
+    updateSceneCenter();
+};
+document.getElementById('palletCheck').onchange = e => {
+    showPallet = e.target.checked;
+    updateSceneCenter();
+};
+
+// Базовые вершины куба (от -1 до 1)
+const cubeBaseVertices = [
+    [-1,-1,-1], [1,-1,-1], [1,1,-1], [-1,1,-1],
+    [-1,-1, 1], [1,-1, 1], [1,1, 1], [-1,1, 1]
+];
+
+// Грани куба (индексы вершин)
+const cubeFaces = [
+    [0,1,2,3], // задняя (z = -1)
+    [5,4,7,6], // передняя (z = 1)
+    [4,5,1,0], // нижняя (y = -1)
+    [3,2,6,7], // верхняя (y = 1)
+    [1,5,6,2], // правая (x = 1)
+    [4,0,3,7]  // левая (x = -1)
+];
+
+// Параметры паллеты (1200x800x145 мм)
+const pallet = {
+    width: 1200,        // по X
+    depth: 800,        // по Z
+    boardThick: 20,    // толщина досок
+    legHeight: 45,     // высота опор
+    legSize: 40,       // размер опоры в плане
+    crossBoardHeight: 25, // высота поперечных досок
+    topBoardCount: 6,
+    bottomBoardCount: 3,
+    crossBoardCount: 3
+};
+
+// Высота паллеты (от низа до верха)
+const palletTotalHeight = pallet.boardThick + pallet.legHeight + pallet.crossBoardHeight + pallet.boardThick;
+
+// Единый цвет для всех элементов паллеты (светлое дерево)
+const palletColor = '#C19A6B'; // Светло-коричневый
+
+// Создаём элементы паллеты
+function createPalletElements() {
+    let elements = [];
+    
+    // ВЕРХНИЕ ДОСКИ
+    const topY = -pallet.boardThick/2;
+    const topZPositions = [];
+    for (let i = 0; i < pallet.topBoardCount; i++) {
+        let z = -pallet.depth/2 + pallet.depth/(pallet.topBoardCount+1) * (i+1);
+        topZPositions.push(z);
+    }
+    
+    topZPositions.forEach(z => {
+        elements.push({
+            centerX: 0,
+            centerY: topY,
+            centerZ: z,
+            width: pallet.width * 0.8,
+            height: pallet.boardThick,
+            depth: pallet.boardThick * 3,
+            color: palletColor
+        });
+    });
+
+    // Поперечные доски
+    const crossY = -pallet.boardThick - pallet.crossBoardHeight/2;
+    const crossXPositions = [-pallet.width/3, 0, pallet.width/3];
+    
+    crossXPositions.forEach(x => {
+        elements.push({
+            centerX: x,
+            centerY: crossY,
+            centerZ: 0,
+            width: pallet.boardThick * 2.5,
+            height: pallet.crossBoardHeight,
+            depth: pallet.depth * 0.7,
+            color: palletColor
+        });
+    });
+
+    // Опоры
+    const legY = -pallet.boardThick - pallet.crossBoardHeight - pallet.legHeight/2;
+    const legXPositions = [-pallet.width/3, 0, pallet.width/3];
+    const legZPositions = [-pallet.depth/3, 0, pallet.depth/3];
+    
+    legZPositions.forEach(z => {
+        legXPositions.forEach(x => {
+            elements.push({
+                centerX: x,
+                centerY: legY,
+                centerZ: z,
+                width: pallet.legSize,
+                height: pallet.legHeight,
+                depth: pallet.legSize,
+                color: palletColor
+            });
+        });
+    });
+
+    // НИЖНИЕ ДОСКИ
+    const bottomY = -palletTotalHeight + pallet.boardThick/2;
+    const bottomZPositions = [-pallet.depth/3, 0, pallet.depth/3];
+    
+    bottomZPositions.forEach(z => {
+        elements.push({
+            centerX: 0,
+            centerY: bottomY,
+            centerZ: z,
+            width: pallet.width * 0.85,
+            height: pallet.boardThick,
+            depth: pallet.boardThick * 2.5,
+            color: palletColor
+        });
+    });
+
+    return elements;
+}
+
+let palletElements = createPalletElements();
+
+// Обновление центра сцены
+function updateSceneCenter() {
+    if (showPallet) {
+        // Куб стоит на паллете
+        sceneCenterY = (cubeHeight + (-palletTotalHeight)) / 2;
+    } else {
+        // Без паллеты куб стоит на земле
+        sceneCenterY = cubeHeight / 2;
+    }
+}
+
+// Начальный расчет центра
+updateSceneCenter();
+
+// Математические функции
+function normalize(vector) {
+    let length = Math.hypot(...vector);
+    return length === 0 ? vector : vector.map(n => n/length);
+}
+
+function subtract(a, b) { 
+    return [a[0]-b[0], a[1]-b[1], a[2]-b[2]]; 
+}
+
+function crossProduct(a, b) {
+    return [
+        a[1]*b[2] - a[2]*b[1],
+        a[2]*b[0] - a[0]*b[2],
+        a[0]*b[1] - a[1]*b[0]
+    ];
+}
+
+function dotProduct(a, b) { 
+    return a[0]*b[0] + a[1]*b[1] + a[2]*b[2]; 
+}
+
+// Поворот камеры
+function rotateByCamera(vector) {
+    let cosX = Math.cos(cameraAngleX);
+    let sinX = Math.sin(cameraAngleX);
+    let cosY = Math.cos(cameraAngleY);
+    let sinY = Math.sin(cameraAngleY);
+    
+    let x1 = vector[0] * cosY + vector[2] * sinY;
+    let z1 = -vector[0] * sinY + vector[2] * cosY;
+    let y1 = vector[1] * cosX - z1 * sinX;
+    let z2 = vector[1] * sinX + z1 * cosX;
+    
+    return [x1, y1, z2];
+}
+
+// Преобразование вершины куба
+function transformCubeVertex(vertex) {
+    let scaled = [
+        vertex[0] * cubeWidth/2,
+        vertex[1] * cubeHeight/2 + cubeHeight/2,
+        vertex[2] * cubeDepth/2
+    ];
+    return rotateByCamera(scaled);
+}
+
+// Преобразование точки паллеты
+function transformPalletPoint(point) {
+    return rotateByCamera(point);
+}
+
+function project([x, y, z]) {
+    let centeredY = y - sceneCenterY;
+    let scale = cameraDistance / (cameraDistance + z + 800);
+    
+    return [
+        x * scale + canvas.width/2,
+        canvas.height/2 - centeredY * scale
+    ];
+}
+
+// Рисуем сетку ПОД паллетой (на y = -300)
+function drawGrid() {
+    const gridY = -105; // Сетка глубоко под паллетой
+    const xMin = -800, xMax = 800;
+    const zMin = -800, zMax = 800;
+    const step = 100;
+
+    ctx.save();
+    ctx.strokeStyle = "#a0a0a0";
+    ctx.lineWidth = 1;
+    ctx.setLineDash([5, 5]);
+    ctx.globalAlpha = 0.4; // Более прозрачная
+
+    for (let z = zMin; z <= zMax; z += step) {
+        let p1 = rotateByCamera([xMin, gridY, z]);
+        let p2 = rotateByCamera([xMax, gridY, z]);
+        let proj1 = project(p1);
+        let proj2 = project(p2);
+        ctx.beginPath();
+        ctx.moveTo(proj1[0], proj1[1]);
+        ctx.lineTo(proj2[0], proj2[1]);
+        ctx.stroke();
+    }
+
+    for (let x = xMin; x <= xMax; x += step) {
+        let p1 = rotateByCamera([x, gridY, zMin]);
+        let p2 = rotateByCamera([x, gridY, zMax]);
+        let proj1 = project(p1);
+        let proj2 = project(p2);
+        ctx.beginPath();
+        ctx.moveTo(proj1[0], proj1[1]);
+        ctx.lineTo(proj2[0], proj2[1]);
+        ctx.stroke();
+    }
+
+    ctx.restore();
+}
+
+// Рисование параллелепипеда (с поддержкой прозрачности)
+function drawBox(centerX, centerY, centerZ, width, height, depth, color, isPalletElement = false) {
+    // Вершины параллелепипеда
+    let vertices = [
+        [-width/2, -height/2, -depth/2],
+        [ width/2, -height/2, -depth/2],
+        [ width/2, -height/2,  depth/2],
+        [-width/2, -height/2,  depth/2],
+        [-width/2,  height/2, -depth/2],
+        [ width/2,  height/2, -depth/2],
+        [ width/2,  height/2,  depth/2],
+        [-width/2,  height/2,  depth/2]
+    ];
+    
+    // Сдвиг в центр и поворот
+    let transformed = vertices.map(v => 
+        transformPalletPoint([v[0] + centerX, v[1] + centerY, v[2] + centerZ])
+    );
+    let projected = transformed.map(v => project(v));
+
+    // Грани параллелепипеда
+    let boxFaces = [
+        [0,1,2,3], // низ
+        [4,5,6,7], // верх
+        [0,1,5,4], // перед
+        [3,2,6,7], // зад
+        [1,2,6,5], // право
+        [0,3,7,4]  // лево
+    ];
+
+    // Сортируем грани по глубине
+    let facesWithDepth = boxFaces.map(face => {
+        let center = [0,0,0];
+        face.forEach(index => {
+            center[0] += transformed[index][0];
+            center[1] += transformed[index][1];
+            center[2] += transformed[index][2];
+        });
+        center = center.map(c => c/4);
+        return { face, depth: center[2] };
+    }).sort((a, b) => b.depth - a.depth);
+
+    // Рисуем грани
+    for (let item of facesWithDepth) {
+        let points = item.face.map(index => projected[index]);
+        
+        if (isPalletElement) {
+            // Для паллеты делаем полупрозрачной
+            ctx.fillStyle = color;
+            ctx.globalAlpha = 1.0; // Прозрачность 60%
+        } else {
+            ctx.fillStyle = color;
+            ctx.globalAlpha = 1.0;
+        }
+        
+        ctx.beginPath();
+        ctx.moveTo(points[0][0], points[0][1]);
+        for (let i = 1; i < points.length; i++) {
+            ctx.lineTo(points[i][0], points[i][1]);
+        }
+        ctx.closePath();
+        ctx.fill();
+        
+        // Обводка для паллеты тоже полупрозрачная
+        if (isPalletElement) {
+            ctx.strokeStyle = '#8B5A2B';
+            ctx.globalAlpha = 0.4;
+        } else {
+            ctx.strokeStyle = '#b98a5c';
+            ctx.globalAlpha = 1.0;
+        }
+        ctx.lineWidth = isPalletElement ? 0.8 : 1.5;
+        ctx.stroke();
+    }
+}
+
+// Рисование всей паллеты
+function drawPallet() {
+    ctx.save();
+    
+    // Сортируем элементы паллеты по глубине
+    let elementsWithDepth = palletElements.map(element => {
+        let center = transformPalletPoint([element.centerX, element.centerY, element.centerZ]);
+        return { element, depth: center[2] };
+    }).sort((a, b) => b.depth - a.depth);
+    
+    elementsWithDepth.forEach(item => {
+        let el = item.element;
+        drawBox(el.centerX, el.centerY, el.centerZ, el.width, el.height, el.depth, el.color, true);
+    });
+    
+    ctx.restore();
+}
+
+// Иконки на гранях куба
+function drawManipulationSymbol(points) {
+    let p0 = points[0], p1 = points[1], p3 = points[3];
+    let vx = [p1[0] - p0[0], p1[1] - p0[1]];
+    let vy = [p3[0] - p0[0], p3[1] - p0[1]];
+
+    ctx.save();
+    ctx.globalAlpha = 0.4;
+    ctx.transform(
+        vx[0]/100, vx[1]/100,
+        vy[0]/100, vy[1]/100,
+        p0[0] + vx[0]*0.2 + vy[0]*0.2,
+        p0[1] + vx[1]*0.2 + vy[1]*0.2
+    );
+    ctx.scale(0.5, 0.5);
+    ctx.strokeStyle = "#332211";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(4,6); ctx.lineTo(7,3); ctx.lineTo(10,6);
+    ctx.moveTo(7,17); ctx.lineTo(7,3);
+    ctx.moveTo(14,6); ctx.lineTo(17,3); ctx.lineTo(20,6);
+    ctx.moveTo(17,17); ctx.lineTo(17,3);
+    ctx.moveTo(4,21); ctx.lineTo(20,21);
+    ctx.stroke();
+    ctx.restore();
+}
+
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.globalAlpha = 1.0;
+
+    // Сетка ПОД всем (на y = -300)
+    drawGrid();
+
+    // Паллета (над сеткой)
+    if (showPallet) {
+        drawPallet();
+    }
+
+    // Куб (на паллете)
+    let cubeVertices = cubeBaseVertices.map(v => transformCubeVertex(v));
+    let cubeProjected = cubeVertices.map(v => project(v));
+
+    const lightDirection = normalize([0.5, 1, 0.5]);
+
+    // Подготавливаем грани куба с глубиной
+    let cubeFacesWithDepth = cubeFaces.map((face, index) => {
+        // Вычисляем нормаль грани
+        let v1 = subtract(cubeBaseVertices[face[1]], cubeBaseVertices[face[0]]);
+        let v2 = subtract(cubeBaseVertices[face[2]], cubeBaseVertices[face[0]]);
+        let normal = normalize(crossProduct(v1, v2));
+        
+        // Центр грани
+        let center = [0,0,0];
+        face.forEach(vertexIndex => {
+            center[0] += cubeBaseVertices[vertexIndex][0];
+            center[1] += cubeBaseVertices[vertexIndex][1];
+            center[2] += cubeBaseVertices[vertexIndex][2];
+        });
+        center = center.map(c => c/4);
+        
+        // Центр грани в мировых координатах
+        let worldCenter = transformCubeVertex(center);
+        
+        return {
+            face,
+            index,
+            depth: worldCenter[2],
+            normal
+        };
+    }).sort((a, b) => b.depth - a.depth);
+
+    // Рисуем грани куба
+    for (let faceData of cubeFacesWithDepth) {
+        let points = faceData.face.map(vertexIndex => cubeProjected[vertexIndex]);
+        
+        // Поворачиваем нормаль для освещения
+        let cosX = Math.cos(cameraAngleX), sinX = Math.sin(cameraAngleX);
+        let cosY = Math.cos(cameraAngleY), sinY = Math.sin(cameraAngleY);
+        
+        let nx = faceData.normal[0];
+        let ny = faceData.normal[1];
+        let nz = faceData.normal[2];
+        
+        let rotatedNX = nx * cosY + nz * sinY;
+        let rotatedNZ = -nx * sinY + nz * cosY;
+        let rotatedNY = ny * cosX - rotatedNZ * sinX;
+        
+        let rotatedNormal = [rotatedNX, rotatedNY, rotatedNZ];
+        
+        let lightIntensity = Math.max(0.3, dotProduct(rotatedNormal, lightDirection));
+        
+        let red = 180 + 50 * lightIntensity;
+        let green = 130 + 40 * lightIntensity;
+        let blue = 75 + 30 * lightIntensity;
+        
+        ctx.beginPath();
+        ctx.moveTo(points[0][0], points[0][1]);
+        for (let i = 1; i < points.length; i++) {
+            ctx.lineTo(points[i][0], points[i][1]);
+        }
+        ctx.closePath();
+        
+        ctx.fillStyle = `rgb(${Math.min(255, red)}, ${Math.min(255, green)}, ${Math.min(255, blue)})`;
+        ctx.fill();
+        
+        ctx.strokeStyle = "#b98a5c";
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // Иконки на вертикальных гранях
+        if (faceData.index === 0 || faceData.index === 1 || faceData.index === 4 || faceData.index === 5) {
+            drawManipulationSymbol(points);
+        }
+    }
+}
+
+let lastX, lastY;
+
+canvas.addEventListener("mousedown", e => {
+    interacting = true;
+    lastX = e.clientX;
+    lastY = e.clientY;
+});
+
+canvas.addEventListener("mousemove", e => {
+    if (!interacting) return;
+    cameraAngleY -= (e.clientX - lastX) * 0.005;
+    cameraAngleX += (e.clientY - lastY) * 0.005;
+    // ИСПРАВЛЕНИЕ: Разрешаем камере смотреть сверху (до PI/2) и снизу (до -PI/2)
+    cameraAngleX = Math.max(-1.2, Math.min(1.2, cameraAngleX));
+    lastX = e.clientX;
+    lastY = e.clientY;
+});
+
+canvas.addEventListener("mouseup", () => interacting = false);
+canvas.addEventListener("mouseleave", () => interacting = false);
+
+canvas.addEventListener("wheel", e => {
+    e.preventDefault();
+    cameraDistance += e.deltaY * -0.5;
+    cameraDistance = Math.max(400, Math.min(4000, cameraDistance));
+});
+
+function updateFPS() {
+    frameCount++;
+    const now = performance.now();
+    const delta = now - lastFrameTime;
+    if (delta >= 1000) {
+        fps = Math.round((frameCount * 1000) / delta);
+        document.getElementById('fpsValue').textContent = fps;
+        frameCount = 0;
+        lastFrameTime = now;
+    }
+}
+
+function animate() {
+    if (!interacting) cameraAngleY += autoSpeed;
+    draw();
+    updateFPS();
+    requestAnimationFrame(animate);
+}
+
+animate();
+</script>
+
+</body>
+</html>

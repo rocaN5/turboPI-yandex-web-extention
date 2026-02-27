@@ -194,6 +194,7 @@ th.tpi-cc--table-thead-item .tpi-cc--table-thead-data {
     box-shadow: -2px -1px 0px -1px #e8e8e8 inset;
     position: relative;
     z-index: 0;
+    vertical-align: middle;
     
     &:first-child{
         position: sticky;
@@ -257,6 +258,7 @@ td.tpi-cc--table-tbody-item div.tpi-cc--table-tbody-data{
     height: 100%;
     display: flex;
     align-items: center;
+    height: fit-content;
 }
 
 td.tpi-cc--table-tbody-item div.tpi-cc--table-tbody-data-courier{

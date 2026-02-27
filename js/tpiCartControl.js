@@ -313,11 +313,6 @@ async function loadDateRangeStatuses(startDate, endDate) {
     }
 }
 
-// Вызываем предзагрузку при инициализации
-setTimeout(() => {
-    preloadCalendarData();
-}, 1000);
-
 function extractCartNumbers(courierData) {
     const cartNumbers = [];
     
@@ -1547,10 +1542,8 @@ function checkiIs__onCartControlsPage() {
         })
         
         // Инициализируем Firebase для TPI
-        tpiInitializeFirebase();
 
         // Сразу скрываем все UI элементы
-        hideAllUI();
 
         // Показываем лоадер перед первой проверкой данных
         const loadingWrapper = document.querySelector('.tpi-cc--no-data-loading-wrapper');
@@ -1559,9 +1552,6 @@ function checkiIs__onCartControlsPage() {
         }
 
         // Запускаем проверку данных для текущей даты
-        setTimeout(async () => {
-            await tpiCheckAndLoadData();
-        }, 100);
 
         // Запускаем проверку данных для текущей даты
         setTimeout(async () => {
@@ -1611,6 +1601,16 @@ function addCartsControlsListeners(){
     tpi_cc_filteringColumnData()
     initializeDatePicker();
     initializeCourierStatusDropdown()
+    tpiInitializeFirebase();
+    hideAllUI();
+    setTimeout(() => {
+        preloadCalendarData();
+    }, 500);
+
+    setTimeout(async () => {
+        await tpiCheckAndLoadData();
+    }, 100);
+    
     // const statusDropdown = initializeCourierStatusDropdown();
 }
 
@@ -2712,6 +2712,10 @@ function cartPallet_btnActions() {
             update_ActionProcessContainer();
         });
     });
+    
+    initializeAddCartButtons();
+    initializeAddPalletButtons();
+    initializeDeleteButton();
     update_ActionProcessContainer();
 }
 
@@ -3182,13 +3186,13 @@ function createCourierTableRow(courierData, index) {
     }
     
     // Кнопка добавления CART (всегда показываем)
-    const addCartButton = `
+    const addCartButton = !isNullCell && !isKGT ? `
         <div class="tpi-cc--carts-control-buttons-wrapper">
             <button class="tpi-cc--table-tbody-add-cart" tpi-state-change="tpi-add-cart" tpi-tooltip-data="Добавить CART курьеру">
                 <i>${tpi_cc_i_cart_add}</i>
             </button>
         </div>
-    `;
+    ` : '';
     
     // Создаем HTML для кнопок PALLET (для обычных курьеров и КГТ, не для null ячеек)
     let palletButtonsHTML = '';
@@ -3232,13 +3236,13 @@ function createCourierTableRow(courierData, index) {
     }
     
     // Кнопка добавления PALLET (всегда показываем)
-    const addPalletButton = `
+    const addPalletButton = !isNullCell && !isKGT ? `
         <div class="tpi-cc--carts-control-buttons-wrapper">
             <button class="tpi-cc--table-tbody-add-pallet" tpi-state-change="tpi-add-pallet" tpi-tooltip-data="Добавить PALLET курьеру">
                 <i>${tpi_cc_i_cart_add}</i>
             </button>
         </div>
-    `;
+    ` : '';
     
     // Формируем HTML для блока печати в зависимости от условий
 let printBlockHtml = `
@@ -3656,6 +3660,9 @@ async function fillCouriersTableAndSaveToFirebase() {
         });
 
         initializePrintRowButtons();
+        initializeAddCartButtons();
+        initializeAddPalletButtons();
+        initializeDeleteButton();
         
         // Скрываем блок загрузки и показываем таблицу
         document.querySelector('.tpi-cc--no-ds-data-wrapper').style.display = 'none';
@@ -4116,9 +4123,6 @@ function initializeDatePicker() {
             updatePrintButtonsVisibility();
             
             // Сразу запускаем проверку данных
-            setTimeout(async () => {
-                await tpiCheckAndLoadData();
-            }, 100);
         }
     });
 
@@ -5753,29 +5757,14 @@ function restoreEventListeners() {
         });
         initializePrintRowButtons();
     });
+    initializeAddCartButtons();
+    initializeAddPalletButtons();
+    initializeDeleteButton();
     
-    // Восстанавливаем обработчики для кнопок добавления CART/PALLET
-    const addCartButtons = document.querySelectorAll('.tpi-cc--table-tbody-add-cart');
-    const addPalletButtons = document.querySelectorAll('.tpi-cc--table-tbody-add-pallet');
-    
-    addCartButtons.forEach(btn => {
-        const newBtn = btn.cloneNode(true);
-        btn.parentNode.replaceChild(newBtn, btn);
-        // Здесь можно добавить обработчик для добавления CART
-    });
-    
-    addPalletButtons.forEach(btn => {
-        const newBtn = btn.cloneNode(true);
-        btn.parentNode.replaceChild(newBtn, btn);
-        // Здесь можно добавить обработчик для добавления PALLET
-    });
-    
-    // Восстанавливаем обработчики для кнопок печати
     const printButtons = document.querySelectorAll('.tpi-cc--print-current-row');
     printButtons.forEach(btn => {
         const newBtn = btn.cloneNode(true);
         btn.parentNode.replaceChild(newBtn, btn);
-        // Здесь можно добавить обработчик для печати
     });
     
     // Обновляем контейнер действий
@@ -6260,12 +6249,6 @@ function updateFilterCounters(total, filtered) {
         }
     }
 }
-
-preloadCalendarData().then(() => {
-    console.log('✅ Предзагрузка календаря завершена');
-}).catch(error => {
-    console.error('❌ Ошибка предзагрузки календаря:', error);
-});
 
 // C-
 // C-
@@ -8515,4 +8498,824 @@ function clearAllSelections() {
         btn.removeAttribute('tpi-cc-selected-courier-cell');
     });
     update_ActionProcessContainer();
+}
+
+// C-
+// C-
+// C- Добавить / Удалить CART
+// C-
+// C-
+
+// Функция для добавления нового CART номер к курьеру
+async function addNewCartToCourier(row, cartButton) {
+    try {
+        // Получаем ячейку курьера для определения базового номера
+        const cellElement = row.querySelector('a[tpi-cc-parsing-data="courier-route-cell"]');
+        const cellValue = cellElement ? cellElement.textContent.trim() : '';
+        
+        // Извлекаем номер из ячейки (например, "101" из "MK-101")
+        let cellNumber = 0;
+        if (cellValue && cellValue !== 'null' && cellValue !== 'Нет ячейки') {
+            const match = cellValue.match(/\d+/);
+            cellNumber = match ? parseInt(match[0]) : 0;
+        }
+        
+        if (cellNumber === 0) {
+            console.error('❌ Не удалось определить номер ячейки');
+            return null;
+        }
+        
+        // Получаем все CART кнопки в строке
+        const cartButtons = row.querySelectorAll('.tpi-cc-table-tbody-data-cart-id');
+        
+        // Находим последний CART номер у этого курьера
+        let lastCartValue = 0;
+        let lastCartNumber = null;
+        
+        cartButtons.forEach(btn => {
+            const cartNumber = btn.getAttribute('tpi-data-courier-spec-cell');
+            if (cartNumber && cartNumber.startsWith('CART-')) {
+                const numValue = parseInt(cartNumber.replace('CART-', ''));
+                if (numValue > lastCartValue) {
+                    lastCartValue = numValue;
+                    lastCartNumber = cartNumber;
+                }
+            }
+        });
+        
+        console.log(`🔍 Последний CART для ячейки ${cellValue}: ${lastCartValue}`);
+        
+        // Определяем правильный следующий номер на основе ячейки и последнего номера
+        let nextNumber;
+        
+        if (cellValue.startsWith('MK-1')) {
+            // Первая волна: номера 1011-1019, затем 3011-3019
+            
+            if (lastCartValue === 0) {
+                // Если нет CART, начинаем с 1011
+                nextNumber = 1011;
+                console.log('🆕 Нет CART, начинаем с 1011');
+            } else {
+                // Проверяем, в каком диапазоне находится последний номер
+                if (lastCartValue >= 1011 && lastCartValue <= 1019) {
+                    // В первом диапазоне
+                    if (lastCartValue < 1019) {
+                        // Просто увеличиваем на 1
+                        nextNumber = lastCartValue + 1;
+                        console.log(`📈 В диапазоне 1011-1019: ${lastCartValue} -> ${nextNumber}`);
+                    } else {
+                        // Достигли 1019, переходим к 3011
+                        nextNumber = 3011;
+                        console.log(`🔄 Переход с 1019 на 3011`);
+                    }
+                } else if (lastCartValue >= 3011 && lastCartValue <= 3019) {
+                    // Во втором диапазоне
+                    if (lastCartValue < 3019) {
+                        // Увеличиваем на 1
+                        nextNumber = lastCartValue + 1;
+                        console.log(`📈 В диапазоне 3011-3019: ${lastCartValue} -> ${nextNumber}`);
+                    } else {
+                        // Достигли 3019 - максимум
+                        nextNumber = null;
+                        console.log(`❌ Достигнут максимум 3019`);
+                    }
+                } else {
+                    // Если номер в неправильном диапазоне, начинаем с 1011
+                    nextNumber = 1011;
+                    console.log(`⚠️ Некорректный номер ${lastCartValue}, начинаем с 1011`);
+                }
+            }
+            
+        } else if (cellValue.startsWith('MK-2')) {
+            // Вторая волна: номера 2011-2019, затем 4011-4019
+            
+            if (lastCartValue === 0) {
+                // Если нет CART, начинаем с 2011
+                nextNumber = 2011;
+                console.log('🆕 Нет CART, начинаем с 2011');
+            } else {
+                // Проверяем, в каком диапазоне находится последний номер
+                if (lastCartValue >= 2011 && lastCartValue <= 2019) {
+                    // В первом диапазоне
+                    if (lastCartValue < 2019) {
+                        // Просто увеличиваем на 1
+                        nextNumber = lastCartValue + 1;
+                        console.log(`📈 В диапазоне 2011-2019: ${lastCartValue} -> ${nextNumber}`);
+                    } else {
+                        // Достигли 2019, переходим к 4011
+                        nextNumber = 4011;
+                        console.log(`🔄 Переход с 2019 на 4011`);
+                    }
+                } else if (lastCartValue >= 4011 && lastCartValue <= 4019) {
+                    // Во втором диапазоне
+                    if (lastCartValue < 4019) {
+                        // Увеличиваем на 1
+                        nextNumber = lastCartValue + 1;
+                        console.log(`📈 В диапазоне 4011-4019: ${lastCartValue} -> ${nextNumber}`);
+                    } else {
+                        // Достигли 4019 - максимум
+                        nextNumber = null;
+                        console.log(`❌ Достигнут максимум 4019`);
+                    }
+                } else {
+                    // Если номер в неправильном диапазоне, начинаем с 2011
+                    nextNumber = 2011;
+                    console.log(`⚠️ Некорректный номер ${lastCartValue}, начинаем с 2011`);
+                }
+            }
+            
+        } else {
+            // Для других ячеек (KGT и т.д.) - не добавляем CART
+            if (typeof tpiNotification !== 'undefined') {
+                tpiNotification.show('Невозможно добавить CART', 'warning', 'Для данного типа ячейки нельзя добавить CART');
+            }
+            return null;
+        }
+        
+        // Проверяем, не превышен ли лимит
+        if (nextNumber === null) {
+            if (typeof tpiNotification !== 'undefined') {
+                tpiNotification.show('Превышено кол-во возможных CART', 'error', 'Для данного курьера достигнут максимум CART номеров');
+            }
+            return null;
+        }
+        
+        // Проверяем максимальные значения
+        if ((cellValue.startsWith('MK-1') && nextNumber > 3019) || 
+            (cellValue.startsWith('MK-2') && nextNumber > 4019)) {
+            if (typeof tpiNotification !== 'undefined') {
+                tpiNotification.show('Превышено кол-во возможных CART', 'error', 'Для данного курьера достигнут максимум CART номеров');
+            }
+            return null;
+        }
+        
+        // Создаем новый CART номер
+        const newCartNumber = `CART-${nextNumber}`;
+        
+        // Создаем новую кнопку CART
+        const newButton = document.createElement('button');
+        newButton.className = 'tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-cart-id';
+        newButton.setAttribute('tpi-data-courier-spec-cell', newCartNumber);
+        newButton.setAttribute('tpi-tooltip-data', 'Нажмите, чтобы выбрать этот CART');
+        newButton.innerHTML = `
+            <i class="tpi-cc-table-tbody-data-cart-icon">${tpi_cc_i_cart}</i>
+            -${nextNumber}
+        `;
+        
+        // Добавляем обработчик клика
+        newButton.addEventListener('click', () => {
+            if (newButton.hasAttribute('tpi-cc-selected-courier-cell')) {
+                newButton.removeAttribute('tpi-cc-selected-courier-cell');
+            } else {
+                newButton.setAttribute('tpi-cc-selected-courier-cell', '');
+            }
+            update_ActionProcessContainer();
+        });
+        
+        // Находим контейнер для CART
+        const cartDataContainer = row.querySelector('.tpi-cc--table-tbody-data-carts');
+        if (cartDataContainer) {
+            // Находим wrapper внутри контейнера CART
+            const wrapper = cartDataContainer.querySelector('.tpi-cc--carts-control-buttons-wrapper');
+            if (wrapper) {
+                // Вставляем новую кнопку перед wrapper'ом
+                cartDataContainer.insertBefore(newButton, wrapper);
+            } else {
+                // Если wrapper не найден, просто добавляем в конец
+                cartDataContainer.appendChild(newButton);
+            }
+        }
+        
+        console.log(`✅ Добавлен новый CART: ${newCartNumber} для ячейки ${cellValue}`);
+        
+        if (typeof tpiNotification !== 'undefined') {
+            tpiNotification.show('CART добавлен', 'success', `Новый номер: ${newCartNumber}`);
+        }
+        
+        return newCartNumber;
+        
+    } catch (error) {
+        console.error('❌ Ошибка при добавлении CART:', error);
+        return null;
+    }
+}
+
+// Функция для сохранения обновленных CART номеров в Firebase
+async function saveUpdatedCartNumbersToFirebase(selectedDate, courierId, cartNumbers) {
+    try {
+        if (!tpiFirebaseInitialized) {
+            tpiDb = tpiInitializeFirebase();
+            if (!tpiDb) return false;
+        }
+        
+        // Форматируем дату
+        const dateParts = selectedDate.split('/');
+        const firebaseDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+        
+        const dateDocRef = tpiDb.collection("dates").doc(firebaseDate);
+        const cartControlRef = dateDocRef.collection("cartControl");
+        
+        // Обновляем документ курьера
+        await cartControlRef.doc(courierId).update({
+            cartNumbers: cartNumbers,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        console.log(`✅ Сохранены CART номера для курьера ${courierId} в Firebase`);
+        return true;
+        
+    } catch (error) {
+        console.error('❌ Ошибка при сохранении CART номеров в Firebase:', error);
+        return false;
+    }
+}
+
+// Функция для инициализации обработчиков кнопок добавления CART
+function initializeAddCartButtons() {
+    const addCartButtons = document.querySelectorAll('.tpi-cc--table-tbody-add-cart');
+    
+    addCartButtons.forEach(button => {
+        // Удаляем старые обработчики
+        const newButton = button.cloneNode(true);
+        button.parentNode.replaceChild(newButton, button);
+        
+        newButton.addEventListener('click', async function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            // Проверяем, можно ли показывать кнопки печати
+            if (!canShowPrintButton()) {
+                if (typeof tpiNotification !== 'undefined') {
+                    tpiNotification.show('Недоступно', 'warning', 'Для данной даты нельзя добавлять CART');
+                }
+                return;
+            }
+            
+            // Находим строку
+            const row = this.closest('.tpi-cc--table-tbody');
+            if (!row) return;
+            
+            // Получаем ID курьера
+            const courierIdElement = row.querySelector('p[tpi-cc-parsing-data="courier-personal-id"]');
+            if (!courierIdElement) {
+                console.error('❌ Не найден ID курьера');
+                return;
+            }
+            const courierId = courierIdElement.textContent.trim();
+            
+            // Получаем выбранную дату
+            const searchDateButton = document.querySelector('.tpi-cc-search-date');
+            const selectedDate = searchDateButton.getAttribute('tpi-cc-selected-date-value');
+            
+            // Добавляем новый CART
+            const newCartNumber = await addNewCartToCourier(row, this);
+            
+            if (newCartNumber) {
+                // Получаем все CART номера из строки после добавления
+                const updatedCartButtons = row.querySelectorAll('.tpi-cc-table-tbody-data-cart-id');
+                const updatedCartNumbers = Array.from(updatedCartButtons).map(btn => 
+                    btn.getAttribute('tpi-data-courier-spec-cell')
+                );
+                
+                // Сохраняем в Firebase
+                const saved = await saveUpdatedCartNumbersToFirebase(selectedDate, courierId, updatedCartNumbers);
+                
+                if (saved) {
+                    
+                    // Обновляем сохраненные номера в данных курьера (для последующего сохранения)
+                    const rowIndex = Array.from(document.querySelectorAll('.tpi-cc--table-tbody')).indexOf(row);
+                    
+                    // Добавляем атрибут строки с обновленными номерами
+                    row.setAttribute('data-cart-numbers', JSON.stringify(updatedCartNumbers));
+                    
+                } else {
+                    if (typeof tpiNotification !== 'undefined') {
+                        tpiNotification.show('Ошибка', 'error', 'Не удалось сохранить в базу данных');
+                    }
+                }
+            }
+        });
+    });
+}
+
+// Функция для удаления выбранных CART/PALLET
+async function deleteSelectedItems() {
+    try {
+        // Находим все выбранные кнопки
+        const selectedCartButtons = document.querySelectorAll('.tpi-cc-table-tbody-data-cart-id[tpi-cc-selected-courier-cell]');
+        const selectedPalletButtons = document.querySelectorAll('.tpi-cc-table-tbody-data-pallet-id[tpi-cc-selected-courier-cell]');
+        
+        if (selectedCartButtons.length === 0 && selectedPalletButtons.length === 0) {
+            if (typeof tpiNotification !== 'undefined') {
+                tpiNotification.show('Нет выделенных', 'warning', 'Не выбрано ни одного CART или PALLET номера');
+            }
+            return false;
+        }
+        
+        // Группируем по строкам для обновления в БД
+        const rowsToUpdate = new Map();
+        
+        // Собираем CART для удаления
+        selectedCartButtons.forEach(btn => {
+            const row = btn.closest('.tpi-cc--table-tbody');
+            if (!row) return;
+            
+            const courierIdElement = row.querySelector('p[tpi-cc-parsing-data="courier-personal-id"]');
+            const courierId = courierIdElement ? courierIdElement.textContent.trim() : null;
+            
+            if (!courierId) return;
+            
+            if (!rowsToUpdate.has(courierId)) {
+                rowsToUpdate.set(courierId, {
+                    row: row,
+                    cartNumbers: [],
+                    palletNumbers: [],
+                    cartElements: [],
+                    palletElements: []
+                });
+            }
+            
+            const cartNumber = btn.getAttribute('tpi-data-courier-spec-cell');
+            if (cartNumber) {
+                rowsToUpdate.get(courierId).cartNumbers.push(cartNumber);
+                rowsToUpdate.get(courierId).cartElements.push(btn);
+            }
+        });
+        
+        // Собираем PALLET для удаления
+        selectedPalletButtons.forEach(btn => {
+            const row = btn.closest('.tpi-cc--table-tbody');
+            if (!row) return;
+            
+            const courierIdElement = row.querySelector('p[tpi-cc-parsing-data="courier-personal-id"]');
+            const courierId = courierIdElement ? courierIdElement.textContent.trim() : null;
+            
+            if (!courierId) return;
+            
+            if (!rowsToUpdate.has(courierId)) {
+                rowsToUpdate.set(courierId, {
+                    row: row,
+                    cartNumbers: [],
+                    palletNumbers: [],
+                    cartElements: [],
+                    palletElements: []
+                });
+            }
+            
+            const palletNumber = btn.getAttribute('tpi-data-courier-spec-cell');
+            if (palletNumber) {
+                rowsToUpdate.get(courierId).palletNumbers.push(palletNumber);
+                rowsToUpdate.get(courierId).palletElements.push(btn);
+            }
+        });
+        
+        // Получаем выбранную дату
+        const searchDateButton = document.querySelector('.tpi-cc-search-date');
+        const selectedDate = searchDateButton.getAttribute('tpi-cc-selected-date-value');
+        
+        // Удаляем элементы из UI и обновляем БД
+        let successCount = 0;
+        
+        for (const [courierId, data] of rowsToUpdate) {
+            // Удаляем элементы из DOM
+            data.cartElements.forEach(btn => btn.remove());
+            data.palletElements.forEach(btn => btn.remove());
+            
+            // Получаем оставшиеся CART и PALLET номера в строке
+            const remainingCartButtons = data.row.querySelectorAll('.tpi-cc-table-tbody-data-cart-id');
+            const remainingPalletButtons = data.row.querySelectorAll('.tpi-cc-table-tbody-data-pallet-id');
+            
+            const remainingCartNumbers = Array.from(remainingCartButtons).map(btn => 
+                btn.getAttribute('tpi-data-courier-spec-cell')
+            );
+            
+            const remainingPalletNumbers = Array.from(remainingPalletButtons).map(btn => 
+                btn.getAttribute('tpi-data-courier-spec-cell')
+            );
+            
+            // Сохраняем в Firebase
+            const saved = await saveDeletedItemsToFirebase(selectedDate, courierId, remainingCartNumbers, remainingPalletNumbers);
+            
+            if (saved) {
+                successCount++;
+                
+                // Обновляем атрибуты строки
+                data.row.setAttribute('data-cart-numbers', JSON.stringify(remainingCartNumbers));
+                data.row.setAttribute('data-pallet-numbers', JSON.stringify(remainingPalletNumbers));
+            }
+        }
+        
+        // Обновляем контейнер действий
+        update_ActionProcessContainer();
+        
+        if (successCount > 0) {
+            if (typeof tpiNotification !== 'undefined') {
+                const totalDeleted = selectedCartButtons.length + selectedPalletButtons.length;
+                tpiNotification.show('Удаление завершено', 'success', `Удалено ${totalDeleted} элементов у ${successCount} курьеров`);
+            }
+            return true;
+        } else {
+            if (typeof tpiNotification !== 'undefined') {
+                tpiNotification.show('Ошибка', 'error', 'Не удалось удалить выбранные элементы');
+            }
+            return false;
+        }
+        
+    } catch (error) {
+        console.error('❌ Ошибка при удалении выбранных элементов:', error);
+        if (typeof tpiNotification !== 'undefined') {
+            tpiNotification.show('Ошибка', 'error', 'Произошла ошибка при удалении');
+        }
+        return false;
+    }
+}
+
+// Функция для сохранения изменений после удаления в Firebase
+async function saveDeletedItemsToFirebase(selectedDate, courierId, cartNumbers, palletNumbers) {
+    try {
+        if (!tpiFirebaseInitialized) {
+            tpiDb = tpiInitializeFirebase();
+            if (!tpiDb) return false;
+        }
+        
+        // Форматируем дату
+        const dateParts = selectedDate.split('/');
+        const firebaseDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+        
+        const dateDocRef = tpiDb.collection("dates").doc(firebaseDate);
+        const cartControlRef = dateDocRef.collection("cartControl");
+        
+        // Подготавливаем данные для обновления
+        const updateData = {
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+        
+        if (cartNumbers) {
+            updateData.cartNumbers = cartNumbers;
+        }
+        
+        if (palletNumbers) {
+            updateData.palletNumbers = palletNumbers;
+        }
+        
+        // Обновляем документ курьера
+        await cartControlRef.doc(courierId).update(updateData);
+        
+        console.log(`✅ Сохранены изменения для курьера ${courierId} в Firebase после удаления`);
+        return true;
+        
+    } catch (error) {
+        console.error('❌ Ошибка при сохранении изменений в Firebase:', error);
+        return false;
+    }
+}
+
+// Добавьте этот обработчик в существующий код или обновите существующий
+function initializeDeleteButton() {
+    const deleteButton = document.querySelector('.tpi-cc-process-manager-button[tpi-cc-action="delete"]');
+    
+    if (!deleteButton) return;
+    
+    // Удаляем старые обработчики
+    const newButton = deleteButton.cloneNode(true);
+    deleteButton.parentNode.replaceChild(newButton, deleteButton);
+    
+    newButton.addEventListener('click', async function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        
+        // Проверяем, можно ли показывать кнопки печати (для удаления тоже)
+        if (!canShowPrintButton()) {
+            if (typeof tpiNotification !== 'undefined') {
+                tpiNotification.show('Недоступно', 'warning', 'Для данной даты нельзя удалять элементы');
+            }
+            return;
+        }
+        
+        // Блокируем кнопки на время удаления
+        const processManagerButtons = document.querySelectorAll('.tpi-cc-process-manager-button');
+        const closeButton = document.querySelector('.tpi-cc-process-manager-close');
+        const allTableButtons = document.querySelectorAll('.tpi-cc--table-tbody-data-button');
+        
+        processManagerButtons.forEach(btn => {
+            btn.style.pointerEvents = 'none';
+            btn.disabled = true;
+        });
+        
+        if (closeButton) {
+            closeButton.style.pointerEvents = 'none';
+            closeButton.disabled = true;
+        }
+        
+        allTableButtons.forEach(btn => {
+            btn.disabled = true;
+        });
+        
+        try {
+            await deleteSelectedItems();
+        } finally {
+            // Разблокируем кнопки
+            processManagerButtons.forEach(btn => {
+                btn.style.pointerEvents = '';
+                btn.disabled = false;
+            });
+            
+            if (closeButton) {
+                closeButton.style.pointerEvents = '';
+                closeButton.disabled = false;
+            }
+            
+            allTableButtons.forEach(btn => {
+                btn.disabled = false;
+            });
+        }
+    });
+}
+
+// Функция для добавления нового PALLET к курьеру
+async function addNewPalletToCourier(row) {
+    try {
+        // Получаем все PALLET кнопки в строке (включая те, что внутри wrapper)
+        const palletButtons = row.querySelectorAll('.tpi-cc-table-tbody-data-pallet-id');
+        
+        // Получаем ячейку курьера
+        const cellElement = row.querySelector('a[tpi-cc-parsing-data="courier-route-cell"]');
+        const cellValue = cellElement ? cellElement.textContent.trim() : '';
+        
+        // Проверяем, является ли курьер КГТ
+        const isKGT = cellValue && cellValue.toUpperCase().startsWith('KGT');
+        
+        // Для КГТ не должно быть кнопки добавления PALLET
+        if (isKGT) {
+            if (typeof tpiNotification !== 'undefined') {
+                tpiNotification.show('Невозможно добавить PALLET', 'warning', 'Для КГТ курьеров нельзя добавить PALLET');
+            }
+            return null;
+        }
+        
+        // Извлекаем базовый номер ячейки
+        let baseNumber = 0;
+        if (cellValue && cellValue !== 'null' && cellValue !== 'Нет ячейки') {
+            const match = cellValue.match(/\d+/);
+            baseNumber = match ? parseInt(match[0]) : 0;
+        }
+        
+        if (baseNumber === 0) {
+            console.error('❌ Не удалось определить номер ячейки');
+            return null;
+        }
+        
+        // Определяем, к какой волне относится курьер
+        const isFirstWave = cellValue.startsWith('MK-1');
+        const isSecondWave = cellValue.startsWith('MK-2');
+        
+        if (!isFirstWave && !isSecondWave) {
+            if (typeof tpiNotification !== 'undefined') {
+                tpiNotification.show('Невозможно добавить PALLET', 'warning', 'Для данного типа ячейки нельзя добавить PALLET');
+            }
+            return null;
+        }
+        
+        // Собираем все существующие PALLET номера у всех курьеров для определения следующего номера в нужном диапазоне
+        const allPalletNumbers = new Set();
+        const allRows = document.querySelectorAll('.tpi-cc--table-tbody');
+        
+        allRows.forEach(r => {
+            const palletBtns = r.querySelectorAll('.tpi-cc-table-tbody-data-pallet-id');
+            palletBtns.forEach(btn => {
+                const palletNumber = btn.getAttribute('tpi-data-courier-spec-cell');
+                if (palletNumber && palletNumber.startsWith('PALLET-')) {
+                    const num = parseInt(palletNumber.replace('PALLET-', ''));
+                    allPalletNumbers.add(num);
+                }
+            });
+        });
+        
+        // Определяем следующий номер
+        let nextNumber = null;
+        
+        if (isFirstWave) {
+            // Для первой волны: после базового номера (101) и 301, следующие в 500-й сотне
+            // Проверяем, есть ли уже у курьера PALLET-{baseNumber}
+            const hasBasePallet = Array.from(palletButtons).some(btn => {
+                const num = parseInt(btn.getAttribute('tpi-data-courier-spec-cell').replace('PALLET-', ''));
+                return num === baseNumber;
+            });
+            
+            // Проверяем, есть ли уже у курьера PALLET-{baseNumber + 200} (301)
+            const hasSecondPallet = Array.from(palletButtons).some(btn => {
+                const num = parseInt(btn.getAttribute('tpi-data-courier-spec-cell').replace('PALLET-', ''));
+                return num === (baseNumber + 200);
+            });
+            
+            if (!hasBasePallet) {
+                // Если нет первого PALLET (номер ячейки), добавляем его
+                nextNumber = baseNumber;
+            } else if (!hasSecondPallet) {
+                // Если есть первый, но нет второго (номер ячейки + 200)
+                nextNumber = baseNumber + 200;
+            } else {
+                // Если есть оба базовых, добавляем из 500-й сотни
+                // Ищем наименьший свободный номер в 500-й сотне
+                for (let i = 501; i <= 599; i++) {
+                    if (!allPalletNumbers.has(i)) {
+                        nextNumber = i;
+                        break;
+                    }
+                }
+            }
+        } else if (isSecondWave) {
+            // Для второй волны: после базового номера (201) и 401, следующие в 600-й сотне
+            // Проверяем, есть ли уже у курьера PALLET-{baseNumber}
+            const hasBasePallet = Array.from(palletButtons).some(btn => {
+                const num = parseInt(btn.getAttribute('tpi-data-courier-spec-cell').replace('PALLET-', ''));
+                return num === baseNumber;
+            });
+            
+            // Проверяем, есть ли уже у курьера PALLET-{baseNumber + 200} (401)
+            const hasSecondPallet = Array.from(palletButtons).some(btn => {
+                const num = parseInt(btn.getAttribute('tpi-data-courier-spec-cell').replace('PALLET-', ''));
+                return num === (baseNumber + 200);
+            });
+            
+            if (!hasBasePallet) {
+                // Если нет первого PALLET (номер ячейки), добавляем его
+                nextNumber = baseNumber;
+            } else if (!hasSecondPallet) {
+                // Если есть первый, но нет второго (номер ячейки + 200)
+                nextNumber = baseNumber + 200;
+            } else {
+                // Если есть оба базовых, добавляем из 600-й сотни
+                // Ищем наименьший свободный номер в 600-й сотне
+                for (let i = 601; i <= 699; i++) {
+                    if (!allPalletNumbers.has(i)) {
+                        nextNumber = i;
+                        break;
+                    }
+                }
+            }
+        }
+        
+        // Проверяем, найден ли свободный номер
+        if (nextNumber === null) {
+            if (typeof tpiNotification !== 'undefined') {
+                tpiNotification.show('Нет свободных номеров', 'error', 'В данном диапазоне нет свободных PALLET номеров');
+            }
+            return null;
+        }
+        
+        // Создаем новый PALLET номер
+        const newPalletNumber = `PALLET-${nextNumber}`;
+        
+        // Создаем новую кнопку
+        const newButton = document.createElement('button');
+        newButton.className = 'tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-pallet-id';
+        newButton.setAttribute('tpi-data-courier-spec-cell', newPalletNumber);
+        newButton.setAttribute('tpi-tooltip-data', 'Нажмите, чтобы выбрать этот PALLET');
+        newButton.innerHTML = `
+            <i class="tpi-cc-table-tbody-data-pallet-icon">${tpi_cc_i_pallet}</i>
+            -${nextNumber}
+        `;
+        
+        // Добавляем обработчик клика
+        newButton.addEventListener('click', () => {
+            if (newButton.hasAttribute('tpi-cc-selected-courier-cell')) {
+                newButton.removeAttribute('tpi-cc-selected-courier-cell');
+            } else {
+                newButton.setAttribute('tpi-cc-selected-courier-cell', '');
+            }
+            update_ActionProcessContainer();
+        });
+        
+        // Находим контейнер для PALLET
+        const palletDataContainer = row.querySelector('.tpi-cc--table-tbody-data-pallets');
+        if (palletDataContainer) {
+            // Находим wrapper внутри контейнера PALLET
+            const wrapper = palletDataContainer.querySelector('.tpi-cc--carts-control-buttons-wrapper');
+            if (wrapper) {
+                // Вставляем новую кнопку перед wrapper'ом
+                palletDataContainer.insertBefore(newButton, wrapper);
+            } else {
+                // Если wrapper не найден, просто добавляем в конец
+                palletDataContainer.appendChild(newButton);
+            }
+        }
+        
+        console.log(`✅ Добавлен новый PALLET: ${newPalletNumber}`);
+        return newPalletNumber;
+        
+    } catch (error) {
+        console.error('❌ Ошибка при добавлении PALLET:', error);
+        return null;
+    }
+}
+
+// Функция для сохранения обновленных PALLET номеров в Firebase
+async function saveUpdatedPalletNumbersToFirebase(selectedDate, courierId, palletNumbers) {
+    try {
+        if (!tpiFirebaseInitialized) {
+            tpiDb = tpiInitializeFirebase();
+            if (!tpiDb) return false;
+        }
+        
+        // Форматируем дату
+        const dateParts = selectedDate.split('/');
+        const firebaseDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+        
+        const dateDocRef = tpiDb.collection("dates").doc(firebaseDate);
+        const cartControlRef = dateDocRef.collection("cartControl");
+        
+        // Обновляем документ курьера
+        await cartControlRef.doc(courierId).update({
+            palletNumbers: palletNumbers,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        console.log(`✅ Сохранены PALLET номера для курьера ${courierId} в Firebase`);
+        return true;
+        
+    } catch (error) {
+        console.error('❌ Ошибка при сохранении PALLET номеров в Firebase:', error);
+        return false;
+    }
+}
+
+// Функция для инициализации обработчиков кнопок добавления PALLET
+function initializeAddPalletButtons() {
+    const addPalletButtons = document.querySelectorAll('.tpi-cc--table-tbody-add-pallet');
+    
+    addPalletButtons.forEach(button => {
+        // Удаляем старые обработчики
+        const newButton = button.cloneNode(true);
+        button.parentNode.replaceChild(newButton, button);
+        
+        newButton.addEventListener('click', async function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            // Проверяем, можно ли показывать кнопки печати
+            if (!canShowPrintButton()) {
+                if (typeof tpiNotification !== 'undefined') {
+                    tpiNotification.show('Недоступно', 'warning', 'Для данной даты нельзя добавлять PALLET');
+                }
+                return;
+            }
+            
+            // Находим строку
+            const row = this.closest('.tpi-cc--table-tbody');
+            if (!row) return;
+            
+            // Получаем ячейку курьера для проверки на KGT
+            const cellElement = row.querySelector('a[tpi-cc-parsing-data="courier-route-cell"]');
+            const cellValue = cellElement ? cellElement.textContent.trim() : '';
+            
+            // Проверяем, является ли курьер КГТ
+            const isKGT = cellValue && cellValue.toUpperCase().startsWith('KGT');
+            
+            // Для КГТ не должно быть кнопки добавления PALLET
+            if (isKGT) {
+                if (typeof tpiNotification !== 'undefined') {
+                    tpiNotification.show('Невозможно добавить PALLET', 'warning', 'Для КГТ курьеров нельзя добавить PALLET');
+                }
+                return;
+            }
+            
+            // Получаем ID курьера
+            const courierIdElement = row.querySelector('p[tpi-cc-parsing-data="courier-personal-id"]');
+            if (!courierIdElement) {
+                console.error('❌ Не найден ID курьера');
+                return;
+            }
+            const courierId = courierIdElement.textContent.trim();
+            
+            // Получаем выбранную дату
+            const searchDateButton = document.querySelector('.tpi-cc-search-date');
+            const selectedDate = searchDateButton.getAttribute('tpi-cc-selected-date-value');
+            
+            // Добавляем новый PALLET
+            const newPalletNumber = await addNewPalletToCourier(row);
+            
+            if (newPalletNumber) {
+                // Получаем все PALLET номера из строки после добавления
+                const updatedPalletButtons = row.querySelectorAll('.tpi-cc-table-tbody-data-pallet-id');
+                const updatedPalletNumbers = Array.from(updatedPalletButtons).map(btn => 
+                    btn.getAttribute('tpi-data-courier-spec-cell')
+                );
+                
+                // Сохраняем в Firebase
+                const saved = await saveUpdatedPalletNumbersToFirebase(selectedDate, courierId, updatedPalletNumbers);
+                
+                if (saved) {
+                    
+                    // Обновляем атрибуты строки
+                    row.setAttribute('data-pallet-numbers', JSON.stringify(updatedPalletNumbers));
+                    
+                } else {
+                    if (typeof tpiNotification !== 'undefined') {
+                        tpiNotification.show('Ошибка', 'error', 'Не удалось сохранить в базу данных');
+                    }
+                }
+            }
+        });
+    });
 }

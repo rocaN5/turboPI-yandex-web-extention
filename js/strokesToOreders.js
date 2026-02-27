@@ -533,6 +533,7 @@ const tpiIconByStatus = {
 // --- helpers ---
 function getTableValuesForLine(lineIndex) {
     const tbody = document.querySelector('.diman__TURBOpi__textToOrders__table tbody');
+    
     if (!tbody) return [];
 
     const trs = Array.from(tbody.querySelectorAll('tr'));
@@ -696,6 +697,9 @@ function checkiIs__onStrokeToOrdersPage() {
 
     // Функция добавления блока (и отключения наблюдателя)
     function addTurboBlock() {
+        const tpiTooltip = document.createElement('div')
+        tpiTooltip.className = 'tpi-tooltip-by-sheva_r6'
+        document.querySelector('body').appendChild(tpiTooltip)
         if (document.querySelector('.diman__TURBOpi__textToOrders__wrapper')) return;
 
         document.title = "Строки в заказы"
@@ -706,7 +710,7 @@ function checkiIs__onStrokeToOrdersPage() {
         newOverlay.setAttribute('tpi-sto-version-selected', stoSelectedVersion === 'new' ? true : false)
         newOverlay.innerHTML = `
             <div class="tpi-sto--section" style="height: fit-content;">
-                <div class="tpi-sto--section-title">
+                <div class="tpi-sto--section-title" tpi-tooltip-data="TEST">
                     <p>Строки в заказы</p>
                     <button class="tpi-sto--switch-version">${tpiIcon__version}</button>
                 </div>
@@ -1316,6 +1320,7 @@ function checkiIs__onStrokeToOrdersPage() {
 
         setTimeout(() => {
             syncScrollBetweenTextareaAndStatusList();
+            initTooltips();
         }, 100);
 
         // Обработчик копирования в обычном формате
