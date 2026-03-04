@@ -1,4 +1,20 @@
-const turboPi__version = "3.19.8";
+const turboPi__version = chrome.runtime.getManifest().version;
+const manifest = chrome.runtime.getManifest();
+let turboPi__version_name = '';
+const fullVersionName = manifest.version_name || '';
+if (fullVersionName.includes('_')) {
+  const suffix = fullVersionName.split('_').pop();
+  const match = suffix.match(/^([a-zA-Z]+)(\d+)$/);
+  if (match) {
+    const letters = match[1]; // "dev"
+    const digits = match[2];  // "4"
+    turboPi__version_name = `${letters}_${digits}`; // "dev_4"
+  } else {
+    turboPi__version_name = suffix;
+  }
+} else {
+  turboPi__version_name = '';
+}
 
 // Глобальный флаг для внешнего MutationObserver’а
 let notMutation = true;

@@ -128,7 +128,7 @@ async function preloadCalendarData() {
             resolve();
             
         } catch (error) {
-            console.error('❌ Ошибка предзагрузки календаря:', error);
+            console.warn('❌ Ошибка предзагрузки календаря:', error);
             tpiCalendarPreloadComplete = false;
             tpiCalendarPreloadPromise = null;
             reject(error);
@@ -196,7 +196,7 @@ async function updateCalendarCacheForDate(dateStr) {
         return status;
         
     } catch (error) {
-        console.error(`❌ Ошибка обновления кэша для ${dateStr}:`, error);
+        console.warn(`❌ Ошибка обновления кэша для ${dateStr}:`, error);
         return null;
     }
 }
@@ -308,7 +308,7 @@ async function loadDateRangeStatuses(startDate, endDate) {
             
             console.log(`📊 Загружено ${Math.min(i + batchSize, datesToCheck.length)}/${datesToCheck.length} дат`);
         } catch (error) {
-            console.error(`Ошибка загрузки батча ${i/batchSize + 1}:`, error);
+            console.warn(`Ошибка загрузки батча ${i/batchSize + 1}:`, error);
         }
     }
 }
@@ -642,7 +642,7 @@ async function tpi_getCouriersAndCells(selectedDate = null) {
             return null;
         }
     } catch (error) {
-        console.error('💥 Ошибка при получении данных:', error);
+        console.warn('💥 Ошибка при получении данных:', error);
         return null;
     }
 }
@@ -683,7 +683,7 @@ function tpiInitializeFirebase() {
         console.log('✅ TPI Firebase успешно инициализирован');
         return tpiDb;
     } catch (error) {
-        console.error('❌ Ошибка инициализации TPI Firebase:', error);
+        console.warn('❌ Ошибка инициализации TPI Firebase:', error);
         return null;
     }
 }
@@ -699,7 +699,7 @@ async function tpiCheckDataInFirebase(selectedDate) {
         // Форматируем дату в формат YYYY-MM-DD
         const dateParts = selectedDate.split('/');
         if (dateParts.length !== 3) {
-            console.error('Неверный формат даты:', selectedDate);
+            console.warn('Неверный формат даты:', selectedDate);
             return { exists: false, hasCartPalletData: false };
         }
         
@@ -793,7 +793,7 @@ async function tpiLoadDataFromFirebase(selectedDate) {
         return couriersData;
         
     } catch (error) {
-        console.error('💥 TPI Ошибка при загрузке данных из Firebase:', error);
+        console.warn('💥 TPI Ошибка при загрузке данных из Firebase:', error);
         return null;
     }
 }
@@ -873,7 +873,7 @@ async function tpiSaveDataToFirebase(selectedDate, couriersData) {
                 }
                 
             } catch (error) {
-                console.error(`❌ TPI Ошибка при сохранении курьера ${courier.courier}:`, error);
+                console.warn(`❌ TPI Ошибка при сохранении курьера ${courier.courier}:`, error);
             }
         }
         
@@ -882,7 +882,7 @@ async function tpiSaveDataToFirebase(selectedDate, couriersData) {
         return savedCount > 0;
         
     } catch (error) {
-        console.error('💥 TPI Ошибка при сохранении данных в Firebase:', error);
+        console.warn('💥 TPI Ошибка при сохранении данных в Firebase:', error);
         return false;
     }
 }
@@ -2032,12 +2032,12 @@ async function tpiLoadAndDisplayData(selectedDate) {
                     updatePrintButtonsVisibility();
                 }
             } catch (error) {
-                console.error('⚠️ Ошибка при обновлении таблицы:', error);
+                console.warn('⚠️ Ошибка при обновлении таблицы:', error);
             }
         }, 1500);
         
     } catch (error) {
-        console.error('💥 TPI Ошибка при загрузке данных из Firebase:', error);
+        console.warn('💥 TPI Ошибка при загрузке данных из Firebase:', error);
         showTableLoader(false);
         showNoDataScreen(true, selectedDate);
     }
@@ -2314,7 +2314,7 @@ async function tpi_getCouriersAndCells(selectedDate = null) {
             return null;
         }
     } catch (error) {
-        console.error('💥 Ошибка при получении данных:', error);
+        console.warn('💥 Ошибка при получении данных:', error);
         return null;
     }
 }
@@ -2600,7 +2600,7 @@ async function showCouriers() {
         }
         
     } catch (error) {
-        console.error('💥 Ошибка:', error);
+        console.warn('💥 Ошибка:', error);
     }
 }
 
@@ -2821,7 +2821,7 @@ async function fillCouriersTable() {
 function getRouteStatusText(status) {
     switch(status) {
         case 'CELL_SHIPPED':
-            return 'Передано<br>курьеру';
+            return 'Передано курьеру';
         case 'FINISHED':
             return 'Собран';
         case 'IN_PROGRESS':
@@ -2845,7 +2845,7 @@ function cc_formatTime(dateString) {
         const seconds = String(date.getSeconds()).padStart(2, '0');
         return `${hours}:${minutes}:${seconds}`;
     } catch (e) {
-        console.error('Ошибка форматирования времени:', e);
+        console.warn('Ошибка форматирования времени:', e);
         return null;
     }
 }
@@ -2860,7 +2860,7 @@ function cc_formatDate(dateString) {
         const year = date.getFullYear();
         return `${day}/${month}/${year}`;
     } catch (e) {
-        console.error('Ошибка форматирования даты:', e);
+        console.warn('Ошибка форматирования даты:', e);
         return null;
     }
 }
@@ -3780,7 +3780,7 @@ function toggle_ActionProcessContainer(state){
     const actionProcessContainer = document.querySelector('.tpi-cc-process-manager-wrapper');
     
     if (!actionProcessContainer) {
-        console.error('Элемент .tpi-cc-process-manager-wrapper не найден');
+        console.warn('Элемент .tpi-cc-process-manager-wrapper не найден');
         return;
     }
     
@@ -3905,7 +3905,7 @@ async function tpiCheckMultipleDatesInFirebase(dateStrings) {
                     };
                     
                 } catch (error) {
-                    console.error(`💥 Ошибка проверки даты ${dateStr}:`, error);
+                    console.warn(`💥 Ошибка проверки даты ${dateStr}:`, error);
                     return { dateStr, exists: false };
                 }
             });
@@ -3923,7 +3923,7 @@ async function tpiCheckMultipleDatesInFirebase(dateStrings) {
                 });
                 
             } catch (error) {
-                console.error('💥 Ошибка при выполнении батча:', error);
+                console.warn('💥 Ошибка при выполнении батча:', error);
                 // В случае ошибки помечаем все даты батча как несуществующие
                 batch.forEach(dateStr => {
                     results[dateStr] = { exists: false, hasCartPalletData: false };
@@ -3940,7 +3940,7 @@ async function tpiCheckMultipleDatesInFirebase(dateStrings) {
         return results;
         
     } catch (error) {
-        console.error('💥 Ошибка при массовой проверке данных в Firebase:', error);
+        console.warn('💥 Ошибка при массовой проверке данных в Firebase:', error);
         return {};
     }
 }
@@ -4014,7 +4014,7 @@ function initializeDatePicker() {
             document.dispatchEvent(calendarOpenedEvent);
             
         } catch (error) {
-            console.error('Ошибка открытия календаря:', error);
+            console.warn('Ошибка открытия календаря:', error);
             calendarContainer.innerHTML = `
                 <div class="tpi-cc-calendar-error">
                     <p>Не удалось загрузить календарь</p>
@@ -4582,7 +4582,7 @@ function createCalendar(container, currentDisplayDate, currentSelectedDate, sele
                 });
                 
             } catch (error) {
-                console.error('Ошибка при проверке статусов дат:', error);
+                console.warn('Ошибка при проверке статусов дат:', error);
                 
                 // В случае ошибки убираем индикаторы загрузки
                 Object.values(dayElements).forEach(dayElement => {
@@ -4707,13 +4707,13 @@ function createDropdownCheckboxFilter(dropdownButton, options, config = {}) {
     
     // Проверяем, что передан правильный элемент
     if (!dropdownButton || !(dropdownButton instanceof HTMLElement)) {
-        console.error('Dropdown button element is required');
+        console.warn('Dropdown button element is required');
         return null;
     }
     
     // Проверяем options
     if (!Array.isArray(options) || options.length === 0) {
-        console.error('Options array is required');
+        console.warn('Options array is required');
         return null;
     }
     
@@ -4725,7 +4725,7 @@ function createDropdownCheckboxFilter(dropdownButton, options, config = {}) {
     // Находим ближайший .tpi-cc-filters-item для правильного позиционирования
     const filterItem = dropdownButton.closest('.tpi-cc-filters-item');
     if (!filterItem) {
-        console.error('Could not find parent filter item');
+        console.warn('Could not find parent filter item');
         return null;
     }
     
@@ -4750,7 +4750,7 @@ function createDropdownCheckboxFilter(dropdownButton, options, config = {}) {
     // Получаем элемент ввода
     const input = dropdownButton.querySelector('input');
     if (!input) {
-        console.error('Input element not found inside dropdown button');
+        console.warn('Input element not found inside dropdown button');
         return null;
     }
     
@@ -5773,7 +5773,6 @@ function restoreEventListeners() {
 
 // Функция для инициализации кнопок печати в каждой строке
 function initializePrintRowButtons() {
-    console.log('🖨️ Инициализация кнопок печати строк');
     const printRowButtons = document.querySelectorAll('.tpi-cc--print-current-row');
     
     if (printRowButtons.length === 0) {
@@ -5794,11 +5793,9 @@ function initializePrintRowButtons() {
         newButton.addEventListener('click', async function(event) {
             event.preventDefault();
             event.stopPropagation();
-            console.log('🖨️ Нажата кнопка печати строки');
             
             // Проверяем, не выполняется ли уже печать
             if (this.hasAttribute('tpi-cc-printing-state')) {
-                console.log('⏳ Уже выполняется печать');
                 return;
             }
             
@@ -5809,7 +5806,7 @@ function initializePrintRowButtons() {
                 // Находим родительскую строку
                 const row = this.closest('.tpi-cc--table-tbody');
                 if (!row) {
-                    console.error('❌ Строка не найдена');
+                    console.warn('❌ Строка не найдена');
                     return;
                 }
                 
@@ -5862,7 +5859,7 @@ function initializePrintRowButtons() {
                 });
                 
             } catch (error) {
-                console.error('❌ Ошибка при печати:', error);
+                console.warn('❌ Ошибка при печати:', error);
             } finally {
                 // Снимаем состояние загрузки
                 this.removeAttribute('tpi-cc-printing-state');
@@ -5920,7 +5917,7 @@ function parseDateString(dateStr) {
             return new Date(year, month, day).getTime();
         }
     } catch (e) {
-        console.error('Ошибка парсинга даты:', e);
+        console.warn('Ошибка парсинга даты:', e);
     }
     return null;
 }
@@ -5939,7 +5936,7 @@ function parseTimeString(timeStr) {
             return hours * 3600 + minutes * 60 + seconds;
         }
     } catch (e) {
-        console.error('Ошибка парсинга времени:', e);
+        console.warn('Ошибка парсинга времени:', e);
     }
     return null;
 }
@@ -6375,7 +6372,7 @@ async function getFreshCouriersData(selectedDate) {
             return null;
         }
     } catch (error) {
-        console.error('💥 Ошибка при получении данных из API:', error);
+        console.warn('💥 Ошибка при получении данных из API:', error);
         return null;
     }
 }
@@ -6512,7 +6509,7 @@ async function saveUpdatedTableData(selectedDate) {
                 }
                 
             } catch (error) {
-                console.error(`Ошибка при обработке строки:`, error);
+                console.warn(`Ошибка при обработке строки:`, error);
             }
         }
         
@@ -6546,7 +6543,7 @@ async function saveUpdatedTableData(selectedDate) {
         return saveResult;
         
     } catch (error) {
-        console.error('💥 Ошибка при сохранении обновленных данных:', error);
+        console.warn('💥 Ошибка при сохранении обновленных данных:', error);
         return false;
     }
 }
@@ -6622,7 +6619,7 @@ async function updateTableDataFromAPI(selectedDate) {
         return { updatedCount, savedToFirebase };
         
     } catch (error) {
-        console.error('💥 Ошибка при обновлении данных таблицы:', error);
+        console.warn('💥 Ошибка при обновлении данных таблицы:', error);
         return null;
     }
 }
@@ -6748,7 +6745,7 @@ async function getFreshCouriersData(selectedDate) {
             return null;
         }
     } catch (error) {
-        console.error('💥 Ошибка при получении данных:', error);
+        console.warn('💥 Ошибка при получении данных:', error);
         return null;
     }
 }
@@ -6985,7 +6982,7 @@ async function updatePartialDataInFirebase(selectedDate, updatedCouriersData) {
                 console.log(`  ✅ Обновлен курьер ${courierId}`);
                 
             } catch (error) {
-                console.error(`❌ Ошибка при обновлении курьера ${courier.courier}:`, error);
+                console.warn(`❌ Ошибка при обновлении курьера ${courier.courier}:`, error);
                 errorCount++;
             }
         }
@@ -6994,7 +6991,7 @@ async function updatePartialDataInFirebase(selectedDate, updatedCouriersData) {
         return successCount > 0;
         
     } catch (error) {
-        console.error('💥 Ошибка при частичном обновлении данных в Firebase:', error);
+        console.warn('💥 Ошибка при частичном обновлении данных в Firebase:', error);
         return false;
     }
 }
@@ -7081,7 +7078,7 @@ async function tpi_getRoutesSummary(selectedDate = null) {
         return null;
         
     } catch (error) {
-        console.error(`💥 Ошибка при получении сводных данных за дату ${currentDate || 'неизвестную'}:`, error);
+        console.warn(`💥 Ошибка при получении сводных данных за дату ${currentDate || 'неизвестную'}:`, error);
         return null;
     }
 }
@@ -7632,7 +7629,7 @@ async function tpi_cc_generateQRcodes_toPrint(cartNumbers, palletNumbers) {
             }
             
         } catch (error) {
-            console.error(`❌ Ошибка генерации QR для ${item.value}:`, error);
+            console.warn(`❌ Ошибка генерации QR для ${item.value}:`, error);
         }
     }
     
@@ -8029,7 +8026,7 @@ async function tpi_cc_generatePDFlabels(data, options = {}) {
                 }
                 
             } catch (error) {
-                console.error(`❌ Ошибка генерации QR для ${item.value}:`, error);
+                console.warn(`❌ Ошибка генерации QR для ${item.value}:`, error);
             }
 
             // Обновляем прогресс после каждого QR-кода
@@ -8342,7 +8339,7 @@ async function tpi_cc_generatePDFlabels(data, options = {}) {
         pdf.save(`${fileName}.pdf`);
 
     } catch (error) {
-        console.error('❌ Ошибка создания PDF:', error);
+        console.warn('❌ Ошибка создания PDF:', error);
         if (typeof tpiNotification !== 'undefined') {
             tpiNotification.show('Ошибка', 'error', 'Не удалось создать PDF');
         }
@@ -8521,7 +8518,7 @@ async function addNewCartToCourier(row, cartButton) {
         }
         
         if (cellNumber === 0) {
-            console.error('❌ Не удалось определить номер ячейки');
+            console.warn('❌ Не удалось определить номер ячейки');
             return null;
         }
         
@@ -8545,87 +8542,79 @@ async function addNewCartToCourier(row, cartButton) {
         
         console.log(`🔍 Последний CART для ячейки ${cellValue}: ${lastCartValue}`);
         
-        // Определяем правильный следующий номер на основе ячейки и последнего номера
-        let nextNumber;
+        // Определяем следующий номер в зависимости от волны
+        let nextNumber = null;
         
         if (cellValue.startsWith('MK-1')) {
-            // Первая волна: номера 1011-1019, затем 3011-3019
+            // Первая волна: диапазоны [cellNumber]1..9 и [cellNumber+200]1..9
+            const firstRangeStart = cellNumber * 10 + 1;
+            const firstRangeEnd   = cellNumber * 10 + 9;
+            const secondRangeStart = (cellNumber + 200) * 10 + 1;
+            const secondRangeEnd   = (cellNumber + 200) * 10 + 9;
             
             if (lastCartValue === 0) {
-                // Если нет CART, начинаем с 1011
-                nextNumber = 1011;
-                console.log('🆕 Нет CART, начинаем с 1011');
-            } else {
-                // Проверяем, в каком диапазоне находится последний номер
-                if (lastCartValue >= 1011 && lastCartValue <= 1019) {
-                    // В первом диапазоне
-                    if (lastCartValue < 1019) {
-                        // Просто увеличиваем на 1
-                        nextNumber = lastCartValue + 1;
-                        console.log(`📈 В диапазоне 1011-1019: ${lastCartValue} -> ${nextNumber}`);
-                    } else {
-                        // Достигли 1019, переходим к 3011
-                        nextNumber = 3011;
-                        console.log(`🔄 Переход с 1019 на 3011`);
-                    }
-                } else if (lastCartValue >= 3011 && lastCartValue <= 3019) {
-                    // Во втором диапазоне
-                    if (lastCartValue < 3019) {
-                        // Увеличиваем на 1
-                        nextNumber = lastCartValue + 1;
-                        console.log(`📈 В диапазоне 3011-3019: ${lastCartValue} -> ${nextNumber}`);
-                    } else {
-                        // Достигли 3019 - максимум
-                        nextNumber = null;
-                        console.log(`❌ Достигнут максимум 3019`);
-                    }
+                // Нет CART – начинаем с первого диапазона
+                nextNumber = firstRangeStart;
+                console.log(`🆕 Нет CART, начинаем с ${firstRangeStart}`);
+            } else if (lastCartValue >= firstRangeStart && lastCartValue <= firstRangeEnd) {
+                // В первом диапазоне
+                if (lastCartValue < firstRangeEnd) {
+                    nextNumber = lastCartValue + 1;
+                    console.log(`📈 В диапазоне ${firstRangeStart}-${firstRangeEnd}: ${lastCartValue} -> ${nextNumber}`);
                 } else {
-                    // Если номер в неправильном диапазоне, начинаем с 1011
-                    nextNumber = 1011;
-                    console.log(`⚠️ Некорректный номер ${lastCartValue}, начинаем с 1011`);
+                    // Достигнут максимум первого диапазона → переходим во второй
+                    nextNumber = secondRangeStart;
+                    console.log(`🔄 Переход с ${firstRangeEnd} на ${secondRangeStart}`);
                 }
+            } else if (lastCartValue >= secondRangeStart && lastCartValue <= secondRangeEnd) {
+                // Во втором диапазоне
+                if (lastCartValue < secondRangeEnd) {
+                    nextNumber = lastCartValue + 1;
+                    console.log(`📈 В диапазоне ${secondRangeStart}-${secondRangeEnd}: ${lastCartValue} -> ${nextNumber}`);
+                } else {
+                    // Достигнут абсолютный максимум
+                    nextNumber = null;
+                    console.log(`❌ Достигнут максимум ${secondRangeEnd}`);
+                }
+            } else {
+                // Некорректный номер – начинаем сначала
+                nextNumber = firstRangeStart;
+                console.log(`⚠️ Некорректный номер ${lastCartValue}, начинаем с ${firstRangeStart}`);
             }
             
         } else if (cellValue.startsWith('MK-2')) {
-            // Вторая волна: номера 2011-2019, затем 4011-4019
+            // Вторая волна: диапазоны [cellNumber]1..9 и [cellNumber+200]1..9
+            const firstRangeStart = cellNumber * 10 + 1;
+            const firstRangeEnd   = cellNumber * 10 + 9;
+            const secondRangeStart = (cellNumber + 200) * 10 + 1;
+            const secondRangeEnd   = (cellNumber + 200) * 10 + 9;
             
             if (lastCartValue === 0) {
-                // Если нет CART, начинаем с 2011
-                nextNumber = 2011;
-                console.log('🆕 Нет CART, начинаем с 2011');
-            } else {
-                // Проверяем, в каком диапазоне находится последний номер
-                if (lastCartValue >= 2011 && lastCartValue <= 2019) {
-                    // В первом диапазоне
-                    if (lastCartValue < 2019) {
-                        // Просто увеличиваем на 1
-                        nextNumber = lastCartValue + 1;
-                        console.log(`📈 В диапазоне 2011-2019: ${lastCartValue} -> ${nextNumber}`);
-                    } else {
-                        // Достигли 2019, переходим к 4011
-                        nextNumber = 4011;
-                        console.log(`🔄 Переход с 2019 на 4011`);
-                    }
-                } else if (lastCartValue >= 4011 && lastCartValue <= 4019) {
-                    // Во втором диапазоне
-                    if (lastCartValue < 4019) {
-                        // Увеличиваем на 1
-                        nextNumber = lastCartValue + 1;
-                        console.log(`📈 В диапазоне 4011-4019: ${lastCartValue} -> ${nextNumber}`);
-                    } else {
-                        // Достигли 4019 - максимум
-                        nextNumber = null;
-                        console.log(`❌ Достигнут максимум 4019`);
-                    }
+                nextNumber = firstRangeStart;
+                console.log(`🆕 Нет CART, начинаем с ${firstRangeStart}`);
+            } else if (lastCartValue >= firstRangeStart && lastCartValue <= firstRangeEnd) {
+                if (lastCartValue < firstRangeEnd) {
+                    nextNumber = lastCartValue + 1;
+                    console.log(`📈 В диапазоне ${firstRangeStart}-${firstRangeEnd}: ${lastCartValue} -> ${nextNumber}`);
                 } else {
-                    // Если номер в неправильном диапазоне, начинаем с 2011
-                    nextNumber = 2011;
-                    console.log(`⚠️ Некорректный номер ${lastCartValue}, начинаем с 2011`);
+                    nextNumber = secondRangeStart;
+                    console.log(`🔄 Переход с ${firstRangeEnd} на ${secondRangeStart}`);
                 }
+            } else if (lastCartValue >= secondRangeStart && lastCartValue <= secondRangeEnd) {
+                if (lastCartValue < secondRangeEnd) {
+                    nextNumber = lastCartValue + 1;
+                    console.log(`📈 В диапазоне ${secondRangeStart}-${secondRangeEnd}: ${lastCartValue} -> ${nextNumber}`);
+                } else {
+                    nextNumber = null;
+                    console.log(`❌ Достигнут максимум ${secondRangeEnd}`);
+                }
+            } else {
+                nextNumber = firstRangeStart;
+                console.log(`⚠️ Некорректный номер ${lastCartValue}, начинаем с ${firstRangeStart}`);
             }
             
         } else {
-            // Для других ячеек (KGT и т.д.) - не добавляем CART
+            // Для других ячеек (KGT и т.д.) – не добавляем CART
             if (typeof tpiNotification !== 'undefined') {
                 tpiNotification.show('Невозможно добавить CART', 'warning', 'Для данного типа ячейки нельзя добавить CART');
             }
@@ -8640,19 +8629,10 @@ async function addNewCartToCourier(row, cartButton) {
             return null;
         }
         
-        // Проверяем максимальные значения
-        if ((cellValue.startsWith('MK-1') && nextNumber > 3019) || 
-            (cellValue.startsWith('MK-2') && nextNumber > 4019)) {
-            if (typeof tpiNotification !== 'undefined') {
-                tpiNotification.show('Превышено кол-во возможных CART', 'error', 'Для данного курьера достигнут максимум CART номеров');
-            }
-            return null;
-        }
-        
-        // Создаем новый CART номер
+        // Создаём новый CART номер
         const newCartNumber = `CART-${nextNumber}`;
         
-        // Создаем новую кнопку CART
+        // Создаём новую кнопку CART
         const newButton = document.createElement('button');
         newButton.className = 'tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-cart-id';
         newButton.setAttribute('tpi-data-courier-spec-cell', newCartNumber);
@@ -8675,27 +8655,20 @@ async function addNewCartToCourier(row, cartButton) {
         // Находим контейнер для CART
         const cartDataContainer = row.querySelector('.tpi-cc--table-tbody-data-carts');
         if (cartDataContainer) {
-            // Находим wrapper внутри контейнера CART
             const wrapper = cartDataContainer.querySelector('.tpi-cc--carts-control-buttons-wrapper');
             if (wrapper) {
-                // Вставляем новую кнопку перед wrapper'ом
                 cartDataContainer.insertBefore(newButton, wrapper);
             } else {
-                // Если wrapper не найден, просто добавляем в конец
                 cartDataContainer.appendChild(newButton);
             }
         }
         
         console.log(`✅ Добавлен новый CART: ${newCartNumber} для ячейки ${cellValue}`);
         
-        if (typeof tpiNotification !== 'undefined') {
-            tpiNotification.show('CART добавлен', 'success', `Новый номер: ${newCartNumber}`);
-        }
-        
         return newCartNumber;
         
     } catch (error) {
-        console.error('❌ Ошибка при добавлении CART:', error);
+        console.warn('❌ Ошибка при добавлении CART:', error);
         return null;
     }
 }
@@ -8725,7 +8698,7 @@ async function saveUpdatedCartNumbersToFirebase(selectedDate, courierId, cartNum
         return true;
         
     } catch (error) {
-        console.error('❌ Ошибка при сохранении CART номеров в Firebase:', error);
+        console.warn('❌ Ошибка при сохранении CART номеров в Firebase:', error);
         return false;
     }
 }
@@ -8758,7 +8731,7 @@ function initializeAddCartButtons() {
             // Получаем ID курьера
             const courierIdElement = row.querySelector('p[tpi-cc-parsing-data="courier-personal-id"]');
             if (!courierIdElement) {
-                console.error('❌ Не найден ID курьера');
+                console.warn('❌ Не найден ID курьера');
                 return;
             }
             const courierId = courierIdElement.textContent.trim();
@@ -8922,7 +8895,7 @@ async function deleteSelectedItems() {
         }
         
     } catch (error) {
-        console.error('❌ Ошибка при удалении выбранных элементов:', error);
+        console.warn('❌ Ошибка при удалении выбранных элементов:', error);
         if (typeof tpiNotification !== 'undefined') {
             tpiNotification.show('Ошибка', 'error', 'Произошла ошибка при удалении');
         }
@@ -8965,7 +8938,7 @@ async function saveDeletedItemsToFirebase(selectedDate, courierId, cartNumbers, 
         return true;
         
     } catch (error) {
-        console.error('❌ Ошибка при сохранении изменений в Firebase:', error);
+        console.warn('❌ Ошибка при сохранении изменений в Firebase:', error);
         return false;
     }
 }
@@ -9061,7 +9034,7 @@ async function addNewPalletToCourier(row) {
         }
         
         if (baseNumber === 0) {
-            console.error('❌ Не удалось определить номер ячейки');
+            console.warn('❌ Не удалось определить номер ячейки');
             return null;
         }
         
@@ -9205,7 +9178,7 @@ async function addNewPalletToCourier(row) {
         return newPalletNumber;
         
     } catch (error) {
-        console.error('❌ Ошибка при добавлении PALLET:', error);
+        console.warn('❌ Ошибка при добавлении PALLET:', error);
         return null;
     }
 }
@@ -9235,7 +9208,7 @@ async function saveUpdatedPalletNumbersToFirebase(selectedDate, courierId, palle
         return true;
         
     } catch (error) {
-        console.error('❌ Ошибка при сохранении PALLET номеров в Firebase:', error);
+        console.warn('❌ Ошибка при сохранении PALLET номеров в Firebase:', error);
         return false;
     }
 }
@@ -9283,7 +9256,7 @@ function initializeAddPalletButtons() {
             // Получаем ID курьера
             const courierIdElement = row.querySelector('p[tpi-cc-parsing-data="courier-personal-id"]');
             if (!courierIdElement) {
-                console.error('❌ Не найден ID курьера');
+                console.warn('❌ Не найден ID курьера');
                 return;
             }
             const courierId = courierIdElement.textContent.trim();

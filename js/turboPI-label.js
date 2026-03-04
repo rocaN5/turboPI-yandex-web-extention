@@ -4,6 +4,13 @@ const tpi_WPversion = getTPIversion(currentUrl);
 let tokenAttempts = 0;
 const MAX_TOKEN_ATTEMPTS = 10;
 const TOKEN_RETRY_INTERVAL = 2000; // 2 секунды в миллисекундах
+let tpi_adding_in_progress = false;
+
+const tpi_i_label_update = `
+<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+    <path d="M105.1 202.6c7.7-21.8 20.2-42.3 37.8-59.8c62.5-62.5 163.8-62.5 226.3 0L386.3 160 352 160c-17.7 0-32 14.3-32 32s14.3 32 32 32l111.5 0c0 0 0 0 0 0l.4 0c17.7 0 32-14.3 32-32l0-112c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 35.2L414.4 97.6c-87.5-87.5-229.3-87.5-316.8 0C73.2 122 55.6 150.7 44.8 181.4c-5.9 16.7 2.9 34.9 19.5 40.8s34.9-2.9 40.8-19.5zM39 289.3c-5 1.5-9.8 4.2-13.7 8.2c-4 4-6.7 8.8-8.1 14c-.3 1.2-.6 2.5-.8 3.8c-.3 1.7-.4 3.4-.4 5.1L16 432c0 17.7 14.3 32 32 32s32-14.3 32-32l0-35.1 17.6 17.5c0 0 0 0 0 0c87.5 87.4 229.3 87.4 316.7 0c24.4-24.4 42.1-53.1 52.9-83.8c5.9-16.7-2.9-34.9-19.5-40.8s-34.9 2.9-40.8 19.5c-7.7 21.8-20.2 42.3-37.8 59.8c-62.5 62.5-163.8 62.5-226.3 0l-.1-.1L125.6 352l34.4 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L48.4 288c-1.6 0-3.2 .1-4.8 .3s-3.1 .5-4.6 1z"></path>
+</svg>
+`
 
 function getTPIversion(url) {
     if (url.startsWith('https://hubs.market.yandex.ru/')) {
@@ -86,14 +93,57 @@ function retryTokenProcessing() {
     }
 }
 
-function addTurboPiTitle() {
+async function getRemoteVersion() {
+    const url = 'https://raw.githubusercontent.com/rocaN5/turboPI-yandex-web-extention/main/manifest.json';
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Network response was not ok');
+        const manifest = await response.json();
+        return manifest.version;
+    } catch (error) {
+        console.error('Не удалось получить версию с GitHub:', error);
+        return null;
+    }
+}
+
+async function addTurboPiTitle() {
+    // Если уже выполняется вставка или блок существует — выходим
+    if (tpi_adding_in_progress || document.querySelector('.turboPiTitle')) {
+        return;
+    }
+    tpi_adding_in_progress = true;
+
     const targetDiv = document.querySelector('div[data-tid="c08f713 7915f99e"]');
     const targetDivExtra = document.querySelector('div.cursor-pointer');
     
+    // Ваше оригинальное условие
     if (targetDiv && !document.querySelector('.turboPiTitle') || targetDivExtra && !document.querySelector('.turboPiTitle')) {
+        
+        // Получаем версию с GitHub
+        const remoteVersion = await getRemoteVersion();
+        
+        // После ожидания проверяем, не вставил ли блок другой вызов
+        if (document.querySelector('.turboPiTitle')) {
+            tpi_adding_in_progress = false;
+            return;
+        }
+        
+        const needUpdate = remoteVersion && remoteVersion !== turboPi__version;
+        const updateWrapperStyle = needUpdate ? '' : 'style="display: none;"';
+
         const newDiv = document.createElement('div');
         newDiv.className = 'turboPiTitle';
         newDiv.innerHTML = `
+        <div class="tpi-label-update-wrapper" ${updateWrapperStyle}>
+            <i class="tpi-label-update-icon">${tpi_i_label_update}</i>
+            <p class="tpi-label-update-text">Есть обновление</p>
+            <div class="tpi-label-update-circle" tpi-cicle-id="5"></div>
+            <div class="tpi-label-update-circle" tpi-cicle-id="4"></div>
+            <div class="tpi-label-update-circle" tpi-cicle-id="3"></div>
+            <div class="tpi-label-update-circle" tpi-cicle-id="2"></div>
+            <div class="tpi-label-update-circle" tpi-cicle-id="1"></div>
+            <div class="tpi-label-update-circle" tpi-cicle-id="0"></div>
+        </div>
         <div class="turboPi__wrapper" tpi-active-user="unset">
             <div class="turboPi__container" status="online">Extended by
                 <span class="turboPianimText" style="margin-left: 4px;">T</span>
@@ -104,7 +154,7 @@ function addTurboPiTitle() {
                 <span class="turboPianimText" style="animation-delay: 250ms;">p</span>
                 <span class="turboPianimText" style="animation-delay: 300ms;">i</span>
             </div>
-            <div class="turboPi__version">Версия: ${turboPi__version}</div>
+            <div class="turboPi__version">Версия: ${turboPi__version}<span class="tpi-version-name">${turboPi__version_name}<span></div>
             <div class="turboPi__options">
                 <div class="turboPi__options__block" id="tpi-page-main">
                     <div class="turboPI__Autorithation">
@@ -281,9 +331,12 @@ function addTurboPiTitle() {
             </div>
         </div>
         `;
-        if(targetDiv) targetDiv.parentNode.insertBefore(newDiv, targetDiv);
-        if (targetDivExtra) targetDivExtra.parentNode.insertBefore(newDiv, targetDivExtra);
-        
+
+        // Вставляем перед целевым элементом
+        if (targetDiv) targetDiv.parentNode.insertBefore(newDiv, targetDiv);
+        else if (targetDivExtra) targetDivExtra.parentNode.insertBefore(newDiv, targetDivExtra);
+
+        // Далее идёт ваш оригинальный код для аватара и токена (без изменений)
         const avatarImg = document.querySelector('.UserID-Avatar img');
 
         function cloneAvatarImage() {
@@ -309,15 +362,14 @@ function addTurboPiTitle() {
             cloneAvatarImage();
         }
 
-        if(tpi_WPversion == "old" || tpi_WPversion == "new"){
-            // Пытаемся сразу обработать токен
+        if (tpi_WPversion == "old" || tpi_WPversion == "new") {
             if (processTokenAndLogin()) {
                 console.log('Token processed on first attempt');
             } else {
-                // Если не получилось, начинаем повторные попытки
                 console.log('Starting retry attempts for token...');
                 setTimeout(retryTokenProcessing, TOKEN_RETRY_INTERVAL);
             }
         }
     }
+    tpi_adding_in_progress = false;
 }

@@ -2,9 +2,9 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>3D Box + Паллета (Three.js) — финальные правки</title>
+    <title>3D Box + Паллета — финал</title>
     <style>
-        body { margin: 0; overflow: hidden; font-family: Arial; background-color: #e8e8e8; }
+        body { margin: 0; overflow: hidden; font-family: 'Segoe UI', Arial, sans-serif; background-color: #e8e8e8; }
         #info {
             position: absolute;
             top: 20px;
@@ -13,10 +13,10 @@
             color: #0f0;
             font-family: monospace;
             font-size: 16px;
-            padding: 6px 12px;
-            border-radius: 20px;
+            padding: 6px 14px;
+            border-radius: 30px;
             backdrop-filter: blur(4px);
-            border: 1px solid rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.25);
             z-index: 100;
         }
         .controls {
@@ -26,23 +26,56 @@
             transform: translateX(-50%);
             display: flex;
             gap: 20px;
-            background: white;
-            padding: 15px 25px;
-            border-radius: 40px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(8px);
+            padding: 16px 30px;
+            border-radius: 60px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
             flex-wrap: wrap;
             justify-content: center;
             z-index: 200;
-            pointer-events: all;
+            border: 1px solid rgba(255,255,255,0.5);
+            font-weight: 500;
         }
         .controls label {
-            font-weight: bold;
-            color: #444;
+            font-weight: 600;
+            color: #2c3e50;
             display: flex;
             align-items: center;
             gap: 8px;
+            font-size: 15px;
         }
-        input[type=range] { width: 160px; }
+        input[type=range] { 
+            width: 140px; 
+            height: 5px; 
+            background: #d0d0d0; 
+            border-radius: 10px;
+            accent-color: #ff9900;
+        }
+        input[type=checkbox] {
+            width: 18px;
+            height: 18px;
+            accent-color: #ff9900;
+            margin-right: 5px;
+            border-radius: 10px;
+        }
+        button {
+            background: #ff9900;
+            border: none;
+            color: white;
+            font-weight: bold;
+            padding: 8px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 16px;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            transition: background 0.2s;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        button:hover {
+            background: #ff9900;
+        }
         canvas { display: block; }
     </style>
 </head>
@@ -50,14 +83,21 @@
     <div id="info">FPS: <span id="fpsValue">60</span></div>
     
     <div class="controls">
-        <label>X <input type="range" id="sizeX" min="50" max="1200" value="300"></label>
-        <label>Y <input type="range" id="sizeY" min="50" max="1200" value="300"></label>
-        <label>Z <input type="range" id="sizeZ" min="50" max="1200" value="300"></label>
-        <label style="margin-left:20px">
-            <input type="checkbox" id="palletCheck" checked> Паллета
+        <label>📏 X <input type="range" id="sizeX" min="50" max="1200" value="300"></label>
+        <label>📐 Y <input type="range" id="sizeY" min="50" max="1200" value="300"></label>
+        <label>📦 Z <input type="range" id="sizeZ" min="50" max="1200" value="300"></label>
+        <label style="margin-left:5px">
+            <input type="checkbox" id="palletCheck" checked> 🪵 Паллета
         </label>
+        <label style="margin-left:5px">
+            <input type="checkbox" id="rulersCheck" checked> 📏 Линейки
+        </label>
+        <label style="margin-left:5px">
+            <input type="checkbox" id="rotateCheck" checked> 🔄 Вращение
+        </label>
+        <button id="randomBtn">🎲 Случайный размер</button>
     </div>
-
+<!-- 
     <script type="importmap">
         {
             "imports": {
@@ -65,258 +105,257 @@
                 "three/addons/": "https://unpkg.com/three@0.128.0/examples/jsm/"
             }
         }
-    </script>
+    </script> -->
 
     <script type="module">
-        import * as THREE from 'three';
-        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import * as THREE from '../libs/three/three.module.js';
+        import { OrbitControls } from '../libs/three/OrbitControls.js';
 
-        // --- Настройка сцены ---
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0xe8e8e8);
 
-        // --- Камера ---
         const camera = new THREE.PerspectiveCamera(45, 800/550, 1, 5000);
         camera.position.set(600, 300, 800);
         camera.lookAt(0, 150, 0);
 
-        // --- Рендерер ---
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
         renderer.setSize(800, 550);
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.shadowMap.enabled = false;
         renderer.setClearColor(0xe8e8e8);
         document.body.appendChild(renderer.domElement);
+        renderer.physicallyCorrectLights = true;
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.2;
 
-        // FPS счётчик
-        const fpsSpan = document.getElementById('fpsValue');
-        let lastTime = performance.now();
-        let frames = 0;
+        // 🌤 Мягкий небесный свет
+        const hemiLight = new THREE.HemisphereLight(
+            0xe8e8e8,  // цвет неба
+            0xe8e8e8,  // цвет земли
+            1.0        // интенсивность
+        );
+        scene.add(hemiLight);
 
-        // --- Освещение ---
-        const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
-        dirLight.position.set(2, 3, 2);
-        scene.add(dirLight);
-        
-        const ambientLight = new THREE.AmbientLight(0x404060);
-        scene.add(ambientLight);
-        
-        const backLight = new THREE.DirectionalLight(0xffffff, 0.6);
-        backLight.position.set(-1, 1, -2);
-        scene.add(backLight);
+        // ☀ Основное солнце
+        const sunLight = new THREE.DirectionalLight(0xffffff, 3.5);
+        sunLight.position.set(2, 20, 2);
+        scene.add(sunLight);
 
-        // --- Группы ---
+        // 🌅 Мягкая подсветка сзади
+        const fillLight = new THREE.DirectionalLight(0xffffff, 1.2);
+        fillLight.position.set(-4, 3, -4);
+        scene.add(fillLight);
+
         const cubeGroup = new THREE.Group();
         const palletGroup = new THREE.Group();
+        const rulersGroup = new THREE.Group();
         scene.add(cubeGroup);
         scene.add(palletGroup);
+        scene.add(rulersGroup);
 
-        // --- Параметры ---
         let cubeWidth = 300, cubeHeight = 300, cubeDepth = 300;
         
-        // --- Сетка всегда под паллетой (на Y = -150) ---
-        const gridHelper = new THREE.GridHelper(2000, 20, 0x888888, 0x888888);
-        gridHelper.position.y = 0; // всегда под паллетой, независимо от видимости
-        gridHelper.material.opacity = 0.3;
+        // сетка
+        const gridHelper = new THREE.GridHelper(2000, 20, 0x777777, 0x999999);
+        gridHelper.position.y = 0;
+        gridHelper.material.opacity = 0.35;
         gridHelper.material.transparent = true;
         scene.add(gridHelper);
 
-        // --- Функция для создания стрелки оси ---
-        function createAxisArrow(color, direction, length = 80, headLength = 20, headWidth = 12) {
-            const arrowHelper = new THREE.ArrowHelper(
-                direction.clone().normalize(),
-                direction.clone().multiplyScalar(length * 0.5),
-                length,
-                color,
-                headLength,
-                headWidth
-            );
-            return arrowHelper;
-        }
+        // ========== ТОЧНЫЙ SVG ==========
+        const svgString = `<?xml version="1.0" encoding="UTF-8"?>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 612 612" fill="#00000044">
+            <path d="M612,553.586v32.107c0,5.911-4.792,10.702-10.702,10.702H10.702C4.792,596.396,0,591.604,0,585.693v-32.107   c0-5.91,4.792-10.702,10.702-10.702h590.596C607.208,542.884,612,547.675,612,553.586z M122.021,491.431h53.512   c11.821,0,21.405-9.583,21.405-21.404V202.131h34.823c16.478,0,26.776-17.839,18.536-32.109L167.305,26.305   c-8.24-14.268-28.834-14.267-37.073,0.001L47.255,170.023c-8.239,14.27,2.059,32.107,18.537,32.107h34.825v267.896   C100.617,481.848,110.2,491.431,122.021,491.431z M443.104,491.431h53.512c11.821,0,21.404-9.583,21.404-21.404V202.131h34.827   c16.478,0,26.776-17.839,18.535-32.109L488.39,26.305c-8.239-14.268-28.834-14.267-37.072,0.001l-82.977,143.717   c-8.239,14.27,2.06,32.107,18.536,32.107h34.821v267.896C421.698,481.848,431.282,491.431,443.104,491.431z"/>
+        </svg>`;
+        
+        const base64SVG = btoa(unescape(encodeURIComponent(svgString)));
+        const dataUri = 'data:image/svg+xml;base64,' + base64SVG;
 
-        // --- Функция для создания текстовой метки ---
-        function createTextLabel(text, color, position) {
+        const iconImage = new Image();
+        iconImage.src = dataUri;
+
+        // Создаём иконку с адаптивным размером
+        function createIconSprite(size, margin) {
             const canvas = document.createElement('canvas');
-            canvas.width = 64;
-            canvas.height = 64;
+            canvas.width = 128;
+            canvas.height = 128;
             const ctx = canvas.getContext('2d');
-            ctx.fillStyle = color;
-            ctx.font = 'Bold 48px Arial';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(text, 32, 32);
+            
+            if (iconImage.complete) {
+                ctx.drawImage(iconImage, 0, 0, 128, 128);
+            } else {
+                iconImage.onload = () => updateAllIcons();
+            }
             
             const texture = new THREE.CanvasTexture(canvas);
-            const material = new THREE.SpriteMaterial({ map: texture });
-            const sprite = new THREE.Sprite(material);
-            sprite.scale.set(40, 40, 40);
-            sprite.position.copy(position);
-            return sprite;
-        }
-
-        // --- Добавляем оси на краях сетки ---
-        function addAxisIndicators() {
-            // Ось X (красная) - справа от сетки
-            const arrowX = createAxisArrow(0xff3333, new THREE.Vector3(1, 0, 0), 120, 30, 18);
-            arrowX.position.set(950, 30, 0);
-            scene.add(arrowX);
-            
-            const labelX = createTextLabel('X', '#ff3333', new THREE.Vector3(1050, 40, 0));
-            scene.add(labelX);
-            
-            // Ось Z (синяя) - сверху/сзади сетки
-            const arrowZ = createAxisArrow(0x3333ff, new THREE.Vector3(0, 0, 1), 120, 30, 18);
-            arrowZ.position.set(0, 30, 950);
-            scene.add(arrowZ);
-            
-            const labelZ = createTextLabel('Z', '#3333ff', new THREE.Vector3(0, 40, 1050));
-            scene.add(labelZ);
-            
-            // Добавляем маленькие стрелки на самих осях для наглядности
-            for (let i = 200; i <= 900; i += 200) {
-                // Маленькие красные стрелки на оси X
-                const smallArrowX = createAxisArrow(0xff9999, new THREE.Vector3(1, 0, 0), 40, 10, 6);
-                smallArrowX.position.set(i, 20, 0);
-                scene.add(smallArrowX);
-                
-                // Маленькие синие стрелки на оси Z
-                const smallArrowZ = createAxisArrow(0x9999ff, new THREE.Vector3(0, 0, 1), 40, 10, 6);
-                smallArrowZ.position.set(0, 20, i);
-                scene.add(smallArrowZ);
-            }
-        }
-
-        // Вызываем функцию добавления осей
-        addAxisIndicators();
-
-        // --- Создание куба с окантовкой и 3D-иконками из линий ---
-        function createCube(w, h, d) {
-            while(cubeGroup.children.length) cubeGroup.remove(cubeGroup.children[0]);
-            
-            // Основной куб
-            const material = new THREE.MeshPhongMaterial({
-                color: 0xb98a5c,
-                shininess: 25,
-                emissive: 0x000000,
-                flatShading: false,
-                side: THREE.DoubleSide
+            const material = new THREE.MeshBasicMaterial({ 
+                map: texture,
+                transparent: true,
+                side: THREE.DoubleSide,
+                depthTest: true,
+                depthWrite: false
             });
             
+            const geometry = new THREE.PlaneGeometry(size, size);
+            const mesh = new THREE.Mesh(geometry, material);
+            
+            mesh.userData = { isIcon: true };
+            return mesh;
+        }
+
+        function updateAllIcons() {
+            cubeGroup.children.forEach(child => {
+                if (child.userData && child.userData.isIcon) {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 128;
+                    canvas.height = 128;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(iconImage, 0, 0, 128, 128);
+                    child.material.map = new THREE.CanvasTexture(canvas);
+                    child.material.needsUpdate = true;
+                }
+            });
+        }
+
+        // ===== СОЗДАНИЕ КУБА С ИКОНКАМИ =====
+        function createCubeWithIcons(w, h, d) {
+            while(cubeGroup.children.length) cubeGroup.remove(cubeGroup.children[0]);
+            
+            const material = new THREE.MeshPhongMaterial({
+                color: 0xb78d5a,
+                shininess: 18,
+                side: THREE.DoubleSide
+            });
             const geometry = new THREE.BoxGeometry(w, h, d);
             const cube = new THREE.Mesh(geometry, material);
             cube.castShadow = true;
-            cube.receiveShadow = false;
             cube.position.y = h / 2;
             cubeGroup.add(cube);
             
-            // Окантовка куба
             const edges = new THREE.EdgesGeometry(geometry);
             const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x5d3a1a }));
             line.position.y = h / 2;
             cubeGroup.add(line);
             
-            // Добавляем 3D-иконки из линий на грани
-            add3DIcons(w, h, d);
-        }
-
-        // Функция создания 3D-иконки из линий (SVG-паттерн в 3D)
-        function createIconLines(posX, posY, posZ, scale = 10, color = 0x332211) {
-            const group = new THREE.Group();
+            const baseMargin = 15;
+            const baseIconSize = 50;
             
-            // Материал для линий
-            const mat = new THREE.LineBasicMaterial({ color: color });
+            const minRequired = baseIconSize + 2 * baseMargin;
+            const scaleFactor = Math.min(1, Math.min(h, w, d) / minRequired);
             
-            // Функция для создания линии по точкам
-            function addLine(points) {
-                const geo = new THREE.BufferGeometry().setFromPoints(points);
-                const line = new THREE.Line(geo, mat);
-                group.add(line);
-            }
+            const iconSize = Math.max(15, baseIconSize * scaleFactor);
+            const margin = Math.max(4, baseMargin * scaleFactor);
             
-            // Рисуем иконку из SVG: 
-            // M4,6 L7,3 L10,6 (первая стрелка вверх)
-            addLine([new THREE.Vector3(-6, 3, 0), new THREE.Vector3(-3, 0, 0), new THREE.Vector3(0, 3, 0)]);
-            // M7,17 L7,3 (вертикальная линия первой стрелки)
-            addLine([new THREE.Vector3(-3, 8, 0), new THREE.Vector3(-3, -2, 0)]);
-            
-            // M14,6 L17,3 L20,6 (вторая стрелка)
-            addLine([new THREE.Vector3(8, 3, 0), new THREE.Vector3(11, 0, 0), new THREE.Vector3(14, 3, 0)]);
-            // M17,17 L17,3 (вертикальная линия второй стрелки)
-            addLine([new THREE.Vector3(11, 8, 0), new THREE.Vector3(11, -2, 0)]);
-            
-            // M4,21 L20,21 (горизонтальная линия внизу)
-            addLine([new THREE.Vector3(-6, 12, 0), new THREE.Vector3(14, 12, 0)]);
-            
-            // Масштабируем и позиционируем
-            group.scale.set(scale/10, scale/10, scale/10);
-            group.position.set(posX, posY, posZ);
-            
-            return group;
-        }
-
-        // Добавление 3D-иконок на грани куба
-        function add3DIcons(w, h, d) {
-            const iconSize = 12;
-            
-            // Правая грань (X+) - иконка смотрит вправо
-            const rightIcon = createIconLines(w/2 + 2, h/2, 0, iconSize);
-            rightIcon.rotation.y = Math.PI/2; // поворачиваем к грани
-            cubeGroup.add(rightIcon);
+            const epsilon = 0.5;
             
             // Левая грань (X-)
-            const leftIcon = createIconLines(-w/2 - 2, h/2, 0, iconSize);
-            leftIcon.rotation.y = -Math.PI/2;
-            cubeGroup.add(leftIcon);
+            const iconLeft = createIconSprite(iconSize, margin);
+            iconLeft.position.set(-w/2 - epsilon, h - margin - iconSize/2, -d/2 + margin + iconSize/2);
+            iconLeft.rotation.y = -Math.PI/2;
+            cubeGroup.add(iconLeft);
+            
+            // Правая грань (X+)
+            const iconRight = createIconSprite(iconSize, margin);
+            iconRight.position.set(w/2 + epsilon, h - margin - iconSize/2, d/2 - margin - iconSize/2);
+            iconRight.rotation.y = Math.PI/2;
+            cubeGroup.add(iconRight);
             
             // Передняя грань (Z+)
-            const frontIcon = createIconLines(0, h/2, d/2 + 2, iconSize);
-            frontIcon.rotation.y = 0; // уже смотрит вперед
-            cubeGroup.add(frontIcon);
+            const iconFront = createIconSprite(iconSize, margin);
+            iconFront.position.set(-w/2 + margin + iconSize/2, h - margin - iconSize/2, d/2 + epsilon);
+            iconFront.rotation.y = 0;
+            cubeGroup.add(iconFront);
             
             // Задняя грань (Z-)
-            const backIcon = createIconLines(0, h/2, -d/2 - 2, iconSize);
-            backIcon.rotation.y = Math.PI; // поворачиваем к грани
-            cubeGroup.add(backIcon);
-            
-            // Добавляем дополнительные иконки на боковые стороны (как в оригинале по несколько)
-            // Правая грань, две дополнительные
-            const rightIcon2 = createIconLines(w/2 + 2, h/3, d/3, iconSize);
-            rightIcon2.rotation.y = Math.PI/2;
-            cubeGroup.add(rightIcon2);
-            
-            const rightIcon3 = createIconLines(w/2 + 2, 2*h/3, -d/3, iconSize);
-            rightIcon3.rotation.y = Math.PI/2;
-            cubeGroup.add(rightIcon3);
-            
-            // Левая грань
-            const leftIcon2 = createIconLines(-w/2 - 2, h/3, d/3, iconSize);
-            leftIcon2.rotation.y = -Math.PI/2;
-            cubeGroup.add(leftIcon2);
-            
-            const leftIcon3 = createIconLines(-w/2 - 2, 2*h/3, -d/3, iconSize);
-            leftIcon3.rotation.y = -Math.PI/2;
-            cubeGroup.add(leftIcon3);
-            
-            // Передняя грань
-            const frontIcon2 = createIconLines(w/3, h/3, d/2 + 2, iconSize);
-            frontIcon2.rotation.y = 0;
-            cubeGroup.add(frontIcon2);
-            
-            const frontIcon3 = createIconLines(-w/3, 2*h/3, d/2 + 2, iconSize);
-            frontIcon3.rotation.y = 0;
-            cubeGroup.add(frontIcon3);
-            
-            // Задняя грань
-            const backIcon2 = createIconLines(w/3, h/3, -d/2 - 2, iconSize);
-            backIcon2.rotation.y = Math.PI;
-            cubeGroup.add(backIcon2);
-            
-            const backIcon3 = createIconLines(-w/3, 2*h/3, -d/2 - 2, iconSize);
-            backIcon3.rotation.y = Math.PI;
-            cubeGroup.add(backIcon3);
+            const iconBack = createIconSprite(iconSize, margin);
+            iconBack.position.set(w/2 - margin - iconSize/2, h - margin - iconSize/2, -d/2 - epsilon);
+            iconBack.rotation.y = Math.PI;
+            cubeGroup.add(iconBack);
         }
 
-        // --- Создание паллеты с окантовкой ---
+        // ===== РАЗМЕРНЫЕ ЛИНЕЙКИ =====
+        function createRulers(w, h, d, yOffset) {
+            while(rulersGroup.children.length) rulersGroup.remove(rulersGroup.children[0]);
+            
+            const offset = 10;
+            const textOffset = 5;
+            const colors = { x: 0xff0000, y: 0x00ff00, z: 0x0000ff };
+            
+            function addRuler(points, color, value, corner1, corner2, labelOffset, normalDir) {
+                const start = points[0];
+                const end = points[1];
+                
+                const lineGeo = new THREE.BufferGeometry().setFromPoints([start, end]);
+                const lineMat = new THREE.LineBasicMaterial({ color: color });
+                const line = new THREE.Line(lineGeo, lineMat);
+                rulersGroup.add(line);
+                
+                const extLine1Geo = new THREE.BufferGeometry().setFromPoints([corner1, start]);
+                const extLine1 = new THREE.Line(extLine1Geo, lineMat);
+                rulersGroup.add(extLine1);
+                
+                const extLine2Geo = new THREE.BufferGeometry().setFromPoints([corner2, end]);
+                const extLine2 = new THREE.Line(extLine2Geo, lineMat);
+                rulersGroup.add(extLine2);
+                
+                const mid = new THREE.Vector3().lerpVectors(start, end, 0.5);
+                mid.add(labelOffset);
+                mid.add(normalDir.clone().multiplyScalar(textOffset));
+                
+                const canvas = document.createElement('canvas');
+                canvas.width = 1024;
+                canvas.height = 512;
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#' + color.toString(16).padStart(6, '0');
+                ctx.font = 'bold 160px "Segoe UI"';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(value + ' см', 512, 256);
+                
+                const texture = new THREE.CanvasTexture(canvas);
+                const material = new THREE.SpriteMaterial({ 
+                    map: texture, 
+                    depthTest: true,
+                    transparent: true,
+                    opacity: 1
+                });
+                const sprite = new THREE.Sprite(material);
+                sprite.scale.set(240, 120, 1);
+                sprite.position.copy(mid);
+                rulersGroup.add(sprite);
+            }
+            
+            // X линейка – передняя грань, верхнее ребро
+            const xStart = new THREE.Vector3(-w/2, yOffset + h, d/2 + offset);
+            const xEnd = new THREE.Vector3(w/2, yOffset + h, d/2 + offset);
+            addRuler([xStart, xEnd], colors.x, (w/10).toFixed(0),
+                new THREE.Vector3(-w/2, yOffset + h, d/2),
+                new THREE.Vector3(w/2, yOffset + h, d/2),
+                new THREE.Vector3(0, 30, 0),
+                new THREE.Vector3(0, 0, 1));
+            
+            // Z линейка – правая грань, верхнее ребро
+            const zStart = new THREE.Vector3(w/2 + offset, yOffset + h, -d/2);
+            const zEnd = new THREE.Vector3(w/2 + offset, yOffset + h, d/2);
+            addRuler([zStart, zEnd], colors.z, (d/10).toFixed(0),
+                new THREE.Vector3(w/2, yOffset + h, -d/2),
+                new THREE.Vector3(w/2, yOffset + h, d/2),
+                new THREE.Vector3(0, 30, 0),
+                new THREE.Vector3(1, 0, 0));
+            
+            // Y линейка – на передне-правом углу
+            const yStart = new THREE.Vector3(w/2 + offset, yOffset, d/2 + offset);
+            const yEnd = new THREE.Vector3(w/2 + offset, yOffset + h, d/2 + offset);
+            addRuler([yStart, yEnd], colors.y, (h/10).toFixed(0),
+                new THREE.Vector3(w/2, yOffset, d/2),
+                new THREE.Vector3(w/2, yOffset + h, d/2),
+                new THREE.Vector3(30, 0, 30),
+                new THREE.Vector3(1, 0, 1).normalize());
+        }
+
+        // --- паллета с гвоздями (темнее) ---
         function createPallet() {
             while(palletGroup.children.length) palletGroup.remove(palletGroup.children[0]);
             
@@ -351,6 +390,22 @@
                 const z = -depth/2 + depth/(topBoardCount+1) * (i+1);
                 const geo = new THREE.BoxGeometry(width, boardThick, boardThick * 4.5);
                 addBoard(geo, 0, topY, z);
+                
+                // Гвозди по углам верхних досок (темнее)
+                const nailPositions = [
+                    [-width/2 + 30, topY + boardThick/2.5, z - boardThick*2.25 + 15],
+                    [ width/2 - 30, topY + boardThick/2.5, z - boardThick*2.25 + 15],
+                    [-width/2 + 30, topY + boardThick/2.5, z + boardThick*2.25 - 15],
+                    [ width/2 - 30, topY + boardThick/2.5, z + boardThick*2.25 - 15]
+                ];
+                nailPositions.forEach(pos => {
+                    const nailGeo = new THREE.CylinderGeometry(4, 4, 8, 8);
+                    const nailMat = new THREE.MeshStandardMaterial({ color: 0x555555, emissive: 0x111111 });
+                    const nail = new THREE.Mesh(nailGeo, nailMat);
+                    nail.position.set(pos[0], pos[1], pos[2]);
+                    nail.rotation.x = 0;
+                    palletGroup.add(nail);
+                });
             }
             
             // Нижние доски
@@ -383,58 +438,85 @@
             palletGroup.position.y = 0;
         }
 
-        // Создаём объекты
-        createCube(cubeWidth, cubeHeight, cubeDepth);
-        createPallet();
+        // Обновление всего
+        function updateAll() {
+            const palletVisible = document.getElementById('palletCheck').checked;
+            const rulersVisible = document.getElementById('rulersCheck').checked;
+            
+            const yOffset = palletVisible ? 190 : 0;
+            
+            createCubeWithIcons(cubeWidth, cubeHeight, cubeDepth);
+            cubeGroup.position.y = yOffset;
+            
+            palletGroup.visible = palletVisible;
+            
+            if (rulersVisible) {
+                createRulers(cubeWidth, cubeHeight, cubeDepth, yOffset);
+            } else {
+                while(rulersGroup.children.length) rulersGroup.remove(rulersGroup.children[0]);
+            }
+            
+            if (typeof controls !== 'undefined') {
+                controls.target.set(0, yOffset + cubeHeight/2, 0);
+            }
+        }
 
-        // --- Управление ---
+        // --- Инициализация ---
+        createPallet();
+        
+        // Настройка камеры
         const controls = new OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
-        controls.dampingFactor = 0.05;
-        controls.autoRotate = true;
-        controls.autoRotateSpeed = 1.2;
+        controls.dampingFactor = 0.06;
+        controls.autoRotate = true; // начальное состояние
+        controls.autoRotateSpeed = -1.2;
         controls.enableZoom = true;
         controls.zoomSpeed = 1.0;
-        controls.rotateSpeed = 0.8;
-        controls.target.set(0, 180, 0);
+        controls.minDistance = 200;
+        controls.maxDistance = 2500;
+        controls.enablePan = false;
+        controls.target.set(0, 190 + cubeHeight/2, 0);
         controls.maxPolarAngle = Math.PI / 2.2;
 
-        // --- Связь с ползунками ---
+        updateAll();
+
+        // UI
         document.getElementById('sizeX').addEventListener('input', (e) => {
             cubeWidth = +e.target.value;
-            createCube(cubeWidth, cubeHeight, cubeDepth);
+            updateAll();
         });
         document.getElementById('sizeY').addEventListener('input', (e) => {
             cubeHeight = +e.target.value;
-            createCube(cubeWidth, cubeHeight, cubeDepth);
-            if (document.getElementById('palletCheck').checked) {
-                controls.target.set(0, 145 + cubeHeight/2, 0);
-            } else {
-                controls.target.set(0, cubeHeight/2, 0);
-            }
+            updateAll();
         });
         document.getElementById('sizeZ').addEventListener('input', (e) => {
             cubeDepth = +e.target.value;
-            createCube(cubeWidth, cubeHeight, cubeDepth);
+            updateAll();
         });
         
-        document.getElementById('palletCheck').addEventListener('change', (e) => {
-            palletGroup.visible = e.target.checked;
-            
-            if (e.target.checked) {
-                cubeGroup.position.y = 190;
-                controls.target.set(0, 190 + cubeHeight/2, 0);
-            } else {
-                cubeGroup.position.y = 0;
-                controls.target.set(0, cubeHeight/2, 0);
-            }
+        document.getElementById('palletCheck').addEventListener('change', updateAll);
+        document.getElementById('rulersCheck').addEventListener('change', updateAll);
+
+        // Чекбокс вращения
+        const rotateCheck = document.getElementById('rotateCheck');
+        rotateCheck.addEventListener('change', (e) => {
+            controls.autoRotate = e.target.checked;
         });
 
-        // Инициализация
-        cubeGroup.position.y = 190;
-        controls.target.set(0, 190 + cubeHeight/2, 0);
+        // Кнопка случайных значений
+        document.getElementById('randomBtn').addEventListener('click', () => {
+            const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+            cubeWidth = rand(50, 1200);
+            cubeHeight = rand(50, 1200);
+            cubeDepth = rand(50, 1200);
+            
+            document.getElementById('sizeX').value = cubeWidth;
+            document.getElementById('sizeY').value = cubeHeight;
+            document.getElementById('sizeZ').value = cubeDepth;
+            
+            updateAll();
+        });
 
-        // --- Анимация ---
         function animate() {
             requestAnimationFrame(animate);
             
@@ -445,8 +527,7 @@
             const now = performance.now();
             const delta = now - lastTime;
             if (delta >= 1000) {
-                const fps = Math.round((frames * 1000) / delta);
-                fpsSpan.textContent = fps;
+                fpsSpan.textContent = Math.round((frames * 1000) / delta);
                 frames = 0;
                 lastTime = now;
             }

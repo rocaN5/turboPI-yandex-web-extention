@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Яндекс Турбо ПИ",
-  "version": "3.19.8",
-  "version_name": "3.19.8_dev3-hotfix",
+  "version": "3.19.9",
+  "version_name": "3.19.9_dev1",
   "description": "Расширение для получения дополнительной информации из ПИ 💛",
   "permissions": [
     "activeTab",
