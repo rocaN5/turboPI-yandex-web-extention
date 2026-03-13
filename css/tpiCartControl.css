@@ -452,7 +452,37 @@ button.tpi-cc--table-tbody-data-button.tpi-cc-table-tbody-data-cart-id{
         height: 100%;
         display: flex;
     }
+
+    &[tpi-cc-button-is-blocked]{
+        background: #e1e1e1;
+        color: #616161;
+        cursor: not-allowed !important;
+    }
+
+    &[tpi-cc-button-is-blocked] .tpi-cc-blocked-button-indicator{
+        position: absolute;
+        left: -8px;
+        background: #ffbdbd;
+        height: 16px;
+        width: 16px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50%;
+        border: 1px solid red;
+        color: red;
+        transform: scale(0) rotate(1turn);
+        transition: 200ms linear;
+    }
+
+    &[tpi-cc-button-is-blocked]:hover .tpi-cc-blocked-button-indicator{
+        transform: scale(1) rotate(0turn);
+        transition: 300ms cubic-bezier(0.51, 0.75, 0.08, 1.46);
+    }
     
+    &[tpi-cc-button-is-blocked]::before{
+        color: #616161 !important;
+    }
 }
 
 @keyframes tpi-cc-selected-cart {
@@ -1403,7 +1433,12 @@ button.tpi-cc--print-current-row {
         transform: scale(.97);
     }
 
-
+    &:disabled{
+        opacity: .5 !important;
+        color: #a7a7a7;
+        background: #e8e8e8;
+        cursor: not-allowed;
+    }
 
     &[tpi-cc-printing-state="loading"]{
         background-image: repeating-linear-gradient(-45deg, #e8e8e8, #e8e8e8 6px, #d1d1d1 0, #d1d1d1 12px);

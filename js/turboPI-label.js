@@ -56,7 +56,7 @@ function processTokenAndLogin() {
                 login: login
             };
             
-            console.log('Token and login processed successfully. Login:', login);
+            console.log('📌 Текущий пользователь:', login);
             return true;
         } else {
             console.log('Login not found in cookies');
@@ -70,8 +70,6 @@ function retryTokenProcessing() {
     tokenAttempts++;
     
     if (tokenAttempts <= MAX_TOKEN_ATTEMPTS) {
-        console.log(`Attempt ${tokenAttempts}/${MAX_TOKEN_ATTEMPTS} to get token`);
-        
         if (processTokenAndLogin()) {
             console.log('Token processing successful');
             return true;
@@ -363,13 +361,78 @@ async function addTurboPiTitle() {
         }
 
         if (tpi_WPversion == "old" || tpi_WPversion == "new") {
-            if (processTokenAndLogin()) {
-                console.log('Token processed on first attempt');
-            } else {
-                console.log('Starting retry attempts for token...');
+            if (!processTokenAndLogin()) {
                 setTimeout(retryTokenProcessing, TOKEN_RETRY_INTERVAL);
             }
         }
     }
     tpi_adding_in_progress = false;
+    checkAndInitReminder();
+}
+
+// Вставка напоминания о поставках для старой версии
+function shouldShowReminder() {
+    const now = new Date();
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    const seconds = now.getSeconds();
+    const currentTime = hours * 3600 + minutes * 60 + seconds; // время в секундах
+    
+    // Интервалы: 00:00:00 - 07:00:00 (0 - 25200 секунд) и 22:00:00 - 23:59:59 (79200 - 86399 секунд)
+    return (currentTime >= 0 && currentTime <= 25200) || (currentTime >= 79200 && currentTime <= 86399);
+}
+
+function updateReminderVisibility() {
+    const reminder = document.querySelector('.tpi-inbounds-reminder-wrapper');
+    const showReminder = shouldShowReminder();
+    
+    if (showReminder && !reminder) {
+        insertReminder();
+    } else if (!showReminder && reminder) {
+        reminder.remove();
+    }
+}
+
+function insertReminder() {
+    if (typeof tpi_WPversion === 'undefined') return;
+    
+    if (tpi_WPversion === "old") {
+        const headerMenu = document.querySelector('ul[data-e2e="headerMenu"]');
+        if (headerMenu) {
+            const nav = headerMenu.closest('nav');
+            if (nav) {
+                const yellowDiv = nav.closest('div');
+                if (yellowDiv) {
+                    const redDiv = yellowDiv.closest('div');
+                    if (redDiv && !redDiv.querySelector('.tpi-inbounds-reminder-wrapper')) {
+                        const reminderHTML = `
+                            <div class="tpi-inbounds-reminder-wrapper">
+                                <icon class="tpi-inbounds-reminder-icon"></icon>
+                            </div>
+                        `;
+                        yellowDiv.insertAdjacentHTML('afterend', reminderHTML);
+                    }
+                }
+            }
+        }
+    } else if (tpi_WPversion === "new") {
+        const cursorElement = document.querySelector('.cursor-pointer');
+        if (cursorElement && !cursorElement.parentNode.querySelector('.tpi-inbounds-reminder-wrapper')) {
+            const reminderHTML = `
+                <div class="tpi-inbounds-reminder-wrapper">
+                    <icon class="tpi-inbounds-reminder-icon"></icon>
+                </div>
+            `;
+            cursorElement.parentNode.insertAdjacentHTML('beforebegin', reminderHTML);
+        }
+    }
+}
+
+function checkAndInitReminder() {
+    if (typeof tpi_WPversion !== 'undefined') {
+        updateReminderVisibility();
+        setInterval(updateReminderVisibility, 30000);
+    } else {
+        setTimeout(checkAndInitReminder, 500);
+    }
 }

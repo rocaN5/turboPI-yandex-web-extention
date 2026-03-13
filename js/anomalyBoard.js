@@ -136,8 +136,6 @@ function anomalyBoard() {
         } else {
             console.log('Целевой div не найден');
         }
-    } else {
-        console.log('Страница не находится на нужной ссылке');
     }
 }
 

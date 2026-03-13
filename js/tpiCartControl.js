@@ -1187,6 +1187,11 @@ tpi_cc_i_circle_4 = `
     <path d="M224,128a96,96,0,1,1-96-96A96,96,0,0,1,224,128Z" opacity="0.2"></path>
     <path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm32-72h-8V80a8,8,0,0,0-14.31-4.91l-56,72A8,8,0,0,0,88,160h48v16a8,8,0,0,0,16,0V160h8a8,8,0,0,0,0-16Zm-24,0H104.36L136,103.32Z"></path>
 </svg>
+`,
+tpi_cc_i_blocked_button = `
+<svg stroke="currentColor" fill="currentColor" stroke-width="0" version="1" viewBox="0 0 48 48" enable-background="new 0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+    <path d="M24,6C14.1,6,6,14.1,6,24s8.1,18,18,18s18-8.1,18-18S33.9,6,24,6z M24,10c3.1,0,6,1.1,8.4,2.8L12.8,32.4 C11.1,30,10,27.1,10,24C10,16.3,16.3,10,24,10z M24,38c-3.1,0-6-1.1-8.4-2.8l19.6-19.6C36.9,18,38,20.9,38,24C38,31.7,31.7,38,24,38 z"></path>
+</svg>
 `
 
 function checkiIs__onCartControlsPage() {
@@ -1766,7 +1771,12 @@ const tpi_cc_funny_text_array = [
     'Делаем жёсткий ППС',
     'Делаем ППС по братски',
     'Олени не прошли в плановую ТС',
-    'iPhone - говно'
+    'iPhone - говно',
+    'Высматриваем шкоду по камерам',
+    '5 градусов жары',
+    'Прячем колонку от Ильяшенко',
+    'Не пикаца брат',
+    'Еврики- это наш чай с сахаром'
 ];
 
 // Функция для управления лоадером
@@ -2704,12 +2714,17 @@ function cartPallet_btnActions() {
         btn.parentNode.replaceChild(newBtn, btn);
         
         newBtn.addEventListener('click', () => {
-            if (newBtn.hasAttribute('tpi-cc-selected-courier-cell')) {
-                newBtn.removeAttribute('tpi-cc-selected-courier-cell');
-            } else {
-                newBtn.setAttribute('tpi-cc-selected-courier-cell', '');
+            if(newBtn.hasAttribute('tpi-cc-button-is-blocked')) {
+                tpiNotification.show('Ошибка', "error", "Взаимодействия с паллетами КГТ были заблокированы по просьбе старших смен.");
+                return
+            }else{
+                if (newBtn.hasAttribute('tpi-cc-selected-courier-cell')) {
+                    newBtn.removeAttribute('tpi-cc-selected-courier-cell');
+                } else {
+                    newBtn.setAttribute('tpi-cc-selected-courier-cell', '');
+                }
+                update_ActionProcessContainer();
             }
-            update_ActionProcessContainer();
         });
     });
     
@@ -3215,7 +3230,8 @@ function createCourierTableRow(courierData, index) {
                 // Для КГТ - одна кнопка PALLET с номером ячейки
                 const kgtNumber = courierData.cell.replace('KGT-', '').replace('kgt-', '');
                 palletButtonsHTML += `
-                    <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-pallet-id" tpi-data-courier-spec-cell="PALLET-${kgtNumber}" tpi-tooltip-data="Нажмите, чтобы выбрать этот PALLET">
+                    <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-pallet-id" tpi-data-courier-spec-cell="PALLET-${kgtNumber}" tpi-tooltip-data="КГТ Паллеты заблокированы" tpi-cc-button-is-blocked disabled>
+                        <div class="tpi-cc-blocked-button-indicator">${tpi_cc_i_blocked_button}</div>
                         <i class="tpi-cc-table-tbody-data-pallet-icon">${tpi_cc_i_pallet}</i>
                         -${kgtNumber}
                     </button>
@@ -3805,11 +3821,11 @@ function update_ActionProcessContainer(){
     const tpi_cc_selected_data_carts = document.querySelector('p.tpi-cc-process-data-item-text.tpi-cc-data-cart-amount span');
     const tpi_cc_selected_data_pallets = document.querySelector('p.tpi-cc-process-data-item-text.tpi-cc-data-pallet-amount span');
 
-    const tpi_cc_actionButtons = document.querySelectorAll('.tpi-cc-table-tbody-data-cart-id, .tpi-cc-table-tbody-data-pallet-id');
+    // Считаем только НЕЗАБЛОКИРОВАННЫЕ выбранные кнопки
+    const tpi_cc_cart_amount = document.querySelectorAll('.tpi-cc-table-tbody-data-cart-id[tpi-cc-selected-courier-cell]:not([tpi-cc-button-is-blocked])');
+    const tpi_cc_pallet_amount = document.querySelectorAll('.tpi-cc-table-tbody-data-pallet-id[tpi-cc-selected-courier-cell]:not([tpi-cc-button-is-blocked])');
     
     let hasSelected = false;
-    let tpi_cc_cart_amount = document.querySelectorAll('.tpi-cc-table-tbody-data-cart-id[tpi-cc-selected-courier-cell]');
-    let tpi_cc_pallet_amount = document.querySelectorAll('.tpi-cc-table-tbody-data-pallet-id[tpi-cc-selected-courier-cell]');
     
     if (tpi_cc_selected_data_carts) {
         tpi_cc_selected_data_carts.innerText = tpi_cc_cart_amount.length;
@@ -3818,6 +3834,7 @@ function update_ActionProcessContainer(){
             tpi_cc_selected_data_carts.style.color = '#fc0';
             tpi_cc_selected_carts.style.height = '.8rem'
             tpi_cc_selected_carts.style.opacity = '1'
+            hasSelected = true;
         } else {
             tpi_cc_selected_data_carts.style.color = '';
             tpi_cc_selected_carts.style.height = '0rem'
@@ -3832,18 +3849,13 @@ function update_ActionProcessContainer(){
             tpi_cc_selected_data_pallets.style.color = '#fc0';
             tpi_cc_selected_pallets.style.height = '.8rem'
             tpi_cc_selected_pallets.style.opacity = '1'
+            hasSelected = true;
         } else {
             tpi_cc_selected_data_pallets.style.color = '';
             tpi_cc_selected_pallets.style.height = '0rem'
             tpi_cc_selected_pallets.style.opacity = '0'
         }
     }
-    
-    tpi_cc_actionButtons.forEach(button => {
-        if (button.hasAttribute('tpi-cc-selected-courier-cell')) {
-            hasSelected = true;
-        }
-    });
     
     if (hasSelected) {
         toggle_ActionProcessContainer("show");
@@ -5748,12 +5760,17 @@ function restoreEventListeners() {
 
         // Добавляем новый обработчик
         newBtn.addEventListener('click', () => {
-            if (newBtn.hasAttribute('tpi-cc-selected-courier-cell')) {
-                newBtn.removeAttribute('tpi-cc-selected-courier-cell');
-            } else {
-                newBtn.setAttribute('tpi-cc-selected-courier-cell', '');
+            if(newBtn.hasAttribute('tpi-cc-button-is-blocked')) {
+                tpiNotification.show('Ошибка', "error", "Взаимодействия с паллетами КГТ были заблокированы по просьбе старших смен.");
+                return
+            }else{
+                if (newBtn.hasAttribute('tpi-cc-selected-courier-cell')) {
+                    newBtn.removeAttribute('tpi-cc-selected-courier-cell');
+                } else {
+                    newBtn.setAttribute('tpi-cc-selected-courier-cell', '');
+                }
+                update_ActionProcessContainer();
             }
-            update_ActionProcessContainer();
         });
         initializePrintRowButtons();
     });
@@ -5789,6 +5806,20 @@ function initializePrintRowButtons() {
             button.parentNode.replaceChild(newButton, button);
         }
         
+        // Проверяем, есть ли в строке курьер с заблокированными кнопками
+        const row = newButton.closest('.tpi-cc--table-tbody');
+        if (row) {
+            // Проверяем, все ли кнопки PALLET заблокированы
+            const palletButtons = row.querySelectorAll('.tpi-cc-table-tbody-data-pallet-id');
+            const allPalletsBlocked = palletButtons.length > 0 && 
+                Array.from(palletButtons).every(btn => btn.hasAttribute('tpi-cc-button-is-blocked'));
+            
+            // Проверяем, есть ли у курьера PALLET кнопки (для КГТ)
+            if (palletButtons.length > 0 && allPalletsBlocked) {
+                newButton.disabled = true;
+            }
+        }
+        
         // Добавляем новый обработчик
         newButton.addEventListener('click', async function(event) {
             event.preventDefault();
@@ -5796,6 +5827,11 @@ function initializePrintRowButtons() {
             
             // Проверяем, не выполняется ли уже печать
             if (this.hasAttribute('tpi-cc-printing-state')) {
+                return;
+            }
+            
+            // Проверяем, не отключена ли кнопка
+            if (this.disabled) {
                 return;
             }
             
@@ -5810,7 +5846,7 @@ function initializePrintRowButtons() {
                     return;
                 }
                 
-                // Собираем данные из строки
+                // Собираем данные из строки (только незаблокированные)
                 const courierNameElement = row.querySelector('p[tpi-cc-parsing-data="courier-full-name"]');
                 const cellElement = row.querySelector('a[tpi-cc-parsing-data="courier-route-cell"]');
                 
@@ -5819,21 +5855,30 @@ function initializePrintRowButtons() {
                     cell: cellElement?.textContent
                 });
                 
-                // Получаем CART номера
-                const cartElements = row.querySelectorAll('.tpi-cc--table-tbody-data-carts .tpi-cc-table-tbody-data-cart-id[tpi-data-courier-spec-cell]');
+                // Получаем ТОЛЬКО НЕЗАБЛОКИРОВАННЫЕ CART номера
+                const cartElements = row.querySelectorAll('.tpi-cc--table-tbody-data-carts .tpi-cc-table-tbody-data-cart-id[tpi-data-courier-spec-cell]:not([tpi-cc-button-is-blocked])');
                 const cartNumbers = Array.from(cartElements).map(el => el.getAttribute('tpi-data-courier-spec-cell'));
                 
-                // Получаем PALLET номера
-                const palletElements = row.querySelectorAll('.tpi-cc--table-tbody-data-pallets .tpi-cc-table-tbody-data-pallet-id[tpi-data-courier-spec-cell]');
+                // Получаем ТОЛЬКО НЕЗАБЛОКИРОВАННЫЕ PALLET номера
+                const palletElements = row.querySelectorAll('.tpi-cc--table-tbody-data-pallets .tpi-cc-table-tbody-data-pallet-id[tpi-data-courier-spec-cell]:not([tpi-cc-button-is-blocked])');
                 const palletNumbers = Array.from(palletElements).map(el => el.getAttribute('tpi-data-courier-spec-cell'));
                 
-                console.log('📦 Найденные номера:', {
+                console.log('📦 Найденные номера (незаблокированные):', {
                     cart: cartNumbers,
                     pallet: palletNumbers
                 });
                 
+                // Если нет номеров для печати, показываем уведомление
+                if (cartNumbers.length === 0 && palletNumbers.length === 0) {
+                    console.log('⚠️ Нет номеров для печати');
+                    if (typeof tpiNotification !== 'undefined') {
+                        tpiNotification.show('Нет номеров', 'warning', 'У курьера нет доступных CART или PALLET номеров для печати');
+                    }
+                    return;
+                }
+                
                 // Формируем данные курьера
-                const courierData = {
+                const courierData = [{
                     courierName: courierNameElement ? courierNameElement.textContent.trim() : 'Не указано',
                     cell: {
                         value: cellElement ? cellElement.textContent.trim() : 'Нет ячейки',
@@ -5841,16 +5886,7 @@ function initializePrintRowButtons() {
                     },
                     cartNumbers,
                     palletNumbers
-                };
-                
-                // Если нет номеров для печати, показываем уведомление
-                if (cartNumbers.length === 0 && palletNumbers.length === 0) {
-                    console.log('⚠️ Нет номеров для печати');
-                    if (typeof tpiNotification !== 'undefined') {
-                        tpiNotification.show('Нет номеров', 'warning', 'У курьера нет CART или PALLET номеров для печати');
-                    }
-                    return;
-                }
+                }];
                 
                 // Генерируем PDF
                 await tpi_cc_generatePDFlabels(courierData, {
@@ -5867,7 +5903,6 @@ function initializePrintRowButtons() {
         });
     });
 }
-
 // Функция для извлечения текстового значения из ячейки
 function extractCellValue(cell) {
     if (!cell) return '';
@@ -7651,14 +7686,19 @@ function tpi_cc_claimTableData_toPrint() {
         const cellValue = cellElement ? cellElement.textContent.trim() : 'Нет ячейки';
         const cellAttribute = cellElement ? cellElement.getAttribute('courier-spec-cell') : '';
         
-        // 3) Получаем все CART номера
+        // 3) Получаем все НЕЗАБЛОКИРОВАННЫЕ CART номера
         const cartElements = row.querySelectorAll('.tpi-cc--table-tbody-data-carts .tpi-cc-table-tbody-data-cart-id[tpi-data-courier-spec-cell]');
-        const cartNumbers = Array.from(cartElements).map(el => el.getAttribute('tpi-data-courier-spec-cell'));
+        const cartNumbers = Array.from(cartElements)
+            .filter(el => !el.hasAttribute('tpi-cc-button-is-blocked')) // Фильтруем заблокированные
+            .map(el => el.getAttribute('tpi-data-courier-spec-cell'));
         
-        // 4) Получаем все PALLET номера
+        // 4) Получаем все НЕЗАБЛОКИРОВАННЫЕ PALLET номера
         const palletElements = row.querySelectorAll('.tpi-cc--table-tbody-data-pallets .tpi-cc-table-tbody-data-pallet-id[tpi-data-courier-spec-cell]');
-        const palletNumbers = Array.from(palletElements).map(el => el.getAttribute('tpi-data-courier-spec-cell'));
+        const palletNumbers = Array.from(palletElements)
+            .filter(el => !el.hasAttribute('tpi-cc-button-is-blocked')) // Фильтруем заблокированные
+            .map(el => el.getAttribute('tpi-data-courier-spec-cell'));
         
+        // Добавляем в результат только если есть хотя бы один незаблокированный номер
         if (cartNumbers.length > 0 || palletNumbers.length > 0) {
             tableData.push({
                 courierName,
@@ -7740,8 +7780,8 @@ document.addEventListener('click', async function(event) {
         });
 
         // Собираем выбранные номера CART и PALLET
-        const selectedCartButtons = document.querySelectorAll('.tpi-cc-table-tbody-data-cart-id[tpi-cc-selected-courier-cell]');
-        const selectedPalletButtons = document.querySelectorAll('.tpi-cc-table-tbody-data-pallet-id[tpi-cc-selected-courier-cell]');
+        const selectedCartButtons = document.querySelectorAll('.tpi-cc-table-tbody-data-cart-id[tpi-cc-selected-courier-cell]:not([tpi-cc-button-is-blocked])');
+        const selectedPalletButtons = document.querySelectorAll('.tpi-cc-table-tbody-data-pallet-id[tpi-cc-selected-courier-cell]:not([tpi-cc-button-is-blocked])');
 
         if (selectedCartButtons.length === 0 && selectedPalletButtons.length === 0) {
             if (typeof tpiNotification !== 'undefined') {
@@ -8413,22 +8453,24 @@ function handlePrintButtonMouseEnter(event) {
     const rows = document.querySelectorAll('.tpi-cc--table-tbody');
     
     rows.forEach(row => {
-        // Находим кнопки CART и PALLET в строке с нужным индексом (nth-child)
+        // Находим кнопки CART и PALLET в строке с нужным индексом
         const cartButtons = row.querySelectorAll('.tpi-cc-table-tbody-data-cart-id');
         const palletButtons = row.querySelectorAll('.tpi-cc-table-tbody-data-pallet-id');
         
-        // Подсвечиваем кнопку CART с нужным индексом (1-based)
+        // Подсвечиваем кнопку CART с нужным индексом, только если она не заблокирована
         if (cartButtons.length >= rowIndex) {
             const targetCartButton = cartButtons[parseInt(rowIndex) - 1];
-            if (targetCartButton) {
+            // Добавляем проверку на заблокированную кнопку
+            if (targetCartButton && !targetCartButton.hasAttribute('tpi-cc-button-is-blocked')) {
                 targetCartButton.setAttribute('tpi-cc-highlighted_row', '');
             }
         }
         
-        // Подсвечиваем кнопку PALLET с нужным индексом (1-based)
+        // Подсвечиваем кнопку PALLET с нужным индексом, только если она не заблокирована
         if (palletButtons.length >= rowIndex) {
             const targetPalletButton = palletButtons[parseInt(rowIndex) - 1];
-            if (targetPalletButton) {
+            // Добавляем проверку на заблокированную кнопку
+            if (targetPalletButton && !targetPalletButton.hasAttribute('tpi-cc-button-is-blocked')) {
                 targetPalletButton.setAttribute('tpi-cc-highlighted_row', '');
             }
         }
@@ -8459,18 +8501,20 @@ function handlePrintButtonClick(event) {
         const cartButtons = row.querySelectorAll('.tpi-cc-table-tbody-data-cart-id');
         const palletButtons = row.querySelectorAll('.tpi-cc-table-tbody-data-pallet-id');
         
-        // Выделяем кнопку CART с нужным индексом
+        // Выделяем кнопку CART с нужным индексом, только если она не заблокирована
         if (cartButtons.length >= rowIndex) {
             const targetCartButton = cartButtons[parseInt(rowIndex) - 1];
-            if (targetCartButton) {
+            // Добавляем проверку на заблокированную кнопку
+            if (targetCartButton && !targetCartButton.hasAttribute('tpi-cc-button-is-blocked')) {
                 targetCartButton.setAttribute('tpi-cc-selected-courier-cell', '');
             }
         }
         
-        // Выделяем кнопку PALLET с нужным индексом
+        // Выделяем кнопку PALLET с нужным индексом, только если она не заблокирована
         if (palletButtons.length >= rowIndex) {
             const targetPalletButton = palletButtons[parseInt(rowIndex) - 1];
-            if (targetPalletButton) {
+            // Добавляем проверку на заблокированную кнопку
+            if (targetPalletButton && !targetPalletButton.hasAttribute('tpi-cc-button-is-blocked')) {
                 targetPalletButton.setAttribute('tpi-cc-selected-courier-cell', '');
             }
         }
@@ -8775,8 +8819,8 @@ function initializeAddCartButtons() {
 async function deleteSelectedItems() {
     try {
         // Находим все выбранные кнопки
-        const selectedCartButtons = document.querySelectorAll('.tpi-cc-table-tbody-data-cart-id[tpi-cc-selected-courier-cell]');
-        const selectedPalletButtons = document.querySelectorAll('.tpi-cc-table-tbody-data-pallet-id[tpi-cc-selected-courier-cell]');
+        const selectedCartButtons = document.querySelectorAll('.tpi-cc-table-tbody-data-cart-id[tpi-cc-selected-courier-cell]:not([tpi-cc-button-is-blocked])');
+        const selectedPalletButtons = document.querySelectorAll('.tpi-cc-table-tbody-data-pallet-id[tpi-cc-selected-courier-cell]:not([tpi-cc-button-is-blocked])');
         
         if (selectedCartButtons.length === 0 && selectedPalletButtons.length === 0) {
             if (typeof tpiNotification !== 'undefined') {
@@ -8894,7 +8938,7 @@ async function deleteSelectedItems() {
             return false;
         }
         
-    } catch (error) {
+     } catch (error) {
         console.warn('❌ Ошибка при удалении выбранных элементов:', error);
         if (typeof tpiNotification !== 'undefined') {
             tpiNotification.show('Ошибка', 'error', 'Произошла ошибка при удалении');
