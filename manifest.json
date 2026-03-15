@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Яндекс Турбо ПИ",
   "version": "3.19.10",
-  "version_name": "3.19.10_dev1",
+  "version_name": "3.19.10_dev2",
   "description": "Расширение для получения дополнительной информации из ПИ 💛",
   "permissions": [
     "activeTab",
@@ -42,7 +42,8 @@
         "js/tpiSettings.js",
         "js/tpiCartControl.js",
         "js/fixOutboundsNames.js",
-        "js/tpiSortables.js"
+        "js/tpiSortables.js",
+        "js/tpiSortablesTable.js"
       ],
       "css": [
         "css/styles.css",
@@ -69,7 +70,8 @@
         "css/tpiSettings.css",
         "css/tpiCartControl.css",
         "css/anomalyBoard.css",
-        "css/tpiSortables.css"
+        "css/tpiSortables.css",
+        "css/tpiSortablesTable.css"
       ]
     }
   ],

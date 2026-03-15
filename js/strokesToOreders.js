@@ -1,8 +1,18 @@
 let onTextToOrdersDomain = false;
 let observer = null; // Будем хранить наблюдатель, чтобы отключить его
-let stoSelectedVersion = 'new'
+let stoSelectedVersion = 'old'
 
-
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
 
 const theadForTables = `
 <thead data-tid="511d58e0 c4185b1" data-tid-prop="c4185b1" class="___thead___FJGT0">
@@ -921,7 +931,7 @@ function checkiIs__onStrokeToOrdersPage() {
                                 ${temp__tr_second}
                                 ${temp__tr_first}
                                 <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data">
+                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="Первая приемка завершена, прямой поток (прибыл на СЦ в лоте, лот прошел 1 приемку)">
                                         <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
                                             <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="first-accept-complete" tpi-sto-status-direction="forward"></i>
                                         </div>
@@ -933,7 +943,7 @@ function checkiIs__onStrokeToOrdersPage() {
                                 ${temp__tr_second}
                                 ${temp__tr_first}
                                 <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data">
+                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="Первая приёмка завершена, возвратный поток (прибыл на СЦ в лоте, лот прошел 1 приемку)">
                                         <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
                                             <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="first-accept-complete" tpi-sto-status-direction="return"></i>
                                         </div>
@@ -945,7 +955,7 @@ function checkiIs__onStrokeToOrdersPage() {
                                 ${temp__tr_second}
                                 ${temp__tr_first}
                                 <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data">
+                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="Предсорт пройден, прямой поток">
                                         <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
                                             <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="predsort-complete" tpi-sto-status-direction="forward"></i>
                                         </div>
@@ -957,7 +967,7 @@ function checkiIs__onStrokeToOrdersPage() {
                                 ${temp__tr_second}
                                 ${temp__tr_first}
                                 <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data">
+                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="Предсорт пройден, возвратный поток">
                                         <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
                                             <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="predsort-complete" tpi-sto-status-direction="return"></i>
                                         </div>
@@ -969,7 +979,7 @@ function checkiIs__onStrokeToOrdersPage() {
                                 ${temp__tr_second}
                                 ${temp__tr_first}
                                 <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data">
+                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="Ожидает прибытия, прямой поток">
                                         <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
                                             <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="waiting-accept" tpi-sto-status-direction="forward"></i>
                                         </div>
@@ -981,7 +991,7 @@ function checkiIs__onStrokeToOrdersPage() {
                                 ${temp__tr_second}
                                 ${temp__tr_first}
                                 <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data">
+                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="Ожидает прибытия, возвратный поток">
                                         <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
                                             <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="waiting-accept" tpi-sto-status-direction="return"></i>
                                         </div>
@@ -993,7 +1003,7 @@ function checkiIs__onStrokeToOrdersPage() {
                                 ${temp__tr_second}
                                 ${temp__tr_first}
                                 <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data">
+                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="На хранении, прямой поток">
                                         <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
                                             <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="on-hran" tpi-sto-status-direction="forward"></i>
                                         </div>
@@ -1005,7 +1015,7 @@ function checkiIs__onStrokeToOrdersPage() {
                                 ${temp__tr_second}
                                 ${temp__tr_first}
                                 <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data">
+                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="На хранении, возвратный поток">
                                         <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
                                             <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="on-hran" tpi-sto-status-direction="return"></i>
                                         </div>
@@ -1017,7 +1027,7 @@ function checkiIs__onStrokeToOrdersPage() {
                                 ${temp__tr_second}
                                 ${temp__tr_first}
                                 <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data">
+                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="Ожидает приемки курьером, прямой поток">
                                         <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
                                             <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="awaiting-courier-accept" tpi-sto-status-direction="any"></i>
                                         </div>
@@ -1029,7 +1039,7 @@ function checkiIs__onStrokeToOrdersPage() {
                                 ${temp__tr_second}
                                 ${temp__tr_first}
                                 <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data">
+                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="Консолидирован в лоте">
                                         <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
                                             <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="consolidated" tpi-sto-status-direction="any"></i>
                                         </div>
@@ -1041,7 +1051,7 @@ function checkiIs__onStrokeToOrdersPage() {
                                 ${temp__tr_second}
                                 ${temp__tr_first}
                                 <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data">
+                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="Удален">
                                         <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
                                             <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="deleted" tpi-sto-status-direction="any"></i>
                                         </div>
@@ -1053,7 +1063,7 @@ function checkiIs__onStrokeToOrdersPage() {
                                 ${temp__tr_second}
                                 ${temp__tr_first}
                                 <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data">
+                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="Отмена из внешней системы">
                                         <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
                                             <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="canceled" tpi-sto-status-direction="any"></i>
                                         </div>
@@ -1065,7 +1075,7 @@ function checkiIs__onStrokeToOrdersPage() {
                                 ${temp__tr_second}
                                 ${temp__tr_first}
                                 <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data">
+                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="Пустой лот создан (обезличенный), прямой поток">
                                         <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
                                             <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="orphan-lot-created" tpi-sto-status-direction="any"></i>
                                         </div>
@@ -1077,7 +1087,7 @@ function checkiIs__onStrokeToOrdersPage() {
                                 ${temp__tr_second}
                                 ${temp__tr_first}
                                 <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data">
+                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="Пустой лот создан (на направление), прямой поток">
                                         <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
                                             <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="lot-created" tpi-sto-status-direction="any"></i>
                                         </div>
@@ -1089,7 +1099,7 @@ function checkiIs__onStrokeToOrdersPage() {
                                 ${temp__tr_second}
                                 ${temp__tr_first}
                                 <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data">
+                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="Лот наполняется посылками, прямой поток">
                                         <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
                                             <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="lot-filling" tpi-sto-status-direction="forward"></i>
                                         </div>
@@ -1101,7 +1111,7 @@ function checkiIs__onStrokeToOrdersPage() {
                                 ${temp__tr_second}
                                 ${temp__tr_first}
                                 <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data">
+                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="Лот наполняется посылками, возвратный поток">
                                         <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
                                             <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="lot-filling" tpi-sto-status-direction="return"></i>
                                         </div>
@@ -1113,7 +1123,7 @@ function checkiIs__onStrokeToOrdersPage() {
                                 ${temp__tr_second}
                                 ${temp__tr_first}
                                 <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data">
+                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="Лот упакован для хранения, прямой поток">
                                         <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
                                             <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="lot-packed-for-hran" tpi-sto-status-direction="any"></i>
                                         </div>
@@ -1125,7 +1135,7 @@ function checkiIs__onStrokeToOrdersPage() {
                                 ${temp__tr_second}
                                 ${temp__tr_first}
                                 <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data">
+                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="Не принят курьером, прямой поток">
                                         <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
                                             <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="not-accept-by-courier" tpi-sto-status-direction="any"></i>
                                         </div>
@@ -1137,7 +1147,7 @@ function checkiIs__onStrokeToOrdersPage() {
                                 ${temp__tr_second}
                                 ${temp__tr_first}
                                 <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data">
+                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="Загружен в ТС, прямой поток">
                                         <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
                                             <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="loaded-in-vehicle" tpi-sto-status-direction="any"></i>
                                         </div>
@@ -1149,7 +1159,7 @@ function checkiIs__onStrokeToOrdersPage() {
                                 ${temp__tr_second}
                                 ${temp__tr_first}
                                 <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data">
+                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="Отгружен, прямой поток">
                                         <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
                                             <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="shipped" tpi-sto-status-direction="forward"></i>
                                         </div>
@@ -1161,7 +1171,7 @@ function checkiIs__onStrokeToOrdersPage() {
                                 ${temp__tr_second}
                                 ${temp__tr_first}
                                 <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data">
+                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="Отгружен, возвратный поток">
                                         <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
                                             <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="shipped" tpi-sto-status-direction="return"></i>
                                         </div>
@@ -1173,7 +1183,7 @@ function checkiIs__onStrokeToOrdersPage() {
                                 ${temp__tr_second}
                                 ${temp__tr_first}
                                 <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data">
+                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="Отгружен и заменен, прямой поток">
                                         <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
                                             <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="shipped-and-replaced" tpi-sto-status-direction="forward"></i>
                                         </div>
@@ -1185,7 +1195,7 @@ function checkiIs__onStrokeToOrdersPage() {
                                 ${temp__tr_second}
                                 ${temp__tr_first}
                                 <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data">
+                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="Подготовлен к отгрузке, прямой поток">
                                         <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
                                             <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="ready-to-shipment" tpi-sto-status-direction="forward"></i>
                                         </div>
@@ -1197,7 +1207,7 @@ function checkiIs__onStrokeToOrdersPage() {
                                 ${temp__tr_second}
                                 ${temp__tr_first}
                                 <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data">
+                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="Подготовлен к отгрузке, возвратный поток">
                                         <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
                                             <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="ready-to-shipment" tpi-sto-status-direction="return"></i>
                                         </div>
@@ -1399,8 +1409,9 @@ function checkiIs__onStrokeToOrdersPage() {
         }
 
         const textArea = overlay.querySelector('.diman__TURBOpi__textToOrders__textArea');
-        textArea.addEventListener('input', handleTextAreaChange);
-        textArea.addEventListener('change', handleTextAreaChange);
+        textArea.removeEventListener('input', handleTextAreaChange);
+        textArea.removeEventListener('change', handleTextAreaChange);
+        textArea.addEventListener('input', debounce(handleTextAreaChange, 300));
         const statusListEl = overlay.querySelector("ul.tpi-sto--search-status-list");
 
         const syncHeights = () => {
@@ -1468,17 +1479,24 @@ function checkiIs__onStrokeToOrdersPage() {
         // Обработчик вставки (Ctrl+V)
         textArea.addEventListener('paste', function(e) {
             e.preventDefault();
-        
+
             const pastedText = (e.clipboardData || window.clipboardData).getData('text');
-        
+
             const formattedText = pastedText
-                .replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F700}-\u{1F77F}\u{1F780}-\u{1F7FF}\u{1F800}-\u{1F8FF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{FE00}-\u{FE0F}]/gu, '')
+                .replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}]/gu, '')
                 .split(/[, \n]+/)
                 .map(item => item.trim().replace(/[()]/g, ''))
                 .filter(item => item.length > 0)
                 .join('\n');
-        
-            document.execCommand('insertText', false, formattedText);
+
+            const start = textArea.selectionStart;
+            const end = textArea.selectionEnd;
+            const text = textArea.value;
+            textArea.value = text.substring(0, start) + formattedText + text.substring(end);
+            
+            textArea.selectionStart = textArea.selectionEnd = start + formattedText.length;
+            
+            forcedMultipleLines.clear();
             updateStatusList();
         });
         
@@ -2291,142 +2309,159 @@ function checkDuplicates() {
     
 }
 
+let isUpdatingStatus = false;
+
 function updateStatusList() {
-    const ul = document.querySelector("ul.tpi-sto--search-status-list");
-    if (!ul) return;
-    
-    // Если список скрыт, не обновляем его
-    if (ul.getAttribute('status-list-visible') === 'false') {
-        return;
-    }
+    if (isUpdatingStatus) return;
+    isUpdatingStatus = true;
 
-    const textArea = document.querySelector(".diman__TURBOpi__textToOrders__textArea");
-    if (!textArea) return;
-
-    const lines = textArea.value.split("\n");
-    
-    // Сохраняем текущие статусы
-    const currentStatuses = {};
-    ul.querySelectorAll('li').forEach(li => {
-        const idx = li.getAttribute("data-line-idx");
-        const status = li.getAttribute("data-status");
-        const originalValue = li.getAttribute("data-original-value");
-        if (idx !== null) {
-            currentStatuses[idx] = { status, originalValue };
-        }
-    });
-
-    // Удаляем лишние строки (если текст сократился)
-    const existingItems = ul.querySelectorAll('li');
-    existingItems.forEach(li => {
-        const idx = li.getAttribute("data-line-idx");
-        if (idx >= lines.length) {
-            li.remove();
-            // Удаляем из forcedMultipleLines если строка удалена
-            forcedMultipleLines.delete(idx);
-        }
-    });
-
-    let visibleIndex = 0;
-    const previousLines = [];
-
-    lines.forEach((line, index) => {
-        const needle = line.trim();
-        const idx = String(index);
-        
-        let li = ul.querySelector(`li[data-line-idx="${idx}"]`);
-        const isNewLine = !li;
-
-        if (isNewLine) {
-            li = document.createElement("li");
-            li.setAttribute("data-line-idx", idx);
-            
-            const wrapper = document.createElement("div");
-            wrapper.className = "tpi-sto--status-line";
-
-            const numDiv = document.createElement("div");
-            numDiv.className = "tpi-sto--status-line-number";
-
-            const iconDiv = document.createElement("div");
-            iconDiv.className = "tpi-sto--status-line-icon";
-
-            wrapper.appendChild(numDiv);
-            wrapper.appendChild(iconDiv);
-            li.appendChild(wrapper);
-            ul.appendChild(li);
-        }
-
-        // Обновляем номер строки
-        const numDiv = li.querySelector(".tpi-sto--status-line-number");
-        if (numDiv) {
-            numDiv.textContent = needle ? String(++visibleIndex) : "×";
-        }
-
-        // Сохраняем оригинальное значение
-        li.setAttribute("data-original-value", needle);
-
-        // Определяем статус
-        let status;
-        if (!needle) {
-            status = "empty";
-        } else {
-            const previousData = currentStatuses[idx];
-            
-            // Если строка изменилась или новая - определяем статус заново
-            if (isNewLine || !previousData || previousData.originalValue !== needle) {
-                const previousNeedles = new Set(previousLines);
-                const { found, isDouble, isMultiple } = findStatusAcrossTables(needle, previousNeedles);
-                
-                // Сбрасываем forcedMultiple если строка изменилась
-                if (isNewLine || previousData.originalValue !== needle) {
-                    forcedMultipleLines.delete(idx);
-                }
-                
-                if (isMultiple) {
-                    status = "multiple";
-                } else if (isDouble) {
-                    status = "double";
-                } else if (found) {
-                    status = "found";
-                } else {
-                    status = "default";
-                }
-            } else {
-                // Сохраняем существующий статус
-                status = previousData.status || "default";
+     requestAnimationFrame(() => {
+        try {
+            const ul = document.querySelector("ul.tpi-sto--search-status-list");
+            if (!ul) {
+                isUpdatingStatus = false;
+                return;
             }
             
-            previousLines.push(needle);
-        }
+            // Если список скрыт, не обновляем его
+            if (ul.getAttribute('status-list-visible') === 'false') {
+                isUpdatingStatus = false;
+                return;
+            }
+            const textArea = document.querySelector(".diman__TURBOpi__textToOrders__textArea");
+            if (!textArea) return;
 
-        // Устанавливаем статус
-        setLineStatus(index, status);
+            const lines = textArea.value.split("\n");
+            
+            // Сохраняем текущие статусы
+            const currentStatuses = {};
+            ul.querySelectorAll('li').forEach(li => {
+                const idx = li.getAttribute("data-line-idx");
+                const status = li.getAttribute("data-status");
+                const originalValue = li.getAttribute("data-original-value");
+                if (idx !== null) {
+                    currentStatuses[idx] = { status, originalValue };
+                }
+            });
 
-        // Обновляем обработчики событий
-        li.removeEventListener('mouseenter', li._mouseEnterHandler);
-        li.removeEventListener('mouseleave', li._mouseLeaveHandler);
-        
-        const mouseEnterHandler = () => toggleHighlightForLine(index, true);
-        const mouseLeaveHandler = () => toggleHighlightForLine(index, false);
-        
-        li._mouseEnterHandler = mouseEnterHandler;
-        li._mouseLeaveHandler = mouseLeaveHandler;
-        
-        // Добавляем обработчики ко всему элементу li
-        li.addEventListener('mouseenter', mouseEnterHandler);
-        li.addEventListener('mouseleave', mouseLeaveHandler);
-        
-        // Также добавляем обработчики specifically к иконке
-        const iconDiv = li.querySelector(".tpi-sto--status-line-icon");
-        if (iconDiv) {
-            iconDiv.removeEventListener('mouseenter', iconDiv._mouseEnterHandler);
-            iconDiv.removeEventListener('mouseleave', iconDiv._mouseLeaveHandler);
-            
-            iconDiv._mouseEnterHandler = mouseEnterHandler;
-            iconDiv._mouseLeaveHandler = mouseLeaveHandler;
-            
-            iconDiv.addEventListener('mouseenter', mouseEnterHandler);
-            iconDiv.addEventListener('mouseleave', mouseLeaveHandler);
+            // Удаляем лишние строки (если текст сократился)
+            const existingItems = ul.querySelectorAll('li');
+            existingItems.forEach(li => {
+                const idx = li.getAttribute("data-line-idx");
+                if (idx >= lines.length) {
+                    li.remove();
+                    // Удаляем из forcedMultipleLines если строка удалена
+                    forcedMultipleLines.delete(idx);
+                }
+            });
+
+            let visibleIndex = 0;
+            const previousLines = [];
+
+            lines.forEach((line, index) => {
+                const needle = line.trim();
+                const idx = String(index);
+                
+                let li = ul.querySelector(`li[data-line-idx="${idx}"]`);
+                const isNewLine = !li;
+
+                if (isNewLine) {
+                    li = document.createElement("li");
+                    li.setAttribute("data-line-idx", idx);
+                    
+                    const wrapper = document.createElement("div");
+                    wrapper.className = "tpi-sto--status-line";
+
+                    const numDiv = document.createElement("div");
+                    numDiv.className = "tpi-sto--status-line-number";
+
+                    const iconDiv = document.createElement("div");
+                    iconDiv.className = "tpi-sto--status-line-icon";
+
+                    wrapper.appendChild(numDiv);
+                    wrapper.appendChild(iconDiv);
+                    li.appendChild(wrapper);
+                    ul.appendChild(li);
+                }
+
+                // Обновляем номер строки
+                const numDiv = li.querySelector(".tpi-sto--status-line-number");
+                if (numDiv) {
+                    numDiv.textContent = needle ? String(++visibleIndex) : "×";
+                }
+
+                // Сохраняем оригинальное значение
+                li.setAttribute("data-original-value", needle);
+
+                // Определяем статус
+                let status;
+                if (!needle) {
+                    status = "empty";
+                } else {
+                    const previousData = currentStatuses[idx];
+                    
+                    // Если строка изменилась или новая - определяем статус заново
+                    if (isNewLine || !previousData || previousData.originalValue !== needle) {
+                        const previousNeedles = new Set(previousLines);
+                        const { found, isDouble, isMultiple } = findStatusAcrossTables(needle, previousNeedles);
+                        
+                        // Сбрасываем forcedMultiple если строка изменилась
+                        if (isNewLine || previousData.originalValue !== needle) {
+                            forcedMultipleLines.delete(idx);
+                        }
+                        
+                        if (isMultiple) {
+                            status = "multiple";
+                        } else if (isDouble) {
+                            status = "double";
+                        } else if (found) {
+                            status = "found";
+                        } else {
+                            status = "default";
+                        }
+                    } else {
+                        // Сохраняем существующий статус
+                        status = previousData.status || "default";
+                    }
+                    
+                    previousLines.push(needle);
+                }
+
+                // Устанавливаем статус
+                setLineStatus(index, status);
+
+                // Обновляем обработчики событий
+                li.removeEventListener('mouseenter', li._mouseEnterHandler);
+                li.removeEventListener('mouseleave', li._mouseLeaveHandler);
+                
+                const mouseEnterHandler = () => toggleHighlightForLine(index, true);
+                const mouseLeaveHandler = () => toggleHighlightForLine(index, false);
+                
+                li._mouseEnterHandler = mouseEnterHandler;
+                li._mouseLeaveHandler = mouseLeaveHandler;
+                
+                // Добавляем обработчики ко всему элементу li
+                li.addEventListener('mouseenter', mouseEnterHandler);
+                li.addEventListener('mouseleave', mouseLeaveHandler);
+                
+                // Также добавляем обработчики specifically к иконке
+                const iconDiv = li.querySelector(".tpi-sto--status-line-icon");
+                if (iconDiv) {
+                    iconDiv.removeEventListener('mouseenter', iconDiv._mouseEnterHandler);
+                    iconDiv.removeEventListener('mouseleave', iconDiv._mouseLeaveHandler);
+                    
+                    iconDiv._mouseEnterHandler = mouseEnterHandler;
+                    iconDiv._mouseLeaveHandler = mouseLeaveHandler;
+                    
+                    iconDiv.addEventListener('mouseenter', mouseEnterHandler);
+                    iconDiv.addEventListener('mouseleave', mouseLeaveHandler);
+                }
+            });        
+        } finally {
+            // Сбрасываем флаг в конце
+            setTimeout(() => {
+                isUpdatingStatus = false;
+            }, 50);
         }
     });
 }
@@ -2888,7 +2923,6 @@ function ensureStatusListDelegation() {
 function handleTextAreaChange() {
     forcedMultipleLines.clear();
     updateStatusList();
-    updateAllStatusesOnShow();
 }
 
 function initTextAreaHandlers() {

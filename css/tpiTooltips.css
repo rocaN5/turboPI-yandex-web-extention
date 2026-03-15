@@ -17,13 +17,36 @@ div.tpi-tooltip-by-sheva_r6{
     border-radius: 10px;
     color: #fff;
     width: fit-content;
-    /* animation: tooltip-popup 300ms ease-in-out; */
+    animation: tooltip-popup 150ms ease-in-out;
     box-shadow: 0px 0px 10px 0px #000;
     border: 2px solid #ffffff52;
     backdrop-filter: invert(1) hue-rotate(180deg) blur(2px);
     font-weight: 500;
     max-width: 240px;
     white-space: pre-wrap;
+    pointer-events: none;
+    position: fixed;
+    &[sheva_r6]{color: red;}
+
+    &[tpi-tolltip-position-x='from-left']{
+        -ms-transform-origin-x: left;
+        -webkit-transform-origin-x: left;
+    }
+
+    &[tpi-tolltip-position-x='from-right']{
+        -ms-transform-origin-x: right;
+        -webkit-transform-origin-x: right;
+    }
+
+    &[tpi-tolltip-position-y='from-top']{
+        -ms-transform-origin-y: top;
+        -webkit-transform-origin-y: top;
+    }
+
+    &[tpi-tolltip-position-y='from-bottom']{
+        -ms-transform-origin-y: bottom;
+        -webkit-transform-origin-y: bottom;
+    }
 
     p{
         margin: 0;
@@ -53,7 +76,7 @@ div.tpi-tooltip-by-sheva_r6{
         font-weight: normal;
     }
 }
-/* 
+
 @keyframes tooltip-popup  {
     from{
         opacity: 0;
@@ -65,4 +88,4 @@ div.tpi-tooltip-by-sheva_r6{
         transform: scale(1);
         filter: blur(0);
     }
-} */
+}

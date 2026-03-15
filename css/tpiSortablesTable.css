@@ -1,0 +1,149 @@
+.tpi-sortables-contols-wrapper {
+    display: flex !important;
+    flex-flow: row !important;
+    gap: 10px;
+}
+
+.tpi-sortables-buttons-wrapper{
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+button.tpi-sortables-contols-copy-data {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 40px;
+    border: 0;
+    width: 40px;
+    border-radius: 10px;
+    background: #e8e8e8;
+    cursor: pointer;
+    transition: 150ms ease-out;
+    padding: 10px;
+
+    &:hover{
+        filter: brightness(0.95);
+    }
+
+    &:focus-visible{
+        filter: brightness(0.95);
+        outline: none;
+        box-shadow: 0px 0px 6px 0px #212121;
+    }
+
+    &:not(:disabled):active{
+        transform: scale(.97);
+        filter: brightness(0.9);
+    }
+
+    &[tpi-sortables-action="copy-default"]{
+        padding: 12px;
+    }
+
+    icon.tpi-sortables-controls-copy-icon{
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        color: #212121;
+    }
+
+    icon.tpi-sortables-controls-copy-icon svg{
+        width: 100%;
+        height: 100%;
+        color: currentColor;
+        fill: currentColor;
+    }
+
+    &[tpi-sortables-action="copy-mono"]{
+        background: #d8edf8;
+    }
+}
+
+.tpi-sortables-page-switch-wrapper{
+    padding: 4px;
+    margin-left: 0px;
+    border-radius: 10px;
+    display: flex;
+    gap: 0;
+    animation: tpi-sortables-page-switch-popup cubic-bezier(0.51, 0.75, 0.08, 1.46) 300ms forwards;
+    &[sheva_r6]{color:red}
+
+    .tpi-sortables-data-current-page{
+        display: flex;
+        height: 100%;
+        border-radius: 10px;
+        justify-content: center;
+        align-items: center;
+        padding: 8px 10px;
+    }
+    .tpi-sortables-data-current-page p.tpi-sortables-data-current-page-data{
+        margin: 0;
+        color: #212121;
+        font-size: .8rem;
+    }
+}
+
+@keyframes tpi-sortables-page-switch-popup {
+    from{
+        opacity: 0;
+        transform: scale(0);
+    }
+    to{
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.tpi-sortables-contols-switch-page{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 0;
+    height: 32px;
+    width: 32px;
+    border-radius: 10px;
+    background: #e8e8e8;
+    cursor: pointer;
+    transition: 150ms ease-out;
+    padding: 8px;
+
+    &:hover{
+        filter: brightness(0.95);
+    }
+
+    &:focus-visible{
+        filter: brightness(0.95);
+        outline: none;
+        box-shadow: 0px 0px 6px 0px #212121;
+    }
+
+    &:not(:disabled):active{
+        transform: scale(.97);
+        filter: brightness(0.9);
+    }
+
+    &:disabled{
+        opacity: .3;
+        cursor: not-allowed;
+    }
+
+    &[tpi-sortables-action="copy-default"]{
+        padding: 12px;
+    }
+
+    icon.tpi-sortables-controls-copy-icon{
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        color: #212121;
+    }
+
+    icon.tpi-sortables-controls-copy-icon svg{
+        width: 100%;
+        height: 100%;
+        color: currentColor;
+        fill: currentColor;
+    }
+}

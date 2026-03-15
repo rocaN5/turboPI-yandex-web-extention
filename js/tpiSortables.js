@@ -424,6 +424,7 @@ const tpi_sort_icon_inner_sortables = `
         const tpiTooltips = document.createElement('div')
         tpiTooltips.className = 'tpi-tooltip-by-sheva_r6'
         document.querySelector('body').appendChild(tpiTooltips)
+        initTooltips()
     }
 
     const preview_observer = new MutationObserver(() => {
@@ -436,7 +437,6 @@ const tpi_sort_icon_inner_sortables = `
         preview_observer.disconnect();
 
         addTooltipsWrapper();
-        initTooltips()
         makeSortablesPretier(preview_title);
         start();
 

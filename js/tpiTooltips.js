@@ -5,113 +5,190 @@ const tpi_tooltip_i_icon = `
 </svg>
 `;
 
+let tooltip_ATTEMPTS = 0;
+let tooltip_MAXATTEMPTS = 10;
+let tooltipState = {
+    initialized: false,
+    wrapper: null,
+    activeTooltipElement: null,
+    showTimer: null,
+    lastMousePosition: { x: 0, y: 0 },
+    isMouseOverTooltip: false,
+    currentTargetElement: null,
+    containerObserver: null,
+    mutationObserver: null
+};
+
 function initTooltips() {
-    // Проверяем наличие контейнера для тултипов на странице
-    const tooltipContainer = document.querySelector('div.tpi-tooltip-by-sheva_r6');
+    // Сначала создаем контейнер (всегда при вызове)
+    let tooltipContainer = document.querySelector('div.tpi-tooltip-by-sheva_r6');
+    
     if (!tooltipContainer) {
-        console.warn('Контейнер .tpi-tooltip-by-sheva_r6 не найден. Тултипы не будут работать.');
-        return;
+        tooltipContainer = document.createElement('div');
+        tooltipContainer.className = 'tpi-tooltip-by-sheva_r6';
+        document.body.appendChild(tooltipContainer);
+    }
+    
+    // Проверяем существование контейнера (на случай если его удалили)
+    if (!document.querySelector('div.tpi-tooltip-by-sheva_r6')) {
+        if (tooltip_ATTEMPTS < tooltip_MAXATTEMPTS) {
+            tooltip_ATTEMPTS++;
+            
+            // Создаем контейнер заново
+            const newContainer = document.createElement('div');
+            newContainer.className = 'tpi-tooltip-by-sheva_r6';
+            document.body.appendChild(newContainer);
+            
+            // Пытаемся инициализировать снова через 2 секунды
+            setTimeout(() => {
+                tooltipState.initialized = false;
+                initTooltips();
+            }, 2000);
+            return;
+        } else {
+            tooltip_ATTEMPTS = 0;
+            return;
+        }
+    }
+    
+    // Контейнер существует, продолжаем инициализацию
+    tooltip_ATTEMPTS = 0;
+    
+    // Получаем актуальную ссылку на контейнер
+    tooltipContainer = document.querySelector('div.tpi-tooltip-by-sheva_r6');
+
+    // Очищаем предыдущее состояние если нужно
+    if (tooltipState.initialized) {
+        // Удаляем старую обертку если есть
+        if (tooltipState.wrapper && tooltipState.wrapper.parentNode) {
+            tooltipState.wrapper.parentNode.removeChild(tooltipState.wrapper);
+        }
+        // Очищаем таймеры
+        if (tooltipState.showTimer) {
+            clearTimeout(tooltipState.showTimer);
+        }
+        // Отключаем старые наблюдатели
+        if (tooltipState.containerObserver) {
+            tooltipState.containerObserver.disconnect();
+        }
+        if (tooltipState.mutationObserver) {
+            tooltipState.mutationObserver.disconnect();
+        }
     }
 
-    // Создаем элемент-обертку для тултипа, если его еще нет
+    // Создаем новую обертку для тултипа
     let tooltipWrapper = document.querySelector('.tpi-tooltip-wrapper');
+    if (tooltipWrapper) {
+        // Если обертка существует, но в другом контейнере, перемещаем или удаляем
+        if (tooltipWrapper.parentNode !== tooltipContainer) {
+            tooltipWrapper.parentNode.removeChild(tooltipWrapper);
+            tooltipWrapper = null;
+        }
+    }
+    
     if (!tooltipWrapper) {
         tooltipWrapper = document.createElement('div');
         tooltipWrapper.className = 'tpi-tooltip-wrapper';
         tooltipWrapper.style.display = 'none';
         tooltipWrapper.style.position = 'fixed';
         tooltipWrapper.style.zIndex = '99999999999';
+        // Без встроенных стилей - они должны быть в CSS
         tooltipContainer.appendChild(tooltipWrapper);
     }
 
-    // Переменные для хранения состояния
-    let activeTooltipElement = null;
-    let showTimer = null;
-    let lastMousePosition = { x: 0, y: 0 };
-    let isMouseOverTooltip = false;
-    let currentTargetElement = null;
+    // Сохраняем состояние
+    tooltipState.wrapper = tooltipWrapper;
+    tooltipState.initialized = true;
+    tooltipState.activeTooltipElement = null;
+    tooltipState.currentTargetElement = null;
+    tooltipState.isMouseOverTooltip = false;
 
     // Функция для отслеживания позиции мыши
     function trackMousePosition(event) {
-        lastMousePosition = {
+        tooltipState.lastMousePosition = {
             x: event.clientX,
             y: event.clientY
         };
         
         // Если тултип активен, обновляем его позицию
-        if (activeTooltipElement && tooltipWrapper.style.display !== 'none') {
+        if (tooltipState.activeTooltipElement && tooltipWrapper.style.display !== 'none') {
             positionTooltipNearMouse();
         }
     }
 
     // Функция для позиционирования тултипа рядом с мышью
     function positionTooltipNearMouse() {
-        // Показываем тултип для получения размеров
-        const wasVisible = tooltipWrapper.style.display === 'flex';
-        
+
+        const wasVisible = tooltipWrapper.style.display !== 'none';
+
         if (!wasVisible) {
             tooltipWrapper.style.display = 'flex';
             tooltipWrapper.style.opacity = '0';
-            tooltipWrapper.style.transform = 'scale(1)';
-            tooltipWrapper.style.filter = 'none';
+            tooltipWrapper.style.visibility = 'hidden';
         }
-        
-        // Получаем реальные размеры
-        const tooltipRect = tooltipWrapper.getBoundingClientRect();
+
         const viewportWidth = window.innerWidth;
         const viewportHeight = window.innerHeight;
-        
-        // Отступ от курсора
-        const offsetX = 15;
-        const offsetY = 15;
-        
-        // Начальная позиция - справа снизу от мыши
-        let left = lastMousePosition.x + offsetX;
-        let top = lastMousePosition.y + offsetY;
-        
-        // Корректировка если выходит за границы
-        if (left + tooltipRect.width > viewportWidth) {
-            left = Math.max(0, lastMousePosition.x - tooltipRect.width - offsetX);
+
+        const offsetX = 20;
+        const offsetY = 20;
+
+        let left;
+        let top;
+
+        // если курсор близко к правому краю — показываем слева
+        if (tooltipState.lastMousePosition.x > viewportWidth - 270) {
+            left = tooltipState.lastMousePosition.x - 250;
+            tooltipWrapper.setAttribute('tpi-tolltip-position-x', 'from-right')
+        } else {
+            left = tooltipState.lastMousePosition.x + offsetX;
+            tooltipWrapper.setAttribute('tpi-tolltip-position-x', 'from-left')
         }
-        
-        if (top + tooltipRect.height > viewportHeight) {
-            top = Math.max(0, lastMousePosition.y - tooltipRect.height - offsetY);
+
+        // если курсор близко к нижнему краю — показываем сверху
+        if (tooltipState.lastMousePosition.y > viewportHeight - 100) {
+            top = tooltipState.lastMousePosition.y - 80;
+            tooltipWrapper.setAttribute('tpi-tolltip-position-y', 'from-bottom')
+        } else {
+            top = tooltipState.lastMousePosition.y + offsetY;
+            tooltipWrapper.setAttribute('tpi-tolltip-position-y', 'from-top')
         }
-        
-        // Финальная проверка границ
-        left = Math.min(Math.max(0, left), viewportWidth - tooltipRect.width);
-        top = Math.min(Math.max(0, top), viewportHeight - tooltipRect.height);
-        
-        // Устанавливаем позицию
+
         tooltipWrapper.style.left = left + 'px';
         tooltipWrapper.style.top = top + 'px';
-        
-        // Показываем с анимацией появления
+
+        const rect = tooltipWrapper.getBoundingClientRect();
+
+        // если вылез справа → переносим налево
+        if (rect.right > viewportWidth) {
+            left = tooltipState.lastMousePosition.x - rect.width - offsetX;
+        }
+
+        // если вылез снизу → переносим вверх
+        if (rect.bottom > viewportHeight) {
+            top = tooltipState.lastMousePosition.y - rect.height - offsetY;
+        }
+
+        tooltipWrapper.style.left = left + 'px';
+        tooltipWrapper.style.top = top + 'px';
+
         if (!wasVisible) {
-            // Запускаем анимацию появления
-            tooltipWrapper.style.animation = 'tooltip-popup 300ms ease-in-out';
             tooltipWrapper.style.opacity = '1';
-            
-            // Убираем анимацию после завершения
-            setTimeout(() => {
-                if (tooltipWrapper.style.display === 'flex') {
-                    tooltipWrapper.style.animation = '';
-                }
-            }, 300);
+            tooltipWrapper.style.visibility = 'visible';
         }
     }
 
     // Функция для показа тултипа
     function showTooltip(element) {
         // Если это другой элемент, скрываем текущий тултип сразу
-        if (activeTooltipElement && activeTooltipElement !== element) {
+        if (tooltipState.activeTooltipElement && tooltipState.activeTooltipElement !== element) {
             tooltipWrapper.style.display = 'none';
-            activeTooltipElement = null;
+            tooltipState.activeTooltipElement = null;
         }
 
         // Запоминаем элемент
-        activeTooltipElement = element;
-        currentTargetElement = element;
+        tooltipState.activeTooltipElement = element;
+        tooltipState.currentTargetElement = element;
         
         // Получаем текст из атрибута
         const tooltipText = element.getAttribute('tpi-tooltip-data');
@@ -126,23 +203,23 @@ function initTooltips() {
     // Функция для скрытия тултипа
     function hideTooltip() {
         // Проверяем, не наведена ли мышь на тултип
-        if (isMouseOverTooltip) {
+        if (tooltipState.isMouseOverTooltip) {
             return;
         }
         
         // Проверяем, не наведена ли мышь на целевой элемент
-        if (currentTargetElement) {
-            const hoveredElement = document.elementFromPoint(lastMousePosition.x, lastMousePosition.y);
-            if (hoveredElement === currentTargetElement || currentTargetElement.contains(hoveredElement)) {
+        if (tooltipState.currentTargetElement) {
+            const hoveredElement = document.elementFromPoint(tooltipState.lastMousePosition.x, tooltipState.lastMousePosition.y);
+            if (hoveredElement === tooltipState.currentTargetElement || tooltipState.currentTargetElement.contains(hoveredElement)) {
                 return;
             }
         }
         
         // Скрываем тултип
         tooltipWrapper.style.display = 'none';
-        tooltipWrapper.style.animation = '';
-        activeTooltipElement = null;
-        currentTargetElement = null;
+        tooltipWrapper.style.visibility = 'visible'; // Сбрасываем visibility
+        tooltipState.activeTooltipElement = null;
+        tooltipState.currentTargetElement = null;
     }
 
     // Обработчик mouseenter для элементов с атрибутом
@@ -150,77 +227,60 @@ function initTooltips() {
         const element = event.currentTarget;
         
         // Очищаем предыдущий таймер
-        if (showTimer) {
-            clearTimeout(showTimer);
+        if (tooltipState.showTimer) {
+            clearTimeout(tooltipState.showTimer);
         }
         
         // Запоминаем текущий элемент
-        currentTargetElement = element;
+        tooltipState.currentTargetElement = element;
         
         // Устанавливаем новый таймер показа
-        showTimer = setTimeout(() => {
+        tooltipState.showTimer = setTimeout(() => {
             // Проверяем, что мышь всё ещё на этом элементе
-            const hoveredElement = document.elementFromPoint(lastMousePosition.x, lastMousePosition.y);
+            const hoveredElement = document.elementFromPoint(tooltipState.lastMousePosition.x, tooltipState.lastMousePosition.y);
             if (hoveredElement === element || element.contains(hoveredElement)) {
                 showTooltip(element);
             }
-            showTimer = null;
+            tooltipState.showTimer = null;
         }, 150);
     }
 
     // Обработчик mouseleave для элементов с атрибутом
-    function handleMouseLeave(event) {
+    function handleMouseLeave() {
         // Очищаем таймер показа
-        if (showTimer) {
-            clearTimeout(showTimer);
-            showTimer = null;
+        if (tooltipState.showTimer) {
+            clearTimeout(tooltipState.showTimer);
+            tooltipState.showTimer = null;
         }
         
         // Если мышь ушла с элемента, проверяем не на тултипе ли она
         setTimeout(() => {
-            if (!isMouseOverTooltip) {
+            if (!tooltipState.isMouseOverTooltip) {
                 hideTooltip();
             }
-        }, 10);
+        }, 50);
     }
 
     // Обработчики для самого тултипа
     tooltipWrapper.addEventListener('mouseenter', () => {
-        isMouseOverTooltip = true;
+        tooltipState.isMouseOverTooltip = true;
     });
 
     tooltipWrapper.addEventListener('mouseleave', () => {
-        isMouseOverTooltip = false;
+        tooltipState.isMouseOverTooltip = false;
         
         // Проверяем, не наведена ли мышь на целевой элемент
         setTimeout(() => {
-            if (!isMouseOverTooltip) {
+            if (!tooltipState.isMouseOverTooltip) {
                 hideTooltip();
             }
-        }, 10);
-    });
-
-    // Обработчик движения мыши
-    document.body.addEventListener('mousemove', (event) => {
-        trackMousePosition(event);
-        
-        // Если нет активного тултипа, ничего не делаем
-        if (!activeTooltipElement) return;
-        
-        // Проверяем, где находится мышь
-        const hoveredElement = document.elementFromPoint(event.clientX, event.clientY);
-        const isOnTarget = hoveredElement === activeTooltipElement || activeTooltipElement.contains(hoveredElement);
-        const isOnTooltip = hoveredElement === tooltipWrapper || tooltipWrapper.contains(hoveredElement);
-        
-        // Если мышь не на целевом элементе и не на тултипе, скрываем
-        if (!isOnTarget && !isOnTooltip) {
-            hideTooltip();
-        }
+        }, 50);
     });
 
     // Функция для добавления обработчиков на элементы
     function attachHandlers() {
         const elements = document.querySelectorAll('[tpi-tooltip-data]');
+        
         elements.forEach(element => {
             // Удаляем старые обработчики и добавляем новые
             element.removeEventListener('mouseenter', handleMouseEnter);
@@ -230,11 +290,36 @@ function initTooltips() {
         });
     }
 
+    // Добавляем обработчик движения мыши (только один раз)
+    if (!window._tooltipMouseListenerAdded) {
+        document.body.addEventListener('mousemove', (event) => {
+            trackMousePosition(event);
+            
+            // Если нет активного тултипа, ничего не делаем
+            if (!tooltipState.activeTooltipElement) return;
+            
+            // Проверяем, где находится мышь
+            const hoveredElement = document.elementFromPoint(event.clientX, event.clientY);
+            const isOnTarget = hoveredElement === tooltipState.activeTooltipElement || tooltipState.activeTooltipElement.contains(hoveredElement);
+            const isOnTooltip = hoveredElement === tooltipWrapper || tooltipWrapper.contains(hoveredElement);
+            
+            // Если мышь не на целевом элементе и не на тултипе, скрываем
+            if (!isOnTarget && !isOnTooltip) {
+                hideTooltip();
+            }
+        });
+        window._tooltipMouseListenerAdded = true;
+    }
+
     // Добавляем обработчики для существующих элементов
     attachHandlers();
 
     // Создаем MutationObserver для отслеживания новых элементов
-    const observer = new MutationObserver((mutations) => {
+    if (tooltipState.mutationObserver) {
+        tooltipState.mutationObserver.disconnect();
+    }
+    
+    tooltipState.mutationObserver = new MutationObserver((mutations) => {
         let shouldAttach = false;
         
         mutations.forEach(mutation => {
@@ -264,20 +349,47 @@ function initTooltips() {
         }
     });
 
-    observer.observe(document.body, {
+    tooltipState.mutationObserver.observe(document.body, {
         childList: true,
         subtree: true,
         attributes: true,
         attributeFilter: ['tpi-tooltip-data']
     });
 
+    // Добавляем наблюдение за удалением контейнера
+    if (tooltipState.containerObserver) {
+        tooltipState.containerObserver.disconnect();
+    }
+    
+    tooltipState.containerObserver = new MutationObserver((mutations) => {
+        mutations.forEach(mutation => {
+            mutation.removedNodes.forEach(node => {
+                if (node.nodeType === 1 && node.classList && node.classList.contains('tpi-tooltip-by-sheva_r6')) {
+                    tooltip_ATTEMPTS = 0;
+                    tooltipState.initialized = false;
+                    setTimeout(initTooltips, 500);
+                }
+            });
+        });
+    });
+
+    tooltipState.containerObserver.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
+
     // Возвращаем API
     return {
         hideTooltip: () => {
             tooltipWrapper.style.display = 'none';
-            activeTooltipElement = null;
-            currentTargetElement = null;
+            tooltipState.activeTooltipElement = null;
+            tooltipState.currentTargetElement = null;
         },
-        refresh: attachHandlers
+        refresh: attachHandlers,
+        forceReinit: () => {
+            tooltip_ATTEMPTS = 0;
+            tooltipState.initialized = false;
+            setTimeout(initTooltips, 100);
+        }
     };
 }

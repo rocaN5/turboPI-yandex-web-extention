@@ -360,6 +360,10 @@ button.diman__TURBOpi__textToOrders__searchButton{
     &:has(tbody:empty) thead{
         display: none;
     }
+
+    & tbody tr:has(td:has(input)) td:has(.diman__copyFullOrderDataDefault){
+        left: 0 !important;
+    }
 }
 
 .diman__TURBOpi__textToOrders__loadingWrapper,
