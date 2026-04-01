@@ -137,7 +137,7 @@ function initTooltips() {
         let top;
 
         // если курсор близко к правому краю — показываем слева
-        if (tooltipState.lastMousePosition.x > viewportWidth - 270) {
+        if (tooltipState.lastMousePosition.x > viewportWidth - 280) {
             left = tooltipState.lastMousePosition.x - 250;
             tooltipWrapper.setAttribute('tpi-tolltip-position-x', 'from-right')
         } else {

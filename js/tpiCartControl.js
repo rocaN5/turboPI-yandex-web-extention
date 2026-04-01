@@ -1,4 +1,4 @@
-// Глобальные переменные для Firebase
+// Глобальные переменные для Firebase+
 let tpiFirebaseInitialized = false;
 let tpiDb = null;
 window.tpiCalendarDatesCache = {};
@@ -23,19 +23,16 @@ let tpiChartInstance = null;
 
 // Функция для предзагрузки данных календаря
 async function preloadCalendarData() {
-    // Если предзагрузка уже завершена, возвращаем resolved Promise
     if (tpiCalendarPreloadComplete) {
         return Promise.resolve();
     }
     
-    // Если предзагрузка уже идет, возвращаем существующий Promise
     if (tpiCalendarPreloadPromise) {
         return tpiCalendarPreloadPromise;
     }
     
-    console.log('📅 Запуск оптимизированной предзагрузки данных календаря...');
+    console.log('📅 Запуск предзагрузки данных календаря...');
     
-    // Создаем новый Promise для отслеживания предзагрузки
     tpiCalendarPreloadPromise = new Promise(async (resolve, reject) => {
         try {
             const now = new Date();
@@ -43,88 +40,80 @@ async function preloadCalendarData() {
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             
-            // Определяем какие даты нужно проверить (только актуальные)
+            // 🔥 ПРЕДЗАГРУЖАЕМ ТОЛЬКО 5 ДНЕЙ, А НЕ 30
             const datesToCheck = [];
             
-            // Проверяем прошедшие даты (только 30 дней назад, а не 60)
-            const pastStartDate = new Date(today);
-            pastStartDate.setDate(pastStartDate.getDate() - 30);
+            // Проверяем только последние 2 дня и следующие 2 дня
+            for (let i = -2; i <= 2; i++) {
+                const date = new Date(today);
+                date.setDate(date.getDate() + i);
+                const dateStr = formatDateToDDMMYYYY(date);
+                datesToCheck.push(dateStr);
+            }
             
-            // Проверяем сегодняшнюю дату
+            // Добавляем сегодня, если вдруг не попал в диапазон
             const todayStr = formatDateToDDMMYYYY(today);
-            datesToCheck.push(todayStr);
+            if (!datesToCheck.includes(todayStr)) {
+                datesToCheck.push(todayStr);
+            }
             
-            // Если сейчас после 22:00, проверяем завтрашнюю дату
+            // Если сейчас после 22:00, добавляем завтра
             if (currentHour >= 22) {
                 const tomorrow = new Date(today);
                 tomorrow.setDate(tomorrow.getDate() + 1);
                 const tomorrowStr = formatDateToDDMMYYYY(tomorrow);
-                datesToCheck.push(tomorrowStr);
+                if (!datesToCheck.includes(tomorrowStr)) {
+                    datesToCheck.push(tomorrowStr);
+                }
             }
             
-            // Для даты послезавтра и дальше - только проверка через быструю логику
-            console.log(`🔍 Проверка ${datesToCheck.length} актуальных дат в Firebase...`);
+            console.log(`🔍 Предзагрузка ${datesToCheck.length} актуальных дат...`);
             
-            // Инициализируем кэш, если он не существует
             if (!window.tpiCalendarDatesCache) {
                 window.tpiCalendarDatesCache = {};
             }
             
-            // Инициализируем месячный кэш
-            if (!window.tpiCalendarMonthCache) {
-                window.tpiCalendarMonthCache = {};
-            }
+            // Используем массовую проверку ТОЛЬКО для этих дат
+            const uniqueDates = [...new Set(datesToCheck)];
+            const firebaseResults = await tpiCheckMultipleDatesInFirebase(uniqueDates);
             
-            // Проверяем только актуальные даты (не все подряд)
-            for (const dateStr of datesToCheck) {
-                try {
-                    const result = await tpiCheckDataInFirebase(dateStr);
-                    
-                    // Определяем статус на основе результата проверки
-                    if (result.exists) {
-                        window.tpiCalendarDatesCache[dateStr] = 'has-bd-data';
+            // Обновляем кэш
+            uniqueDates.forEach(dateStr => {
+                const result = firebaseResults[dateStr] || { exists: false };
+                
+                const dateParts = dateStr.split('/');
+                const checkDate = new Date(
+                    parseInt(dateParts[2]),
+                    parseInt(dateParts[1]) - 1,
+                    parseInt(dateParts[0])
+                );
+                checkDate.setHours(0, 0, 0, 0);
+                
+                const timeDiff = checkDate.getTime() - today.getTime();
+                const diffDays = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+                
+                let status;
+                if (result.exists) {
+                    status = 'has-bd-data';
+                } else {
+                    if (diffDays < 0) {
+                        status = 'no-bd-data';
+                    } else if (diffDays === 0) {
+                        status = 'available-to-write-bd-data';
+                    } else if (diffDays === 1) {
+                        status = (currentHour >= 23) ? 'available-to-write-bd-data' : 'future-date';
                     } else {
-                        // Определяем статус локально без дополнительных запросов
-                        const dateParts = dateStr.split('/');
-                        const checkDate = new Date(
-                            parseInt(dateParts[2]),
-                            parseInt(dateParts[1]) - 1,
-                            parseInt(dateParts[0])
-                        );
-                        checkDate.setHours(0, 0, 0, 0);
-                        
-                        const timeDiff = checkDate.getTime() - today.getTime();
-                        const diffDays = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
-                        
-                        let status;
-                        if (diffDays < 0) {
-                            // Прошлые даты без данных
-                            status = 'no-bd-data';
-                        } else if (diffDays === 0) {
-                            // Сегодня без данных
-                            status = 'available-to-write-bd-data';
-                        } else if (diffDays === 1) {
-                            // Завтра
-                            status = (currentHour >= 23) ? 'available-to-write-bd-data' : 'future-date';
-                        } else {
-                            // Будущие даты
-                            status = 'future-date';
-                        }
-                        
-                        window.tpiCalendarDatesCache[dateStr] = status;
+                        status = 'future-date';
                     }
-                } catch (error) {
-                    console.log(`⚠️ Ошибка загрузки даты ${dateStr}:`, error);
-                    // В случае ошибки используем локальную логику
-                    window.tpiCalendarDatesCache[dateStr] = 'no-bd-data';
                 }
-            }
+                
+                window.tpiCalendarDatesCache[dateStr] = status;
+            });
             
             tpiCalendarPreloadComplete = true;
             tpiCalendarDataLoaded = true;
             
-            console.log('✅ Данные календаря предзагружены (оптимизированно)');
-            
+            console.log('✅ Данные календаря предзагружены');
             resolve();
             
         } catch (error) {
@@ -902,6 +891,11 @@ tpiIcon__cross = `
     <path fill-rule="evenodd" clip-rule="evenodd" d="M12.8536 2.85355C13.0488 2.65829 13.0488 2.34171 12.8536 2.14645C12.6583 1.95118 12.3417 1.95118 12.1464 2.14645L7.5 6.79289L2.85355 2.14645C2.65829 1.95118 2.34171 1.95118 2.14645 2.14645C1.95118 2.34171 1.95118 2.65829 2.14645 2.85355L6.79289 7.5L2.14645 12.1464C1.95118 12.3417 1.95118 12.6583 2.14645 12.8536C2.34171 13.0488 2.65829 13.0488 2.85355 12.8536L7.5 8.20711L12.1464 12.8536C12.3417 13.0488 12.6583 13.0488 12.8536 12.8536C13.0488 12.6583 13.0488 12.3417 12.8536 12.1464L8.20711 7.5L12.8536 2.85355Z" fill="currentColor"></path>
 </svg>
 `,
+tpi_cc_i_cancel = `
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M13.44 12 21 19.56 19.56 21 12 13.44 4.44 21 3 19.56 10.56 12 3 4.44 4.44 3 12 10.56 19.56 3 21 4.44 13.44 12Z"></path>
+</svg>
+`,
 tpi_cc_i_cart = `
 <svg stroke="currentColor" fill="currentColor" stroke-width="0" baseProfile="tiny" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
     <path d="M20.756 5.345c-.191-.219-.466-.345-.756-.345h-13.819l-.195-1.164c-.08-.482-.497-.836-.986-.836h-2.25c-.553 0-1 .447-1 1s.447 1 1 1h1.403l1.86 11.164.045.124.054.151.12.179.095.112.193.13.112.065c.116.047.238.075.367.075h11.001c.553 0 1-.447 1-1s-.447-1-1-1h-10.153l-.166-1h11.319c.498 0 .92-.366.99-.858l1-7c.041-.288-.045-.579-.234-.797zm-1.909 1.655l-.285 2h-3.562v-2h3.847zm-4.847 0v2h-3v-2h3zm0 3v2h-3v-2h3zm-4-3v2h-3l-.148.03-.338-2.03h3.486zm-2.986 3h2.986v2h-2.653l-.333-2zm7.986 2v-2h3.418l-.285 2h-3.133z"></path>
@@ -945,6 +939,14 @@ tpi_cc_i_courier_app = `
 <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
     <path fill="none" stroke-linejoin="round" stroke-width="32" d="M416 221.25V416a48 48 0 0 1-48 48H144a48 48 0 0 1-48-48V96a48 48 0 0 1 48-48h98.75a32 32 0 0 1 22.62 9.37l141.26 141.26a32 32 0 0 1 9.37 22.62z"></path>
     <path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M256 56v120a32 32 0 0 0 32 32h120"></path>
+</svg>
+`,
+tpi_cc_i_courier_restore = `
+<svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+    <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"></path>
+    <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"></path>
+    <path d="M12 9l0 3"></path>
+    <path d="M12 15l.01 0"></path>
 </svg>
 `,
 tpi_cc_i_courier_delete = `
@@ -1515,11 +1517,91 @@ function checkiIs__onCartControlsPage() {
                     <p class="tpi-cc-process-manager-text">Удалить</p>
                     <i class="tpi-cc-progress-action-icon">${tpi_cc_i_courier_delete}</i>
                 </button>
-                <button class="tpi-cc-process-manager-close" tpi-tooltip-data="Отменить выделение">
-                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M13.44 12 21 19.56 19.56 21 12 13.44 4.44 21 3 19.56 10.56 12 3 4.44 4.44 3 12 10.56 19.56 3 21 4.44 13.44 12Z" fill="#000"></path>
-                    </svg>
-                </button>
+                <button class="tpi-cc-process-manager-close" tpi-tooltip-data="Отменить выделение">${tpi_cc_i_cancel}</button>
+            </div>
+        </div>
+        <div class="tpi-cc-modal-window-wrapper">
+            <div class="tpi-cc-modal-window-container">
+                <div class="tpi-cc-modal-window-title">
+                    <p class="tpi-cc-modal-window-title-text">Сброс данных курьера</p>
+                    <button class="tpi-cc-modal-window-close">${tpi_cc_i_cancel}</button>
+                </div>
+                <div class="tpi-cc-modal-window-courier-data-wrapper">
+                <div class="tpi-cc-modal-window-courier-data-container">
+                        <div class="tpi-cc-modal-window-courier-data-item">
+                            <p class="tpi-cc-modal-window-courier-data-item-title">Курьер:</p>
+                            <p class="tpi-cc-modal-window-courier-data-item-text" tpi-data-anchor="courier-name">Лунев Никита Сергеевич</p>
+                        </div>
+                        <div class="tpi-cc-modal-window-courier-data-item">
+                            <p class="tpi-cc-modal-window-courier-data-item-title">Ячейка:</p>
+                            <p class="tpi-cc-modal-window-courier-data-item-text" tpi-data-anchor="courier-cell">MK-103</p>
+                        </div>
+                        <div class="tpi-cc-modal-window-courier-data-item">
+                            <p class="tpi-cc-modal-window-courier-data-item-title">Маршрут:</p>
+                            <p class="tpi-cc-modal-window-courier-data-item-text" tpi-data-anchor="courier-route">1095024829</p>
+                        </div>
+                        <div class="tpi-cc-modal-window-courier-data-item">
+                            <p class="tpi-cc-modal-window-courier-data-item-title">ID Курьера:</p>
+                            <p class="tpi-cc-modal-window-courier-data-item-text" tpi-data-anchor="courier-id">1286447028</p>
+                        </div>
+                        <div class="tpi-cc-modal-window-courier-data-item">
+                            <p class="tpi-cc-modal-window-courier-data-item-title">Статус:</p>
+                            <p class="tpi-cc-modal-window-courier-data-item-text" tpi-data-anchor="courier-status">В работе</p>
+                        </div>
+                    </div>
+                <div class="tpi-cc-modal-window-courier-data-container">
+                        <div class="tpi-cc-modal-window-courier-data-item">
+                            <p class="tpi-cc-modal-window-courier-data-item-title">Отсортировано:</p>
+                            <p class="tpi-cc-modal-window-courier-data-item-text" tpi-data-anchor="courier-sorted">107 / 231</p>
+                        </div>
+                        <div class="tpi-cc-modal-window-courier-data-item">
+                            <p class="tpi-cc-modal-window-courier-data-item-title">Подготовлено:</p>
+                            <p class="tpi-cc-modal-window-courier-data-item-text" tpi-data-anchor="courier-prepared">4 / 231</p>
+                        </div>
+                        <div class="tpi-cc-modal-window-courier-data-item">
+                            <p class="tpi-cc-modal-window-courier-data-item-title">CART:</p>
+                            <div class="tpi-cc-modal-window-courier-data-item-cart-wrapper" tpi-data-anchor="courier-carts">
+                                <div class="tpi-cc-modal-window-courier-data-item-cart">
+                                    <i class="tpi-cc-modal-window-courier-data-item-cart-icon">${tpi_cc_i_cart}</i>
+                                    <p>-1031</p>
+                                </div>
+                                <div class="tpi-cc-modal-window-courier-data-item-cart">
+                                    <i class="tpi-cc-modal-window-courier-data-item-cart-icon">${tpi_cc_i_cart}</i>
+                                    <p>-1032</p>
+                                </div>
+                                <div class="tpi-cc-modal-window-courier-data-item-cart">
+                                    <i class="tpi-cc-modal-window-courier-data-item-cart-icon">${tpi_cc_i_cart}</i>
+                                    <p>-1033</p>
+                                </div>
+                                <div class="tpi-cc-modal-window-courier-data-item-cart">
+                                    <i class="tpi-cc-modal-window-courier-data-item-cart-icon">${tpi_cc_i_cart}</i>
+                                    <p>-1034</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tpi-cc-modal-window-courier-data-item">
+                            <p class="tpi-cc-modal-window-courier-data-item-title">PALLET:</p>
+                            <div class="tpi-cc-modal-window-courier-data-item-pallet-wrapper" tpi-data-anchor="courier-pallets">
+                                <div class="tpi-cc-modal-window-courier-data-item-pallet">
+                                    <i class="tpi-cc-modal-window-courier-data-item-pallet-icon">${tpi_cc_i_pallet}</i>
+                                    <p>-103</p>
+                                </div>
+                                <div class="tpi-cc-modal-window-courier-data-item-pallet">
+                                    <i class="tpi-cc-modal-window-courier-data-item-pallet-icon">${tpi_cc_i_pallet}</i>
+                                    <p>-303</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tpi-cc-modal-window-accept-wrapper">
+                    <button class="tpi-cc-modal-window-accept">
+                        <i class="tpi-cc-modal-window-accept-icon">${tpi_cc_i_courier_restore}</i>
+                        <p class="tpi-cc-modal-window-accept-title">Сбросить</p>
+                    </button>
+                </div>
+                <i class="tpi-cc-modal-wolf-img"></i>
+                <i class="tpi-cc-modal-wolf-img"></i>
             </div>
         </div>
         ${tpi_cc_liquid_glass}
@@ -1546,9 +1628,11 @@ function checkiIs__onCartControlsPage() {
             }else return
         })
         
-        // Инициализируем Firebase для TPI
-
+        // Инициализируем Firebase ТОЛЬКО сейчас
+        tpiInitializeFirebase();
+        
         // Сразу скрываем все UI элементы
+        hideAllUI();
 
         // Показываем лоадер перед первой проверкой данных
         const loadingWrapper = document.querySelector('.tpi-cc--no-data-loading-wrapper');
@@ -1556,7 +1640,10 @@ function checkiIs__onCartControlsPage() {
             loadingWrapper.style.display = 'flex';
         }
 
-        // Запускаем проверку данных для текущей даты
+        // Предзагружаем данные календаря
+        setTimeout(() => {
+            preloadCalendarData();
+        }, 500);
 
         // Запускаем проверку данных для текущей даты
         setTimeout(async () => {
@@ -1570,8 +1657,7 @@ function checkiIs__onCartControlsPage() {
             observer = null;
         }
         
-        // 🔥 ДОБАВЛЯЕМ ВЫЗОВ ИНИЦИАЛИЗАЦИИ ГРАФИКА ЗДЕСЬ
-        // Инициализируем график один раз при загрузке страницы
+        // Инициализируем график
         initializeChartOnce();
     }
 
@@ -1598,26 +1684,6 @@ function checkiIs__onCartControlsPage() {
 }
 
 checkiIs__onCartControlsPage()
-
-function addCartsControlsListeners(){
-    waitForTokenAndRun();
-    initTooltips();
-    couriersDataCapturing();
-    tpi_cc_filteringColumnData()
-    initializeDatePicker();
-    initializeCourierStatusDropdown()
-    tpiInitializeFirebase();
-    hideAllUI();
-    setTimeout(() => {
-        preloadCalendarData();
-    }, 500);
-
-    setTimeout(async () => {
-        await tpiCheckAndLoadData();
-    }, 100);
-    
-    // const statusDropdown = initializeCourierStatusDropdown();
-}
 
 //A-
 
@@ -1814,6 +1880,80 @@ function showTableLoader(show) {
     }
 }
 
+// Функция для генерации DEFAULT_COURIER номеров
+function generateDefaultCourierNumbers(courierData, index, palletNumbersByDefault) {
+    const numbers = {
+        cartNumbers: [],
+        palletNumbers: []
+    };
+    
+    // Извлекаем индекс из ячейки (например, из "DEFAULT_COURIER (15)" или "DEFAULT_COURIER (15)")
+    let defaultIndex = 0;
+    if (courierData.cell) {
+        // Ищем число в скобках
+        const match = courierData.cell.match(/\((\d+)\)/);
+        if (match) {
+            defaultIndex = parseInt(match[1]);
+        }
+    }
+    
+    // Если индекс не найден, используем 1 как запасной вариант
+    if (defaultIndex === 0) {
+        defaultIndex = 1;
+        console.warn(`⚠️ Не удалось определить индекс для DEFAULT_COURIER, используем 1`);
+    }
+    
+    // Инициализируем хранилище для DEFAULT_COURIER, если его нет
+    if (!window.tpiDefaultCourierNumbers) {
+        window.tpiDefaultCourierNumbers = {
+            cart: new Set(),
+            pallet: new Set()
+        };
+    }
+    
+    // Генерируем CART номера (4 штуки: 60(индекс)1, 60(индекс)2, 60(индекс)3, 60(индекс)4)
+    for (let i = 1; i <= 4; i++) {
+        const cartNumber = 600 + (defaultIndex * 10) + i;
+        // Проверяем, не занят ли номер
+        if (!window.tpiDefaultCourierNumbers.cart.has(cartNumber)) {
+            numbers.cartNumbers.push(`CART-${cartNumber}`);
+            window.tpiDefaultCourierNumbers.cart.add(cartNumber);
+        } else {
+            // Если номер занят, ищем следующий свободный
+            let nextNumber = cartNumber + 1;
+            while (window.tpiDefaultCourierNumbers.cart.has(nextNumber) && nextNumber < 700) {
+                nextNumber++;
+            }
+            if (nextNumber < 700) {
+                numbers.cartNumbers.push(`CART-${nextNumber}`);
+                window.tpiDefaultCourierNumbers.cart.add(nextNumber);
+            }
+        }
+    }
+    
+    // Генерируем PALLET номера (2 штуки: 60(индекс)1, 60(индекс)2)
+    for (let i = 1; i <= 2; i++) {
+        const palletNumber = 600 + (defaultIndex * 10) + i;
+        // Проверяем, не занят ли номер
+        if (!window.tpiDefaultCourierNumbers.pallet.has(palletNumber)) {
+            numbers.palletNumbers.push(`PALLET-${palletNumber}`);
+            window.tpiDefaultCourierNumbers.pallet.add(palletNumber);
+        } else {
+            // Если номер занят, ищем следующий свободный
+            let nextNumber = palletNumber + 1;
+            while (window.tpiDefaultCourierNumbers.pallet.has(nextNumber) && nextNumber < 700) {
+                nextNumber++;
+            }
+            if (nextNumber < 700) {
+                numbers.palletNumbers.push(`PALLET-${nextNumber}`);
+                window.tpiDefaultCourierNumbers.pallet.add(nextNumber);
+            }
+        }
+    }
+    
+    return numbers;
+}
+
 // Добавьте эту функцию где-нибудь среди других функций (можно после функции showCalendarPreloader):
 function getRandomFunnyTexts() {
     if (!tpi_cc_funny_text_array || tpi_cc_funny_text_array.length < 2) {
@@ -2004,7 +2144,13 @@ async function tpiLoadAndDisplayData(selectedDate) {
             
             // Создаем строки для каждого курьера в правильном порядке
             sortedCouriersData.forEach((courierData, index) => {
-                // Добавляем индекс строки для восстановления номеров
+                // Проверяем, является ли курьер КГТ или DEFAULT_COURIER
+                if (courierData.cell && courierData.cell.toUpperCase().startsWith('KGT')) {
+                    courierData.isKGT = true;
+                }
+                if (courierData.cell && courierData.cell.toUpperCase().startsWith('DEFAULT_COURIER')) {
+                    courierData.isDefaultCourier = true;
+                }
                 courierData._rowIndex = index;
                 const row = createCourierTableRow(courierData, index);
                 tpi_cc_tableBody.appendChild(row);
@@ -2024,6 +2170,7 @@ async function tpiLoadAndDisplayData(selectedDate) {
                 tpi_cc_filteringColumnData();
             }
             initializePrintRowHighlight();
+            initializeRestoreModal();
         }
         
         // Показываем таблицу, скрываем лоадер
@@ -2987,12 +3134,10 @@ function updatePrintButtonsVisibility() {
     const cartPallet_buttons = document.querySelectorAll('.tpi-cc--table-tbody-data-button');
     cartPallet_buttons.forEach(button => {
         if (!showPrintButton) {
-            // Если не показываем кнопки печати, добавляем атрибут и disabled
             button.setAttribute('tpi-cc-day-passed', 'true');
             button.setAttribute('tpi-tooltip-data', "Уже отгружен, взаимодействий нет");
             button.disabled = true;
         } else {
-            // Иначе убираем атрибут и disabled
             button.removeAttribute('tpi-cc-day-passed');
             button.disabled = false;
         }
@@ -3005,7 +3150,6 @@ function updatePrintButtonsVisibility() {
             button.setAttribute('tpi-tooltip-data', "Уже отгружен, взаимодействий нет");
             button.disabled = true;
         } else {
-            // Иначе убираем атрибут и disabled
             button.removeAttribute('tpi-cc-day-passed');
             button.disabled = false;
         }
@@ -3015,6 +3159,7 @@ function updatePrintButtonsVisibility() {
     
     printButtonsContainers.forEach(container => {
         const printButton = container.querySelector('.tpi-cc--print-current-row');
+        const restoreButton = container.querySelector('.tpi-cc-restore-courier-data');
         
         if (showPrintButton) {
             // Если кнопки печати нет, добавляем её
@@ -3029,10 +3174,21 @@ function updatePrintButtonsVisibility() {
                     appLink.insertAdjacentHTML('afterend', printButtonHtml);
                 }
             }
+            // Включаем кнопку восстановления
+            if (restoreButton) {
+                restoreButton.disabled = false;
+                restoreButton.removeAttribute('disabled');
+                restoreButton.setAttribute('tpi-tooltip-data', 'Сбросить и заново сгенерировать данные текущего курьера из БД');
+            }
         } else {
             // Если кнопка печати есть, удаляем её
             if (printButton) {
                 printButton.remove();
+            }
+            // Отключаем кнопку восстановления
+            if (restoreButton) {
+                restoreButton.disabled = true;
+                restoreButton.setAttribute('tpi-tooltip-data', 'Восстановление недоступно для этой даты');
             }
         }
     });
@@ -3180,7 +3336,7 @@ function createCourierTableRow(courierData, index) {
             courierData._savedCartNumbers.forEach(cartNumber => {
                 const cartId = cartNumber.replace('CART-', '');
                 cartButtonsHTML += `
-                    <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-cart-id" tpi-data-courier-spec-cell="${cartNumber}" tpi-tooltip-data="Нажмите, чтобы выбрать этот CART">
+                    <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-cart-id tpi-cc-skeleton-target" tpi-data-courier-spec-cell="${cartNumber}" tpi-tooltip-data="Нажмите, чтобы выбрать этот CART">
                         <i class="tpi-cc-table-tbody-data-cart-icon">${tpi_cc_i_cart}</i>
                         -${cartId}
                     </button>
@@ -3188,28 +3344,36 @@ function createCourierTableRow(courierData, index) {
             });
         } else {
             // Генерируем новые номера CART
-            for (let i = 1; i <= 4; i++) {
-                const cartNumber = `${cellNumber}${i}`;
-                cartButtonsHTML += `
-                    <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-cart-id" tpi-data-courier-spec-cell="CART-${cartNumber}" tpi-tooltip-data="Нажмите, чтобы выбрать этот CART">
-                        <i class="tpi-cc-table-tbody-data-cart-icon">${tpi_cc_i_cart}</i>
-                        -${cartNumber}
-                    </button>
-                `;
+            if (courierData.isDefaultCourier) {
+                // Для DEFAULT_COURIER используем сгенерированные номера
+                // Они уже должны быть в _savedCartNumbers или в courierData.cartNumbers
+                if (courierData.cartNumbers && courierData.cartNumbers.length > 0) {
+                    courierData.cartNumbers.forEach(cartNumber => {
+                        const cartId = cartNumber.replace('CART-', '');
+                        cartButtonsHTML += `
+                            <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-cart-id tpi-cc-skeleton-target" tpi-data-courier-spec-cell="${cartNumber}" tpi-tooltip-data="Нажмите, чтобы выбрать этот CART">
+                                <i class="tpi-cc-table-tbody-data-cart-icon">${tpi_cc_i_cart}</i>
+                                -${cartId}
+                            </button>
+                        `;
+                    });
+                }
+            } else {
+                // Обычная генерация для MK-1 и MK-2
+                for (let i = 1; i <= 4; i++) {
+                    const cartNumber = `${cellNumber}${i}`;
+                    cartButtonsHTML += `
+                        <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-cart-id tpi-cc-skeleton-target" tpi-data-courier-spec-cell="CART-${cartNumber}" tpi-tooltip-data="Нажмите, чтобы выбрать этот CART">
+                            <i class="tpi-cc-table-tbody-data-cart-icon">${tpi_cc_i_cart}</i>
+                            -${cartNumber}
+                        </button>
+                    `;
+                }
             }
         }
     }
     
-    // Кнопка добавления CART (всегда показываем)
-    const addCartButton = !isNullCell && !isKGT ? `
-        <div class="tpi-cc--carts-control-buttons-wrapper">
-            <button class="tpi-cc--table-tbody-add-cart" tpi-state-change="tpi-add-cart" tpi-tooltip-data="Добавить CART курьеру">
-                <i>${tpi_cc_i_cart_add}</i>
-            </button>
-        </div>
-    ` : '';
-    
-    // Создаем HTML для кнопок PALLET (для обычных курьеров и КГТ, не для null ячеек)
+    // Создаем HTML для кнопок PALLET
     let palletButtonsHTML = '';
     if (!isNullCell) {
         // Проверяем, есть ли сохраненные номера PALLET
@@ -3217,31 +3381,72 @@ function createCourierTableRow(courierData, index) {
             // Используем сохраненные номера
             courierData._savedPalletNumbers.forEach(palletNumber => {
                 const palletId = palletNumber.replace('PALLET-', '');
-                palletButtonsHTML += `
-                    <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-pallet-id" tpi-data-courier-spec-cell="${palletNumber}" tpi-tooltip-data="Нажмите, чтобы выбрать этот PALLET">
-                        <i class="tpi-cc-table-tbody-data-pallet-icon">${tpi_cc_i_pallet}</i>
-                        -${palletId}
-                    </button>
-                `;
+                // Проверяем, является ли этот сохраненный номер КГТ паллетом
+                const isSavedKGT = isKGT || (courierData.cell && courierData.cell.toUpperCase().startsWith('KGT'));
+                const isDefault = courierData.isDefaultCourier;
+                
+                if (isSavedKGT) {
+                    // Для КГТ - добавляем заблокированную кнопку с индикатором
+                    palletButtonsHTML += `
+                        <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-pallet-id tpi-cc-skeleton-target" 
+                                tpi-data-courier-spec-cell="${palletNumber}" 
+                                tpi-tooltip-data="КГТ Паллеты заблокированы" 
+                                tpi-cc-button-is-blocked 
+                                disabled>
+                            <div class="tpi-cc-blocked-button-indicator">${tpi_cc_i_blocked_button}</div>
+                            <i class="tpi-cc-table-tbody-data-pallet-icon">${tpi_cc_i_pallet}</i>
+                            -${palletId}
+                        </button>
+                    `;
+                } else {
+                    // Обычная кнопка PALLET
+                    palletButtonsHTML += `
+                        <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-pallet-id tpi-cc-skeleton-target" 
+                                tpi-data-courier-spec-cell="${palletNumber}" 
+                                tpi-tooltip-data="Нажмите, чтобы выбрать этот PALLET">
+                            <i class="tpi-cc-table-tbody-data-pallet-icon">${tpi_cc_i_pallet}</i>
+                            -${palletId}
+                        </button>
+                    `;
+                }
             });
         } else {
-            // Генерируем новые номера PALLET
             if (isKGT) {
-                // Для КГТ - одна кнопка PALLET с номером ячейки
                 const kgtNumber = courierData.cell.replace('KGT-', '').replace('kgt-', '');
                 palletButtonsHTML += `
-                    <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-pallet-id" tpi-data-courier-spec-cell="PALLET-${kgtNumber}" tpi-tooltip-data="КГТ Паллеты заблокированы" tpi-cc-button-is-blocked disabled>
+                    <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-pallet-id tpi-cc-skeleton-target" 
+                            tpi-data-courier-spec-cell="PALLET-${kgtNumber}" 
+                            tpi-tooltip-data="КГТ Паллеты заблокированы" 
+                            tpi-cc-button-is-blocked 
+                            disabled>
                         <div class="tpi-cc-blocked-button-indicator">${tpi_cc_i_blocked_button}</div>
                         <i class="tpi-cc-table-tbody-data-pallet-icon">${tpi_cc_i_pallet}</i>
                         -${kgtNumber}
                     </button>
                 `;
+            } else if (courierData.isDefaultCourier) {
+                // Для DEFAULT_COURIER используем сгенерированные номера
+                if (courierData.palletNumbers && courierData.palletNumbers.length > 0) {
+                    courierData.palletNumbers.forEach(palletNumber => {
+                        const palletId = palletNumber.replace('PALLET-', '');
+                        palletButtonsHTML += `
+                            <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-pallet-id tpi-cc-skeleton-target" 
+                                    tpi-data-courier-spec-cell="${palletNumber}" 
+                                    tpi-tooltip-data="Нажмите, чтобы выбрать этот PALLET">
+                                <i class="tpi-cc-table-tbody-data-pallet-icon">${tpi_cc_i_pallet}</i>
+                                -${palletId}
+                            </button>
+                        `;
+                    });
+                }
             } else {
                 // Для обычных курьеров - 2 кнопки PALLET со случайными номерами
                 const palletNumbers = generateRandomPalletNumbers(2, index);
                 palletNumbers.forEach(palletNumber => {
                     palletButtonsHTML += `
-                        <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-pallet-id" tpi-data-courier-spec-cell="PALLET-${palletNumber}" tpi-tooltip-data="Нажмите, чтобы выбрать этот PALLET">
+                        <button class="tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-pallet-id tpi-cc-skeleton-target" 
+                                tpi-data-courier-spec-cell="PALLET-${palletNumber}" 
+                                tpi-tooltip-data="Нажмите, чтобы выбрать этот PALLET">
                             <i class="tpi-cc-table-tbody-data-pallet-icon">${tpi_cc_i_pallet}</i>
                             -${palletNumber}
                         </button>
@@ -3250,19 +3455,29 @@ function createCourierTableRow(courierData, index) {
             }
         }
     }
-    
-    // Кнопка добавления PALLET (всегда показываем)
-    const addPalletButton = !isNullCell && !isKGT ? `
+
+    // Кнопка добавления PALLET (всегда показываем для обычных курьеров, но не для DEFAULT_COURIER)
+    const addPalletButton = !isNullCell && !isKGT && !courierData.isDefaultCourier ? `
         <div class="tpi-cc--carts-control-buttons-wrapper">
-            <button class="tpi-cc--table-tbody-add-pallet" tpi-state-change="tpi-add-pallet" tpi-tooltip-data="Добавить PALLET курьеру">
+            <button class="tpi-cc--table-tbody-add-pallet tpi-cc-skeleton-target" tpi-state-change="tpi-add-pallet" tpi-tooltip-data="Добавить PALLET курьеру">
+                <i>${tpi_cc_i_cart_add}</i>
+            </button>
+        </div>
+    ` : '';
+
+     const addCartButton = !isNullCell && !isKGT && !courierData.isDefaultCourier ? `
+        <div class="tpi-cc--carts-control-buttons-wrapper">
+            <button class="tpi-cc--table-tbody-add-cart tpi-cc-skeleton-target" tpi-state-change="tpi-add-cart" tpi-tooltip-data="Добавить CART курьеру">
                 <i>${tpi_cc_i_cart_add}</i>
             </button>
         </div>
     ` : '';
     
-    // Формируем HTML для блока печати в зависимости от условий
-let printBlockHtml = `
-        <div class="tpi-cc--table-body-print-container">
+    let printBlockHtml = `
+        <div class="tpi-cc--table-body-print-container tpi-cc-skeleton-target">
+            <button class="tpi-cc-restore-courier-data" tpi-tooltip-data="Сбросить и заново сгенерировать данные текущего курьера из БД">
+                <i class="tpi-cc--table-tbody-data-icon">${tpi_cc_i_courier_restore}</i>
+            </button>
             ${eappLinkHtml}
             <a class="tpi-cc--dcoument-app" href="/api/sorting-center/21972131/routes/${courierData.routeId || ''}/transferAct/ALL?date=${selectedDateFormatted}" target="_blank" tpi-tooltip-data="АПП курьера">
                 <i class="tpi-cc--table-tbody-data-icon">${tpi_cc_i_courier_app}</i>
@@ -3272,21 +3487,35 @@ let printBlockHtml = `
             </button>
         </div>
     `;
+
+    if (!showPrintButton) {
+        printBlockHtml = `
+            <div class="tpi-cc--table-body-print-container tpi-cc-skeleton-target">
+                <button class="tpi-cc-restore-courier-data" disabled tpi-tooltip-data="Восстановление недоступно для этой даты">
+                    <i class="tpi-cc--table-tbody-data-icon">${tpi_cc_i_courier_restore}</i>
+                </button>
+                ${eappLinkHtml}
+                <a class="tpi-cc--dcoument-app" href="/api/sorting-center/21972131/routes/${courierData.routeId || ''}/transferAct/ALL?date=${selectedDateFormatted}" target="_blank" tpi-tooltip-data="АПП курьера">
+                    <i class="tpi-cc--table-tbody-data-icon">${tpi_cc_i_courier_app}</i>
+                </a>
+            </div>
+        `;
+    }
     
     row.innerHTML = `
         <td class="tpi-cc--table-tbody-item">
             <div class="tpi-cc--table-tbody-data-courier">
                 <div class="tpi-cc--sortable-data-wrapper tpi-cc--courier-id-data-wrapper">
-                    <a href="https://logistics.market.yandex.ru/sorting-center/21972131/routes?type=OUTGOING_COURIER&sort=&hasCarts=false&category=COURIER&id=21972131&page=1&pageSize=50&recipientName=${courierData.externalId}" target="_blank" class="tpi-cc--table-tbody-data-link" tpi-tooltip-data="Ссылка на курьера в «Отгрузки по маршрутам»">
+                    <a href="https://logistics.market.yandex.ru/sorting-center/21972131/routes?type=OUTGOING_COURIER&sort=&hasCarts=false&category=COURIER&id=21972131&page=1&pageSize=50&recipientName=${courierData.externalId}" target="_blank" class="tpi-cc--table-tbody-data-link tpi-cc-skeleton-target" tpi-tooltip-data="Ссылка на курьера в «Отгрузки по маршрутам»">
                         <i>${tpi_cc_i_courier}</i>
                         <p class="tpi-cc--sortable-data-courier" tpi-cc-parsing-data="courier-full-name">${courierData.courier}</p>
                     </a>
                     <div class="tpi-cc--table-tbody-data-courier-extra-info-wrapper">
-                        <div class="tpi-cc--table-tbody-data-courier-extra-info" tpi-tooltip-data="ID Маршрута курьера за текущую дату (каждый день разный)">
+                        <div class="tpi-cc--table-tbody-data-courier-extra-info tpi-cc-skeleton-target" tpi-tooltip-data="ID Маршрута курьера за текущую дату (каждый день разный)">
                             <i>${tpi_cc_i_courier_route_id}</i>
                             <p tpi-cc-parsing-data="courier-route-id">${courierData.routeId || 'Нет данных'}</p>
                         </div>
-                        <div class="tpi-cc--table-tbody-data-courier-extra-info" tpi-tooltip-data="Персональный ID курьера">
+                        <div class="tpi-cc--table-tbody-data-courier-extra-info tpi-cc-skeleton-target" tpi-tooltip-data="Персональный ID курьера">
                             <i>${tpi_cc_i_courier_id}</i>
                             <p tpi-cc-parsing-data="courier-personal-id">${courierData.externalId || courierData.courierId || 'Нет данных'}</p>
                         </div>
@@ -3296,7 +3525,7 @@ let printBlockHtml = `
         </td>
         <td class="tpi-cc--table-tbody-item">
             <div class="tpi-cc--table-tbody-data">
-                <a href="https://logistics.market.yandex.ru/sorting-center/21972131/sortables?sortableTypes=CART&sortableTypes=COURIER_PALLET&cellName=${courierData.cell}" class="tpi-cc--table-tbody-data-link" tpi-cc-parsing-data="courier-route-cell" courier-spec-cell="${courierData.cell}" target="_blank" tpi-tooltip-data="Ссылка на активные CART и PALLET курьера">
+                <a href="https://logistics.market.yandex.ru/sorting-center/21972131/sortables?sortableTypes=CART&sortableTypes=COURIER_PALLET&cellName=${courierData.cell}" class="tpi-cc--table-tbody-data-link tpi-cc-skeleton-target" tpi-cc-parsing-data="courier-route-cell" courier-spec-cell="${courierData.cell}" target="_blank" tpi-tooltip-data="Ссылка на активные CART и PALLET курьера">
                     <i class="tpi-cc-i-cell-name">${tpi_cc_i_tag}</i>
                     ${courierData.cell}
                 </a>
@@ -3316,18 +3545,18 @@ let printBlockHtml = `
         </td>
         <td class="tpi-cc--table-tbody-item">
             <div class="tpi-cc--table-tbody-data">
-                <div class="tpi-cc-table-tbody-data-route-status" tpi-cc-route-status="${courierData.status.toLowerCase()}" tpi-tooltip-data="Текущий статус маршрута курьера">
+                <div class="tpi-cc-table-tbody-data-route-status tpi-cc-skeleton-target" tpi-cc-route-status="${courierData.status.toLowerCase()}" tpi-tooltip-data="Текущий статус маршрута курьера">
                     <i></i>
                     <p tpi-cc-parsing-data="courier-route-status">${routeStatusText}</p>
                 </div>
             </div>
         </td>
         <td class="tpi-cc--table-tbody-item">
-            <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-data-sort-progress-container">
-                    <p class="tpi-cc--table-tbody-data-sort-progress" tpi-cc-parsing-data="courier-sorting-progress">
+            <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-data-sort-progress-container tpi-cc-skeleton-target">
+                    <p class="tpi-cc--table-tbody-data-sort-progress tpi-cc-skeleton-target" tpi-cc-parsing-data="courier-sorting-progress">
                         <a class="tpi-cc--table-tbody-data-link" target="_blank" href="https://logistics.market.yandex.ru/sorting-center/21972131/sortables?routeId=${courierData.routeId}&searchRouteIdInOldRoutes=true&crossDockOnly=true&sortableStatusesLeafs=SHIPPED_DIRECT&sortableTypes=PLACE&sortableTypes=TOTE&sortableTypes=PALLET&sortableTypes=XDOC_PALLET&sortableTypes=XDOC_BOX" tpi-tooltip-data="Ссылка на отсортированные заказы курьеру"><i>${tpi_cc_i_box_outline}</i>${sortCount || 0}</a> из <a class="tpi-cc--table-tbody-data-link" target="_blank" href="https://logistics.market.yandex.ru/sorting-center/21972131/sortables?routeId=${courierData.routeId}&searchRouteIdInOldRoutes=true&sortableStatusesLeafs=&sortableTypes=PLACE&sortableTypes=TOTE&sortableTypes=PALLET&sortableTypes=XDOC_PALLET&sortableTypes=XDOC_BOX&crossDockOnly=true" tpi-tooltip-data="Ссылка на назначенные заказы курьеру"><i>${tpi_cc_i_box_filled}</i>${courierData.ordersPlanned || 0}</a>
                     </p>
-                <div class="tpi-cc--table-tbody-data-sort-progress-circle-wrapper" tpi-tooltip-data="Прогресс сортировки заказов курьеру">
+                <div class="tpi-cc--table-tbody-data-sort-progress-circle-wrapper tpi-cc-skeleton-target" tpi-tooltip-data="Прогресс сортировки заказов курьеру">
                     <p class="tpi-cc--table-tbody-data-sort-progress-circle-value" tpi-cc-parsing-data="courier-sorting-progress-percent">
                         ${sortPercent}%
                     </p>
@@ -3344,11 +3573,11 @@ let printBlockHtml = `
             </div>
         </td>
         <td class="tpi-cc--table-tbody-item">
-            <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-data-sort-progress-container">
-                <p class="tpi-cc--table-tbody-data-sort-progress" tpi-cc-parsing-data="courier-prepared-progress">
+            <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-data-sort-progress-container tpi-cc-skeleton-target">
+                <p class="tpi-cc--table-tbody-data-sort-progress tpi-cc-skeleton-target" tpi-cc-parsing-data="courier-prepared-progress">
                     <span tpi-tooltip-data="Количество подготовленных заказов"><i>${tpi_cc_i_pen_outline}</i>${courierData.sortablesPrepared || 0}</span> из <span tpi-tooltip-data="Общее количество заказов для подготовки"><i>${tpi_cc_i_pen_filled}</i>${courierData.sortablesInCell || 0}</span>
                 </p>
-                <div class="tpi-cc--table-tbody-data-sort-progress-circle-wrapper" tpi-tooltip-data="Прогресс подготовки заказов у курьреа">
+                <div class="tpi-cc--table-tbody-data-sort-progress-circle-wrapper tpi-cc-skeleton-target" tpi-tooltip-data="Прогресс подготовки заказов у курьреа">
                     <p class="tpi-cc--table-tbody-data-sort-progress-circle-value" tpi-cc-parsing-data="courier-prepared-progress-percent">
                         ${preparedPercent}%
                     </p>
@@ -3365,7 +3594,7 @@ let printBlockHtml = `
             </div>
         </td>
         <td class="tpi-cc--table-tbody-item">
-            <div class="tpi-cc--table-body-date-container">
+            <div class="tpi-cc--table-body-date-container tpi-cc-skeleton-target">
                 <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-date-wrapper">
                     <i class="tpi-cc--table-tbody-data-icon">${tpi_cc_i_calendar}</i>
                     <p class="tpi-cc--table-tbody-data-courier-status" tpi-cc-date-type="start" tpi-cc-parsing-data="courier-started-at-date">
@@ -3381,7 +3610,7 @@ let printBlockHtml = `
             </div>
         </td>
         <td class="tpi-cc--table-tbody-item">
-            <div class="tpi-cc--table-body-date-container">
+            <div class="tpi-cc--table-body-date-container tpi-cc-skeleton-target">
                 <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-date-wrapper">
                     <i class="tpi-cc--table-tbody-data-icon">${tpi_cc_i_calendar}</i>
                     <p class="tpi-cc--table-tbody-data-courier-status" tpi-cc-date-type="end" tpi-cc-parsing-data="courier-ended-at-date">
@@ -3397,7 +3626,7 @@ let printBlockHtml = `
             </div>
         </td>
         <td class="tpi-cc--table-tbody-item">
-            <div class="tpi-cc--table-body-date-container">
+            <div class="tpi-cc--table-body-date-container tpi-cc-skeleton-target">
                 <div class="tpi-cc--table-tbody-data tpi-cc--table-tbody-date-wrapper">
                     <i class="tpi-cc--table-tbody-data-icon">${tpi_cc_i_calendar}</i>
                     <p class="tpi-cc--table-tbody-data-courier-status" tpi-cc-date-type="arrived" tpi-cc-parsing-data="courier-arrives-at-date">
@@ -3493,122 +3722,122 @@ async function fillCouriersTableAndSaveToFirebase() {
             '1': new Set(),
             '2': new Set(),
             '3': new Set(),
-            '5': new Set() 
+            '5': new Set(),
+            '6': new Set()
         };
+
+        window.tpiDefaultCourierNumbers = {
+            cart: new Set(),
+            pallet: new Set()
+        };
+
         
         const couriersWithGeneratedNumbers = sortedCouriersData.map((courier, index) => {
             // Создаем копию объекта курьера
             const courierWithNumbers = { ...courier };
             
-            // Генерируем номера CART (только для обычных курьеров, не для null ячеек и не для КГТ)
+            // Проверяем, является ли ячейка DEFAULT_COURIER
+            const isDefaultCourier = courier.cell && courier.cell.toUpperCase().startsWith('DEFAULT_COURIER');
             const isKGT = courier.cell && courier.cell.toUpperCase().startsWith('KGT');
             const isNullCell = courier.cell === 'null';
             
-            if (!isNullCell && !isKGT) {
-                // Извлекаем номер из ячейки
-                let cellNumber = "000";
-                if (courier.cell && courier.cell !== 'null' && courier.cell !== 'Нет ячейки') {
-                    const match = courier.cell.match(/\d+/);
-                    cellNumber = match ? match[0].padStart(3, '0') : "000";
-                }
-                
-                // Генерируем 4 номера CART
-                const cartNumbers = [];
-                for (let i = 1; i <= 4; i++) {
-                    const cartNumber = `CART-${cellNumber}${i}`;
-                    cartNumbers.push(cartNumber);
-                }
-                
-                // Добавляем в данные курьера
-                courierWithNumbers.cartNumbers = cartNumbers;
-            }
-            
-            // Генерируем номера PALLET
-            if (!isNullCell) {
-                const palletNumbers = [];
-                
-                if (isKGT) {
-                    // Для КГТ - один номер PALLET с номером ячейки
-                    const kgtNumber = courier.cell.replace('KGT-', '').replace('kgt-', '');
-                    const palletNumber = `PALLET-${kgtNumber}`;
-                    palletNumbers.push(palletNumber);
-                    
-                    // Для КГТ добавляем в массив соответствующей сотни
-                    const firstDigit = kgtNumber.toString()[0];
-                    if (palletNumbersByHundred[firstDigit]) {
-                        palletNumbersByHundred[firstDigit].add(parseInt(kgtNumber));
-                    }
-                } else {
-                    // Для обычных курьеров
-                    // Извлекаем базовый номер ячейки (например, 101 из MK-101)
-                    let baseNumber = 0;
+            if (isDefaultCourier) {
+                // Генерируем номера для DEFAULT_COURIER
+                const defaultNumbers = generateDefaultCourierNumbers(courier, index, palletNumbersByHundred);
+                courierWithNumbers.cartNumbers = defaultNumbers.cartNumbers;
+                courierWithNumbers.palletNumbers = defaultNumbers.palletNumbers;
+                courierWithNumbers.isDefaultCourier = true;
+            } else {
+                // Генерируем номера CART (только для обычных курьеров, не для null ячеек и не для КГТ)
+                if (!isNullCell && !isKGT) {
+                    // Извлекаем номер из ячейки
+                    let cellNumber = "000";
                     if (courier.cell && courier.cell !== 'null' && courier.cell !== 'Нет ячейки') {
                         const match = courier.cell.match(/\d+/);
-                        baseNumber = match ? parseInt(match[0]) : 0;
+                        cellNumber = match ? match[0].padStart(3, '0') : "000";
                     }
                     
-                    if (baseNumber > 0) {
-                        const firstDigit = baseNumber.toString()[0];
-                        
-                        // --- ПЕРВЫЙ PALLET (номер ячейки) ---
-                        // Проверяем, есть ли уже такой номер в массиве для первой цифры
-                        if (!palletNumbersByHundred[firstDigit].has(baseNumber)) {
-                            palletNumbers.push(`PALLET-${baseNumber}`);
-                            palletNumbersByHundred[firstDigit].add(baseNumber);
-                        } else {
-                            // Если номер уже занят, находим следующий свободный в этой сотне
-                            let nextNumber = baseNumber;
-                            while (palletNumbersByHundred[firstDigit].has(nextNumber) && nextNumber < (parseInt(firstDigit) * 100 + 99)) {
-                                nextNumber++;
-                            }
-                            palletNumbers.push(`PALLET-${nextNumber}`);
-                            palletNumbersByHundred[firstDigit].add(nextNumber);
-                        }
-                        
-                        // --- ВТОРОЙ PALLET (номер ячейки + 200) ---
-                        const secondPalletNumber = baseNumber + 200;
-                        const secondDigit = '3'; // Вторая сотня всегда начинается с 3
-                        
-                        // Проверяем, есть ли уже такой номер в массиве для третьей сотни
-                        if (!palletNumbersByHundred[secondDigit].has(secondPalletNumber)) {
-                            palletNumbers.push(`PALLET-${secondPalletNumber}`);
-                            palletNumbersByHundred[secondDigit].add(secondPalletNumber);
-                        } else {
-                            // Если номер уже занят, находим следующий свободный в третьей сотне
-                            let nextNumber = secondPalletNumber;
-                            while (palletNumbersByHundred[secondDigit].has(nextNumber) && nextNumber < 400) {
-                                nextNumber++;
-                            }
-                            if (nextNumber < 400) {
-                                palletNumbers.push(`PALLET-${nextNumber}`);
-                                palletNumbersByHundred[secondDigit].add(nextNumber);
-                            }
-                        }
-                        
-                        // // --- ТРЕТИЙ PALLET (из пятой сотни) ---
-                        // const thirdDigit = '5';
-                        
-                        // // Определяем начальное значение для пятой сотни
-                        // let startNumber = 501;
-                        
-                        // // Находим следующий свободный номер в пятой сотне
-                        // let nextPalletNumber = startNumber;
-                        // while (palletNumbersByHundred[thirdDigit].has(nextPalletNumber) && nextPalletNumber < 600) {
-                        //     nextPalletNumber++;
-                        // }
-                        
-                        // if (nextPalletNumber < 600) {
-                        //     palletNumbers.push(`PALLET-${nextPalletNumber}`);
-                        //     palletNumbersByHundred[thirdDigit].add(nextPalletNumber);
-                        // } else {
-                        //     // Если вся сотня занята (маловероятно), используем 501
-                        //     palletNumbers.push(`PALLET-501`);
-                        // }
+                    // Генерируем 4 номера CART
+                    const cartNumbers = [];
+                    for (let i = 1; i <= 4; i++) {
+                        const cartNumber = `CART-${cellNumber}${i}`;
+                        cartNumbers.push(cartNumber);
                     }
+                    
+                    // Добавляем в данные курьера
+                    courierWithNumbers.cartNumbers = cartNumbers;
                 }
                 
-                // Добавляем в данные курьера
-                courierWithNumbers.palletNumbers = palletNumbers;
+                // Генерируем номера PALLET
+                if (!isNullCell) {
+                    const palletNumbers = [];
+                    
+                    if (isKGT) {
+                        // Для КГТ - один номер PALLET с номером ячейки
+                        const kgtNumber = courier.cell.replace('KGT-', '').replace('kgt-', '');
+                        const palletNumber = `PALLET-${kgtNumber}`;
+                        palletNumbers.push(palletNumber);
+                        
+                        // Сохраняем информацию, что это КГТ паллет
+                        courierWithNumbers.isKGT = true;
+                        
+                        // Для КГТ добавляем в массив соответствующей сотни
+                        const firstDigit = kgtNumber.toString()[0];
+                        if (palletNumbersByHundred[firstDigit]) {
+                            palletNumbersByHundred[firstDigit].add(parseInt(kgtNumber));
+                        }
+                    } else {
+                        // Для обычных курьеров
+                        // Извлекаем базовый номер ячейки (например, 101 из MK-101)
+                        let baseNumber = 0;
+                        if (courier.cell && courier.cell !== 'null' && courier.cell !== 'Нет ячейки') {
+                            const match = courier.cell.match(/\d+/);
+                            baseNumber = match ? parseInt(match[0]) : 0;
+                        }
+                        
+                        if (baseNumber > 0) {
+                            const firstDigit = baseNumber.toString()[0];
+                            
+                            // --- ПЕРВЫЙ PALLET (номер ячейки) ---
+                            // Проверяем, есть ли уже такой номер в массиве для первой цифры
+                            if (!palletNumbersByHundred[firstDigit].has(baseNumber)) {
+                                palletNumbers.push(`PALLET-${baseNumber}`);
+                                palletNumbersByHundred[firstDigit].add(baseNumber);
+                            } else {
+                                // Если номер уже занят, находим следующий свободный в этой сотне
+                                let nextNumber = baseNumber;
+                                while (palletNumbersByHundred[firstDigit].has(nextNumber) && nextNumber < (parseInt(firstDigit) * 100 + 99)) {
+                                    nextNumber++;
+                                }
+                                palletNumbers.push(`PALLET-${nextNumber}`);
+                                palletNumbersByHundred[firstDigit].add(nextNumber);
+                            }
+                            
+                            // --- ВТОРОЙ PALLET (номер ячейки + 200) ---
+                            const secondPalletNumber = baseNumber + 200;
+                            const secondDigit = '3'; // Вторая сотня всегда начинается с 3
+                            
+                            // Проверяем, есть ли уже такой номер в массиве для третьей сотни
+                            if (!palletNumbersByHundred[secondDigit].has(secondPalletNumber)) {
+                                palletNumbers.push(`PALLET-${secondPalletNumber}`);
+                                palletNumbersByHundred[secondDigit].add(secondPalletNumber);
+                            } else {
+                                // Если номер уже занят, находим следующий свободный в третьей сотне
+                                let nextNumber = secondPalletNumber;
+                                while (palletNumbersByHundred[secondDigit].has(nextNumber) && nextNumber < 400) {
+                                    nextNumber++;
+                                }
+                                if (nextNumber < 400) {
+                                    palletNumbers.push(`PALLET-${nextNumber}`);
+                                    palletNumbersByHundred[secondDigit].add(nextNumber);
+                                }
+                            }
+                        }
+                    }
+                    
+                    // Добавляем в данные курьера
+                    courierWithNumbers.palletNumbers = palletNumbers;
+                }
             }
             
             // Сохраняем onlineTransferActId (он уже есть в courier)
@@ -3690,6 +3919,7 @@ async function fillCouriersTableAndSaveToFirebase() {
         cartPallet_btnActions();
         tpi_cc_filteringColumnData();
         initializePrintRowHighlight();
+        initializeRestoreModal();
         
     } catch (error) {
         console.log('💥 Ошибка при заполнении таблицы и сохранении в Firebase:', error);
@@ -3881,13 +4111,35 @@ async function tpiCheckMultipleDatesInFirebase(dateStrings) {
         console.log(`🔍 Массовая проверка ${dateStrings.length} дат в Firebase...`);
         
         const results = {};
-        const batchSize = 10; // Firestore ограничения
+        const batchSize = 10;
         
-        // Разбиваем даты на батчи
-        for (let i = 0; i < dateStrings.length; i += batchSize) {
-            const batch = dateStrings.slice(i, i + batchSize);
+        // 🔥 РАЗДЕЛЯЕМ ДАТЫ НА КЭШИРОВАННЫЕ И НОВЫЕ
+        const datesToCheck = [];
+        
+        dateStrings.forEach(dateStr => {
+            // Если дата уже есть в кэше, используем её
+            if (window.tpiCalendarDatesCache && window.tpiCalendarDatesCache[dateStr] !== undefined) {
+                const cachedStatus = window.tpiCalendarDatesCache[dateStr];
+                results[dateStr] = { 
+                    exists: cachedStatus === 'has-bd-data',
+                    hasCartPalletData: cachedStatus === 'has-bd-data'
+                };
+            } else {
+                datesToCheck.push(dateStr);
+            }
+        });
+        
+        console.log(`📊 Из кэша: ${Object.keys(results).length}, нужно проверить: ${datesToCheck.length}`);
+        
+        // Если нет дат для проверки - сразу возвращаем результат
+        if (datesToCheck.length === 0) {
+            return results;
+        }
+        
+        // Проверяем только новые даты
+        for (let i = 0; i < datesToCheck.length; i += batchSize) {
+            const batch = datesToCheck.slice(i, i + batchSize);
             
-            // Создаем массив промисов для каждой даты в батче
             const promises = batch.map(async (dateStr) => {
                 try {
                     const dateParts = dateStr.split('/');
@@ -3898,14 +4150,12 @@ async function tpiCheckMultipleDatesInFirebase(dateStrings) {
                     const firebaseDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
                     const dateDocRef = tpiDb.collection("dates").doc(firebaseDate);
                     
-                    // Проверяем существование документа с датой
                     const dateDoc = await dateDocRef.get();
                     
                     if (!dateDoc.exists) {
                         return { dateStr, exists: false };
                     }
                     
-                    // Проверяем существование подколлекции cartControl
                     const cartControlRef = dateDocRef.collection("cartControl");
                     const cartControlSnapshot = await cartControlRef.get();
                     
@@ -3923,27 +4173,33 @@ async function tpiCheckMultipleDatesInFirebase(dateStrings) {
             });
             
             try {
-                // Выполняем все промисы в батче параллельно
                 const batchResults = await Promise.all(promises);
                 
-                // Обрабатываем результаты
                 batchResults.forEach(result => {
                     results[result.dateStr] = { 
                         exists: result.exists,
-                        hasCartPalletData: false // Упрощаем, не проверяем подробно
+                        hasCartPalletData: false
                     };
+                    
+                    // Сразу обновляем кэш
+                    if (window.tpiCalendarDatesCache) {
+                        window.tpiCalendarDatesCache[result.dateStr] = result.exists ? 'has-bd-data' : 'no-bd-data';
+                    }
                 });
                 
             } catch (error) {
                 console.warn('💥 Ошибка при выполнении батча:', error);
-                // В случае ошибки помечаем все даты батча как несуществующие
                 batch.forEach(dateStr => {
                     results[dateStr] = { exists: false, hasCartPalletData: false };
+                    
+                    // Обновляем кэш даже при ошибке
+                    if (window.tpiCalendarDatesCache) {
+                        window.tpiCalendarDatesCache[dateStr] = 'no-bd-data';
+                    }
                 });
             }
             
-            // Пауза между батчами
-            if (i + batchSize < dateStrings.length) {
+            if (i + batchSize < datesToCheck.length) {
                 await new Promise(resolve => setTimeout(resolve, 100));
             }
         }
@@ -4272,7 +4528,7 @@ async function checkMonthDatesStatus(year, month) {
         currentDate.setDate(currentDate.getDate() + 1);
     }
     
-    // Сначала проверяем глобальный кэш для каждой даты
+    // 🔥 ВАЖНО: Сначала заполняем из глобального кэша ВСЕ даты
     const datesToCheck = [];
     
     allDatesInMonth.forEach(dateStr => {
@@ -4280,6 +4536,7 @@ async function checkMonthDatesStatus(year, month) {
         if (window.tpiCalendarDatesCache && window.tpiCalendarDatesCache[dateStr] !== undefined) {
             monthStatuses[dateStr] = window.tpiCalendarDatesCache[dateStr];
         } else {
+            // Если нет в кэше - будем проверять
             datesToCheck.push(dateStr);
         }
     });
@@ -4332,7 +4589,7 @@ async function checkMonthDatesStatus(year, month) {
         });
     }
     
-    // Заполняем оставшиеся даты (которые уже были в кэше)
+    // Заполняем оставшиеся даты (которые уже были в кэше) - хотя они уже заполнены выше
     allDatesInMonth.forEach(dateStr => {
         if (!monthStatuses[dateStr] && window.tpiCalendarDatesCache && window.tpiCalendarDatesCache[dateStr]) {
             monthStatuses[dateStr] = window.tpiCalendarDatesCache[dateStr];
@@ -4345,12 +4602,11 @@ async function checkMonthDatesStatus(year, month) {
     }
     
     if (DEBUG_CALENDAR) {
-        console.log(`✅ Проверка месяца ${monthKey} завершена`);
+        console.log(`✅ Проверка месяца ${monthKey} завершена, всего дат: ${Object.keys(monthStatuses).length}`);
     }
     
     return monthStatuses;
 }
-
 function applyStatusToDayElement(dayElement, status) {
     // Удаляем все статусные классы
     dayElement.classList.remove(
@@ -5777,6 +6033,7 @@ function restoreEventListeners() {
     initializeAddCartButtons();
     initializeAddPalletButtons();
     initializeDeleteButton();
+    initializeRestoreModal();
     
     const printButtons = document.querySelectorAll('.tpi-cc--print-current-row');
     printButtons.forEach(btn => {
@@ -6367,14 +6624,16 @@ async function getFreshCouriersData(selectedDate) {
                     }
                     
                     // Определяем ячейку
-                    let mainCell = 'Нет ячейки';
-                    if (route.cells && route.cells.length > 0) {
-                        mainCell = route.cells[0]?.number || 'Нет ячейки';
-                    } else if (route.cell && route.cell.number) {
+                    let mainCell = null; // По умолчанию null - значит не будем обновлять
+                    if (route.cells && route.cells.length > 0 && route.cells[0]?.number) {
+                        // Если есть ячейки и у первой есть номер - используем его
+                        mainCell = route.cells[0].number;
+                    } else if (route.cell && route.cell.number && route.cell.number !== 'null') {
+                        // Если есть отдельное поле cell с валидным номером - используем его
                         mainCell = route.cell.number;
-                    } else {
-                        mainCell = 'null';
                     }
+
+                    let onlineTransferActId = route.onlineTransferActId || null;
                     
                     return {
                         courierId: courierId,
@@ -6391,7 +6650,8 @@ async function getFreshCouriersData(selectedDate) {
                         startedAt: route.startedAt || null,
                         finishedAt: route.finishedAt || null,
                         routeId: route.id || null,
-                        hasCells: route.cells && route.cells.length > 0
+                        hasCells: route.cells && route.cells.length > 0,
+                        onlineTransferActId: onlineTransferActId // ДОБАВЛЯЕМ ЭТО ПОЛЕ
                     };
                 });
                 
@@ -6460,6 +6720,16 @@ async function saveUpdatedTableData(selectedDate) {
                 // Создаем копию текущих данных
                 const updatedData = { ...currentCourierData };
                 let hasChanges = false;
+
+                const newCell = row.getAttribute('data-cell');
+                if (newCell && newCell !== 'null' && newCell !== 'Нет ячейки' && newCell.trim() !== '') {
+                    const currentCell = updatedData.cell;
+                    if (currentCell !== newCell) {
+                        updatedData.cell = newCell;
+                        hasChanges = true;
+                        console.log(`  📝 cell ${courierId}: ${currentCell} -> ${newCell}`);
+                    }
+                }
                 
                 // 1. Обновляем статус если изменился
                 const newStatus = row.getAttribute('data-status');
@@ -6533,6 +6803,25 @@ async function saveUpdatedTableData(selectedDate) {
                         hasChanges = true;
                         console.log(`  📝 finishedAt ${courierId}: ${currentFinishedAt} -> ${newFinishedAt}`);
                     }
+                }
+
+                 // 7. Обновляем onlineTransferActId если изменился (НОВОЕ)
+                const newOnlineTransferActId = row.getAttribute('data-online-transfer-act-id');
+                if (newOnlineTransferActId && newOnlineTransferActId !== 'null') {
+                    const currentActId = updatedData.onlineTransferActId;
+                    if (currentActId !== newOnlineTransferActId) {
+                        updatedData.onlineTransferActId = newOnlineTransferActId;
+                        hasChanges = true;
+                        console.log(`  📝 onlineTransferActId ${courierId}: ${currentActId || 'null'} -> ${newOnlineTransferActId}`);
+                    }
+                }
+                
+                // Добавляем в массив только если есть изменения
+                if (hasChanges) {
+                    updatedCouriersData.push(updatedData);
+                    console.log(`  ✅ Курьер ${courierId} добавлен в список обновлений`);
+                } else {
+                    console.log(`  ⏭️ Курьер ${courierId} без изменений, пропускаем`);
                 }
                 
                 // Добавляем в массив только если есть изменения
@@ -6629,11 +6918,24 @@ async function updateTableDataFromAPI(selectedDate) {
             
             if (!freshCourierData) return;
             
-            // Обновляем данные в строке
+            // Обновляем данные в строке и получаем флаг обновления
             const rowUpdated = updateRowData(row, freshCourierData, rowIndex);
             
             if (rowUpdated) {
                 updatedCount++;
+                
+                // Сохраняем onlineTransferActId в data-атрибуты строки
+                if (freshCourierData.onlineTransferActId) {
+                    row.setAttribute('data-online-transfer-act-id', freshCourierData.onlineTransferActId);
+                }
+                
+                // Сохраняем cell в data-атрибуты ТОЛЬКО если оно валидное
+                if (freshCourierData.cell && 
+                    freshCourierData.cell !== 'null' && 
+                    freshCourierData.cell !== 'Нет ячейки' && 
+                    freshCourierData.cell.trim() !== '') {
+                    row.setAttribute('data-cell', freshCourierData.cell);
+                }
             }
         });
         
@@ -6646,6 +6948,7 @@ async function updateTableDataFromAPI(selectedDate) {
                 console.log('✅ Данные успешно сохранены в Firebase');
                 tpiNotification.show('Обновление', 'success', `Обновлено ${updatedCount} записей`);
                 initializePrintRowHighlight();
+                initializeRestoreModal();
             }
         } else {
             console.log('✅ Данные уже актуальны');
@@ -6659,154 +6962,57 @@ async function updateTableDataFromAPI(selectedDate) {
     }
 }
 
-// Функция для получения свежих данных из API без расшифровки имен
-async function getFreshCouriersData(selectedDate) {
-    try {
-        // Формируем URL для запроса
-        const url = new URL('https://logistics.market.yandex.ru/api/resolve/');
-        url.searchParams.append('r', 'sortingCenter/routes/resolveGetRoutesFullInfo:resolveGetRoutesFullInfo');
-
-        // Форматируем дату для API
-        let targetDate;
-        if (selectedDate) {
-            const dateParts = selectedDate.split('/');
-            if (dateParts.length === 3) {
-                targetDate = new Date(`${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`);
-            } else {
-                targetDate = new Date();
-            }
-        } else {
-            targetDate = new Date();
-        }
-
-        const year = targetDate.getFullYear();
-        const month = String(targetDate.getMonth() + 1).padStart(2, '0');
-        const day = String(targetDate.getDate()).padStart(2, '0');
-        const currentDate = `${year}-${month}-${day}`;
-        
-        const requestBody = {
-            "params": [{
-                "sortingCenterId": 21972131,
-                "type": "OUTGOING_COURIER",
-                "sort": "",
-                "hasCarts": false,
-                "category": "COURIER",
-                "date": currentDate,
-                "recipientName": "",
-                "page": 0,
-                "size": 200
-            }],
-            "path": `/sorting-center/21972131/routes?type=OUTGOING_COURIER&sort=&hasCarts=false&category=COURIER&date=${currentDate}&recipientName=`
-        };
-
-        const response = await fetch(url.toString(), {
-            method: 'POST',
-            credentials: 'include',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-Market-Core-Service': '<UNKNOWN>',
-                'sk': tpiUserTOKEN
-            },
-            body: JSON.stringify(requestBody)
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        
-        if (data && data.results && data.results.length > 0) {
-            const result = data.results[0];
-            
-            if (result.error) {
-                console.log('❌ Ошибка API:', result.error.message);
-                return null;
-            }
-            
-            if (result.data && result.data.content && result.data.content.length > 0) {
-                const routes = result.data.content;
-                
-                // Формируем упрощенные данные (без расшифровки имен)
-                const couriersData = routes.map((route, index) => {
-                    // Берем ID курьера из разных возможных мест
-                    let courierId = null;
-                    if (route.courier && route.courier.externalId) {
-                        courierId = route.courier.externalId;
-                    } else if (route.courier && route.courier.id) {
-                        courierId = route.courier.id;
-                    }
-                    
-                    // Определяем ячейку
-                    let mainCell = 'Нет ячейки';
-                    if (route.cells && route.cells.length > 0) {
-                        mainCell = route.cells[0]?.number || 'Нет ячейки';
-                    } else if (route.cell && route.cell.number) {
-                        mainCell = route.cell.number;
-                    } else {
-                        mainCell = 'null';
-                    }
-                    
-                    return {
-                        courierId: courierId,
-                        externalId: route.courier?.externalId || null,
-                        cell: mainCell,
-                        status: route.status || 'Неизвестно',
-                        ordersLeft: route.ordersLeft || 0,
-                        ordersSorted: route.ordersSorted || 0,
-                        ordersShipped: route.ordersShipped || 0,
-                        ordersPlanned: route.ordersPlanned || 0,
-                        sortablesInCell: route.sortablesInCell || 0,
-                        sortablesPrepared: route.sortablesPrepared || 0,
-                        courierArrivesAt: route.courierArrivesAt || null,
-                        startedAt: route.startedAt || null,
-                        finishedAt: route.finishedAt || null,
-                        routeId: route.id || null,
-                        hasCells: route.cells && route.cells.length > 0
-                    };
-                });
-                
-                console.log(`📊 Получено ${couriersData.length} записей из API`);
-                return couriersData;
-                
-            } else {
-                console.log('❌ Нет данных о маршрутах');
-                return null;
-            }
-        } else {
-            console.log('❌ Неверный формат ответа');
-            return null;
-        }
-    } catch (error) {
-        console.warn('💥 Ошибка при получении данных:', error);
-        return null;
-    }
-}
-
 // Функция обновления данных в строке таблицы
 function updateRowData(row, freshData, rowIndex) {
     let updated = false;
     const courierId = freshData.externalId || freshData.courierId;
     
-    // 1. Обновление статуса маршрута (только если статус другой)
-    const statusElement = row.querySelector('div.tpi-cc-table-tbody-data-route-status');
-    if (statusElement) {
-        const currentStatus = statusElement.getAttribute('tpi-cc-route-status');
-        const newStatus = freshData.status ? freshData.status.toLowerCase() : 'unknown';
+    // 1. Обновление onlineTransferActId (НОВЫЙ БЛОК)
+    const eappLink = row.querySelector('.tpi-cc--dcoument-eapp');
+    const hasActId = freshData.onlineTransferActId && freshData.onlineTransferActId !== 'null';
+    
+    if (hasActId) {
+        // Проверяем, есть ли уже активная ссылка
+        const existingLink = row.querySelector('.tpi-cc--dcoument-eapp[tpi-tooltip-data="ЭАПП курьера"]');
         
-        if (currentStatus !== newStatus) {
-            // Обновляем атрибут и текст
-            statusElement.setAttribute('tpi-cc-route-status', newStatus);
+        if (!existingLink) {
+            // Если нет активной ссылки, заменяем disabled элемент на активную ссылку
+            const disabledElement = row.querySelector('.tpi-cc--dcoument-eapp[disabled]');
+            const printContainer = row.querySelector('.tpi-cc--table-body-print-container');
             
-            const statusTextElement = statusElement.querySelector('p[tpi-cc-parsing-data="courier-route-status"]');
-            if (statusTextElement) {
-                statusTextElement.textContent = getRouteStatusText(freshData.status);
+            if (disabledElement && printContainer) {
+                // Получаем выбранную дату для ссылки
+                const searchDateButton = document.querySelector('.tpi-cc-search-date');
+                let selectedDateFormatted = '';
+                if (searchDateButton) {
+                    const selectedDateStr = searchDateButton.getAttribute('tpi-cc-selected-date-value');
+                    if (selectedDateStr) {
+                        const dateParts = selectedDateStr.split('/');
+                        if (dateParts.length === 3) {
+                            selectedDateFormatted = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+                        }
+                    }
+                }
+                
+                // Создаем активную ссылку
+                const newLinkHtml = `
+                    <a class="tpi-cc--dcoument-eapp" 
+                       href="/api/sorting-center/21972131/online-transfer-act/${freshData.onlineTransferActId}/download" 
+                       target="_blank" 
+                       tpi-tooltip-data="ЭАПП курьера">
+                        <i class="tpi-cc--table-tbody-data-icon">${tpi_cc_i_courier_eapp}</i>
+                    </a>
+                `;
+                
+                // Заменяем disabled элемент на активную ссылку
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = newLinkHtml;
+                const newLink = tempDiv.firstElementChild;
+                
+                disabledElement.parentNode.replaceChild(newLink, disabledElement);
+                updated = true;
+                console.log(`🔄 Обновлен onlineTransferActId для курьера ${courierId}: появился новый акт`);
             }
-            
-            updated = true;
-            console.log(`🔄 Обновлен статус для курьера ${courierId}: ${currentStatus} -> ${newStatus}`);
         }
     }
     
@@ -6924,6 +7130,19 @@ function updateRowData(row, freshData, rowIndex) {
             console.log(`🔄 Обновлена дата окончания для курьера ${courierId}: null -> ${endDate}`);
         }
     }
+
+    // Обновляем отображение ячейки (для DEFAULT_COURIER важно)
+    const cellElement = row.querySelector('a[tpi-cc-parsing-data="courier-route-cell"]');
+    if (cellElement && freshData.cell && 
+        freshData.cell !== 'null' && 
+        freshData.cell !== 'Нет ячейки' && 
+        freshData.cell.trim() !== '' && 
+        cellElement.textContent.trim() !== freshData.cell) {
+        
+        cellElement.textContent = freshData.cell;
+        updated = true;
+        console.log(`🔄 Обновлена ячейка для курьера ${courierId}: ${cellElement.textContent} -> ${freshData.cell}`);
+    }
     
     // 5. Сохраняем флаг обновления и данные ТОЛЬКО если были изменения
     if (updated) {
@@ -7006,7 +7225,14 @@ async function updatePartialDataInFirebase(selectedDate, updatedCouriersData) {
                 if (courier.sortablesPrepared !== undefined) updateData.sortablesPrepared = courier.sortablesPrepared;
                 if (courier.sortablesInCell !== undefined) updateData.sortablesInCell = courier.sortablesInCell;
                 if (courier.finishedAt !== undefined) updateData.finishedAt = courier.finishedAt;
-                
+                if (courier.onlineTransferActId !== undefined) updateData.onlineTransferActId = courier.onlineTransferActId; // НОВОЕ
+                if (courier.cell !== undefined && 
+                    courier.cell !== null && 
+                    courier.cell !== 'null' && 
+                    courier.cell !== 'Нет ячейки' && 
+                    courier.cell.trim() !== '') {
+                    updateData.cell = courier.cell;
+                }
                 // Добавляем поле обновления
                 updateData.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
                 
@@ -7676,7 +7902,9 @@ function tpi_cc_claimTableData_toPrint() {
     const tableData = [];
     const rows = document.querySelectorAll('.tpi-cc--table-tbody');
     
-    rows.forEach(row => {
+    console.log(`🔍 Поиск данных в ${rows.length} строках`);
+    
+    rows.forEach((row, rowIndex) => {
         // 1) Получаем ФИО курьера
         const courierNameElement = row.querySelector('p[tpi-cc-parsing-data="courier-full-name"]');
         const courierName = courierNameElement ? courierNameElement.textContent.trim() : 'Не указано';
@@ -7689,14 +7917,21 @@ function tpi_cc_claimTableData_toPrint() {
         // 3) Получаем все НЕЗАБЛОКИРОВАННЫЕ CART номера
         const cartElements = row.querySelectorAll('.tpi-cc--table-tbody-data-carts .tpi-cc-table-tbody-data-cart-id[tpi-data-courier-spec-cell]');
         const cartNumbers = Array.from(cartElements)
-            .filter(el => !el.hasAttribute('tpi-cc-button-is-blocked')) // Фильтруем заблокированные
+            .filter(el => !el.hasAttribute('tpi-cc-button-is-blocked'))
             .map(el => el.getAttribute('tpi-data-courier-spec-cell'));
         
         // 4) Получаем все НЕЗАБЛОКИРОВАННЫЕ PALLET номера
         const palletElements = row.querySelectorAll('.tpi-cc--table-tbody-data-pallets .tpi-cc-table-tbody-data-pallet-id[tpi-data-courier-spec-cell]');
         const palletNumbers = Array.from(palletElements)
-            .filter(el => !el.hasAttribute('tpi-cc-button-is-blocked')) // Фильтруем заблокированные
+            .filter(el => !el.hasAttribute('tpi-cc-button-is-blocked'))
             .map(el => el.getAttribute('tpi-data-courier-spec-cell'));
+        
+        console.log(`📋 Строка ${rowIndex + 1}:`, {
+            courier: courierName,
+            cell: cellValue,
+            carts: cartNumbers,
+            pallets: palletNumbers
+        });
         
         // Добавляем в результат только если есть хотя бы один незаблокированный номер
         if (cartNumbers.length > 0 || palletNumbers.length > 0) {
@@ -7979,38 +8214,56 @@ async function tpi_cc_generatePDFlabels(data, options = {}) {
         const allCartNumbers = couriersData.map(item => item.cartNumbers || []);
         const allPalletNumbers = couriersData.map(item => item.palletNumbers || []);
 
+        console.log('📊 Данные для печати:', {
+            couriersCount: couriersData.length,
+            cartNumbers: allCartNumbers,
+            palletNumbers: allPalletNumbers
+        });
+
         // Собираем все элементы для генерации QR-кодов
         const allQRPromises = [];
-        
+
         // Сначала все CART номера
         if (allCartNumbers && allCartNumbers.length > 0) {
             const maxCartLength = Math.max(...allCartNumbers.map(arr => arr.length), 0);
+            console.log(`📦 Максимальная длина CART: ${maxCartLength}`);
+            
             for (let i = 0; i < maxCartLength; i++) {
                 allCartNumbers.forEach((courierCarts, courierIndex) => {
-                    if (i < courierCarts.length) {
-                        allQRPromises.push({
-                            type: 'CART',
-                            value: courierCarts[i],
-                            courierIndex: courierIndex,
-                            order: i
-                        });
+                    if (courierCarts && i < courierCarts.length) {
+                        const value = courierCarts[i];
+                        if (value && value.startsWith('CART-')) {
+                            allQRPromises.push({
+                                type: 'CART',
+                                value: value,
+                                courierIndex: courierIndex,
+                                order: i
+                            });
+                            console.log(`✅ Добавлен CART: ${value}`);
+                        }
                     }
                 });
             }
         }
-        
+
         // Затем все PALLET номера
         if (allPalletNumbers && allPalletNumbers.length > 0) {
             const maxPalletLength = Math.max(...allPalletNumbers.map(arr => arr.length), 0);
+            console.log(`📦 Максимальная длина PALLET: ${maxPalletLength}`);
+            
             for (let i = 0; i < maxPalletLength; i++) {
                 allPalletNumbers.forEach((courierPallets, courierIndex) => {
-                    if (i < courierPallets.length) {
-                        allQRPromises.push({
-                            type: 'PALLET',
-                            value: courierPallets[i],
-                            courierIndex: courierIndex,
-                            order: i
-                        });
+                    if (courierPallets && i < courierPallets.length) {
+                        const value = courierPallets[i];
+                        if (value && value.startsWith('PALLET-')) {
+                            allQRPromises.push({
+                                type: 'PALLET',
+                                value: value,
+                                courierIndex: courierIndex,
+                                order: i
+                            });
+                            console.log(`✅ Добавлен PALLET: ${value}`);
+                        }
                     }
                 });
             }
@@ -8063,6 +8316,9 @@ async function tpi_cc_generatePDFlabels(data, options = {}) {
                         ...item,
                         qrDataURL
                     });
+                    console.log(`✅ QR сгенерирован для ${item.value}`);
+                } else {
+                    console.warn(`❌ Не удалось получить QR для ${item.value}`);
                 }
                 
             } catch (error) {
@@ -8130,55 +8386,82 @@ async function tpi_cc_generatePDFlabels(data, options = {}) {
             const qr = qrCodes[i];
             const courierInfo = couriersData[qr.courierIndex];
 
-            if (qr.type === 'PALLET') {
-                // ===== ДИЗАЙН ДЛЯ PALLET =====
+        if (qr.type === 'PALLET') {
+            // ===== ДИЗАЙН ДЛЯ PALLET =====
+            
+            // Квадрат справа
+            const squareSize = 50;
+            const squareX = pageWidth - squareSize - 5;
+            const squareY = 10;
+            
+            // Заливка квадрата серым
+            pdf.setFillColor(240, 240, 240);
+            pdf.roundedRect(squareX, squareY, squareSize, squareSize, 10, 10, 'F');
+            
+            // Черная рамка
+            pdf.setDrawColor(0, 0, 0);
+            pdf.setLineWidth(0.35);
+            pdf.roundedRect(squareX, squareY, squareSize, squareSize, 10, 10, 'S');
+            
+            // QR-код в центре
+            if (qr.qrDataURL) {
+                const qrSize = 100;
+                const qrX = (pageWidth - qrSize) / 2;
+                const qrY = (pageHeight - qrSize) / 2 - 20;
+                pdf.addImage(qr.qrDataURL, 'PNG', qrX, qrY, qrSize, qrSize);
+            }
+            
+            // Ячейка слева
+            pdf.setFontSize(100);
+            pdf.setFont("Roboto", "black");
+            const cellValue = typeof courierInfo.cell === 'object' 
+                ? (courierInfo.cell.value || courierInfo.cell.attribute || 'Нет ячейки')
+                : (courierInfo.cell || 'Нет ячейки');
+            
+            // Проверяем, длинное ли название (DEFAULT_COURIER и т.д.)
+            if (cellValue.includes('DEFAULT_COURIER') || cellValue.length > 20) {
+                // Разбиваем на части
+                pdf.setFontSize(30); // Уменьшаем размер для длинных названий
                 
-                // Квадрат справа
-                const squareSize = 50;
-                const squareX = pageWidth - squareSize - 5;
-                const squareY = 10;
+                const firstLine = cellValue.substring(0, 20);
+                const secondLine = cellValue.substring(20);
                 
-                // Заливка квадрата серым
-                pdf.setFillColor(240, 240, 240);
-                pdf.roundedRect(squareX, squareY, squareSize, squareSize, 10, 10, 'F');
-                
-                // Черная рамка
-                pdf.setDrawColor(0, 0, 0);
-                pdf.setLineWidth(0.35);
-                pdf.roundedRect(squareX, squareY, squareSize, squareSize, 10, 10, 'S');
-                
-                // QR-код в центре
-                if (qr.qrDataURL) {
-                    const qrSize = 100;
-                    const qrX = (pageWidth - qrSize) / 2;
-                    const qrY = (pageHeight - qrSize) / 2 - 20;
-                    pdf.addImage(qr.qrDataURL, 'PNG', qrX, qrY, qrSize, qrSize);
+                pdf.text(firstLine, 5, 30);
+                if (secondLine) {
+                    pdf.text(secondLine, 5, 45);
                 }
-                
-                // Ячейка слева
-                pdf.setFontSize(100);
-                pdf.setFont("Roboto", "black");
-                const cellValue = typeof courierInfo.cell === 'object' 
-                    ? (courierInfo.cell.value || courierInfo.cell.attribute || 'Нет ячейки')
-                    : (courierInfo.cell || 'Нет ячейки');
-                pdf.text(cellValue, 5, 45);
-                
-                // Номер PALLET под QR
-                const pureNumber = qr.value;
-                pdf.setFontSize(35);
-                pdf.text(pureNumber, 6, 58);
-                
             } else {
-                // ===== ДИЗАЙН ДЛЯ CART =====
-                
-                // Ячейка справа
+                pdf.text(cellValue, 5, 45);
+            }
+            
+            // Номер PALLET под QR
+            const pureNumber = qr.value;
+            pdf.setFontSize(35);
+            pdf.text(pureNumber, 6, 58);
+            
+        } else {
+                // Для CART - ячейка справа
                 pdf.setFont("Roboto", "black");
-                pdf.setFontSize(120);
                 const cellValue = typeof courierInfo.cell === 'object'
                     ? (courierInfo.cell.value || courierInfo.cell.attribute || 'Нет ячейки')
                     : (courierInfo.cell || 'Нет ячейки');
-                const cellX = cellValue.startsWith('KGT') ? 62 : 52;
-                pdf.text(cellValue, cellX, 88);
+                
+                // Проверяем, длинное ли название (DEFAULT_COURIER и т.д.)
+                if (cellValue.includes('DEFAULT_COURIER') || cellValue.length > 20) {
+                    pdf.setFontSize(50); // Уменьшаем размер
+                    
+                    const parts = cellValue.split(' ');
+                    let yPos = 70;
+                    
+                    parts.forEach(part => {
+                        pdf.text(part, cellValue.startsWith('KGT') ? 62 : 52, yPos);
+                        yPos += 18;
+                    });
+                } else {
+                    pdf.setFontSize(120);
+                    const cellX = cellValue.startsWith('KGT') ? 62 : 52;
+                    pdf.text(cellValue, cellX, 88);
+                }
                 
                 // QR справа
                 if (qr.qrDataURL) {
@@ -8678,7 +8961,7 @@ async function addNewCartToCourier(row, cartButton) {
         
         // Создаём новую кнопку CART
         const newButton = document.createElement('button');
-        newButton.className = 'tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-cart-id';
+        newButton.className = 'tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-cart-id tpi-cc-skeleton-target';
         newButton.setAttribute('tpi-data-courier-spec-cell', newCartNumber);
         newButton.setAttribute('tpi-tooltip-data', 'Нажмите, чтобы выбрать этот CART');
         newButton.innerHTML = `
@@ -9186,7 +9469,7 @@ async function addNewPalletToCourier(row) {
         
         // Создаем новую кнопку
         const newButton = document.createElement('button');
-        newButton.className = 'tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-pallet-id';
+        newButton.className = 'tpi-cc--table-tbody-data-button tpi-cc-table-tbody-data-pallet-id tpi-cc-skeleton-target';
         newButton.setAttribute('tpi-data-courier-spec-cell', newPalletNumber);
         newButton.setAttribute('tpi-tooltip-data', 'Нажмите, чтобы выбрать этот PALLET');
         newButton.innerHTML = `
@@ -9335,4 +9618,391 @@ function initializeAddPalletButtons() {
             }
         });
     });
+}
+
+// Функция для открытия модального окна с данными курьера
+function openCourierRestoreModal(row) {
+    const modalWrapper = document.querySelector('.tpi-cc-modal-window-wrapper');
+    
+    if (!modalWrapper || !row) return;
+    
+    // Получаем данные из строки
+    const courierName = row.querySelector('p[tpi-cc-parsing-data="courier-full-name"]')?.textContent.trim() || 'Не указано';
+    const courierCell = row.querySelector('a[tpi-cc-parsing-data="courier-route-cell"]')?.textContent.trim() || 'Нет ячейки';
+    const courierRouteId = row.querySelector('p[tpi-cc-parsing-data="courier-route-id"]')?.textContent.trim() || 'Нет данных';
+    const courierId = row.querySelector('p[tpi-cc-parsing-data="courier-personal-id"]')?.textContent.trim() || 'Нет данных';
+    const courierStatus = row.querySelector('p[tpi-cc-parsing-data="courier-route-status"]')?.textContent.trim() || 'Неизвестно';
+    
+    // Получаем прогресс сортировки
+    const sortingProgress = row.querySelector('p[tpi-cc-parsing-data="courier-sorting-progress"]')?.textContent.trim() || '0 из 0';
+    
+    // Получаем прогресс подготовки
+    const preparedProgress = row.querySelector('p[tpi-cc-parsing-data="courier-prepared-progress"]')?.textContent.trim() || '0 из 0';
+    
+    // Получаем все CART номера
+    const cartButtons = row.querySelectorAll('.tpi-cc-table-tbody-data-cart-id');
+    const cartNumbers = Array.from(cartButtons).map(btn => {
+        const cartNumber = btn.getAttribute('tpi-data-courier-spec-cell')?.replace('CART-', '') || '';
+        return cartNumber;
+    });
+    
+    // Получаем все PALLET номера
+    const palletButtons = row.querySelectorAll('.tpi-cc-table-tbody-data-pallet-id');
+    const palletNumbers = Array.from(palletButtons).map(btn => {
+        const palletNumber = btn.getAttribute('tpi-data-courier-spec-cell')?.replace('PALLET-', '') || '';
+        return palletNumber;
+    });
+    
+    // Заполняем данные в модальном окне
+    const nameElement = modalWrapper.querySelector('[tpi-data-anchor="courier-name"]');
+    const cellElement = modalWrapper.querySelector('[tpi-data-anchor="courier-cell"]');
+    const routeElement = modalWrapper.querySelector('[tpi-data-anchor="courier-route"]');
+    const idElement = modalWrapper.querySelector('[tpi-data-anchor="courier-id"]');
+    const statusElement = modalWrapper.querySelector('[tpi-data-anchor="courier-status"]');
+    
+    if (nameElement) nameElement.textContent = courierName;
+    if (cellElement) cellElement.textContent = courierCell;
+    if (routeElement) routeElement.textContent = courierRouteId;
+    if (idElement) idElement.textContent = courierId;
+    if (statusElement) statusElement.textContent = courierStatus;
+    
+    // Заполняем прогресс сортировки
+    const sortedElement = modalWrapper.querySelector('[tpi-data-anchor="courier-sorted"]');
+    if (sortedElement) sortedElement.textContent = sortingProgress;
+    
+    // Заполняем прогресс подготовки
+    const preparedElement = modalWrapper.querySelector('[tpi-data-anchor="courier-prepared"]');
+    if (preparedElement) preparedElement.textContent = preparedProgress;
+    
+    // Заполняем CART номера
+    const cartWrapper = modalWrapper.querySelector('[tpi-data-anchor="courier-carts"]');
+    if (cartWrapper) {
+        cartWrapper.innerHTML = '';
+        cartNumbers.forEach(cartNumber => {
+            if (cartNumber) {
+                const cartDiv = document.createElement('div');
+                cartDiv.className = 'tpi-cc-modal-window-courier-data-item-cart';
+                cartDiv.innerHTML = `
+                    <i class="tpi-cc-modal-window-courier-data-item-cart-icon">${tpi_cc_i_cart}</i>
+                    <p>-${cartNumber}</p>
+                `;
+                cartWrapper.appendChild(cartDiv);
+            }
+        });
+        
+        if (cartNumbers.length === 0) {
+            const emptyDiv = document.createElement('p');
+            emptyDiv.className = 'tpi-cc-modal-window-courier-data-item-text';
+            emptyDiv.innerText = `Нет`;
+            cartWrapper.appendChild(emptyDiv);
+        }
+    }
+    
+    // Заполняем PALLET номера
+    const palletWrapper = modalWrapper.querySelector('[tpi-data-anchor="courier-pallets"]');
+    if (palletWrapper) {
+        palletWrapper.innerHTML = '';
+        palletNumbers.forEach(palletNumber => {
+            if (palletNumber) {
+                const palletDiv = document.createElement('div');
+                palletDiv.className = 'tpi-cc-modal-window-courier-data-item-pallet';
+                palletDiv.innerHTML = `
+                    <i class="tpi-cc-modal-window-courier-data-item-pallet-icon">${tpi_cc_i_pallet}</i>
+                    <p>-${palletNumber}</p>
+                `;
+                palletWrapper.appendChild(palletDiv);
+            }
+        });
+        
+        if (palletNumbers.length === 0) {
+            const emptyDiv = document.createElement('div');
+            emptyDiv.className = 'tpi-cc-modal-window-courier-data-item-pallet';
+            emptyDiv.innerHTML = `<p>Нет PALLET номеров</p>`;
+            palletWrapper.appendChild(emptyDiv);
+        }
+    }
+    
+    // Сохраняем ссылку на строку
+    modalWrapper.setAttribute('data-current-row', Array.from(document.querySelectorAll('.tpi-cc--table-tbody')).indexOf(row));
+    
+    // Показываем модальное окно МГНОВЕННО
+    modalWrapper.style.display = 'flex';
+    modalWrapper.setAttribute('tpi-current-state', 'shown');
+}
+
+// Функция для немедленного закрытия модального окна (без задержки)
+function closeCourierRestoreModalImmediate() {
+    const modalWrapper = document.querySelector('.tpi-cc-modal-window-wrapper');
+    
+    if (!modalWrapper) return;
+    
+    // Убираем атрибуты и скрываем мгновенно
+    modalWrapper.removeAttribute('tpi-current-state');
+    modalWrapper.style.display = 'none';
+    modalWrapper.removeAttribute('data-current-row');
+}
+
+// Функция для восстановления данных курьера (только для одного конкретного курьера)
+async function restoreCourierData() {
+    const modalWrapper = document.querySelector('.tpi-cc-modal-window-wrapper');
+    
+    if (!modalWrapper) return;
+    
+    const rowIndex = modalWrapper.getAttribute('data-current-row');
+    if (rowIndex === null) return;
+    
+    const rows = document.querySelectorAll('.tpi-cc--table-tbody');
+    const row = rows[parseInt(rowIndex)];
+    
+    if (!row) return;
+    
+    // Получаем ID курьера
+    const courierIdElement = row.querySelector('p[tpi-cc-parsing-data="courier-personal-id"]');
+    const courierId = courierIdElement ? courierIdElement.textContent.trim() : null;
+    
+    if (!courierId) {
+        if (typeof tpiNotification !== 'undefined') {
+            tpiNotification.show('Ошибка', 'error', 'Не удалось определить ID курьера');
+        }
+        closeCourierRestoreModalImmediate();
+        return;
+    }
+    
+    // Получаем выбранную дату
+    const searchDateButton = document.querySelector('.tpi-cc-search-date');
+    const selectedDate = searchDateButton.getAttribute('tpi-cc-selected-date-value');
+    
+    // СРАЗУ ЗАКРЫВАЕМ МОДАЛЬНОЕ ОКНО
+    closeCourierRestoreModalImmediate();
+    
+    try {
+        // Добавляем скелетон всем элементам в строке
+        const skeletonTargets = row.querySelectorAll('.tpi-cc-skeleton-target');
+        skeletonTargets.forEach(el => {
+            el.classList.add('tpi-lazy-load-skeleton');
+        });
+        
+        // Получаем данные курьера из API
+        const freshData = await getSingleCourierDataFromAPI(selectedDate, courierId);
+        
+        if (!freshData) {
+            throw new Error('Не удалось получить данные курьера из API');
+        }
+        
+        // Обновляем строку в таблице
+        const updated = updateRowData(row, freshData, parseInt(rowIndex));
+        
+        // Удаляем скелетон после обновления
+        skeletonTargets.forEach(el => {
+            el.classList.remove('tpi-lazy-load-skeleton');
+        });
+        
+        if (updated) {
+            // Сохраняем изменения в Firebase
+            const updatedData = [{
+                externalId: courierId,
+                courierId: courierId,
+                status: freshData.status,
+                ordersSorted: freshData.ordersSorted,
+                ordersShipped: freshData.ordersShipped,
+                ordersPlanned: freshData.ordersPlanned,
+                sortablesPrepared: freshData.sortablesPrepared,
+                sortablesInCell: freshData.sortablesInCell,
+                finishedAt: freshData.finishedAt,
+                onlineTransferActId: freshData.onlineTransferActId,
+                cell: freshData.cell
+            }];
+            
+            await updatePartialDataInFirebase(selectedDate, updatedData);
+            
+            if (typeof tpiNotification !== 'undefined') {
+                tpiNotification.show('Успешно', 'success', 'Данные курьера восстановлены');
+            }
+        } else {
+            if (typeof tpiNotification !== 'undefined') {
+                tpiNotification.show('Информация', 'info', 'Данные уже актуальны');
+            }
+        }
+        
+    } catch (error) {
+        console.warn('❌ Ошибка при восстановлении данных курьера:', error);
+        
+        // Удаляем скелетон в случае ошибки
+        const skeletonTargets = row.querySelectorAll('.tpi-cc-skeleton-target');
+        skeletonTargets.forEach(el => {
+            el.classList.remove('tpi-lazy-load-skeleton');
+        });
+        
+        if (typeof tpiNotification !== 'undefined') {
+            tpiNotification.show('Ошибка', 'error', error.message || 'Не удалось восстановить данные');
+        }
+    }
+}
+
+// Функция для инициализации обработчиков модального окна
+function initializeRestoreModal() {
+    const modalWrapper = document.querySelector('.tpi-cc-modal-window-wrapper');
+    const closeBtn = document.querySelector('.tpi-cc-modal-window-close');
+    const acceptBtn = document.querySelector('.tpi-cc-modal-window-accept');
+    const restoreButtons = document.querySelectorAll('.tpi-cc-restore-courier-data');
+    
+    if (!modalWrapper) return;
+    
+    // Обработчик для кнопок восстановления в каждой строке
+        restoreButtons.forEach(button => {
+            // Удаляем старые обработчики
+            const newButton = button.cloneNode(true);
+            button.parentNode.replaceChild(newButton, button);
+            
+            newButton.addEventListener('click', function(event) {
+                event.preventDefault();
+                event.stopPropagation();
+                
+                // Находим родительскую строку
+                const row = this.closest('.tpi-cc--table-tbody');
+                if (!row) return;
+                
+                // Открываем модальное окно с данными курьера
+                openCourierRestoreModal(row);
+            });
+        });
+        
+    // Обработчик для кнопки закрытия
+    if (closeBtn) {
+        const newCloseBtn = closeBtn.cloneNode(true);
+        closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
+        
+        newCloseBtn.addEventListener('click', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            closeCourierRestoreModalImmediate(); // Используем мгновенное закрытие
+        });
+    }
+
+    // Обработчик для кнопки подтверждения (восстановления)
+    if (acceptBtn) {
+        const newAcceptBtn = acceptBtn.cloneNode(true);
+        acceptBtn.parentNode.replaceChild(newAcceptBtn, acceptBtn);
+        
+        newAcceptBtn.addEventListener('click', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            restoreCourierData(); // Эта функция сама закроет модальное окно после завершения
+        });
+    }
+
+    // Закрытие по клику вне модального окна - тоже мгновенно
+    modalWrapper.addEventListener('click', function(event) {
+        if (event.target === modalWrapper) {
+            closeCourierRestoreModalImmediate();
+        }
+    });
+
+    // Закрытие по клавише Escape
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && modalWrapper.style.display === 'flex') {
+            closeCourierRestoreModalImmediate();
+        }
+    });
+}
+
+async function getSingleCourierDataFromAPI(selectedDate, courierId) {
+    try {
+        if (!selectedDate || !courierId) return null;
+        
+        // Формируем URL для запроса
+        const url = new URL('https://logistics.market.yandex.ru/api/resolve/');
+        url.searchParams.append('r', 'sortingCenter/routes/resolveGetRoutesFullInfo:resolveGetRoutesFullInfo');
+
+        // Преобразуем DD/MM/YYYY в YYYY-MM-DD для API
+        const dateParts = selectedDate.split('/');
+        if (dateParts.length !== 3) return null;
+
+        const currentDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+        
+        const requestBody = {
+            "params": [{
+                "sortingCenterId": 21972131,
+                "type": "OUTGOING_COURIER",
+                "sort": "",
+                "hasCarts": false,
+                "category": "COURIER",
+                "date": currentDate,
+                "recipientName": "",
+                "page": 0,
+                "size": 200
+            }],
+            "path": `/sorting-center/21972131/routes?type=OUTGOING_COURIER&sort=&hasCarts=false&category=COURIER&date=${currentDate}&recipientName=`
+        };
+
+        const response = await fetch(url.toString(), {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-Market-Core-Service': '<UNKNOWN>',
+                'sk': tpiUserTOKEN
+            },
+            body: JSON.stringify(requestBody)
+        });
+
+        if (!response.ok) return null;
+
+        const data = await response.json();
+        
+        if (data && data.results && data.results.length > 0) {
+            const result = data.results[0];
+            
+            if (result.error || !result.data || !result.data.content) return null;
+            
+            const route = result.data.content.find(r => 
+                (r.courier && (r.courier.externalId === courierId || r.courier.id === courierId))
+            );
+            
+            if (!route) return null;
+            
+            let mainCell = null;
+            if (route.cells && route.cells.length > 0 && route.cells[0]?.number) {
+                mainCell = route.cells[0].number;
+            } else if (route.cell && route.cell.number && route.cell.number !== 'null') {
+                mainCell = route.cell.number;
+            }
+            
+            return {
+                courierId: courierId,
+                externalId: route.courier?.externalId || null,
+                cell: mainCell,
+                status: route.status || 'Неизвестно',
+                ordersLeft: route.ordersLeft || 0,
+                ordersSorted: route.ordersSorted || 0,
+                ordersShipped: route.ordersShipped || 0,
+                ordersPlanned: route.ordersPlanned || 0,
+                sortablesInCell: route.sortablesInCell || 0,
+                sortablesPrepared: route.sortablesPrepared || 0,
+                courierArrivesAt: route.courierArrivesAt || null,
+                startedAt: route.startedAt || null,
+                finishedAt: route.finishedAt || null,
+                routeId: route.id || null,
+                onlineTransferActId: route.onlineTransferActId || null
+            };
+        }
+        
+        return null;
+        
+    } catch (error) {
+        console.warn('💥 Ошибка при получении данных одного курьера:', error);
+        return null;
+    }
+}
+
+function addCartsControlsListeners(){
+    waitForTokenAndRun();
+    initTooltips();
+    couriersDataCapturing();
+    tpi_cc_filteringColumnData()
+    initializeDatePicker();
+    initializeCourierStatusDropdown()
+    hideAllUI();
 }

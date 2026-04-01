@@ -671,6 +671,19 @@ button.miniRadar{
     padding: 10px;
     border-radius: 10px;
     border: none;
+
+    i.miniRadarStatusIcon svg{
+        animation: miniRadarStatusIcon 300ms cubic-bezier(.17,.73,0,1.32);
+    }
+}
+
+@keyframes miniRadarStatusIcon {
+    from{
+        transform: scale(.2);
+    }
+    to{
+        transform: scale(1);
+    }
 }
 
 button.miniRadar:hover{
@@ -962,20 +975,20 @@ icon.tpi-inbounds-reminder-icon {
     background-position: center;
     background-repeat: no-repeat;
     transition: 10s linear;
-    left: 0;
-    animation: tpi-inbounds-reminder-icon 6s infinite ease-in-out;
+    left: -110%;
+    animation: tpi-inbounds-reminder-icon 40s infinite ease-in-out 5s;
 }
 
 @keyframes tpi-inbounds-reminder-icon {
-    0%{
+    0% {
         left: 0%;
         top: 100%;
     }
-    10%,20%{
+    2.5%, 5% {
         left: 0%;
         top: 0%;
     }
-    50%,100%{
+    12.5%, 100% {
         left: 110%;
         top: 0%;
     }
