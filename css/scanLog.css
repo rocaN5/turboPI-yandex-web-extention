@@ -1,6 +1,7 @@
 .diman__scanLog__wrapper * {
     font-size: 18px !important;
     font-weight: 500 !important;
+    font-family: 'Roboto';
 }
 
 .diman__scanLog__topTableWrapper,
@@ -247,32 +248,37 @@ tbody.diman__scanLog__tbody tr:last-child td div.diman__scanLog__td__info{
     justify-content: left;
     align-items: center;
     gap: 30px;
-    padding: 20px;
-    background: #e5e5e5;
-    border-radius: 10px;
-    box-shadow: rgb(0, 0, 0) 0px 0px 20px -10px, rgb(234, 234, 234) 0px 0px 0px 4px;
+    padding: 20px 30px;
     margin: 20px 0px;
-    width: calc(100% - 20px);
+    width: 100%;
+    background: transparent;
+    box-shadow: unset;
+    /* border: 1px solid #e8e8e8; */
+    border-radius: 20px;
 }
 
 .diman__scanLog__activeButton {
     border: 0;
     padding: 14px;
-    border-radius: 10px;
+    border-radius: 8px;
     background: #fc0;
     box-shadow: 0px 0px 6px 0px #000;
     cursor: pointer;
     color: #000;
     display: flex;
     gap: 10px;
-    transition: 200ms scale;
+    transition: 150ms ease;
     width: fit-content;
     font-weight: 500;
     justify-content: center;
     align-items: center;
     position: relative;
     transform-origin: center;
-    min-width: 285px;
+    min-width: 230px;
+
+    &:active{
+        transform: scale(.9);
+    }
 }
 
 .diman__scanLog__activeButton[scanlog="shown"]{
@@ -286,6 +292,7 @@ tbody.diman__scanLog__tbody tr:last-child td div.diman__scanLog__td__info{
     animation: loadingScanLog__activeButton 5s infinite linear;
     filter: unset !important;
     cursor: not-allowed;
+    transition: 200ms ease-in-out;
 }
 
 @keyframes loadingScanLog__activeButton{
@@ -297,24 +304,40 @@ tbody.diman__scanLog__tbody tr:last-child td div.diman__scanLog__td__info{
     }
 }
 
-.diman__scanLog__activeButton:hover{
+.diman__scanLog__activeButton:hover,
+.diman__scanLog__activeButton:focus-visible{
+    outline: none;
     box-shadow: 0px 0px 6px 0px, 0px 0px 2px 0px inset;
     filter: brightness(0.9);
 }
 
 .diman__scanLog__activeButton__text{
-    min-width: 220px;
-    font-weight: 800;
+    min-width: 150px;
+    font-weight: 700;
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 10px;
 }
 
+.diman__scanLog__activeButton:disabled .diman__scanLog__activeButton__text{
+    justify-content: center;
+    &[scanlog="shown"]{
+        justify-content: center;
+    }
+}
+
+.diman__scanLog__activeButton__text_bugged{
+    width: 100%;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
 .diman__scanLog__activeButton__icon,
 .diman__scanLog__callSettings__icon {
-    width: 1.5rem;
-    height: 24px;
+    width: 22px;
+    height: 22px;
     transition: 200ms;
     fill: #212121;
 }
@@ -555,18 +578,36 @@ label.diman__scanLog__checkBox__container{
     align-items: center;
     z-index: 1;
     width: fit-content;
+    border-radius: 10px;
+    background: #fff;
+    gap: 1ch;
+    padding: 6px 8px;
+    transition: 200ms linear;
 
-
-    &:hover .diman__scanLog__checkBox__pin{
-        box-shadow: 0px 0px 0px 2px inset #b1b1b1;
+    &:hover,
+    &:has(input:checked):hover{
+        box-shadow: #000000 0px 0px 10px -6px;
+        outline: #d3d3d3 solid 1px;
     }
-    
-    &:has(input:checked):hover .diman__scanLog__checkBox__pin{
-        box-shadow: 0px 0px 0px 2px inset #f1c100;
+
+    &:has(input:focus-visible){
+        box-shadow: 0px 0px 0px 2px #000;
     }
 
     &:hover .diman__scanLog__checkBox__text{
         text-shadow: 0px 0px 0px, 0px 0px 0px, 0px 0px 0px;
+    }
+}
+
+label.diman__scanLog__checkBox__container:has(input:checked){
+        background: #fc0;
+    .diman__scanLog__checkBox__pin{
+        background: #fff;
+    }
+    .diman__scanLog__checkBox__pin::before {
+        opacity: 1;
+        filter: blur(0px);
+        animation: tpi-settings-mark-on 300ms linear;
     }
 }
 
@@ -578,48 +619,58 @@ label:has(input#dimanScanLog-option-99){
 }
 
 .diman__scanLog__checkBox__pin{
-    width: 20px;
-    height: 20px;
-    background-color: #ccc;
-    border-radius: 4px;
     position: relative;
-    min-width: 20px;
-    min-height: 20px;
+    width: 14px;
+    height: 14px;
+    background: #c7c7c7;
+    border-radius: 4px;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background 150ms ease-in-out;
+
+    &::before{
+        content: '';
+        display: block;
+        position: absolute;
+        width: 10px;
+        height: 5px;
+        background: transparent;
+        border-bottom: 2px solid #000;
+        border-left: 2px solid #000;
+        transform: rotate(-45deg) translate(1px, -1px);
+        opacity: 0;
+        filter: blur(3px);
+        transition: 150ms linear;
+    }
+
 }
 
-.diman__scanLog__checkBox__pin:before {
-    content: '';
-    display: block;
-    position: absolute;
-    width: 10px;
-    height: 4px;
-    background: transparent;
-    transition: transform 300ms ease;
-    border-bottom: 3px solid #000;
-    border-left: 3px solid #000;
-    transform: rotate(-90deg) translate(-50%) scale(0);
-    left: 40%;
-    top: 1px;
+@keyframes tpi-settings-mark-on {
+    0%{
+        clip-path: polygon(0 0, 100% 0, 0% 0%, 0 0%);
+    }
+    50%{
+        clip-path: polygon(0 0, 40% 0%, 20% 100%, 0 100%);
+    }
+    100%{
+        clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    }
 }
 
 input.diman__scanLog__checkBox__input{
-    display: none;
-}
-
-input[type="checkbox"]:checked+.diman__scanLog__checkBox__pin{
-	background-color: #fc0;
-}
-
-.diman__scanLog__checkBox__container input[type="checkbox"]:checked+.diman__scanLog__checkBox__pin:before {
-    transform: rotate(-45deg) translate(-50%) scale(1.0);
-    transition: transform 300ms ease;
+    position: absolute;
+    width: 0;
+    height: 0;
+    opacity: 0;
 }
 
 .diman__scanLog__checkBox__text{
     user-select: none;
-    font-size: 14px;
+    font-size: .8rem;
     color: #000;
-    margin-left: 8px;
     text-wrap-mode: nowrap;
 }
 
@@ -630,22 +681,26 @@ input[type="checkbox"]:checked+.diman__scanLog__checkBox__pin{
 
 .diman__scanLogSettings__options__container{
     display: flex;
-    gap: 30px;
+    gap: 15px;
 }
 
 .diman__scanLogSettings__options{
     display: flex;
     flex-flow: column;
     gap: 10px;
-}
-
-.diman__scanLogSettings__options{
+    padding: 5px;
     overflow: hidden;
+    position: relative;
 }
 
 .diman__scanLogSettings__options__container__scrollbar{
-    flex-wrap: wrap;
-    gap: 10px 20px;
+    overflow: hidden;
+    position: relative;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    padding: 4px;
+    width: calc(100% - 80px);
+    left: 40px;
 }
 
 
@@ -740,6 +795,10 @@ table *[tpi-scanlog-hidden-column="true"]{
 
 .diman__scanLog__counter{
     color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 55px;
 }
 
 .diman__scanLog__nav:hover {

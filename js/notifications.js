@@ -65,6 +65,11 @@ const tpiNotification_toastIcons = {
                 <path class="turboNotificationIcon" d="m22.97,12.07c-.03,5.96-4.86,10.64-10.9,10.66-5.37.02-10.9-4.73-10.53-11.44C1.83,5.98,6.69,1.21,12.28,1.27c5.91.06,10.71,4.92,10.68,10.8Zm-.47-.24c.19-5.13-4.5-10.31-10.26-10.25C6.45,1.65,1.86,6.22,1.9,12.37c.03,4.23,4.27,9.86,10.31,9.86,5.92,0,10.62-5.4,10.29-10.4Z"></path>
                 <path class="turboNotificationIcon" d="m9.82,18.46c-3.94-.32,1.79-5.27-.22-5.99-7.09.43,3.31-8.22,5.71-8.07,2.03,1.65-2.8,5.43-.2,5.72,6.6.17-3.4,6.83-5.29,8.34Zm5.47-8.29c-3.86,1.39,1.26-3.95-.06-5.44-1.94.29-9.67,5.76-7.14,7.4,5.12-.67.22,3.06,1.04,5.77,2.13-.79,11.34-6.68,6.16-7.74Z"></path>
             </svg>
+    `,
+    egg: `
+            <svg class="tpi-notification_toast-icon" stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 384 512" xmlns="http://www.w3.org/2000/svg">
+                <path d="M192 496C86 496 0 394 0 288C0 176 64 16 192 16s192 160 192 272c0 106-86 208-192 208zM154.8 134c6.5-6 7-16.1 1-22.6s-16.1-7-22.6-1c-23.9 21.8-41.1 52.7-52.3 84.2C69.7 226.1 64 259.7 64 288c0 8.8 7.2 16 16 16s16-7.2 16-16c0-24.5 5-54.4 15.1-82.8c10.1-28.5 25-54.1 43.7-71.2z"></path>
+            </svg>
     `
 };
 
@@ -438,6 +443,10 @@ window.tpiNotification = {
 
     showtpiInject(message, description = '') {
         this.show(message, 'tpiInject', description);
+    },
+
+    showEgg(message, description = '') {
+        this.show(message, 'egg', description);
     },
 
     hideAll() {

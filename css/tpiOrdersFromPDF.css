@@ -1,0 +1,133 @@
+div.tpi-otp-wrapper{
+    position: relative;
+    top: 0px;
+    left: 0px;
+    z-index: 9;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: flex-start;
+    font-family: Arial, sans-serif;
+    gap: 20px;
+    padding: 30px;
+    background: #ffffff;
+    flex-flow: column;
+
+    *::selection{
+        background-color: #000;
+        color: #fff;
+    }
+}
+
+div.tpi-otp-wrapper{
+    font-size: 44px;
+    font-weight: 700;
+    line-height: 46px;
+    color: #2b2b2b;
+    justify-content: space-between;
+    display: flex;
+}
+
+.tpi-otp-content-block{
+    display: flex;
+    gap: 20px;
+
+    p{
+        margin: 0;
+    }
+}
+
+.tpi-otp-section{
+    display: flex;
+    color: #000000;
+    position: relative;
+    width: 100%;
+    flex-flow: column;
+    gap: 20px;
+    padding: 16px 20px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #e8e8e8;
+    border-image: initial;
+    border-radius: 20px;
+    overflow: hidden;
+    transition: 500ms;
+
+    &[tpi-current-section="file input"]{
+        width: fit-content;
+        transition: unset;
+    }
+}
+
+.tpi-otp-section-title{
+    display: flex;
+    justify-content: space-between;
+    &[sheva_r6]{
+        /* ! Буду в ахуе если кто-то это прочитает */
+        color: red;
+        /* ! Буду в ахуе если кто-то это прочитает */
+    }
+    
+    p{
+        font-size: 20px;
+        font-weight: 700;
+        line-height: 22px;
+        color: #212121;
+        margin: 0px;
+        white-space: nowrap;
+    }
+}
+
+.tpi-otp-section-container{
+    display: flex;
+    gap: 20px;
+    position: relative;
+}
+/* 
+.tpi-otp-section-container[tpi-current-section="file input"]{
+} */
+
+label.tpi-otp-file-input-wrapper{
+    width: 100%;
+    height: 100%;
+    position: relative;
+    display: flex;
+    flex-flow: column;
+    gap: 10px;
+    overflow: hidden;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    width: 200px;
+    height: 200px;
+    cursor: pointer;
+    background: #e8e8e8;
+    border: 1px solid #bcbcbc;
+    border-radius: 10px;
+    --main-contrast-color: #212121;
+
+    icon{
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--main-contrast-color);
+    }
+
+    icon svg{
+        width: 100%;
+        height: 100%;
+        fill: currentColor;
+    }
+
+    input#tpi_file_input[type="file"]{
+        width: 0px;
+        height: 0px;
+        opacity: 0;
+    }
+
+    input#tpi_file_input[type="file"]:focus-visible{
+        outline: unset;
+    }
+}

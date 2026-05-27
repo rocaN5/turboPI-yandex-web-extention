@@ -123,12 +123,62 @@
     }
 }
 
-.tpi-notification_toast--success { color: #a6ff00; font-weight: 800;}
-.tpi-notification_toast--error { color: #F44336; font-weight: 800;}
-.tpi-notification_toast--warning { color: #FFC107; font-weight: 800;}
-.tpi-notification_toast--version { color: #0787ff; font-weight: 800;}
-.tpi-notification_toast--tpiInject { color: #ffd600; font-weight: 800;}
-.tpi-notification_toast--info { color: #c221f3; font-weight: 800;}
+.tpi-notification_toast--success {
+    color: #a6ff00;
+    font-weight: 800;
+    .tpi-notification_toast-description span{
+        color: #a6ff00;
+    }
+    
+}
+.tpi-notification_toast--error {
+    color: #F44336;
+    font-weight: 800;
+    .tpi-notification_toast-description span{
+        color: #F44336;
+    }
+    
+}
+.tpi-notification_toast--warning {
+    color: #FFC107;
+    font-weight: 800;
+    .tpi-notification_toast-description span{
+        color: #FFC107;
+    }
+    
+}
+.tpi-notification_toast--version {
+    color: #0787ff;
+    font-weight: 800;
+    .tpi-notification_toast-description span{
+        color: #0787ff;
+    }
+    
+}
+.tpi-notification_toast--tpiInject {
+    color: #ffd600;
+    font-weight: 800;
+    .tpi-notification_toast-description span{
+        color: #ffd600;
+    }
+    
+}
+.tpi-notification_toast--info {
+    color: #c221f3;
+    font-weight: 800;
+    .tpi-notification_toast-description span{
+        color: #c221f3;
+    }
+    
+}
+.tpi-notification_toast--egg {
+    color: #06ffc1;
+    font-weight: 800;
+    .tpi-notification_toast-description span{
+        color: #06ffc1;
+    }
+    
+}
 
 .tpi-notification_toast--show {
     opacity: 1;

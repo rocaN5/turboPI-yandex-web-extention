@@ -97,29 +97,28 @@
         </label>
         <button id="randomBtn">🎲 Случайный размер</button>
     </div>
-<!-- 
+
     <script type="importmap">
         {
             "imports": {
-                "three": "https://unpkg.com/three@0.128.0/build/three.module.js",
-                "three/addons/": "https://unpkg.com/three@0.128.0/examples/jsm/"
+                "three": "./three/three.module.js"
             }
         }
-    </script> -->
+    </script>
 
     <script type="module">
-        import * as THREE from '../libs/three/three.module.js';
-        import { OrbitControls } from '../libs/three/OrbitControls.js';
+        import * as THREE from 'three';
+        import { OrbitControls } from './three/OrbitControls.js';
 
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0xe8e8e8);
 
-        const camera = new THREE.PerspectiveCamera(45, 800/550, 1, 5000);
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 5000);
         camera.position.set(600, 300, 800);
         camera.lookAt(0, 150, 0);
 
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
-        renderer.setSize(800, 550);
+        renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.shadowMap.enabled = false;
         renderer.setClearColor(0xe8e8e8);
@@ -480,6 +479,10 @@
 
         updateAll();
 
+        let frames = 0;
+        let lastTime = performance.now();
+        const fpsSpan = document.getElementById('fpsValue');
+
         // UI
         document.getElementById('sizeX').addEventListener('input', (e) => {
             cubeWidth = +e.target.value;
@@ -516,6 +519,14 @@
             
             updateAll();
         });
+
+        // Обработка изменения размера окна
+        window.addEventListener('resize', onWindowResize, false);
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
 
         function animate() {
             requestAnimationFrame(animate);

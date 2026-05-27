@@ -194,7 +194,7 @@ function initTooltips() {
         const tooltipText = element.getAttribute('tpi-tooltip-data');
         
         // Формируем HTML содержимого
-        tooltipWrapper.innerHTML = `<i>${tpi_tooltip_i_icon}</i><p>${tooltipText}</p><span>@sheva_r6</span>`;
+        tooltipWrapper.innerHTML = `<i>${tpi_tooltip_i_icon}</i><p>${tooltipText}</p>`;
         
         // Позиционируем
         positionTooltipNearMouse();

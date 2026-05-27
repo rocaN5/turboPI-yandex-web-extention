@@ -708,18 +708,35 @@ const tpiBatchGropuHistory_zone_D = `
         </div>
     </div>
 `
-const tpiIcon__chevron_Right = `
+
+const tpi_bgh_i_web_logo_white = `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#ffffff">
+    <path transform="translate(-3, -3) scale(0.025)" d="M349.5 115.7C344.6 103.8 332.9 96 320 96C307.1 96 295.4 103.8 290.5 115.7C197.2 339.7 143.8 467.7 130.5 499.7C123.7 516 131.4 534.7 147.7 541.5C164 548.3 182.7 540.6 189.5 524.3L221.3 448L418.6 448L450.4 524.3C457.2 540.6 475.9 548.3 492.2 541.5C508.5 534.7 516.2 516 509.4 499.7C496.1 467.7 442.7 339.7 349.4 115.7zM392 384L248 384L320 211.2L392 384z" fill="#ffffff"></path>
+    <path transform="translate(10, -3) scale(0.025)" d="M192 96C174.3 96 160 110.3 160 128L160 512C160 529.7 174.3 544 192 544L352 544C422.7 544 480 486.7 480 416C480 369.5 455.2 328.7 418 306.3C436.7 284 448 255.3 448 224C448 153.3 390.7 96 320 96L192 96zM320 288L224 288L224 160L320 160C355.3 160 384 188.7 384 224C384 259.3 355.3 288 320 288zM224 352L352 352C387.3 352 416 380.7 416 416C416 451.3 387.3 480 352 480L224 480L224 352z" fill="#ffffff"></path>
+    <path transform="translate(-3, 10) scale(0.025)" d="M457.1 206.9C394.6 144.4 301.3 144.4 238.8 206.9C176.3 269.4 176.3 370.7 238.8 433.2C301.3 495.7 394.6 495.7 457.1 433.2C469.6 420.7 489.9 420.7 502.4 433.2C514.9 445.7 514.9 466 502.4 478.5C414.9 566 281.1 566 193.6 478.5C106.1 391 106.1 249.2 193.6 161.7C281.1 74.2 414.9 74.2 502.4 161.7C514.9 174.2 514.9 194.5 502.4 207C489.9 219.5 469.6 219.5 457.1 207z" fill="#ffffff"></path>
+    <path transform="translate(11, 10) scale(0.025)" d="M128 128C128 110.3 142.3 96 160 96L288 96C411.7 96 512 196.3 512 320C512 443.7 411.7 544 288 544L160 544C142.3 544 128 529.7 128 512L128 128zM192 160L192 480L288 480C376.4 480 448 408.4 448 320C448 231.6 376.4 160 288 160L192 160z" fill="#ffffff"></path>
+</svg>
+`;
+
+const tpi_bgh_i_web_logo_black = `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#000000">
+    <path transform="translate(-3, -3) scale(0.025)" d="M349.5 115.7C344.6 103.8 332.9 96 320 96C307.1 96 295.4 103.8 290.5 115.7C197.2 339.7 143.8 467.7 130.5 499.7C123.7 516 131.4 534.7 147.7 541.5C164 548.3 182.7 540.6 189.5 524.3L221.3 448L418.6 448L450.4 524.3C457.2 540.6 475.9 548.3 492.2 541.5C508.5 534.7 516.2 516 509.4 499.7C496.1 467.7 442.7 339.7 349.4 115.7zM392 384L248 384L320 211.2L392 384z" fill="#000000"></path>
+    <path transform="translate(10, -3) scale(0.025)" d="M192 96C174.3 96 160 110.3 160 128L160 512C160 529.7 174.3 544 192 544L352 544C422.7 544 480 486.7 480 416C480 369.5 455.2 328.7 418 306.3C436.7 284 448 255.3 448 224C448 153.3 390.7 96 320 96L192 96zM320 288L224 288L224 160L320 160C355.3 160 384 188.7 384 224C384 259.3 355.3 288 320 288zM224 352L352 352C387.3 352 416 380.7 416 416C416 451.3 387.3 480 352 480L224 480L224 352z" fill="#000000"></path>
+    <path transform="translate(-3, 10) scale(0.025)" d="M457.1 206.9C394.6 144.4 301.3 144.4 238.8 206.9C176.3 269.4 176.3 370.7 238.8 433.2C301.3 495.7 394.6 495.7 457.1 433.2C469.6 420.7 489.9 420.7 502.4 433.2C514.9 445.7 514.9 466 502.4 478.5C414.9 566 281.1 566 193.6 478.5C106.1 391 106.1 249.2 193.6 161.7C281.1 74.2 414.9 74.2 502.4 161.7C514.9 174.2 514.9 194.5 502.4 207C489.9 219.5 469.6 219.5 457.1 207z" fill="#000000"></path>
+    <path transform="translate(11, 10) scale(0.025)" d="M128 128C128 110.3 142.3 96 160 96L288 96C411.7 96 512 196.3 512 320C512 443.7 411.7 544 288 544L160 544C142.3 544 128 529.7 128 512L128 128zM192 160L192 480L288 480C376.4 480 448 408.4 448 320C448 231.6 376.4 160 288 160L192 160z" fill="#000000"></path>
+</svg>
+`,
+tpiIcon__chevron_Right = `
     <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 320 512" xmlns="http://www.w3.org/2000/svg">
         <path d="M310.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L242.7 256 73.4 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z"></path>
     </svg>
-`
-const tpiIcon__chevron_Left = `
+`,
+tpiIcon__chevron_Left = `
     <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 320 512" xmlns="http://www.w3.org/2000/svg">
         <path d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z"></path>
     </svg>
-`
-
-const tpiIcon__copy_pi = `
+`,
+tpiIcon__copy_pi = `
 <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M20.6 2.001H7.4a1.402 1.402 0 0 0-1.4 1.4v2.602H3.401a1.401 1.401 0 0 0-1.4 1.4v13.2a1.402 1.402 0 0 0 1.4 1.4h13.2a1.4 1.4 0 0 0 1.4-1.4V18h2.6a1.401 1.401 0 0 0 1.4-1.4V3.4a1.402 1.402 0 0 0-1.4-1.4ZM16 20.003H4v-12h12v12ZM20 16h-1.999V7.402a1.401 1.401 0 0 0-1.4-1.4h-8.6v-2h12v12Z"></path>
     <path d="M9 17.994h2v-3h3v-2h-3v-3H9v3H6v2h3v3Z"></path>
@@ -1109,6 +1126,12 @@ function checkiIs__onGroupHistory() {
         if (document.querySelector('.tpi-bgh--wrapper')) return;
 
         document.title = "История группировок"
+        function forceUpdateFavicon() {
+            changeFaviconToCustomLogo();
+            // Повторная попытка через небольшую задержку
+            setTimeout(() => changeFaviconToCustomLogo(), 100);
+            setTimeout(() => changeFaviconToCustomLogo(), 500);
+        }
 
         const overlay = document.createElement('div');
         overlay.className = 'tpi-bgh--wrapper';
@@ -1249,6 +1272,8 @@ function checkiIs__onGroupHistory() {
                     
                     fifthParent.insertAdjacentElement('afterend', overlay);
                     document.title = "История группировок";
+                    saveOriginalFavicon();
+                    forceUpdateFavicon()
                     // Загружаем данные после вставки блока
                     setTimeout(() => {
                         addTurboListeners();
@@ -1267,6 +1292,8 @@ function checkiIs__onGroupHistory() {
                 const insertionObserver = new MutationObserver(() => {
                     if (tryInsertOverlayBGH()) {
                         document.title = "История группировок";
+                        saveOriginalFavicon();
+                        forceUpdateFavicon()
                         insertionObserver.disconnect();
                     }
                 });
@@ -1306,10 +1333,11 @@ function checkiIs__onGroupHistory() {
 
     if (isGroupHistoryPage(location.href)) {
         addTurboBlock();
-        document.querySelector(".tpi-infi--update-all-groups")
-            ?.addEventListener("click", generateInboundsPDF);
+        document.title = "История группировок";
+        saveOriginalFavicon();
+        forceUpdateFavicon();
+        observeThemeChanges();
         
-        // Инициализируем переключатели графиков после загрузки DOM
         setTimeout(() => {
             initGraphSwitchers();
         }, 100);
@@ -1866,3 +1894,168 @@ function updateBatchMapCellStates() {
     });
 }
 
+function getCurrentTheme() {
+    // Проверяем атрибут на html или body
+    const htmlTheme = document.documentElement.getAttribute('data-theme');
+    if (htmlTheme === 'dark') return 'dark';
+    if (htmlTheme === 'light') return 'light';
+    
+    // Проверяем классы на body
+    if (document.body.classList.contains('dark-theme') || document.body.classList.contains('theme-dark')) return 'dark';
+    if (document.body.classList.contains('light-theme') || document.body.classList.contains('theme-light')) return 'light';
+    
+    // Проверяем медиа-запрос
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return prefersDark ? 'dark' : 'light';
+}
+
+// Функция получения правильной иконки в зависимости от темы
+function getFaviconSvgByTheme() {
+    const theme = getCurrentTheme();
+    return theme === 'dark' ? tpi_bgh_i_web_logo_white : tpi_bgh_i_web_logo_black;
+}
+
+// Основная функция смены favicon
+function changeFaviconToCustomLogo() {
+    const customSvg = getFaviconSvgByTheme();
+    
+    // Кодируем SVG в data URL
+    const encodedSvg = encodeURIComponent(customSvg)
+        .replace(/\(/g, '%28')
+        .replace(/\)/g, '%29')
+        .replace(/'/g, '%27');
+    
+    const svgUrl = `data:image/svg+xml,${encodedSvg}`;
+    
+    // Сохраняем оригинальный URL при первом вызове
+    const existingLinks = document.querySelectorAll("link[rel*='icon']");
+    if (!window.__originalFaviconUrl && existingLinks.length > 0) {
+        const originalLink = Array.from(existingLinks).find(link => 
+            !link.href.includes('data:image') && 
+            !link.href.includes(window.location.origin + '/favicon')
+        );
+        if (originalLink) {
+            window.__originalFaviconUrl = originalLink.href;
+        } else {
+            window.__originalFaviconUrl = '/favicon.ico';
+        }
+    }
+    
+    // Удаляем все существующие favicon
+    existingLinks.forEach(link => link.remove());
+    
+    // Создаем новый favicon
+    const newLink = document.createElement('link');
+    newLink.rel = 'icon';
+    newLink.type = 'image/svg+xml';
+    newLink.href = svgUrl;
+    document.head.appendChild(newLink);
+    
+    // Добавляем fallback
+    const fallbackLink = document.createElement('link');
+    fallbackLink.rel = 'shortcut icon';
+    fallbackLink.href = svgUrl;
+    document.head.appendChild(fallbackLink);
+    
+    window.__customFaviconUrl = svgUrl;
+}
+
+// Функция принудительного обновления с поддержкой темы
+function forceUpdateFavicon() {
+    changeFaviconToCustomLogo();
+    setTimeout(() => changeFaviconToCustomLogo(), 100);
+    setTimeout(() => changeFaviconToCustomLogo(), 500);
+}
+
+// Наблюдатель за изменением темы
+function observeThemeChanges() {
+    // Наблюдаем за атрибутом data-theme на html
+    const themeObserver = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.attributeName === 'data-theme') {
+                forceUpdateFavicon();
+            }
+        });
+    });
+    
+    if (document.documentElement.hasAttribute('data-theme')) {
+        themeObserver.observe(document.documentElement, { attributes: true });
+    }
+    
+    // Наблюдаем за классами на body
+    const bodyObserver = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.attributeName === 'class') {
+                const oldTheme = mutation.oldValue?.includes('dark') ? 'dark' : 'light';
+                const newTheme = getCurrentTheme();
+                if (oldTheme !== newTheme) {
+                    forceUpdateFavicon();
+                }
+            }
+        });
+    });
+    
+    bodyObserver.observe(document.body, { attributes: true, attributeOldValue: true });
+    
+    // Слушаем медиа-запрос
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleThemeChange = (e) => {
+        forceUpdateFavicon();
+    };
+    
+    mediaQuery.addEventListener('change', handleThemeChange);
+    
+    // Сохраняем отключатели
+    window.__themeObservers = { themeObserver, bodyObserver, handleThemeChange, mediaQuery };
+}
+
+// Очистка наблюдателей (при необходимости)
+function cleanupThemeObservers() {
+    if (window.__themeObservers) {
+        window.__themeObservers.themeObserver?.disconnect();
+        window.__themeObservers.bodyObserver?.disconnect();
+        window.__themeObservers.mediaQuery?.removeEventListener('change', window.__themeObservers.handleThemeChange);
+        window.__themeObservers = null;
+    }
+}
+
+// Обновленная функция restoreOriginalFavicon
+function restoreOriginalFavicon() {
+    // Удаляем все кастомные favicon
+    const links = document.querySelectorAll("link[rel*='icon']");
+    links.forEach(link => link.remove());
+    
+    // Восстанавливаем оригинальный
+    if (window.__originalFaviconUrl && window.__originalFaviconUrl !== '/favicon.ico') {
+        const originalLink = document.createElement('link');
+        originalLink.rel = 'icon';
+        originalLink.href = window.__originalFaviconUrl;
+        document.head.appendChild(originalLink);
+    } else {
+        const defaultLink = document.createElement('link');
+        defaultLink.rel = 'icon';
+        defaultLink.type = 'image/x-icon';
+        defaultLink.href = '/favicon.ico';
+        document.head.appendChild(defaultLink);
+    }
+    
+    // Очищаем URL
+    if (window.__customFaviconUrl) {
+        window.__customFaviconUrl = null;
+    }
+    
+    // Останавливаем наблюдатели за темой
+    cleanupThemeObservers();
+}
+
+// Обновленная функция saveOriginalFavicon
+function saveOriginalFavicon() {
+    if (!window.__originalFaviconUrl) {
+        const originalLink = document.querySelector("link[rel*='icon']");
+        if (originalLink && originalLink.href && !originalLink.href.includes('data:image')) {
+            window.__originalFaviconUrl = originalLink.href;
+        } else {
+            window.__originalFaviconUrl = '/favicon.ico';
+        }
+    }
+}

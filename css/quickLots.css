@@ -898,7 +898,6 @@ label.tpi-ql-firebase--search-label:has(input:not(:placeholder-shown)),
     }
 
     td div button:disabled {
-        opacity: 0.6;
         cursor: not-allowed;
     }
 
