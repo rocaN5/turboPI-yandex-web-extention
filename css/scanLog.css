@@ -6,19 +6,21 @@
 
 .diman__scanLog__topTableWrapper,
 .diman__scanLog__bottomTableWrapper{
-    background: #ccc;
+    background: #d3d3d3;
     width: 100%;
     display: flex;
     z-index: 12;
     top: 0;
     left: 0;
     position: sticky;
-    box-shadow: 0px -2px 0px 1px #ccc;
+    box-shadow: 0px -2px 0px 1px #d3d3d3;
+    transform: translateY(1px);
 }
 .diman__scanLog__bottomTableWrapper{
     top: unset;
     bottom: 0;
-    box-shadow: 0px 2px 0px 1px #ccc;
+    box-shadow: 0px 2px 0px 1px #d3d3d3;
+    transform: translateY(-1px);
 }
 
 .diman__scanLog__topTable,
@@ -78,6 +80,9 @@
     overflow: auto;
     --colorSet: #d3d3d3;
     background: var(--colorSet);
+    display: flex;
+    flex-flow: column;
+    gap: 1px;
     &.diman__scanLog__blockMiniRadar{
         outline: unset;
         display: flex;
@@ -139,7 +144,7 @@ table:has(tbody.diman__scanLog__tbody[is-tr-bordered="true"]) thead tr th.diman_
     border-left: 1px solid #fff;
 }
 .diman__scanLog__th__icon{
-    min-width: 45px;
+    min-width: 46px;
     padding: 6px 12px;
     border-top: 1px solid #fff;
     border-left: 1px solid #fff;
@@ -183,8 +188,8 @@ tr:hover .diman__scanLog__td__info{
 }
 
 .diman__scanLog__td__icon{
-    min-width: 45px;
-    max-width: 45px;
+    min-width: 46px;
+    max-width: 46px;
     border-right: 1px solid #fff;
 }
 
@@ -205,7 +210,7 @@ tbody.diman__scanLog__tbody tr:last-child td div.diman__scanLog__td__info{
     text-align: center;
     display: flex;
     padding: 0 !important;
-    box-shadow: #fff 0px 0px 0px 1px, 4px 0px 10px 0px #000;
+    box-shadow: 4px 0px 10px 0px #000;
 }
 
 .diman__scanLog__td__stickySection__time{
@@ -229,6 +234,10 @@ tbody.diman__scanLog__tbody tr:last-child td div.diman__scanLog__td__info{
     font-size: 1.2rem !important;
 }
 
+.diman__scanLog__td__stickySection__info:has(.diman__scanLog__td__icon[is-icons-showed="false"]) .diman__scanLog__td__time{
+    border-right: 1px solid #fff;
+}
+
 /* .diman__scanLog__th__stickySection__other::before{
     content: '';
     display: flex;
@@ -241,6 +250,13 @@ tbody.diman__scanLog__tbody tr:last-child td div.diman__scanLog__td__info{
     left: -1px;
     z-index: -1;
     box-shadow: 0px 0px 0px 1px inset #e5e5e5;
+} */
+
+/* .diman__scanLog__td__stickySection__info .diman__scanLog__td__info{
+    border-left: 0;
+    &:first-child{
+        border-left: 1px solid;
+    }
 } */
 
 .diman__scanLogSettings{
@@ -282,7 +298,7 @@ tbody.diman__scanLog__tbody tr:last-child td div.diman__scanLog__td__info{
 }
 
 .diman__scanLog__activeButton[scanlog="shown"]{
-    background: #c2c2c2;
+    background: #dfdfdf;
 }
 
 .diman__scanLog__activeButton:disabled{
@@ -479,7 +495,7 @@ tr[brakeday="true"]::after{
     position: absolute;
     width: 100%;
     height: 22px;
-    background: #000000;
+    background: #fff;
     left: 0;
     top: -33.5px;
     z-index: 0;

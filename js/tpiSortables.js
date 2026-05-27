@@ -2688,13 +2688,13 @@ function initParentSortableObserver() {
             } else if (resultCell === "Ошибка") {
                 rowAttr += ' dimanOpertaion="error" coloredRow="true"';
                 iconAttr += ' class="diman__scanLog__td__i__icon" diman__tableOpertaionIcon="error"';
-            } else if (operationCell === "Сортировка") {
+            } else if (operationCell === "Сортировка" || operationCell === "sc.display.flow.COLLECT") {
                 rowAttr += ' dimanOpertaion="sort" coloredRow="true"';
                 iconAttr += ' class="diman__scanLog__td__i__icon" diman__tableOpertaionIcon="sort"';
             } else if (operationCell === "Предсортировка посылок" || operationCell === "Предсортировка по группам") {
                 rowAttr += ' dimanOpertaion="predsort" coloredRow="true"';
                 iconAttr += ' class="diman__scanLog__td__i__icon" diman__tableOpertaionIcon="predsort"';
-            } else if (operationCell === "[*] Отгрузка заказов" || operationCell === "Отгрузка на средней миле"|| operationCell === "Отгрузка на последней миле") {
+            } else if (operationCell === "[*] Отгрузка заказов" || operationCell === "Отгрузка на средней миле"|| operationCell === "Отгрузка на последней миле" || operationCell === "sc.display.flow.SC_SHIPMENT") {
                 rowAttr += ' dimanOpertaion="otgruzka" coloredRow="true"';
                 iconAttr += ' class="diman__scanLog__td__i__icon" diman__tableOpertaionIcon="shipped"';
             } else if (operationCell === "[*] Отгрузка возвратов") {
@@ -2784,7 +2784,7 @@ function initParentSortableObserver() {
                 let operationType = '';
                 if (resultCell === "Ошибка") {
                     operationType = "error";
-                } else if (operationCell === "Сортировка") {
+                } else if (operationCell === "Сортировка" || operationCell === "sc.display.flow.COLLECT") {
                     operationType = "sort";
                 } else if (operationCell === "Предсортировка посылок" || operationCell === "Предсортировка по группам") {
                     operationType = "predsort";
@@ -2794,7 +2794,7 @@ function initParentSortableObserver() {
                     operationType = "ready-lot";
                 } else if (operationCell === "[*] Подготовка к отгрузке") {
                     operationType = "ready to shipp";
-                } else if (operationCell === "[*] Отгрузка заказов" || operationCell === "Отгрузка на средней миле" || operationCell === "[*] Отгрузка возвратов") {
+                } else if (operationCell === "[*] Отгрузка заказов" || operationCell === "Отгрузка на средней миле" || operationCell === "[*] Отгрузка возвратов" || operationCell === "sc.display.flow.SC_SHIPMENT") {
                     operationType = "shipped";
                 } else if (operationCell === "Приемка возвратов от курьера") {
                     operationType = "return";
@@ -3022,10 +3022,10 @@ function initParentSortableObserver() {
     }
 
     // ---------- Автозагрузка основной истории ----------
-    async function historyAutoPreload(settingsDiv, button, buttonText) {
+    async function historyAutoPreload(settingsDiv, button, buttonText, force = false) {
         try {
             const option1 = document.querySelector('#dimanHistoryLog-option-1');
-            if (!option1?.checked) return;
+            if (!force && !option1?.checked) return;
             const excelUrl = getHistoryExcelURL();
             if (!excelUrl) throw new Error("URL не найден");
             button.disabled = true;
@@ -3128,7 +3128,7 @@ function initParentSortableObserver() {
         button.addEventListener('click', async () => {
             const state = button.getAttribute('scanLog');
             if (state === 'hidden') {
-                await historyAutoPreload(settingsDiv, button, buttonText);
+                 await historyAutoPreload(settingsDiv, button, buttonText, true);
             } else {
                 const wrapper = document.querySelector('.diman__scanLog__wrapper');
                 if (wrapper) wrapper.remove();
