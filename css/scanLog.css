@@ -120,7 +120,7 @@ table:has(tbody.diman__scanLog__tbody[is-tr-bordered="true"]) thead tr th.diman_
     position: sticky !important;
     top: 0;
     left: 0px;
-    background: #000 !important;
+    background: transparent !important;
     color: #fff;
     z-index: 10 !important;
     font-size: 1.3rem !important;
@@ -129,6 +129,10 @@ table:has(tbody.diman__scanLog__tbody[is-tr-bordered="true"]) thead tr th.diman_
     display: flex;
     min-height: 36px;
     padding: 0 !important;
+
+    .diman__scanLog__th__info{
+        background-color: #000;
+    }
 }
 
 .diman__scanLog__th__date{
@@ -210,7 +214,7 @@ tbody.diman__scanLog__tbody tr:last-child td div.diman__scanLog__td__info{
     text-align: center;
     display: flex;
     padding: 0 !important;
-    box-shadow: 4px 0px 10px 0px #000;
+    /* box-shadow: 4px 0px 10px 0px #000; */
 }
 
 .diman__scanLog__td__stickySection__time{
@@ -383,12 +387,13 @@ tbody.diman__scanLog__tbody tr:last-child td div.diman__scanLog__td__info{
     top: 42px;
     z-index: 10 !important;
     box-shadow: #ffffff 0px 1px 0px 0px, 0px 0px 10px 0px #000;
+    background-color: #ebebeb;
 }
 
 .diman__scanLog__thead__tr__th {
   padding: 6px 12px;
   border: 1px solid #ccc;
-  background: #eee;
+  background: #ebebeb;
   white-space: nowrap;
 }
 
@@ -482,7 +487,7 @@ table *.diman__table__short{
 }
 
 tr[brakeday="true"]{
-    border-top: 23px solid #fff;
+    border-top: 22px solid #fff;
     position: relative;
 }
 
@@ -494,18 +499,18 @@ tr[brakeday="true"]::after{
     display: flex;
     position: absolute;
     width: 100%;
-    height: 22px;
+    height: 24px;
     background: #fff;
     left: 0;
-    top: -33.5px;
+    top: -34px;
     z-index: 0;
-    background-color: #000000;
+    background-color: #fff;
     background: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMjAgNTEyIj48cGF0aCBkPSJNMiAzMzQuNWMtMy44IDguOC0yIDE5IDQuNiAyNmwxMzYgMTQ0YzQuNSA0LjggMTAuOCA3LjUgMTcuNCA3LjVzMTIuOS0yLjcgMTcuNC03LjVsMTM2LTE0NGM2LjYtNyA4LjQtMTcuMiA0LjYtMjZzLTEyLjUtMTQuNS0yMi0xNC41bC03MiAwIDAtMjg4YzAtMTcuNy0xNC4zLTMyLTMyLTMyTDEyOCAwQzExMC4zIDAgOTYgMTQuMyA5NiAzMmwwIDI4OC03MiAwYy05LjYgMC0xOC4yIDUuNy0yMiAxNC41eiIgZmlsbD0iI2ZmZiIvPjwvc3ZnPg==") 0% 50% / 200px 12px repeat-x, repeating-linear-gradient(-45deg, #000, #000 5px, #161616 5px, #161616 10px) 0% 0% / auto repeat #000;
     animation: rarwada infinite 400ms alternate linear;
     background-position: 0% 50%, 0% 0%;
     background-size: 110px 12px, auto;
     background-repeat: repeat-x, repeat;
-    box-shadow: 0px 0px 10px 0px #fff inset;
+    /* box-shadow: 0px 0px 10px 0px #fff inset; */
     border-bottom: 1px solid #fff;
     border-top: 1px solid #fff;
 }
@@ -963,4 +968,16 @@ tr:has(a.diman__tr__miniRadar__loaded){
 
 .diman__scanLog__blockMiniRadar tr[dimanopertaion="error"]{
     background: #220000b8 !important;
+}
+
+tbody.diman__scanLog__tbody tr:has(+ tr[brakeday="true"]) .diman__scanLog__td__date,
+tbody.diman__scanLog__tbody tr:has(+ tr[brakeday="true"]) .diman__scanLog__td__time,
+tbody.diman__scanLog__tbody tr:has(+ tr[brakeday="true"]) .diman__scanLog__td__icon{
+    border-bottom: 1px solid #fff;
+}
+
+.diman__scanLog__th__shadow,
+.diman__scanLog__td__shadow{
+    width: 20px;
+    background-image: linear-gradient(90deg, #000000c9 -30%, #0000 80%);
 }
