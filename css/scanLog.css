@@ -581,6 +581,19 @@ tr[dimanOpertaion="accept-lot"][coloredRow="true"]{
     background: #00f0ff47;
 }
 
+tr[dimanOpertaion="damaged-upload-file"][coloredRow="true"]{
+    background: #17b8ff59;
+}
+tr[dimanOpertaion="damaged-get"][coloredRow="true"]{
+    background: #e34e5959;
+}
+tr[dimanOpertaion="damaged-create"][coloredRow="true"]{
+    background: #7adc1959;
+}
+tr[dimanOpertaion="damaged-predamaged-sort"][coloredRow="true"]{
+    background: #ff970e59;
+}
+
 tr[dimanUser="pi-bot"][coloredRow="true"]{
     color: #fff !important;
     background: #e9e9e957;

@@ -2622,6 +2622,7 @@ function initParentSortableObserver() {
         const zoneIndex = header.findIndex(cell => cell?.toString().trim() === "Зона");
         const resultIndex = header.findIndex(cell => cell?.toString().trim() === "Результат");
         const userIndex = header.findIndex(cell => cell?.toString().trim() === "Кладовщик");
+        const operationTypeIndex = header.findIndex(cell => cell?.toString().trim() === "Операция");
 
         const emptyColumns = new Array(header.length).fill(true);
         for (let colIndex = 0; colIndex < header.length; colIndex++) {
@@ -2678,6 +2679,7 @@ function initParentSortableObserver() {
             const operationCell = operationIndex !== -1 ? row[operationIndex]?.toString().trim() : undefined;
             const userCell = userIndex !== -1 ? row[userIndex]?.toString().trim() : undefined;
             const resultCell = resultIndex !== -1 ? row[resultIndex]?.toString().trim() : undefined;
+            const operationTypeCell = operationTypeIndex !== -1 ? row[operationTypeIndex]?.toString().trim() : undefined;
 
             let rowAttr = '';
             let iconAttr = '';
@@ -2695,7 +2697,7 @@ function initParentSortableObserver() {
             } else if (operationCell === "Предсортировка посылок" || operationCell === "Предсортировка по группам") {
                 rowAttr += ' dimanOpertaion="predsort" coloredRow="true"';
                 iconAttr += ' class="diman__scanLog__td__i__icon" diman__tableOpertaionIcon="predsort"';
-            } else if (operationCell === "[*] Отгрузка заказов" || operationCell === "Отгрузка на средней миле"|| operationCell === "Отгрузка на последней миле" || operationCell === "sc.display.flow.SC_SHIPMENT") {
+            } else if (operationCell === "[*] Отгрузка заказов" || operationCell === "Отгрузка на средней миле"|| operationCell === "Отгрузка на последней миле" || operationCell === "sc.display.flow.SC_SHIPMENT" || operationCell === "Отгрузка возвратов мерчу") {
                 rowAttr += ' dimanOpertaion="otgruzka" coloredRow="true"';
                 iconAttr += ' class="diman__scanLog__td__i__icon" diman__tableOpertaionIcon="shipped"';
             } else if (operationCell === "[*] Отгрузка возвратов") {
@@ -2724,7 +2726,25 @@ function initParentSortableObserver() {
             } else if (operationCell === "[*] Подготовка лотов") {
                 rowAttr += ' dimanOpertaion="ready-lot" coloredRow="true"';
                 iconAttr += ' class="diman__scanLog__td__i__icon" diman__tableOpertaionIcon="ready-lot"';
-            } else {
+            } else if (operationCell === "sc.display.flow.PRE_DAMAGED_SORT") {
+                rowAttr += ' dimanOpertaion="damaged-predamaged-sort" coloredRow="true"';
+                iconAttr += ' class="diman__scanLog__td__i__icon" diman__tableOpertaionIcon="damaged-predamaged-sort"';
+            } else if (operationCell === "sc.display.flow.DAMAGED_FORM") {
+                if (operationTypeCell === "sc.display.operation.GET") {
+                    rowAttr += ' dimanOpertaion="damaged-get" coloredRow="true"';
+                    iconAttr += ' class="diman__scanLog__td__i__icon" diman__tableOpertaionIcon="damaged-get"';
+                } else if (operationTypeCell === "sc.display.operation.UPLOAD_FILE") {
+                    rowAttr += ' dimanOpertaion="damaged-upload-file" coloredRow="true"';
+                    iconAttr += ' class="diman__scanLog__td__i__icon" diman__tableOpertaionIcon="damaged-upload-file"';
+                } else if (operationTypeCell === "sc.display.operation.CREATE") {
+                    rowAttr += ' dimanOpertaion="damaged-create" coloredRow="true"';
+                    iconAttr += ' class="diman__scanLog__td__i__icon" diman__tableOpertaionIcon="damaged-create"';
+                } else {
+                    rowAttr += ' dimanOpertaion="damaged-unknown" coloredRow="true"';
+                    iconAttr += ' class="diman__scanLog__td__i__icon" diman__tableOpertaionIcon="damaged-unknown"';
+                }
+            }
+             else {
                 rowAttr += ' dimanOpertaion="unknown-operation" coloredRow="true"';
                 iconAttr += ' class="diman__scanLog__td__i__icon" diman__tableOpertaionIcon="unknown-operation"';
             }
@@ -2758,7 +2778,7 @@ function initParentSortableObserver() {
 
     function getOperationStatistics(data) {
         const operationCounts = {};
-        const operationPriority = ["sort", "predsort", "error", "infoscan", "ready-lot", "ready to shipp", "return", "inventoryzation", "accept-lot", "moved-lot", "shipped", "robot-shipped"];
+        const operationPriority = ["sort", "predsort", "error", "infoscan", "ready-lot", "ready to shipp", "return", "inventoryzation", "accept-lot", "moved-lot", "shipped", "robot-shipped", "damaged-get", "damaged-upload-file", "damaged-create"];
         const tooltipMap = {
             "sort": "Сортировка",
             "predsort": "Предсортировка",
@@ -2771,7 +2791,10 @@ function initParentSortableObserver() {
             "accept-lot": "Приемка лотов",
             "moved-lot": "Перемещение лотов",
             "shipped": "Отгрузка",
-            "robot-shipped": "Отгрузка, робот"
+            "robot-shipped": "Отгрузка, робот",
+            "damaged-get": "Оформление брака (получение)",
+            "damaged-upload-file": "Оформление брака (загрузка файла)",
+            "damaged-create": "Оформление брака (создание)"
         };
         if (data && data.length > 1) {
             const header = data[0];
@@ -2779,6 +2802,7 @@ function initParentSortableObserver() {
             const operationIndex = header.findIndex(cell => cell?.toString().trim() === "Флоу");
             const resultIndex = header.findIndex(cell => cell?.toString().trim() === "Результат");
             const userIndex = header.findIndex(cell => cell?.toString().trim() === "Кладовщик");
+            const operationTypeIndex = header.findIndex(cell => cell?.toString().trim() === "Операция");
             rows.forEach(row => {
                 const operationCell = operationIndex !== -1 ? row[operationIndex]?.toString().trim() : undefined;
                 const resultCell = resultIndex !== -1 ? row[resultIndex]?.toString().trim() : undefined;
