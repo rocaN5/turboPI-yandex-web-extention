@@ -7139,9 +7139,14 @@ function updateRowData(row, freshData, rowIndex) {
         freshData.cell.trim() !== '' && 
         cellElement.textContent.trim() !== freshData.cell) {
         
-        cellElement.textContent = freshData.cell;
-        updated = true;
-        console.log(`🔄 Обновлена ячейка для курьера ${courierId}: ${cellElement.textContent} -> ${freshData.cell}`);
+        // Проверяем, доступна ли текущая дата для редактирования
+        if (canShowPrintButton()) {
+            cellElement.textContent = freshData.cell;
+            updated = true;
+            console.log(`🔄 Обновлена ячейка для курьера ${courierId}: ${cellElement.textContent} -> ${freshData.cell}`);
+        } else {
+            console.log(`⏸️ Пропущено обновление ячейки для даты, недоступной для редактирования`);
+        }
     }
     
     // 5. Сохраняем флаг обновления и данные ТОЛЬКО если были изменения
@@ -9997,6 +10002,40 @@ async function getSingleCourierDataFromAPI(selectedDate, courierId) {
     }
 }
 
+function tpi_makeFavIcon_cartControl() {
+    const favSvg = `
+        <svg stroke="currentColor" fill="#fff" stroke-width="0" viewBox="0 0 576 512" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0 24C0 10.7 10.7 0 24 0L69.5 0c22 0 41.5 12.8 50.6 32l411 0c26.3 0 45.5 25 38.6 50.4l-41 152.3c-8.5 31.4-37 53.3-69.5 53.3l-288.5 0 5.4 28.5c2.2 11.3 12.1 19.5 23.6 19.5L488 336c13.3 0 24 10.7 24 24s-10.7 24-24 24l-288.3 0c-34.6 0-64.3-24.6-70.7-58.5L77.4 54.5c-.7-3.8-4-6.5-7.9-6.5L24 48C10.7 48 0 37.3 0 24zM128 464a48 48 0 1 1 96 0 48 48 0 1 1 -96 0zm336-48a48 48 0 1 1 0 96 48 48 0 1 1 0-96zM252 160c0 11 9 20 20 20l44 0 0 44c0 11 9 20 20 20s20-9 20-20l0-44 44 0c11 0 20-9 20-20s-9-20-20-20l-44 0 0-44c0-11-9-20-20-20s-20 9-20 20l0 44-44 0c-11 0-20 9-20 20z"></path>
+        </svg>
+    `;
+
+    function setFavicon(color) {
+        let link = document.querySelector("link[rel='icon']");
+        if (!link) {
+            link = document.createElement('link');
+            link.rel = 'icon';
+            document.head.appendChild(link);
+        }
+        link.href = 'data:image/svg+xml,' + encodeURIComponent(favSvg.replace('currentColor', color));
+    }
+
+    function updateTheme() {
+        const isDark = document.documentElement.classList.contains('dark') ||
+                       window.matchMedia('(prefers-color-scheme: dark)').matches;
+        setFavicon(isDark ? '#ffffff' : '#212121');
+    }
+
+    updateTheme();
+    new MutationObserver(updateTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateTheme);
+}
+
+///////////////////////////////////////////////
+///////////////////////////////////////////////
+///////////////////////////////////////////////
+///////////////////////////////////////////////
+///////////////////////////////////////////////
+
 function addCartsControlsListeners(){
     waitForTokenAndRun();
     initTooltips();
@@ -10005,4 +10044,6 @@ function addCartsControlsListeners(){
     initializeDatePicker();
     initializeCourierStatusDropdown()
     hideAllUI();
+    tpi_makeFavIcon_cartControl()
 }
+

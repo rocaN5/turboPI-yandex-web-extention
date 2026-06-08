@@ -583,12 +583,29 @@ tr[dimanOpertaion="accept-lot"][coloredRow="true"]{
 
 tr[dimanOpertaion="damaged-upload-file"][coloredRow="true"]{
     background: #17b8ff59;
+    /* --gr-c-1: #aee6ff;
+    --gr-c-2: #7cd3f8;
+    background: repeating-linear-gradient(-45deg,
+    var(--gr-c-1) 0px,
+    var(--gr-c-1) 13px,
+    var(--gr-c-2) 0px,
+    var(--gr-c-2) 25px); */
 }
 tr[dimanOpertaion="damaged-get"][coloredRow="true"]{
-    background: #e34e5959;
+    background: #d69eff59;
+    /* --gr-c-1: #d69eff59;
+    --gr-c-2: #ddbbf4;
+    background: repeating-linear-gradient(-45deg,
+    var(--gr-c-1) 0px,
+    var(--gr-c-1) 13px,
+    var(--gr-c-2) 0px,
+    var(--gr-c-2) 25px); */
 }
 tr[dimanOpertaion="damaged-create"][coloredRow="true"]{
     background: #7adc1959;
+}
+tr[dimanOpertaion="damaged-unmark"][coloredRow="true"]{
+    background: #ec031159;
 }
 tr[dimanOpertaion="damaged-predamaged-sort"][coloredRow="true"]{
     background: #ff970e59;
@@ -725,13 +742,14 @@ input.diman__scanLog__checkBox__input{
     padding: 5px;
     overflow: hidden;
     position: relative;
+    width: 100%;
 }
 
 .diman__scanLogSettings__options__container__scrollbar{
     overflow: hidden;
     position: relative;
     scroll-behavior: smooth;
-    scroll-snap-type: x mandatory;
+    /* scroll-snap-type: x mandatory; */
     padding: 4px;
     width: calc(100% - 80px);
     left: 40px;

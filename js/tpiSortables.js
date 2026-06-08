@@ -280,6 +280,11 @@ tpi_sort_icon_histry_option_stats = `
     <path d="M899.4 638.2h-27.198c-2.2-.6-4.2-1.6-6.4-2-57.2-8.8-102.4-56.4-106.2-112.199-4.401-62.4 31.199-115.2 89.199-132.4 7.6-2.2 15.6-3.8 23.399-5.8h27.2c1.8.6 3.4 1.6 5.4 1.8 52.8 8.6 93 46.6 104.4 98.6.8 4 2 8 3 12v27.2c-.6 1.8-1.6 3.6-1.8 5.4-8.4 52-45.4 91.599-96.801 103.6-5 1.2-9.6 2.6-14.2 3.8zM130.603 385.8l27.202.001c2.2.6 4.2 1.6 6.4 1.8 57.6 9 102.6 56.8 106.2 113.2 4 62.2-32 114.8-90.2 131.8-7.401 2.2-15 3.8-22.401 5.6h-27.2c-1.8-.6-3.4-1.6-5.2-2-52-9.6-86-39.8-102.2-90.2-2.2-6.6-3.4-13.6-5.2-20.4v-27.2c.6-1.8 1.6-3.6 1.8-5.4 8.6-52.2 45.4-91.6 96.8-103.6 4.8-1.201 9.4-2.401 13.999-3.601zm370.801.001h27.2c2.2.6 4.2 1.6 6.4 2 57.4 9 103.6 58.6 106 114.6 2.8 63-35.2 116.4-93.8 131.4-6.2 1.6-12.4 3-18.6 4.4h-27.2c-2.2-.6-4.2-1.6-6.4-2-57.4-8.8-103.601-58.6-106.2-114.6-3-63 35.2-116.4 93.8-131.4 6.4-1.6 12.6-3 18.8-4.4z"></path>
 </svg>
 `,
+tpi_sort_icon_histry_option_flow_name_fix = `
+<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+    <path d="m478.33 433.6-90-218a22 22 0 0 0-40.67 0l-90 218a22 22 0 1 0 40.67 16.79L316.66 406h102.67l18.33 44.39A22 22 0 0 0 458 464a22 22 0 0 0 20.32-30.4zM334.83 362 368 281.65 401.17 362zm-66.99-19.08a22 22 0 0 0-4.89-30.7c-.2-.15-15-11.13-36.49-34.73 39.65-53.68 62.11-114.75 71.27-143.49H330a22 22 0 0 0 0-44H214V70a22 22 0 0 0-44 0v20H54a22 22 0 0 0 0 44h197.25c-9.52 26.95-27.05 69.5-53.79 108.36-31.41-41.68-43.08-68.65-43.17-68.87a22 22 0 0 0-40.58 17c.58 1.38 14.55 34.23 52.86 83.93.92 1.19 1.83 2.35 2.74 3.51-39.24 44.35-77.74 71.86-93.85 80.74a22 22 0 1 0 21.07 38.63c2.16-1.18 48.6-26.89 101.63-85.59 22.52 24.08 38 35.44 38.93 36.1a22 22 0 0 0 30.75-4.9z"></path>
+</svg>
+`,
 tpi_sort_icon_histry_option_unknown = `
 <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
     <path d="M5 5a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2z"></path>
@@ -1872,7 +1877,8 @@ function initHistoryStatusObserver() {
             // Запускаем оба запроса параллельно
             await Promise.all([
                 updateHistoryWithUserNames(),
-                updateCourierNamesInHistory()
+                updateCourierNamesInHistory(),
+                replaceSortingCenterNames()
             ]);
             usersProcessed = true;
         }
@@ -2279,15 +2285,13 @@ async function updateCourierNamesInHistory() {
         return;
     }
     
-    // Функция для поиска и установки лоадеров (аналогично пользователям)
+    // Функция для поиска и установки лоадеров
     const findAndSetCourierLoaders = () => {
         const courierCells = historyTable.querySelectorAll(`tbody tr td:nth-child(${courierColumnIndex + 1})`);
         let hasNewLoaders = false;
         
         courierCells.forEach(courierCell => {
-            // Проверяем наличие иконки глаза в ячейке
             const eyeIcon = courierCell.querySelector('svg[aria-label="icon-eye"]');
-            // Также проверяем, что ячейка не пустая и не содержит уже загруженные данные
             const hasLoader = courierCell.querySelector('.tpi-sort-courier-link-loader');
             const hasContent = courierCell.querySelector('.tpi-sort-courier-data-wrapper');
             
@@ -2299,7 +2303,7 @@ async function updateCourierNamesInHistory() {
         return hasNewLoaders;
     };
     
-    // Ждем появления глаз и устанавливаем лоадеры (до 15 секунд)
+    // Ждем появления глаз и устанавливаем лоадеры
     let loadersSet = false;
     for (let i = 0; i < 75; i++) {
         const result = findAndSetCourierLoaders();
@@ -2308,10 +2312,6 @@ async function updateCourierNamesInHistory() {
             break;
         }
         await new Promise(r => setTimeout(r, 200));
-    }
-    
-    if (!loadersSet) {
-        // Не возвращаемся, а продолжаем - возможно данные уже загружены
     }
     
     // Получаем данные истории через API
@@ -2339,10 +2339,6 @@ async function updateCourierNamesInHistory() {
         }
     });
     
-    if (encryptedIds.length === 0) {
-        return;
-    }
-    
     // Получаем токен
     let token = null;
     if (typeof window.tpiUserTOKEN !== 'undefined' && window.tpiUserTOKEN) {
@@ -2363,7 +2359,7 @@ async function updateCourierNamesInHistory() {
     // Получаем имена курьеров
     const courierNames = await fetchCourierNames(encryptedIds, scId, token);
     
-    // Обновляем ячейки
+    // Обновляем ячейки с именами курьеров
     const rows = historyTable.querySelectorAll('tbody tr');
     let updatedCount = 0;
     
@@ -2388,7 +2384,82 @@ async function updateCourierNamesInHistory() {
             }
         }
     });
+}
+
+async function replaceSortingCenterNames() {
+    let historyTable = document.querySelector('.tpi-sort-history-status-table');
+    if (!historyTable) {
+        for (let i = 0; i < 30; i++) {
+            await new Promise(r => setTimeout(r, 200));
+            historyTable = document.querySelector('.tpi-sort-history-status-table');
+            if (historyTable) break;
+        }
+    }
+    if (!historyTable) return;
     
+    let courierColumnIndex = -1;
+    const headers = historyTable.querySelectorAll('thead th');
+    for (let idx = 0; idx < headers.length; idx++) {
+        const th = headers[idx];
+        const titleSpan = th.querySelector('span[data-i18n-key="pages.sortable-item:events-table.titles.courier"]');
+        if (titleSpan || th.innerText.includes('Курьер')) {
+            courierColumnIndex = idx;
+            break;
+        }
+    }
+    
+    if (courierColumnIndex === -1) return;
+    
+    const cityMapping = [
+        { keywords: ['Тарный'], id: 'tarn' },
+        { keywords: ['Царицыно'], id: 'tarn' },
+        { keywords: ['Липецк'], id: 'lipetsk' },
+        { keywords: ['Белгород'], id: 'belgorod' },
+        { keywords: ['Курск'], id: 'kursk' },
+        { keywords: ['Грибки'], id: 'gribki' },
+        { keywords: ['Ростов'], id: 'rostov' },
+    ];
+    
+    const allCourierCells = historyTable.querySelectorAll(`tbody tr td:nth-child(${courierColumnIndex + 1})`);
+    
+    allCourierCells.forEach(cell => {
+        if (cell.querySelector('.tpi-sort-courier-data-wrapper')) return;
+        if (cell.hasAttribute('tpi-sort-city-id')) return;
+        
+        let originalText = '';
+        const innerDiv = cell.querySelector('.mez-inline-flex.mez-flex-col');
+        if (innerDiv) {
+            originalText = innerDiv.textContent.trim();
+        } else {
+            originalText = cell.textContent.trim();
+        }
+        
+        if (!originalText) return;
+        
+        let cityId = null;
+        for (const map of cityMapping) {
+            if (map.keywords.some(kw => originalText.includes(kw))) {
+                cityId = map.id;
+                break;
+            }
+        }
+        
+        if (cityId) {
+            const safeText = originalText.replace(/[&<>]/g, m => {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+            cell.innerHTML = `
+                <div class="tpi-sort-table-sc-wrapper">
+                    <icon class="tpi-sort-table-sc-icon" tpi-sort-city-id="${cityId}"></icon>
+                    <p class="tpi-sort-table-sc-text" tpi-tooltip-data="${safeText}">${safeText}</p>
+                </div>
+            `;
+            console.log(`tpi: Заменён СЦ "${originalText}" → ${cityId}`);
+        }
+    });
 }
 
 //D-
@@ -2562,6 +2633,48 @@ function initParentSortableObserver() {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 (function() {
+    
+    const FLOW_NAME_FIXES = {
+        // DAMAGED_FORM (Оформление брака)
+        'sc.display.flow.DAMAGED_FORM': {
+            'sc.display.operation.GET': 'Фиксация брака',
+            'sc.display.operation.UPLOAD_FILE': 'Загрузка файла',
+            'sc.display.operation.CREATE': 'Создание брака',
+            'sc.display.operation.UNMARK': 'Снятие брака',
+            'default': 'оформление брака'
+        },
+        'sc.display.flow.SC_SHIPMENT': {
+            'Отгрузка грузоместа': 'Отгрузка грузоместа',
+            'default': 'Отгрузка'
+        },
+        'sc.display.flow.PRE_DAMAGED_SORT': {
+            'sc.display.operation.PRESORT_ON_SORT': 'Отмечен предбраком (ТСД)',
+            'Сортировка': 'Сортировка',
+            'default': 'Отгрузка'
+        },
+    };
+    
+
+    // Вспомогательная функция для экранирования HTML
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    
+    // Функция для получения фикса
+    function getFixedFlowName(flowValue, operationValue) {
+        const fixes = FLOW_NAME_FIXES[flowValue];
+        if (!fixes) return null;
+        
+        return fixes[operationValue] || fixes['default'] || null;
+    }
+
     // ---------- Вспомогательные функции ----------
     function getHistoryExcelURL() {
         const path = location.pathname;
@@ -2665,7 +2778,7 @@ function initParentSortableObserver() {
                 html += `<th class="diman__scanLog__thead__tr__th diman__scanLog__th__stickySection__other"${hiddenAttr}>${cell !== undefined ? cell : ''}</th>`;
             }
         }
-        html += `<tr></thead><tbody class="diman__scanLog__tbody" is-background-showed="true" is-tr-bordered="true">`;
+        html += `<tr></thead><tbody class="diman__scanLog__tbody" is-background-showed="true" is-tr-bordered="true" is-flow-name-fix="true">`;
 
         let lastDate = null;
         for (const row of rows) {
@@ -2694,7 +2807,7 @@ function initParentSortableObserver() {
             } else if (operationCell === "Сортировка" || operationCell === "sc.display.flow.COLLECT") {
                 rowAttr += ' dimanOpertaion="sort" coloredRow="true"';
                 iconAttr += ' class="diman__scanLog__td__i__icon" diman__tableOpertaionIcon="sort"';
-            } else if (operationCell === "Предсортировка посылок" || operationCell === "Предсортировка по группам") {
+            } else if (operationCell === "Предсортировка посылок" || operationCell === "Предсортировка по группам" || operationCell === "sc.display.flow.INITIAL_RETURN_ACCEPTANCE") {
                 rowAttr += ' dimanOpertaion="predsort" coloredRow="true"';
                 iconAttr += ' class="diman__scanLog__td__i__icon" diman__tableOpertaionIcon="predsort"';
             } else if (operationCell === "[*] Отгрузка заказов" || operationCell === "Отгрузка на средней миле"|| operationCell === "Отгрузка на последней миле" || operationCell === "sc.display.flow.SC_SHIPMENT" || operationCell === "Отгрузка возвратов мерчу") {
@@ -2739,6 +2852,9 @@ function initParentSortableObserver() {
                 } else if (operationTypeCell === "sc.display.operation.CREATE") {
                     rowAttr += ' dimanOpertaion="damaged-create" coloredRow="true"';
                     iconAttr += ' class="diman__scanLog__td__i__icon" diman__tableOpertaionIcon="damaged-create"';
+                } else if (operationTypeCell === "sc.display.operation.UNMARK") {
+                    rowAttr += ' dimanOpertaion="damaged-unmark" coloredRow="true"';
+                    iconAttr += ' class="diman__scanLog__td__i__icon" diman__tableOpertaionIcon="damaged-unmark"';
                 } else {
                     rowAttr += ' dimanOpertaion="damaged-unknown" coloredRow="true"';
                     iconAttr += ' class="diman__scanLog__td__i__icon" diman__tableOpertaionIcon="damaged-unknown"';
@@ -2758,9 +2874,30 @@ function initParentSortableObserver() {
                     <div class="diman__scanLog__td__info diman__scanLog__td__icon" is-icons-showed="true"><i${iconAttr}>i</i></div>
                     </div><div class="diman__scanLog__td__shadow"></div>
                 </td>`;
-            if (operationIndex !== -1) html += `<td class="diman__scanLog__tbody__td">${operationCell !== undefined ? operationCell : ''}</td>`;
+            if (operationIndex !== -1) {
+                const operationTypeCell = operationTypeIndex !== -1 ? row[operationTypeIndex]?.toString().trim() : undefined;
+                
+                if (operationCell) {
+                    const fixedText = getFixedFlowName(operationCell, operationTypeCell);
+                    if (fixedText) {
+                        html += `<td class="diman__scanLog__tbody__td tpi-sort-tbody-flow-name-fix">
+                            <div class="tpi-sort-tbody-flow-name-fix-container">
+                                <div class="tpi-sort-tbody-flow-name-fix-wrapper" tpi-sort-name-fix="default">${escapeHtml(operationCell)}</div>
+                                <div class="tpi-sort-tbody-flow-name-fix-wrapper" tpi-sort-name-fix="fixed" tpi-tooltip-data="Текст был адаптирован, не оригинальное название флоу !">
+                                    ${escapeHtml(fixedText)} 
+                                    <icon class="tpi-sort-tbody-flow-name-fix-icon">${tpi_sort_icon_histry_option_flow_name_fix}</icon>
+                                </div>
+                            </div>
+                        </td>`;
+                    } else {
+                        html += `<td class="diman__scanLog__tbody__td">${operationCell !== undefined ? escapeHtml(operationCell) : ''}</td>`;
+                    }
+                } else {
+                    html += `<td class="diman__scanLog__tbody__td">${operationCell !== undefined ? escapeHtml(operationCell) : ''}</td>`;
+                }
+            }
             if (userIndex !== -1) html += `<td class="diman__scanLog__tbody__td diman__table__short">${userCell !== undefined ? userCell : ''}</td>`;
-            if (zoneIndex !== -1) html += `<td class="diman__scanLog__tbody__td diman__table__short">${row[zoneIndex] !== undefined ? row[zoneIndex] : ''}</td>`;
+            if (zoneIndex !== -1) html += `<td class="diman__scanLog__tbody__td diman__table__short" ${row[zoneIndex] !== undefined ? `tpi-tooltip-data="${row[zoneIndex]}"` : ''}>${row[zoneIndex] !== undefined ? row[zoneIndex] : ''}</td>`;
             for (let colIndex = 0; colIndex < header.length; colIndex++) {
                 if (![datetimeIndex, operationIndex, userIndex, zoneIndex].includes(colIndex)) {
                     const cell = row[colIndex];
@@ -2812,7 +2949,7 @@ function initParentSortableObserver() {
                     operationType = "error";
                 } else if (operationCell === "Сортировка" || operationCell === "sc.display.flow.COLLECT") {
                     operationType = "sort";
-                } else if (operationCell === "Предсортировка посылок" || operationCell === "Предсортировка по группам") {
+                } else if (operationCell === "Предсортировка посылок" || operationCell === "Предсортировка по группам" || operationCell === "sc.display.flow.INITIAL_RETURN_ACCEPTANCE") {
                     operationType = "predsort";
                 } else if (operationCell === "Инфоскан") {
                     operationType = "infoscan";
@@ -2857,6 +2994,8 @@ function initParentSortableObserver() {
         const option6 = document.querySelector('#dimanHistoryLog-option-6');
         const option7 = document.querySelector('#dimanHistoryLog-option-7');
         const option9 = document.querySelector('#dimanHistoryLog-option-9');
+        const option10 = document.querySelector('#dimanHistoryLog-option-10');
+        const option11 = document.querySelector('#dimanHistoryLog-option-11');
         if (option2) {
             const setColorScheme = () => {
                 const coloredRow = document.querySelectorAll('tr[coloredrow]');
@@ -2918,6 +3057,22 @@ function initParentSortableObserver() {
             };
             scrollToTable();
             option9.addEventListener("change", () => { if (option9.checked) scrollToTable(); });
+        }
+        if (option10) {
+            const showTableStats = () => {
+                const tableWrapper = document.querySelectorAll('.diman__scanLog__wrapper');
+                tableWrapper.forEach(elem => elem.setAttribute('is-stats-visible', option10.checked));
+            };
+            showTableStats();
+            option10.addEventListener("change", showTableStats);
+        }
+        if (option11) {
+            const setFlowNameFix = () => {
+                const table = document.querySelectorAll('tbody[is-flow-name-fix]');
+                table.forEach(elem => elem.setAttribute('is-flow-name-fix', option11.checked));
+            };
+            setFlowNameFix();
+            option11.addEventListener("change", setFlowNameFix);
         }
     }
 
@@ -3066,6 +3221,12 @@ function initParentSortableObserver() {
             const html = generateTableHTML(data);
             const wrapperDiv = document.createElement('div');
             wrapperDiv.className = 'diman__scanLog__wrapper';
+            const isStatsEnabled = (() => {
+                const saved = localStorage.getItem('dimanHistoryLog-option-10');
+                if (saved !== null) return saved === "true";
+                return true;
+            })();
+            wrapperDiv.setAttribute('is-stats-visible', isStatsEnabled);
             wrapperDiv.innerHTML = html;
             settingsDiv.insertAdjacentElement('afterend', wrapperDiv);
             button.setAttribute('scanLog', 'shown');
@@ -3125,30 +3286,53 @@ function initParentSortableObserver() {
         // 5. Создаём панель с чекбоксами
         const options = document.createElement('div');
         options.className = 'diman__scanLogSettings__options';
-        options.innerHTML = `<div class="diman__scanLogSettings__options__container"><div class="diman__scanLogSettings__options__description">Настройки применяются ко всем грузоместам</div></div><div class="diman__scanLogSettings__options__container diman__scanLogSettings__options__container__scrollbar" id="dimanHistoryLog-checkboxes-container"></div>`;
+        options.innerHTML = `
+            <div class="diman__scanLogSettings__options__container tpi-sort-table-option-title">
+                <div class="diman__scanLogSettings__options__description">Настройки применяются ко всем грузоместам</div>
+                <div class="tpi-sort-table-option-enabled-count">Включено: <span></span></div>
+            </div>
+            <div class="diman__scanLogSettings__options__container diman__scanLogSettings__options__container__scrollbar" id="dimanHistoryLog-checkboxes-container"></div>
+        `;
         settingsDiv.appendChild(options);
         const checkboxesContainer = options.querySelector('#dimanHistoryLog-checkboxes-container');
         const checkboxConfigs = [
-            { id: "dimanHistoryLog-option-1", label: "Автозагрузка истории", defaultChecked: false },
-            { id: "dimanHistoryLog-option-2", label: "Подсветка операций", defaultChecked: true },
-            { id: "dimanHistoryLog-option-3", label: "Разделение дней", defaultChecked: true },
-            { id: "dimanHistoryLog-option-4", label: "Иконки манипуляций", defaultChecked: true },
-            { id: "dimanHistoryLog-option-5", label: "Задний фон таблицы", defaultChecked: true },
-            { id: "dimanHistoryLog-option-6", label: "Сетка таблицы", defaultChecked: true },
-            { id: "dimanHistoryLog-option-7", label: "Скрывать пустые столбцы", defaultChecked: false },
-            { id: "dimanHistoryLog-option-8", label: "Сканлог лотов", defaultChecked: false },
-            { id: "dimanHistoryLog-option-9", label: "Автоскролл к истории", defaultChecked: false },
-            { id: "dimanHistoryLog-option-10", label: "Статистика операций", defaultChecked: true }
+            { id: "dimanHistoryLog-option-1", label: "Автозагрузка", defaultChecked: false, tooltip: 'Автоматическая загрузка сканлог лотов при обновлении страницы' },
+            { id: "dimanHistoryLog-option-2", label: "Подсветка", defaultChecked: true, tooltip: 'Подсветка строк таблицы, цветом манипуляции' },
+            { id: "dimanHistoryLog-option-3", label: "Разделение дней", defaultChecked: true, tooltip: 'Разделение строк по дням, групируя их в отдельные чанки' },
+            { id: "dimanHistoryLog-option-4", label: "Иконки", defaultChecked: true, tooltip: 'Добавление дополнительных иконок манипуляций' },
+            { id: "dimanHistoryLog-option-5", label: "Задний фон", defaultChecked: true, tooltip: 'Задний фон таблицы в виде диагональных полос' },
+            { id: "dimanHistoryLog-option-6", label: "Сетка", defaultChecked: true, tooltip: 'Дополнительная вертикальная сетка для разграничения столбцов таблицы' },
+            { id: "dimanHistoryLog-option-7", label: "Скрывать пустые столбцы", defaultChecked: false, tooltip: 'Скрытие пустых столбцов в таблице' },
+            { id: "dimanHistoryLog-option-8", label: "Сканлог лотов", defaultChecked: false, tooltip: 'Загрузка сканлогов всех лотово, в которых было вложено грузоместо (вместе с основным сканлогом гм)' },
+            { id: "dimanHistoryLog-option-9", label: "Автоскролл", defaultChecked: false, tooltip: 'Автоматическая прокрутка страницу вниз до таблицы, при загрузке скнлога грузоместа' },
+            { id: "dimanHistoryLog-option-10", label: "Статистика", defaultChecked: true, tooltip: 'Добавлять иконки статистики внизу таблицы, отображающих общее количество манипуляций' },
+            { id: "dimanHistoryLog-option-11", label: "Исправить флоу", defaultChecked: true, tooltip: 'Замена системных наименований флоу на адаптированный аналог' }
         ];
-        checkboxConfigs.forEach(({ id, label, defaultChecked }) => {
+        checkboxConfigs.forEach(({ id, label, defaultChecked, tooltip }) => {
             const saved = localStorage.getItem(id);
             const isChecked = saved !== null ? saved === "true" : defaultChecked;
             const wrapper = document.createElement('label');
             wrapper.className = 'diman__scanLog__checkBox__container';
+            wrapper.setAttribute('tpi-tooltip-data', tooltip)
             wrapper.innerHTML = `<input type="checkbox" class="diman__scanLog__checkBox__input" id="${id}" ${isChecked ? "checked" : ""}><div class="diman__scanLog__checkBox__pin"></div><div class="diman__scanLog__checkBox__text">${label}</div><icon class="tpi-sort-scanlog-option-icon">${historyLogIcon(id)}</icon>`;
             checkboxesContainer.appendChild(wrapper);
             wrapper.querySelector('input').addEventListener('change', (e) => localStorage.setItem(id, e.target.checked));
         });
+        checkboxesContainer.addEventListener('click', countAllOptionsForMe)
+        function countAllOptionsForMe(){
+            const tpi_all_options = document.querySelectorAll('label.diman__scanLog__checkBox__container input.diman__scanLog__checkBox__input')
+            console.log(tpi_all_options)
+            let tpi_all_enabled_options = 0,
+                tpi_all_avalible_options = 0
+            tpi_all_options.forEach(option => {
+                if(option.checked){
+                    tpi_all_enabled_options++
+                }
+                tpi_all_avalible_options++
+            });
+            document.querySelector('.tpi-sort-table-option-enabled-count span').innerHTML = `${tpi_all_enabled_options} из ${tpi_all_avalible_options}`
+        }
+        countAllOptionsForMe()
 
         // 6. Обработчик клика по кнопке
         button.addEventListener('click', async () => {
@@ -3199,6 +3383,8 @@ function initParentSortableObserver() {
                 return tpi_sort_icon_histry_option_autoscroll
             } else if(id == 'dimanHistoryLog-option-10'){
                 return tpi_sort_icon_histry_option_stats
+            } else if(id == 'dimanHistoryLog-option-11'){
+                return tpi_sort_icon_histry_option_flow_name_fix
             } else{
                 return tpi_sort_icon_histry_option_unknown
             }
@@ -3235,6 +3421,91 @@ function initParentSortableObserver() {
     startWatching();
 })();
 
+
+
+
+// Функция для преобразования ячейки с флоу в формат с фиксом
+function applyFlowNameFixToCell(td, flowValue, operationValue, isFixEnabled) {
+    if (!isFixEnabled) {
+        // Если фикс выключен - показываем обычный текст
+        td.innerHTML = flowValue !== undefined ? flowValue : '';
+        td.classList.remove('tpi-sort-tbody-flow-name-fix');
+        return;
+    }
+    
+    const fixedText = getFixedFlowName(flowValue, operationValue);
+    if (!fixedText) {
+        // Если нет правила замены - показываем как есть
+        td.innerHTML = flowValue !== undefined ? flowValue : '';
+        td.classList.remove('tpi-sort-tbody-flow-name-fix');
+        return;
+    }
+    
+    td.classList.add('tpi-sort-tbody-flow-name-fix');
+    td.innerHTML = `
+        <div class="tpi-sort-tbody-flow-name-fix-container">
+            <div class="tpi-sort-tbody-flow-name-fix-wrapper" tpi-sort-name-fix="default">${escapeHtml(flowValue)}</div>
+            <div class="tpi-sort-tbody-flow-name-fix-wrapper" tpi-sort-name-fix="fixed" tpi-tooltip-data="Текст адаптирован, оригинальный текст - ${escapeHtml(flowValue)}">
+                ${escapeHtml(fixedText)} 
+                <icon class="tpi-sort-tbody-flow-name-fix-icon">${tpi_sort_icon_histry_option_flow_name_fix}</icon>
+            </div>
+        </div>
+    `;
+}
+
+function refreshAllFlowNameFixes(isFixEnabled) {
+    const historyTable = document.querySelector('.tpi-sort-history-status-table');
+    if (!historyTable) return;
+    
+    // Находим индекс колонки "Флоу"
+    let flowColumnIndex = -1;
+    const headers = historyTable.querySelectorAll('thead th');
+    for (let idx = 0; idx < headers.length; idx++) {
+        const th = headers[idx];
+        const titleSpan = th.querySelector('span[data-i18n-key="pages.sortable-item:events-table.titles.flow"]');
+        if (titleSpan || th.innerText.includes('Флоу')) {
+            flowColumnIndex = idx;
+            break;
+        }
+    }
+    
+    if (flowColumnIndex === -1) return;
+    
+    // Находим индекс колонки "Операция"
+    let operationColumnIndex = -1;
+    for (let idx = 0; idx < headers.length; idx++) {
+        const th = headers[idx];
+        const titleSpan = th.querySelector('span[data-i18n-key="pages.sortable-item:events-table.titles.operation"]');
+        if (titleSpan || th.innerText.includes('Операция')) {
+            operationColumnIndex = idx;
+            break;
+        }
+    }
+    
+    const rows = historyTable.querySelectorAll('tbody tr');
+    rows.forEach(row => {
+        const cells = row.querySelectorAll('td');
+        if (cells.length <= flowColumnIndex) return;
+        
+        const flowCell = cells[flowColumnIndex];
+        const operationValue = operationColumnIndex !== -1 && cells.length > operationColumnIndex 
+            ? cells[operationColumnIndex]?.textContent?.trim() 
+            : undefined;
+        
+        // Получаем оригинальный текст флоу
+        let originalFlowValue = '';
+        const defaultWrapper = flowCell.querySelector('.tpi-sort-tbody-flow-name-fix-wrapper[tpi-sort-name-fix="default"]');
+        if (defaultWrapper) {
+            originalFlowValue = defaultWrapper.textContent.trim();
+        } else {
+            originalFlowValue = flowCell.textContent.trim();
+        }
+        
+        // Применяем фикс (или убираем его)
+        applyFlowNameFixToCell(flowCell, originalFlowValue, operationValue, isFixEnabled);
+    });
+}
+
 ///////////////////////////////////////////////
 ///////////////////////////////////////////////
 ///////////////////////////////////////////////
@@ -3242,7 +3513,13 @@ function initParentSortableObserver() {
 ///////////////////////////////////////////////
 
 function tpi_makeFavIcon() {
-    const favSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>`;
+    const favSvg = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+            <path d="m3.3 7 8.7 5 8.7-5"/>
+            <path d="M12 22V12"/>
+        </svg>
+    `;
 
     function setFavicon(color) {
         let link = document.querySelector("link[rel='icon']");
