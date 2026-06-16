@@ -57,6 +57,16 @@ div.tpi-otp-wrapper{
         width: fit-content;
         transition: unset;
     }
+
+    &:has(.tpi-otp-section-block){
+        flex-flow: row;
+    }
+
+    .tpi-otp-section-block{
+        display: flex;
+        flex-flow: column;
+        gap: 20px;
+    }
 }
 
 .tpi-otp-section-title{
@@ -130,4 +140,66 @@ label.tpi-otp-file-input-wrapper{
     input#tpi_file_input[type="file"]:focus-visible{
         outline: unset;
     }
+
+    p.tpi-otp-file-input-title{
+        font-size: 1rem;
+    }
+}
+
+ul.tpi-otp-file-input-data-wrapper{
+    display: flex;
+    flex-flow: column;
+    gap: 10px;
+    padding-top: 40px;
+    height: 100%;
+    justify-content: center;
+}
+
+li.tpi-otp-file-input-data-list{
+    display: flex;
+    list-style: none;
+    gap: 1ch;
+}
+
+.tpi-otp-file-input-title {
+    gap: .1ch;
+    display: flex;
+    align-items: center;
+    --df-font-s: .8rem;
+    color: #212121;
+    min-width: 140px;
+}
+
+.tpi-otp-file-input-data {
+    gap: .1ch;
+    display: flex;
+    align-items: center;
+    --df-font-s: .8rem;
+    color: #212121;
+}
+
+icon.tpi-otp-file-input-title-icon {
+    width: var(--df-font-s);
+    height: var(--df-font-s);
+    min-width: var(--df-font-s);
+    display: flex;
+    position: relative;
+
+    svg{
+        width: 100%;
+        height: 100%;
+        fill: currentColor;
+    }
+}
+
+p.tpi-otp-file-input-title-title {
+    font-size: var(--df-font-s);
+    line-height: var(--df-font-s);
+    font-weight: 500;
+}
+
+p.tpi-otp-file-input-data-title {
+    font-size: var(--df-font-s);
+    line-height: var(--df-font-s);
+    font-weight: 500;
 }

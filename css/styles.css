@@ -292,14 +292,26 @@ button.diman__copyFullOrderData-filename:active{
 }
 
 tr[data-e2e="tableRow"]:hover {
-    box-shadow: rgb(0, 0, 0) 0px 0px 30px -10px, rgb(0, 0, 0) 0px 0px 6px 0px inset;
+    box-shadow: #000000 0px 0px 30px -10px, #000000 0px 0px 6px 0px inset;
     z-index: 99999;
     position: relative;
     transition: 300ms;
+
+    td:nth-child(1),
+    td:nth-child(2){
+        box-shadow: #000 0px 0px 30px -10px,
+                    #000 0px 10px 6px -10px inset,
+                    #000 0px -10px 6px -10px inset;
+    }
 }
 
 tr[data-e2e="tableRow"]{
     transition: 300ms box-shadow;
+
+    td:nth-child(1),
+    td:nth-child(2){
+    transition: 300ms;
+    }
 }
 div.diman__InfoPretier{
     display: flex;

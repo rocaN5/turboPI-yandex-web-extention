@@ -11,7 +11,14 @@ const tpi_i_file_pdf = `
 <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
     <path d="M0 64C0 28.7 28.7 0 64 0L224 0l0 128c0 17.7 14.3 32 32 32l128 0 0 144-208 0c-35.3 0-64 28.7-64 64l0 144-48 0c-35.3 0-64-28.7-64-64L0 64zm384 64l-128 0L256 0 384 128zM176 352l32 0c30.9 0 56 25.1 56 56s-25.1 56-56 56l-16 0 0 32c0 8.8-7.2 16-16 16s-16-7.2-16-16l0-48 0-80c0-8.8 7.2-16 16-16zm32 80c13.3 0 24-10.7 24-24s-10.7-24-24-24l-16 0 0 48 16 0zm96-80l32 0c26.5 0 48 21.5 48 48l0 64c0 26.5-21.5 48-48 48l-32 0c-8.8 0-16-7.2-16-16l0-128c0-8.8 7.2-16 16-16zm32 128c8.8 0 16-7.2 16-16l0-64c0-8.8-7.2-16-16-16l-16 0 0 96 16 0zm80-112c0-8.8 7.2-16 16-16l48 0c8.8 0 16 7.2 16 16s-7.2 16-16 16l-32 0 0 32 32 0c8.8 0 16 7.2 16 16s-7.2 16-16 16l-32 0 0 48c0 8.8-7.2 16-16 16s-16-7.2-16-16l0-64 0-64z"></path>
 </svg>
-`
+`,
+tpi_otp_i_file_type = `
+<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+    <path d="M11.625 16.5a1.875 1.875 0 1 0 0-3.75 1.875 1.875 0 0 0 0 3.75Z"></path>
+    <path fill-rule="evenodd" d="M5.625 1.5H9a3.75 3.75 0 0 1 3.75 3.75v1.875c0 1.036.84 1.875 1.875 1.875H16.5a3.75 3.75 0 0 1 3.75 3.75v7.875c0 1.035-.84 1.875-1.875 1.875H5.625a1.875 1.875 0 0 1-1.875-1.875V3.375c0-1.036.84-1.875 1.875-1.875Zm6 16.5c.66 0 1.277-.19 1.797-.518l1.048 1.048a.75.75 0 0 0 1.06-1.06l-1.047-1.048A3.375 3.375 0 1 0 11.625 18Z" clip-rule="evenodd"></path>
+    <path d="M14.25 5.25a5.23 5.23 0 0 0-1.279-3.434 9.768 9.768 0 0 1 6.963 6.963A5.23 5.23 0 0 0 16.5 7.5h-1.875a.375.375 0 0 1-.375-.375V5.25Z"></path>
+</svg>
+`;
 
 function checkiIs__onOrdersToPDF_page() {
     'use strict';
@@ -41,15 +48,77 @@ function checkiIs__onOrdersToPDF_page() {
         </div>
         <div class="tpi-otp-content-block">
             <div class="tpi-otp-section" tpi-current-section="file input">
-                <div class="tpi-otp-section-title">
-                    <p>Выбор файла</p>
+                <div class="tpi-otp-section-block">
+                    <div class="tpi-otp-section-title">
+                        <p>Выбор файла</p>
+                    </div>
+                    <div class="tpi-otp-section-container" tpi-current-section="file input">
+                        <label class="tpi-otp-file-input-wrapper" for="tpi_file_input">
+                            <icon>${tpi_i_file_pdf}</icon>
+                            <input type="file" accept=".pdf" id="tpi_file_input" placeholder="">
+                            <p class="tpi-otp-file-input-title">Загрузите файл</p>
+                        </label>
+                    </div>
                 </div>
-                <div class="tpi-otp-section-container" tpi-current-section="file input">
-                    <label class="tpi-otp-file-input-wrapper" for="tpi_file_input">
-                        <icon>${tpi_i_file_pdf}</icon>
-                        <input type="file" accept=".pdf" id="tpi_file_input" placeholder="">
-                        <p class="tpi-otp-file-input-title">Перетащите файл</p>
-                    </label>
+                <div class="tpi-otp-section-block">
+                    <ul class="tpi-otp-file-input-data-wrapper">
+                        <li class="tpi-otp-file-input-data-list">
+                            <div class="tpi-otp-file-input-title">
+                                <p class="tpi-otp-file-input-title-title">Тип документа:</p>
+                            </div>
+                            <div class="tpi-otp-file-input-data">
+                                <p class="tpi-otp-file-input-data-title">ЭАПП</p>
+                            </div>
+                        </li>
+                        <li class="tpi-otp-file-input-data-list">
+                            <div class="tpi-otp-file-input-title">
+                                <p class="tpi-otp-file-input-title-title">Тип файла:</p>
+                            </div>
+                            <div class="tpi-otp-file-input-data">
+                                <p class="tpi-otp-file-input-data-title">.pdf</p>
+                            </div>
+                        </li>
+                        <li class="tpi-otp-file-input-data-list">
+                            <div class="tpi-otp-file-input-title">
+                                <p class="tpi-otp-file-input-title-title">Вес:</p>
+                            </div>
+                            <div class="tpi-otp-file-input-data">
+                                <p class="tpi-otp-file-input-data-title">28мб</p>
+                            </div>
+                        </li>
+                        <li class="tpi-otp-file-input-data-list">
+                            <div class="tpi-otp-file-input-title">
+                                <p class="tpi-otp-file-input-title-title">Заказов:</p>
+                            </div>
+                            <div class="tpi-otp-file-input-data">
+                                <p class="tpi-otp-file-input-data-title">1055</p>
+                            </div>
+                        </li>
+                        <li class="tpi-otp-file-input-data-list">
+                            <div class="tpi-otp-file-input-title">
+                                <p class="tpi-otp-file-input-title-title">Грузомест:</p>
+                            </div>
+                            <div class="tpi-otp-file-input-data">
+                                <p class="tpi-otp-file-input-data-title">1092</p>
+                            </div>
+                        </li>
+                        <li class="tpi-otp-file-input-data-list">
+                            <div class="tpi-otp-file-input-title">
+                                <p class="tpi-otp-file-input-title-title">Количество лотов:</p>
+                            </div>
+                            <div class="tpi-otp-file-input-data">
+                                <p class="tpi-otp-file-input-data-title">32</p>
+                            </div>
+                        </li>
+                        <li class="tpi-otp-file-input-data-list">
+                            <div class="tpi-otp-file-input-title">
+                                <p class="tpi-otp-file-input-title-title">Общая стоимость:</p>
+                            </div>
+                            <div class="tpi-otp-file-input-data">
+                                <p class="tpi-otp-file-input-data-title">6574554.73</p>
+                            </div>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>

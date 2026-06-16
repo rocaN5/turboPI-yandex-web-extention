@@ -25,13 +25,15 @@
 
 .diman__scanLog__topTable,
 .diman__scanLog__bottomTable{
-    color: rgb(0, 0, 0);
+    --br-r: 12px;
+    color: #000000;
     padding: 10px;
     width: 100%;
-    border-radius: 14px 14px 0px 0px;
+    border-radius: var(--br-r) var(--br-r) 0px 0px;
     left: 0px;
     display: flex;
     background: linear-gradient(180deg, #3b3b3b, #000000);
+    /* background: linear-gradient(#003e46, #000000); */
     gap: 6px;
     border: 1px solid #ffffff;
     border-bottom: 1px solid #fff;
@@ -44,18 +46,19 @@
 }
 
 .diman__scanLog__bottomTable{
-    border-radius: 0px 0px 10px 10px;
+    border-radius: 0px 0px var(--br-r) var(--br-r);
     border-top: 1px solid #fff;
     border-bottom: 0px;
     box-shadow: 0px -10px 10px -8px;
     background: linear-gradient(0deg, #3b3b3b, #000000);
+    /* background: linear-gradient(0deg, #003e46, #000000); */
     bottom: 0;
     padding-left: 20px;
     gap: 22px;
 }
 
 .diman__scanLog__wrapper {
-    margin-top: 20px;
+    /* margin-top: 20px; */
     width: 100%;
     position: relative;
     display: flex;
@@ -269,7 +272,7 @@ tbody.diman__scanLog__tbody tr:last-child td div.diman__scanLog__td__info{
     align-items: center;
     gap: 30px;
     padding: 20px 30px;
-    margin: 20px 0px;
+    /* margin: 20px 0px; */
     width: 100%;
     background: transparent;
     box-shadow: unset;
@@ -384,7 +387,7 @@ tbody.diman__scanLog__tbody tr:last-child td div.diman__scanLog__td__info{
 
 .diman__scanLog__thead__tr{
     position: sticky;
-    top: 42px;
+    top: 54px;
     z-index: 10 !important;
     box-shadow: #ffffff 0px 1px 0px 0px, 0px 0px 10px 0px #000;
     background-color: #ebebeb;
@@ -579,6 +582,14 @@ tr[dimanOpertaion="ready-lot"][coloredRow="true"]{
 
 tr[dimanOpertaion="accept-lot"][coloredRow="true"]{
     background: #00f0ff47;
+}
+
+tr[dimanOpertaion="x-dok-accept"][coloredRow="true"]{
+    background: #21d5f961;
+}
+
+tr[dimanOpertaion="merch-collect"][coloredRow="true"]{
+    background: #e663fe59;
 }
 
 tr[dimanOpertaion="damaged-upload-file"][coloredRow="true"]{
@@ -809,7 +820,7 @@ table *[tpi-scanlog-hidden-column="true"]{
 .diman__scanLog__additional-block {
     display: none;
     .diman__scanLog__thead__tr{
-        top: 55px;
+        top: 56px;
     }
 }
 
@@ -822,7 +833,7 @@ table *[tpi-scanlog-hidden-column="true"]{
     background: linear-gradient(0deg, #353535, #515151);
     padding: 4px;
     border-radius: 10px;
-    box-shadow: 0px 0px 10px 0px;
+    box-shadow: 0px 0px 10px 0px #000;
 }
 
 .diman__scanLog__nav {
@@ -872,14 +883,14 @@ table *[tpi-scanlog-hidden-column="true"]{
     margin-left: 10px;
     gap: 6px;
 
-    span{
-        min-width: 210px;
+    span.tpi-sort-table-sortable-name{
+        min-width: 215px;
     }
 }
 
-.diman__scanLog__wrapper:has(.diman__scanLog__additional-block) .diman__scanLog__block{
+/* .diman__scanLog__wrapper:has(.diman__scanLog__additional-block) .diman__scanLog__block{
     max-height: 380px;
-}
+} */
 
 .diman__sncaLog__totalOpertaion-title{
     color: rgb(255, 255, 255);

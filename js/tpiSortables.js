@@ -8,6 +8,10 @@ let sortableType = null;
 let is3DInserted = false;
 let currentAnimationId = null;
 let current3DInstance = null;
+let scanlogBlocks = [];
+let currentScanlogIndex = 0;
+let mainScanlogBlock = null;
+let isLotMode = false;
 
 const tpi_sort_icon_cell = `
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" fill="currentColor">
@@ -291,6 +295,25 @@ tpi_sort_icon_histry_option_unknown = `
     <path d="M12 16v.01"></path>
     <path d="M12 13a2 2 0 0 0 .914 -3.782a1.98 1.98 0 0 0 -2.414 .483"></path>
 </svg>
+`,
+tpi_sort_icon_ticket_cloud = `
+    <svg xmlns="http://www.w3.org/2000/svg" stroke-linejoin="round" stroke-linecap="round" viewBox="0 0 24 24" stroke-width="2" fill="none" stroke="currentColor">
+        <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path>
+        <path d="M8 12h.01"></path>
+        <path d="M12 12h.01"></path>
+        <path d="M16 12h.01"></path>
+    </svg>
+`,
+tpi_sort_copy_default = `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+</svg>
+`,
+tpi_sort_copy_mono = `
+<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M17.0943 7.14643C17.6874 6.93123 17.9818 6.85378 18.1449 6.82608C18.1461 6.87823 18.1449 6.92051 18.1422 6.94825C17.9096 9.39217 16.8906 15.4048 16.3672 18.2026C16.2447 18.8578 16.1507 19.1697 15.5179 18.798C15.1014 18.5532 14.7245 18.2452 14.3207 17.9805C12.9961 17.1121 11.1 15.8189 11.2557 15.8967C9.95162 15.0373 10.4975 14.5111 11.2255 13.8093C11.3434 13.6957 11.466 13.5775 11.5863 13.4525C11.64 13.3967 11.9027 13.1524 12.2731 12.8081C13.4612 11.7035 15.7571 9.56903 15.8151 9.32202C15.8246 9.2815 15.8334 9.13045 15.7436 9.05068C15.6539 8.97092 15.5215 8.9982 15.4259 9.01989C15.2904 9.05064 13.1326 10.4769 8.95243 13.2986C8.33994 13.7192 7.78517 13.9242 7.28811 13.9134L7.29256 13.9156C6.63781 13.6847 5.9849 13.4859 5.32855 13.286C4.89736 13.1546 4.46469 13.0228 4.02904 12.8812C3.92249 12.8466 3.81853 12.8137 3.72083 12.783C8.24781 10.8109 11.263 9.51243 12.7739 8.884C14.9684 7.97124 16.2701 7.44551 17.0943 7.14643ZM19.5169 5.21806C19.2635 5.01244 18.985 4.91807 18.7915 4.87185C18.5917 4.82412 18.4018 4.80876 18.2578 4.8113C17.7814 4.81969 17.2697 4.95518 16.4121 5.26637C15.5373 5.58382 14.193 6.12763 12.0058 7.03736C10.4638 7.67874 7.39388 9.00115 2.80365 11.001C2.40046 11.1622 2.03086 11.3451 1.73884 11.5619C1.46919 11.7622 1.09173 12.1205 1.02268 12.6714C0.970519 13.0874 1.09182 13.4714 1.33782 13.7738C1.55198 14.037 1.82635 14.1969 2.03529 14.2981C2.34545 14.4483 2.76276 14.5791 3.12952 14.6941C3.70264 14.8737 4.27444 15.0572 4.84879 15.233C6.62691 15.7773 8.09066 16.2253 9.7012 17.2866C10.8825 18.0651 12.041 18.8775 13.2243 19.6531C13.6559 19.936 14.0593 20.2607 14.5049 20.5224C14.9916 20.8084 15.6104 21.0692 16.3636 20.9998C17.5019 20.8951 18.0941 19.8479 18.3331 18.5703C18.8552 15.7796 19.8909 9.68351 20.1332 7.13774C20.1648 6.80544 20.1278 6.433 20.097 6.25318C20.0653 6.068 19.9684 5.58448 19.5169 5.21806Z"></path>
+</svg>
 `
 ;
 
@@ -369,6 +392,10 @@ tpi_sort_icon_histry_option_unknown = `
                 }
                 sortableType = data.type;
                 insert3DViewer();
+            }
+            if(data){
+                window.currentSortableBarcode = data.barcode || '';
+                addBarcodeCopyButtons(data);
             }
         })
         .catch(() => {});
@@ -564,7 +591,7 @@ tpi_sort_icon_histry_option_unknown = `
                 <icon class="tpi-sort-card-custom-data-item-icon">${tpi_sort_icon_support}</icon>
                 <p class="tpi-sort-card-custom-data-item-text">Обращения в ТП</p>
             </div>
-            <div class="tpi-sort-card-custom-data-item-content">
+            <div class="tpi-sort-card-custom-data-item-content tpi-sort-card-custom-tickets-wrapper">
                 <div class="tpi-sort-card-custom-data-item-loader"></div>
             </div>
         `;
@@ -588,9 +615,72 @@ tpi_sort_icon_histry_option_unknown = `
 
         let contentHtml = '';
         if (tickets && tickets.length > 0) {
-            contentHtml = tickets.map(ticket => `
-                <a class="tpi-sort-card-custom-data-item-link" target="_blank" href="https://hubs.market.yandex.ru/sorting-center/${scId}/support/${ticket.ticketId}">${ticket.shortTicketId || ticket.ticketId}</a>
-            `).join('');
+            contentHtml = tickets.map(ticket => {
+                const details = ticket.details || {};
+                const author = details.userFirstName || 'Не указан';
+                const theme = details.requestCategoryText || 'Не указана';
+                const problem = details.problemName || 'Не указана';
+                const cargoType = details.cargoType || 'Не указан';
+                const description = details.problemDetailedDescription || 'Нет описания';
+                
+                // Форматируем дату создания в формате dd/mm/yy
+                let createdDate = '';
+                if (ticket.created) {
+                    const date = new Date(ticket.created);
+                    const day = String(date.getDate()).padStart(2, '0');
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const year = String(date.getFullYear()).slice(-2);
+                    createdDate = `${day}/${month}/${year}`;
+                } else {
+                    createdDate = 'Дата неизвестна';
+                }
+                
+                const escapeForTooltip = (str) => {
+                    if (!str) return '';
+                    return str
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/'/g, '&#39;');
+                };
+                
+                const statusText = ticket.status === 'STATUS_OPEN' ? 'Открыт' : (ticket.status === 'STATUS_CLOSED' ? 'Закрыт' : ticket.status || 'Неизвестно');
+
+                const tooltipText = 
+                    `tooltip-icon-author:author\n` +
+                    `tooltip-title-author:Автор:\n` +
+                    `tooltip-data-author:${escapeForTooltip(author)}\n` +
+                    `tooltip-icon-status:status\n` +
+                    `tooltip-title-status:Статус:\n` +
+                    `tooltip-data-status:${escapeForTooltip(statusText)}\n` +
+                    `tooltip-icon-theme:theme\n` +
+                    `tooltip-title-theme:Тема:\n` +
+                    `tooltip-data-theme:${escapeForTooltip(theme)}\n` +
+                    `tooltip-icon-problem:problem\n` +
+                    `tooltip-title-problem:Проблема:\n` +
+                    `tooltip-data-problem:${escapeForTooltip(problem)}\n` +
+                    `tooltip-icon-cargoType:cargoType\n` +
+                    `tooltip-title-cargoType:Тип грузоместа:\n` +
+                    `tooltip-data-cargoType:${escapeForTooltip(cargoType)}\n` +
+                    `tooltip-icon-description:description\n` +
+                    `tooltip-title-description:Описание проблемы:\n` +
+                    `tooltip-data-description:${escapeForTooltip(description)}\n`;
+                
+                return `
+                    <div class="tpi-sort-card-custom-data-ticket-wrapper">
+                        <a class="tpi-sort-card-custom-data-item-link tpi-sort-card-custom-data-ticket-link" 
+                        target="_blank" 
+                        href="https://hubs.market.yandex.ru/sorting-center/${scId}/support/${ticket.ticketId}"
+                        tpi-tooltip-data="${tooltipText}"
+                        tpi-tooltip-type="sortable-ticket">
+                            <icon class="tpi-sort-card-custom-data-ticket-icon">${tpi_sort_icon_ticket_cloud}</icon>
+                            ${ticket.shortTicketId || ticket.ticketId}
+                        </a>
+                        <div class="tpi-sort-card-custom-data-ticket-created-date">${escapeForTooltip(createdDate)}</div>
+                    </div>
+                `;
+            }).join('');
         } else {
             contentHtml = '<p class="tpi-sort-card-custom-data-item-text">Отсутствуют</p>';
         }
@@ -1811,6 +1901,9 @@ function processExtendedStatusInHistory() {
         } else if (i18nKey === 'common.sorting-center:stage-PREPARED_DIRECT') {
             extendedStatus = 'loaded-in-vehicle';
             direction = 'any';
+        } else if (i18nKey === 'common.sorting-center:stage-LOT_READY_FOR_FILLING_DIRECT' || i18nKey === 'common.sorting-center:stage-LOT_READY_FOR_FILLING_RETURN') {
+            extendedStatus = 'ready-for-fill';
+            direction = 'any';
         } else if (i18nKey === 'common.sorting-center:stage-SHIPPED_DIRECT') {
             extendedStatus = 'shipped';
             direction = 'forward';
@@ -1874,11 +1967,16 @@ function initHistoryStatusObserver() {
             }
         }
         if (table) {
-            // Запускаем оба запроса параллельно
             await Promise.all([
                 updateHistoryWithUserNames(),
                 updateCourierNamesInHistory(),
-                replaceSortingCenterNames()
+                updateHistoryTimeWithSeconds(),
+                (async () => {
+                    const existingIcons = document.querySelectorAll('.tpi-sort-table-sc-wrapper');
+                    if (existingIcons.length === 0) {
+                        await replaceSortingCenterNames();
+                    }
+                })()
             ]);
             usersProcessed = true;
         }
@@ -2002,7 +2100,7 @@ async function fetchUserNames(encryptedIds, scId, token) {
             await new Promise(r => setTimeout(r, 100));
             
         } catch (error) {
-            console.warn(`Ошибка получения имени для ID:`, error);
+            console.log(`❌ | Ошибка получения имени для ID:`, error);
         }
     }
     
@@ -2055,6 +2153,84 @@ async function fetchSortableHistory() {
         console.error('Ошибка получения истории:', error);
         return null;
     }
+}
+
+// Функция для обновления времени с секундами в таблице истории
+async function updateHistoryTimeWithSeconds() {
+    let historyTable = document.querySelector('.tpi-sort-history-status-table');
+    if (!historyTable) {
+        for (let i = 0; i < 30; i++) {
+            historyTable = document.querySelector('.tpi-sort-history-status-table');
+            if (historyTable) break;
+            await new Promise(r => setTimeout(r, 200));
+        }
+    }
+    if (!historyTable) return;
+    
+    const historyData = await fetchSortableHistory();
+    if (!historyData || !Array.isArray(historyData) || historyData.length === 0) return;
+    
+    let timeColumnIndex = -1;
+    const headers = historyTable.querySelectorAll('thead th');
+    for (let idx = 0; idx < headers.length; idx++) {
+        const th = headers[idx];
+        const titleSpan = th.querySelector('span[data-i18n-key="pages.sortable-item:events-table.titles.time"]');
+        if (titleSpan || th.textContent.trim().includes('Время')) {
+            timeColumnIndex = idx;
+            break;
+        }
+    }
+    
+    if (timeColumnIndex === -1) {
+        const firstRow = historyTable.querySelector('tbody tr');
+        if (firstRow) {
+            const cells = firstRow.querySelectorAll('td');
+            for (let idx = 0; idx < cells.length; idx++) {
+                const text = cells[idx].textContent.trim();
+                if (/^\d{2}:\d{2}$/.test(text)) {
+                    timeColumnIndex = idx;
+                    break;
+                }
+            }
+        }
+    }
+    
+    if (timeColumnIndex === -1) return;
+    
+    const timeMap = new Map();
+    historyData.forEach(item => {
+        if (item.createdAt) {
+            const date = new Date(item.createdAt);
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
+            const timeWithoutSeconds = `${hours}:${minutes}`;
+            const fullTime = `${hours}:${minutes}:${seconds}`;
+            timeMap.set(timeWithoutSeconds, fullTime);
+        }
+    });
+    
+    // Обновляем все ячейки времени
+    const rows = historyTable.querySelectorAll('tbody tr');
+    let updatedCount = 0;
+    
+    rows.forEach(row => {
+        const cells = row.querySelectorAll('td');
+        if (cells.length <= timeColumnIndex) return;
+        
+        const timeCell = cells[timeColumnIndex];
+        const currentTime = timeCell.textContent.trim();
+        
+        if (/^\d{2}:\d{2}$/.test(currentTime)) {
+            const fullTime = timeMap.get(currentTime);
+            if (fullTime) {
+                timeCell.setAttribute('data-original-time', currentTime);
+                timeCell.textContent = fullTime;
+                timeCell.classList.add('tpi-history-time-with-seconds');
+                updatedCount++;
+            }
+        }
+    });
 }
 
 async function updateHistoryWithUserNames() {
@@ -2387,18 +2563,44 @@ async function updateCourierNamesInHistory() {
 }
 
 async function replaceSortingCenterNames() {
-    let historyTable = document.querySelector('.tpi-sort-history-status-table');
-    if (!historyTable) {
-        for (let i = 0; i < 30; i++) {
-            await new Promise(r => setTimeout(r, 200));
-            historyTable = document.querySelector('.tpi-sort-history-status-table');
-            if (historyTable) break;
-        }
-    }
-    if (!historyTable) return;
     
+    // Проверка - если иконки уже есть, выходим
+    const existingIcons = document.querySelectorAll('.tpi-sort-table-sc-wrapper');
+    if (existingIcons.length > 0) {
+        return;
+    }
+    
+    // Ждём таблицу с полными заголовками
+    let historyTable = null;
+    let headersCount = 0;
+    let attempts = 0;
+    const MAX_TABLE_ATTEMPTS = 30;
+    
+    while (attempts < MAX_TABLE_ATTEMPTS) {
+        historyTable = document.querySelector('.tpi-sort-history-status-table');
+        if (historyTable) {
+            const headers = historyTable.querySelectorAll('thead th');
+            headersCount = headers.length;
+            
+            // Если заголовков больше 1 - это хороший признак, что таблица загружена
+            if (headersCount > 1) {
+                break;
+            }
+        }
+        attempts++;
+        await new Promise(r => setTimeout(r, 300));
+    }
+    
+    if (!historyTable || headersCount <= 1) {
+        return;
+    }
+    
+    // Находим колонку "Курьер"
     let courierColumnIndex = -1;
     const headers = historyTable.querySelectorAll('thead th');
+    headers.forEach((th, idx) => {
+    });
+    
     for (let idx = 0; idx < headers.length; idx++) {
         const th = headers[idx];
         const titleSpan = th.querySelector('span[data-i18n-key="pages.sortable-item:events-table.titles.courier"]');
@@ -2408,7 +2610,40 @@ async function replaceSortingCenterNames() {
         }
     }
     
-    if (courierColumnIndex === -1) return;
+    if (courierColumnIndex === -1) {
+        return;
+    }
+    
+    // Ждём появления данных в таблице (не пустых строк)
+    let rowsCount = 0;
+    let rowsAttempts = 0;
+    const MAX_ROWS_ATTEMPTS = 20;
+    
+    while (rowsAttempts < MAX_ROWS_ATTEMPTS) {
+        const rows = historyTable.querySelectorAll('tbody tr');
+        rowsCount = rows.length;
+        
+        if (rowsCount > 0) {
+            // Проверяем, есть ли данные в первой строке
+            const firstRow = rows[0];
+            const cells = firstRow.querySelectorAll('td');
+            if (cells.length > 0) {
+                let hasData = false;
+                cells.forEach(cell => {
+                    if (cell.innerText.trim().length > 0) hasData = true;
+                });
+                if (hasData) {
+                    break;
+                }
+            }
+        }
+        rowsAttempts++;
+        await new Promise(r => setTimeout(r, 300));
+    }
+    
+    if (rowsCount === 0) {
+        return;
+    }
     
     const cityMapping = [
         { keywords: ['Тарный'], id: 'tarn' },
@@ -2420,46 +2655,96 @@ async function replaceSortingCenterNames() {
         { keywords: ['Ростов'], id: 'rostov' },
     ];
     
-    const allCourierCells = historyTable.querySelectorAll(`tbody tr td:nth-child(${courierColumnIndex + 1})`);
+    // Функция для проверки, обработана ли уже ячейка
+    function isCellProcessed(cell) {
+        return cell.querySelector('.tpi-sort-table-sc-wrapper') !== null;
+    }
     
-    allCourierCells.forEach(cell => {
-        if (cell.querySelector('.tpi-sort-courier-data-wrapper')) return;
-        if (cell.hasAttribute('tpi-sort-city-id')) return;
-        
-        let originalText = '';
+    // Функция для получения текста из ячейки
+    function getCellText(cell) {
         const innerDiv = cell.querySelector('.mez-inline-flex.mez-flex-col');
         if (innerDiv) {
-            originalText = innerDiv.textContent.trim();
-        } else {
-            originalText = cell.textContent.trim();
+            return innerDiv.textContent.trim();
+        }
+        return cell.textContent.trim();
+    }
+    
+    // Собираем все ячейки, которые нужно обработать
+    const allCourierCells = historyTable.querySelectorAll(`tbody tr td:nth-child(${courierColumnIndex + 1})`);
+    
+    const cellsToProcess = [];
+    
+    allCourierCells.forEach((cell, index) => {
+        // Пропускаем уже обработанные
+        if (isCellProcessed(cell)) {
+            return;
         }
         
-        if (!originalText) return;
+        const text = getCellText(cell);
         
-        let cityId = null;
+        if (!text || text.length === 0) {
+            return;
+        }
+        
+        // Проверяем, есть ли совпадение с городами
+        let matched = false;
+        let matchedCity = null;
         for (const map of cityMapping) {
-            if (map.keywords.some(kw => originalText.includes(kw))) {
-                cityId = map.id;
+            if (map.keywords.some(kw => text.includes(kw))) {
+                matched = true;
+                matchedCity = map.id;
                 break;
             }
         }
         
-        if (cityId) {
-            const safeText = originalText.replace(/[&<>]/g, m => {
+        if (matched) {
+            cellsToProcess.push({ cell, text, cityId: matchedCity });
+        } else {
+        }
+    });
+    
+    
+    if (cellsToProcess.length === 0) {
+        return;
+    }
+    
+    // Обрабатываем ячейки
+    let successCount = 0;
+    for (const { cell, text, cityId } of cellsToProcess) {
+        // Проверяем, не была ли ячейка обработана за это время
+        if (isCellProcessed(cell)) {
+            successCount++;
+            continue;
+        }
+        
+        // Проверяем, есть ли в ячейке ссылка или другой контент, который может помешать
+        const hasLink = cell.querySelector('a');
+        if (hasLink) {
+            continue;
+        }
+        
+        // Вставляем иконку
+        try {
+            const safeText = text.replace(/[&<>]/g, m => {
                 if (m === '&') return '&amp;';
                 if (m === '<') return '&lt;';
                 if (m === '>') return '&gt;';
                 return m;
             });
+            
+            
             cell.innerHTML = `
                 <div class="tpi-sort-table-sc-wrapper">
                     <icon class="tpi-sort-table-sc-icon" tpi-sort-city-id="${cityId}"></icon>
                     <p class="tpi-sort-table-sc-text" tpi-tooltip-data="${safeText}">${safeText}</p>
                 </div>
             `;
-            console.log(`tpi: Заменён СЦ "${originalText}" → ${cityId}`);
+            successCount++;
+        } catch (e) {
+            console.log(e)
         }
-    });
+    }
+    
 }
 
 //D-
@@ -2648,9 +2933,21 @@ function initParentSortableObserver() {
             'default': 'Отгрузка'
         },
         'sc.display.flow.PRE_DAMAGED_SORT': {
-            'sc.display.operation.PRESORT_ON_SORT': 'Отмечен предбраком (ТСД)',
-            'Сортировка': 'Сортировка',
+            'sc.display.operation.PRESORT_ON_SORT': 'Отмечен предбраком',
+            'Сортировка': 'Сортировка в Predbrak',
             'default': 'Отгрузка'
+        },
+        'sc.display.flow.SC_XDOC_ACCEPTANCE': {
+            'sc.display.operation.BARCODE_SCAN': 'Приёмка X-DOK',
+            'default': 'Приёмка X-DOK'
+        },
+        'sc.display.flow.COLLECT': {
+            'sc.display.operation.PRESORT_ON_SORT': 'Сортировка в лот мерча',
+            'Сортировка': 'Сортировка в лот мерча',
+            'default': 'Приёмка X-DOK'
+        },
+        'sc.display.flow.INITIAL_RETURN_ACCEPTANCE': {
+            'Предсортировка посылок': 'Предсортировка (приёмка возврата)',
         },
     };
     
@@ -2707,8 +3004,20 @@ function initParentSortableObserver() {
         if (!data || !data.length) {
             return `<div class="diman__scanLog__block">
                         <div class="diman__scanLog__topTableWrapper">
-                            <div class="diman__scanLog__topTable">
+                            <div class="diman__scanLog__topTable tpi-sort-table-topTable">
                                 <span class="diman__scanLog__block-title">История грузоместа: <span>${getSortableName()}</span></span>
+                                <div class="tpi-switch-sortable-scanlog-wrapper-container" id="tpi-switch-container-main">
+                                    <label class="tpi-switch-sortable-scanlog-wrapper" for="tpi-switch-sortable-checkbox-main">
+                                        <input type="checkbox" id="tpi-switch-sortable-checkbox-main">
+                                        <span class="tpi-switch-sortable-scanlog-pciker"></span>
+                                        <div class="tpi-switch-sortable-scanlog-option" tpi-sort-switch-option="sortable">
+                                            <p class="tpi-switch-sortable-scanlog-title">Заказ</p>
+                                        </div>
+                                        <div class="tpi-switch-sortable-scanlog-option" tpi-sort-switch-option="lot">
+                                            <p class="tpi-switch-sortable-scanlog-title">Лот</p>
+                                        </div>
+                                    </label>
+                                </div>
                             </div>
                         </div>
                         <table style="width:100%"><tbody><tr><td class="diman__scanLog__null">Нет записей в истории</td></tr></tbody></table>
@@ -2721,8 +3030,20 @@ function initParentSortableObserver() {
         if (rows.length === 0) {
             return `<div class="diman__scanLog__block">
                         <div class="diman__scanLog__topTableWrapper">
-                            <div class="diman__scanLog__topTable">
+                            <div class="diman__scanLog__topTable tpi-sort-table-topTable">
                                 <span class="diman__scanLog__block-title">История грузоместа: <span>${getSortableName()}</span></span>
+                                <div class="tpi-switch-sortable-scanlog-wrapper-container" id="tpi-switch-container-main">
+                                    <label class="tpi-switch-sortable-scanlog-wrapper" for="tpi-switch-sortable-checkbox-main">
+                                        <input type="checkbox" id="tpi-switch-sortable-checkbox-main">
+                                        <span class="tpi-switch-sortable-scanlog-pciker"></span>
+                                        <div class="tpi-switch-sortable-scanlog-option" tpi-sort-switch-option="sortable">
+                                            <p class="tpi-switch-sortable-scanlog-title">Заказ</p>
+                                        </div>
+                                        <div class="tpi-switch-sortable-scanlog-option" tpi-sort-switch-option="lot">
+                                            <p class="tpi-switch-sortable-scanlog-title">Лот</p>
+                                        </div>
+                                    </label>
+                                </div>
                             </div>
                         </div>
                         <table style="width:100%"><tbody><tr><td class="diman__scanLog__null">Нет записей в истории</td></tr></tbody></table>
@@ -2753,8 +3074,20 @@ function initParentSortableObserver() {
 
         let html = `<div class="diman__scanLog__block">
             <div class="diman__scanLog__topTableWrapper">
-                <div class="diman__scanLog__topTable">
+                <div class="diman__scanLog__topTable tpi-sort-table-topTable">
                     <span class="diman__scanLog__block-title">История грузоместа: <span>${getSortableName()}</span></span>
+                    <div class="tpi-switch-sortable-scanlog-wrapper-container" id="tpi-switch-container-main">
+                        <label class="tpi-switch-sortable-scanlog-wrapper" for="tpi-switch-sortable-checkbox-main">
+                            <input type="checkbox" id="tpi-switch-sortable-checkbox-main">
+                            <span class="tpi-switch-sortable-scanlog-pciker"></span>
+                            <div class="tpi-switch-sortable-scanlog-option" tpi-sort-switch-option="sortable">
+                                <p class="tpi-switch-sortable-scanlog-title">Заказ</p>
+                            </div>
+                            <div class="tpi-switch-sortable-scanlog-option" tpi-sort-switch-option="lot">
+                                <p class="tpi-switch-sortable-scanlog-title">Лот</p>
+                            </div>
+                        </label>
+                    </div>
                 </div>
             </div>
             <table class="diman__scanLog__table">
@@ -2804,10 +3137,10 @@ function initParentSortableObserver() {
             } else if (resultCell === "Ошибка") {
                 rowAttr += ' dimanOpertaion="error" coloredRow="true"';
                 iconAttr += ' class="diman__scanLog__td__i__icon" diman__tableOpertaionIcon="error"';
-            } else if (operationCell === "Сортировка" || operationCell === "sc.display.flow.COLLECT") {
+            } else if (operationCell === "Сортировка") {
                 rowAttr += ' dimanOpertaion="sort" coloredRow="true"';
                 iconAttr += ' class="diman__scanLog__td__i__icon" diman__tableOpertaionIcon="sort"';
-            } else if (operationCell === "Предсортировка посылок" || operationCell === "Предсортировка по группам" || operationCell === "sc.display.flow.INITIAL_RETURN_ACCEPTANCE") {
+            } else if (operationCell === "Предсортировка посылок" || operationCell === "Предсортировка по группам") {
                 rowAttr += ' dimanOpertaion="predsort" coloredRow="true"';
                 iconAttr += ' class="diman__scanLog__td__i__icon" diman__tableOpertaionIcon="predsort"';
             } else if (operationCell === "[*] Отгрузка заказов" || operationCell === "Отгрузка на средней миле"|| operationCell === "Отгрузка на последней миле" || operationCell === "sc.display.flow.SC_SHIPMENT" || operationCell === "Отгрузка возвратов мерчу") {
@@ -2822,7 +3155,7 @@ function initParentSortableObserver() {
             } else if (operationCell === "Инфоскан") {
                 rowAttr += ' dimanOpertaion="infoscan" coloredRow="true"';
                 iconAttr += ' class="diman__scanLog__td__i__icon" diman__tableOpertaionIcon="infoscan"';
-            } else if (operationCell === "Приемка возвратов от курьера") {
+            } else if (operationCell === "Приемка возвратов от курьера" || operationCell === "sc.display.flow.INITIAL_RETURN_ACCEPTANCE") {
                 rowAttr += ' dimanOpertaion="courier return accept" coloredRow="true"';
                 iconAttr += ' class="diman__scanLog__td__i__icon" diman__tableOpertaionIcon="return"';
             } else if (operationCell === "Приемка палет по первому сканированию") {
@@ -2859,6 +3192,12 @@ function initParentSortableObserver() {
                     rowAttr += ' dimanOpertaion="damaged-unknown" coloredRow="true"';
                     iconAttr += ' class="diman__scanLog__td__i__icon" diman__tableOpertaionIcon="damaged-unknown"';
                 }
+            } else if (operationCell === "sc.display.flow.SC_XDOC_ACCEPTANCE") {
+                rowAttr += ' dimanOpertaion="x-dok-accept" coloredRow="true"';
+                iconAttr += ' class="diman__scanLog__td__i__icon" diman__tableOpertaionIcon="x-dok-accept"';
+            } else if (operationCell === "sc.display.flow.COLLECT") {
+                rowAttr += ' dimanOpertaion="merch-collect" coloredRow="true"';
+                iconAttr += ' class="diman__scanLog__td__i__icon" diman__tableOpertaionIcon="merch-collect"';
             }
              else {
                 rowAttr += ' dimanOpertaion="unknown-operation" coloredRow="true"';
@@ -2915,8 +3254,28 @@ function initParentSortableObserver() {
 
     function getOperationStatistics(data) {
         const operationCounts = {};
-        const operationPriority = ["sort", "predsort", "error", "infoscan", "ready-lot", "ready to shipp", "return", "inventoryzation", "accept-lot", "moved-lot", "shipped", "robot-shipped", "damaged-get", "damaged-upload-file", "damaged-create"];
+        const operationPriority = [
+            "x-dok-accept",
+            "sort",
+            "predsort",
+            "merch-collect",
+            "error",
+            "infoscan",
+            "ready-lot",
+            "ready to shipp",
+            "return",
+            "inventoryzation",
+            "accept-lot",
+            "moved-lot",
+            "shipped",
+            "robot-shipped",
+            "damaged-get",
+            "damaged-upload-file",
+            "damaged-create"
+        ];
         const tooltipMap = {
+            "x-dok-accept": "Приёмка X-DOK",
+            "merch-collect": "Сортировка в лот мерча",
             "sort": "Сортировка",
             "predsort": "Предсортировка",
             "error": "Ошибка",
@@ -2959,7 +3318,7 @@ function initParentSortableObserver() {
                     operationType = "ready to shipp";
                 } else if (operationCell === "[*] Отгрузка заказов" || operationCell === "Отгрузка на средней миле" || operationCell === "[*] Отгрузка возвратов" || operationCell === "sc.display.flow.SC_SHIPMENT") {
                     operationType = "shipped";
-                } else if (operationCell === "Приемка возвратов от курьера") {
+                } else if (operationCell === "Приемка возвратов от курьера" || operationCell === "sc.display.flow.INITIAL_RETURN_ACCEPTANCE") {
                     operationType = "return";
                 } else if (operationCell === "[*] Инвентаризация") {
                     operationType = "inventoryzation";
@@ -2969,6 +3328,10 @@ function initParentSortableObserver() {
                     operationType = "moved-lot";
                 } else if (userCell === "sc-robot-ship-ta-SortingCenter[82]") {
                     operationType = "robot-shipped";
+                } else if (operationCell === "sc.display.flow.SC_XDOC_ACCEPTANCE") {
+                    operationType = "x-dok-accept";
+                } else if (operationCell === "sc.display.flow.COLLECT") {
+                    operationType = "merch-collect";
                 }
                 if (operationType) {
                     operationCounts[operationType] = (operationCounts[operationType] || 0) + 1;
@@ -3159,16 +3522,28 @@ function initParentSortableObserver() {
                 const topTable = block.querySelector('.diman__scanLog__topTable');
                 if (topTable) {
                     topTable.innerHTML = `
-                        <span class="diman__scanLog__block-title">Сканлог: <span>${text}</span></span>
-                        <div class="diman__scanLog__nav-container">
-                            <button class="diman__scanLog__nav prev">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><path d="M169.4 297.4C156.9 309.9 156.9 330.2 169.4 342.7L361.4 534.7C373.9 547.2 394.2 547.2 406.7 534.7C419.2 522.2 419.2 501.9 406.7 489.4L237.3 320L406.6 150.6C419.1 138.1 419.1 117.8 406.6 105.3C394.1 92.8 373.8 92.8 361.3 105.3L169.3 297.3z"/></svg>
-                            </button>
-                            <span class="diman__scanLog__counter">1 из ${linksMap.size}</span>
-                            <button class="diman__scanLog__nav next">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><path d="M471.1 297.4C483.6 309.9 483.6 330.2 471.1 342.7L279.1 534.7C266.6 547.2 246.3 547.2 233.8 534.7C221.3 522.2 221.3 501.9 233.8 489.4L403.2 320L233.9 150.6C221.4 138.1 221.4 117.8 233.9 105.3C246.4 92.8 266.7 92.8 279.2 105.3L471.2 297.3z"/></svg>
-                            </button>
-                        </div>
+                        <span class="diman__scanLog__block-title">
+                            История грузоместа: <span class="tpi-sort-table-sortable-name">${text}</span>
+                            <div class="diman__scanLog__nav-container">
+                                <button class="diman__scanLog__nav prev">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><path d="M169.4 297.4C156.9 309.9 156.9 330.2 169.4 342.7L361.4 534.7C373.9 547.2 394.2 547.2 406.7 534.7C419.2 522.2 419.2 501.9 406.7 489.4L237.3 320L406.6 150.6C419.1 138.1 419.1 117.8 406.6 105.3C394.1 92.8 373.8 92.8 361.3 105.3L169.3 297.3z"/></svg>
+                                </button>
+                                <span class="diman__scanLog__counter">1 из ${linksMap.size}</span>
+                                <button class="diman__scanLog__nav next">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><path d="M471.1 297.4C483.6 309.9 483.6 330.2 471.1 342.7L279.1 534.7C266.6 547.2 246.3 547.2 233.8 534.7C221.3 522.2 221.3 501.9 233.8 489.4L403.2 320L233.9 150.6C221.4 138.1 221.4 117.8 233.9 105.3C246.4 92.8 266.7 92.8 279.2 105.3L471.2 297.3z"/></svg>
+                                </button>
+                            </div>
+                        </span>
+                        <label class="tpi-switch-sortable-scanlog-wrapper" for="tpi-switch-sortable-checkbox-lot-${blocks.length}">
+                            <input type="checkbox" id="tpi-switch-sortable-checkbox-lot-${blocks.length}">
+                            <span class="tpi-switch-sortable-scanlog-pciker"></span>
+                            <div class="tpi-switch-sortable-scanlog-option" tpi-sort-switch-option="sortable">
+                                <p class="tpi-switch-sortable-scanlog-title">Заказ</p>
+                            </div>
+                            <div class="tpi-switch-sortable-scanlog-option" tpi-sort-switch-option="lot">
+                                <p class="tpi-switch-sortable-scanlog-title">Лот</p>
+                            </div>
+                        </label>
                     `;
                 }
                 mainContainer.appendChild(block);
@@ -3193,13 +3568,20 @@ function initParentSortableObserver() {
                 });
             }
         };
+        scanlogBlocks = blocks;
+        mainScanlogBlock = mainContainer;
+
         blocks.forEach((block, index) => {
             const prevBtn = block.querySelector('.prev');
             const nextBtn = block.querySelector('.next');
             if (prevBtn) prevBtn.addEventListener('click', () => switchBlock((currentIndex - 1 + blocks.length) % blocks.length));
             if (nextBtn) nextBtn.addEventListener('click', () => switchBlock((currentIndex + 1) % blocks.length));
         });
-        if (blocks.length > 0) switchBlock(0);
+        if (blocks.length > 0) {
+            currentScanlogIndex = 0;
+        }
+
+        setupSwitchHandler();
     }
 
     // ---------- Автозагрузка основной истории ----------
@@ -3233,11 +3615,26 @@ function initParentSortableObserver() {
             buttonText.innerHTML = `<div class="diman__scanLog__activeButton__text">Скрыть сканлог</div><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="diman__scanLog__activeButton__icon"><path d="M38.8 5.1C28.4-3.1 13.3-1.2 5.1 9.2S-1.2 34.7 9.2 42.9l592 464c10.4 8.2 25.5 6.3 33.7-4.1s6.3-25.5-4.1-33.7L525.6 386.7c39.6-40.6 66.4-86.1 79.9-118.4c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C465.5 68.8 400.8 32 320 32c-68.2 0-125 26.3-169.3 60.8L38.8 5.1zM223.1 149.5C248.6 126.2 282.7 112 320 112c79.5 0 144 64.5 144 144c0 24.9-6.3 48.3-17.4 68.7L408 294.5c8.4-19.3 10.6-41.4 4.8-63.3c-11.1-41.5-47.8-69.4-88.6-71.1c-5.8-.2-9.2 6.1-7.4 11.7c2.1 6.4 3.3 13.2 3.3 20.3c0 10.2-2.4 19.8-6.6 28.3l-90.3-70.8zM373 389.9c-16.4 6.5-34.3 10.1-53 10.1c-79.5 0-144-64.5-144-144c0-6.9 .5-13.6 1.4-20.2L83.1 161.5C60.3 191.2 44 220.8 34.5 243.7c-3.3 7.9-3.3 16.7 0 24.6c14.9 35.7 46.2 87.7 93 131.1C174.5 443.2 239.2 480 320 480c47.8 0 89.9-12.9 126.2-32.5L373 389.9z"/></svg>`;
             scanLogCheckLoadSettings();
             button.disabled = false;
-            if (document.querySelector('#dimanHistoryLog-option-8').checked) {
-                try {
-                    await loadAdditionalScanLogs(wrapperDiv);
-                } catch (err) { console.log(err); }
-            }
+            try {
+                await loadAdditionalScanLogs(wrapperDiv);
+                
+                const switchContainer = document.querySelector('#tpi-switch-container-main');
+                if (switchContainer) {
+                    if (scanlogBlocks.length > 0) {
+                        switchContainer.style.display = 'flex';
+                    } else {
+                        switchContainer.style.display = 'none';
+                    }
+                }
+                
+                const mainSwitch = document.querySelector('#tpi-switch-sortable-checkbox-main');
+                if (mainSwitch) {
+                    mainSwitch.checked = false;
+                    isLotMode = false;
+                    const event = new Event('change');
+                    mainSwitch.dispatchEvent(event);
+                }
+            } catch (err) { console.log(err); }
         } catch (error) {
             console.error("Автозагрузка истории:", error);
             buttonText.innerHTML = `<div class="diman__scanLog__activeButton__text">Ошибка ❌</div><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" class="diman__scanLog__activeButton__icon"><path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C433.5 68.8 368.8 32 288 32zM144 256a144 144 0 1 1 288 0 144 144 0 1 1 -288 0zm144-64c0 35.3-28.7 64-64 64c-7.1 0-13.9-1.2-20.3-3.3c-5.5-1.8-11.9 1.6-11.7 7.4c.3 6.9 1.3 13.8 3.2 20.7c13.7 51.2 66.4 81.6 117.6 67.9s81.6-66.4 67.9-117.6c-11.1-41.5-47.8-69.4-88.6-71.1c-5.8-.2-9.2 6.1-7.4 11.7c2.1 6.4 3.3 13.2 3.3 20.3z"></path></svg>`;
@@ -3303,7 +3700,7 @@ function initParentSortableObserver() {
             { id: "dimanHistoryLog-option-5", label: "Задний фон", defaultChecked: true, tooltip: 'Задний фон таблицы в виде диагональных полос' },
             { id: "dimanHistoryLog-option-6", label: "Сетка", defaultChecked: true, tooltip: 'Дополнительная вертикальная сетка для разграничения столбцов таблицы' },
             { id: "dimanHistoryLog-option-7", label: "Скрывать пустые столбцы", defaultChecked: false, tooltip: 'Скрытие пустых столбцов в таблице' },
-            { id: "dimanHistoryLog-option-8", label: "Сканлог лотов", defaultChecked: false, tooltip: 'Загрузка сканлогов всех лотово, в которых было вложено грузоместо (вместе с основным сканлогом гм)' },
+            // { id: "dimanHistoryLog-option-8", label: "Сканлог лотов", defaultChecked: false, tooltip: 'Загрузка сканлогов всех лотово, в которых было вложено грузоместо (вместе с основным сканлогом гм)' },
             { id: "dimanHistoryLog-option-9", label: "Автоскролл", defaultChecked: false, tooltip: 'Автоматическая прокрутка страницу вниз до таблицы, при загрузке скнлога грузоместа' },
             { id: "dimanHistoryLog-option-10", label: "Статистика", defaultChecked: true, tooltip: 'Добавлять иконки статистики внизу таблицы, отображающих общее количество манипуляций' },
             { id: "dimanHistoryLog-option-11", label: "Исправить флоу", defaultChecked: true, tooltip: 'Замена системных наименований флоу на адаптированный аналог' }
@@ -3321,7 +3718,6 @@ function initParentSortableObserver() {
         checkboxesContainer.addEventListener('click', countAllOptionsForMe)
         function countAllOptionsForMe(){
             const tpi_all_options = document.querySelectorAll('label.diman__scanLog__checkBox__container input.diman__scanLog__checkBox__input')
-            console.log(tpi_all_options)
             let tpi_all_enabled_options = 0,
                 tpi_all_avalible_options = 0
             tpi_all_options.forEach(option => {
@@ -3392,7 +3788,6 @@ function initParentSortableObserver() {
 
         return true;
     }
-
     // ---------- Запуск ----------
     let observer = null;
     let interval = null;
@@ -3421,8 +3816,96 @@ function initParentSortableObserver() {
     startWatching();
 })();
 
+function setupSwitchHandler() {
+    const switches = document.querySelectorAll('input[id^="tpi-switch-sortable-checkbox"]');
+    
+    switches.forEach(switchEl => {
+        switchEl.removeEventListener('change', handleSwitchChange);
+        switchEl.addEventListener('change', handleSwitchChange);
+    });
+}
 
+function handleSwitchChange(e) {
+    console.log('🔄 Переключение:', e.target.id, 'checked:', e.target.checked);
+    const isLot = e.target.checked;
+    isLotMode = isLot;
+    
+    setTimeout(() => {
+        const allSwitches = document.querySelectorAll('input[id^="tpi-switch-sortable-checkbox"]');
+        
+        allSwitches.forEach(sw => {
+            if (sw !== e.target) {
+                sw.checked = isLot;
+            }
+        });
+        
+        const mainWrapper = document.querySelector('.diman__scanLog__wrapper');
+        if (!mainWrapper) return;
+        
+        const mainBlock = mainWrapper.querySelector('.diman__scanLog__block:not(.diman__scanLog__additional-block)');
+        
+        const noLotsMsg = mainWrapper.querySelector('.tpi-sort-no-lots-message');
+        
+        if (isLot) {
+            // Режим "Лот"
+            if (mainBlock) mainBlock.style.display = 'none';
+            if (noLotsMsg) noLotsMsg.style.display = 'none';
+            
+            if (scanlogBlocks.length > 0) {
+                scanlogBlocks.forEach((block, index) => {
+                    block.style.display = (index === currentScanlogIndex) ? 'block' : 'none';
+                });
+            } else {
+                showNoLotsMessage(mainWrapper);
+            }
+        } else {
+            // Режим "Заказ"
+            if (mainBlock) mainBlock.style.display = 'block';
+            if (noLotsMsg) noLotsMsg.style.display = 'none';
+            
+            scanlogBlocks.forEach(block => {
+                block.style.display = 'none';
+            });
+        }
+    }, 300);
+}
 
+function showNoLotsMessage(wrapper) {
+    let noLotsMsg = wrapper.querySelector('.tpi-sort-no-lots-message');
+    if (!noLotsMsg) {
+        noLotsMsg = document.createElement('div');
+        noLotsMsg.className = 'tpi-sort-no-lots-message';
+        noLotsMsg.innerHTML = `
+            <div class="diman__scanLog__block">
+                <div class="diman__scanLog__topTableWrapper">
+                    <div class="diman__scanLog__topTable tpi-sort-table-topTable">
+                        <span class="diman__scanLog__block-title">Сканлог: <span>Лоты не найдены</span></span>
+                        <label class="tpi-switch-sortable-scanlog-wrapper" for="tpi-switch-sortable-checkbox-lot-no">
+                            <input type="checkbox" id="tpi-switch-sortable-checkbox-lot-no" checked>
+                            <span class="tpi-switch-sortable-scanlog-pciker"></span>
+                            <div class="tpi-switch-sortable-scanlog-option" tpi-sort-switch-option="sortable">
+                                <p class="tpi-switch-sortable-scanlog-title">Заказ</p>
+                            </div>
+                            <div class="tpi-switch-sortable-scanlog-option" tpi-sort-switch-option="lot">
+                                <p class="tpi-switch-sortable-scanlog-title">Лот</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                <table style="width:100%"><tbody><tr><td class="diman__scanLog__null">Нет вложенных лотов для этого грузоместа</td></tr></tbody></table>
+            </div>
+        `;
+        wrapper.appendChild(noLotsMsg);
+        
+        // Добавляем обработчик для этого переключателя
+        const switchEl = noLotsMsg.querySelector('#tpi-switch-sortable-checkbox-lot-no');
+        if (switchEl) {
+            switchEl.removeEventListener('change', handleSwitchChange);
+            switchEl.addEventListener('change', handleSwitchChange);
+        }
+    }
+    noLotsMsg.style.display = 'block';
+}
 
 // Функция для преобразования ячейки с флоу в формат с фиксом
 function applyFlowNameFixToCell(td, flowValue, operationValue, isFixEnabled) {
@@ -3690,4 +4173,51 @@ function enableHorizontalScrollWithDrag(container) {
     container.style.cursor = 'grab';
 
     container._scrollHandlers = { onWheel, onMouseDown, onMouseMove, onMouseUp, onMouseLeave };
+}
+
+// Функция для добавления кнопок копирования штрихкодов
+function addBarcodeCopyButtons(data) {
+    const titleSpan = document.querySelector('span[data-i18n-key="pages.sortable-item:page-title"]');
+    if (!titleSpan) return;
+    
+    // Проверяем, нет ли уже кнопок
+    let parent = titleSpan.parentElement;
+    for (let i = 0; i < 5 && parent; i++) {
+        if (parent.querySelector('.tpi-sort-copy-sortable-name-wrapper')) return;
+        parent = parent.parentElement;
+    }
+    
+    const hasMultiple = data.barcodes && data.barcodes.length > 1;
+    const primary = hasMultiple ? data.barcodes[1] : '';
+    const secondary = data.barcode || (data.barcodes && data.barcodes[0]) || '';
+    
+    const wrapper = document.createElement('div');
+    wrapper.className = 'tpi-sort-copy-sortable-name-wrapper';
+    wrapper.innerHTML = `
+        <button class="tpi-sort-copy-sortable-name" data-copy-type="default" tpi-tooltip-data="Копировать номер заказа">
+            ${tpi_sort_copy_default}
+        </button>
+        <button class="tpi-sort-copy-sortable-name" data-copy-type="mono" tpi-tooltip-data="Копировать номер заказа моно, для телеграм">
+            ${tpi_sort_copy_mono}
+        </button>
+    `;
+    
+    titleSpan.insertAdjacentElement('afterend', wrapper);
+    
+    // Обработчики
+    wrapper.querySelector('[data-copy-type="default"]').addEventListener('click', () => {
+        const text = hasMultiple ? `${primary} (${secondary})` : primary;
+        navigator.clipboard.writeText(text);
+        if (typeof tpiNotification !== 'undefined') {
+            tpiNotification.show("Скопировано", "success", text);
+        }
+    });
+    
+    wrapper.querySelector('[data-copy-type="mono"]').addEventListener('click', () => {
+        const text = hasMultiple ? `\`${primary}\` (\`${secondary}\`)` : `\`${primary}\``;
+        navigator.clipboard.writeText(text);
+        if (typeof tpiNotification !== 'undefined') {
+            tpiNotification.show("Скопировано", "success", text);
+        }
+    });
 }

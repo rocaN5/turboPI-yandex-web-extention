@@ -25,6 +25,7 @@ div.tpi-tooltip-by-sheva_r6{
     white-space: pre-wrap;
     pointer-events: none;
     position: fixed;
+    will-change: transform, left, top, opacity;
     &[sheva_r6]{color: red;}
 
     &[tpi-tolltip-position-x='from-left']{
@@ -53,17 +54,19 @@ div.tpi-tooltip-by-sheva_r6{
         font-weight: 500;
     }
 
-    i{
-        width: 16px;
-        height: 16px;
+    icon.tpi-tooltip-default-icon{
+        width: 20px;
+        height: 20px;
         position: relative;
-        min-width: 16px;
-        min-height: 16px;
+        min-width: 20px;
+        min-height: 20px;
         display: flex;
     }
 
-    i svg{
+    icon.tpi-tooltip-default-icon svg{
         fill: currentColor;
+        width: 100%;
+        height: 100%;
     }
 
     span{
@@ -73,6 +76,95 @@ div.tpi-tooltip-by-sheva_r6{
         right: 10px;
         color: #ffffff38;
         font-weight: normal;
+    }
+}
+
+.tpi-tooltip-wrapper[tpi-tooltip-type="sortable-ticket"]{
+    background: #fff;
+    backdrop-filter: unset;
+    max-width: 400px;
+    color: #212121;
+    box-shadow: 0px 0px 6px 0px #0000003f;
+    border-radius: 20px;
+    border: 1px solid #a5a5ff;
+    padding: 20px;
+    --tooltip-main-color: #5d5dff;
+    --tooltip-data-size: .9rem;
+
+    .tpi-tooltip-content{
+        display: flex;
+        flex-flow: column;
+        gap: 12px;
+    }
+    
+    .tpi-tooltip-block{
+        display: flex;
+        flex-flow: column;
+        align-items: flex-start !important;
+        justify-content: center;
+        gap: 0 !important;
+    }
+    
+    .tpi-tooltip-block-content {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 1ch;
+        flex-wrap: wrap;
+    }
+    
+    .tpi-tooltip-block[data-block-key="description"] {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0px;
+    }
+    
+    .tpi-tooltip-block-header {
+        display: flex;
+        align-items: center;
+        gap: .4ch;
+    }
+    
+    icon.tpi-tooltip-block-icon {
+        width: 1rem;
+        height: 1rem;
+        min-width: 1rem;
+        color: var(--tooltip-main-color);
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    icon.tpi-tooltip-block-icon svg {
+        width: 100%;
+        height: 100%;
+        color: currentColor;
+    }
+    
+    icon.tpi-tooltip-block-icon:has(svg.tpi-tooltip-icon-size-14){
+        width: 16px !important;
+        height: 16px !important;
+        min-width: 16px !important;
+        min-height: 16px !important;
+    }
+    
+    .tpi-tooltip-block-title {
+        font-weight: 600;
+        color: var(--tooltip-main-color);
+        font-size: var(--tooltip-data-size);
+    }
+    
+    .tpi-tooltip-block-data {
+        font-size: var(--tooltip-data-size);
+        color: #333;
+        word-break: break-word;
+    }
+    
+    /* Данные для description */
+    .tpi-tooltip-block[data-block-key="description"] .tpi-tooltip-block-data {
+        white-space: pre-wrap;
+        line-height: 1.4;
     }
 }
 
