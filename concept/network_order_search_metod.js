@@ -1,50 +1,40 @@
-A-----------------------------------------------------------------------------------------
-
+// ===== ОРИГИНАЛЬНАЯ ФУНКЦИЯ ОПРЕДЕЛЕНИЯ ТИПА =====
 function determineSearchType(value) {
     const str = String(value).trim();
     
-    // Первый вариант: начинается с "LO-", "FF-", "AE-"
     if (str.startsWith("LO-") || str.startsWith("FF-") || str.startsWith("AE-")) {
         return 'first';
     }
     
-    // Второй вариант: начинается с определенных префиксов
     const secondPrefixes = ["F12", "FA2", "F22", "F30", "F40", "F50", "P20", "YP", "BP", "SP", "VOZ", "PVZ", "YMCN", "07", "08", "05", "02"];
     if (secondPrefixes.some(prefix => str.startsWith(prefix))) {
         return 'second';
     }
     
-    // Второй вариант: 11 цифр с дефисом после
     if (/^\d{11}-/.test(str)) {
         return 'second';
     }
     
-    // Второй вариант: 11 цифр (номера заказов)
     const digitsOnly = str.replace(/\D/g, '');
     if (digitsOnly.length === 11) {
         return 'second';
     }
     
-    // По умолчанию используем второй вариант для всех остальных случаев
     return 'second';
 }
 
-// Функция проверки совпадения найденного заказа с искомым значением
 function checkOrderMatch(order, searchValue, searchType) {
     if (!order) return false;
     
     const searchStr = String(searchValue).trim();
     
     if (searchType === 'first') {
-        // Для поиска по штрихкоду проверяем совпадение со штрихкодом
         return order.sortableBarcode === searchStr;
     } else {
-        // Для поиска по номеру заказа проверяем совпадение с номером заказа
         return order.orderExternalId === searchStr;
     }
 }
 
-// Универсальная функция обработки и логирования данных
 function processAndLogOrderData(data, searchType = '') {
     if (data && data.results && data.results.length > 0) {
         const result = data.results[0];
@@ -53,49 +43,15 @@ function processAndLogOrderData(data, searchType = '') {
             const orders = result.data.content;
             const order = orders[0];
             
-            const searchTypeText = searchType ? `по ${searchType}` : '';
-            
-            console.log(`
-🎯 РЕЗУЛЬТАТ ПОИСКА ${searchTypeText.toUpperCase()}:
-├─ 📦 Номер заказа: ${order.orderExternalId || 'N/A'}
-├─ 🏷️ Штрихкод: ${order.sortableBarcode || 'N/A'}
-├─ 🔢 ID сортируемого: ${order.sortableId || 'N/A'}
-├─ 📊 Тип: ${order.sortableType || 'N/A'}
-├─ 🚚 Статус: ${order.status || 'N/A'}
-├─ 📊 Расширенный статус: ${order.stageDisplayName || 'N/A'}
-├─ 🎯 Назначение: ${order.destinationNameTo?.name || 'N/A'}
-├─ 📍 Откуда: ${order.routeFrom || 'N/A'}
-├─ 📍 Куда: ${order.routeTo || 'N/A'}
-├─ 📅 Создан: ${order.createdAt ? new Date(order.createdAt).toLocaleString() : 'N/A'}
-├─ ⏰ Прибыл: ${order.arrivedDateTime ? new Date(order.arrivedDateTime).toLocaleString() : 'N/A'}
-├─ 📤 Отгружен: ${order.shippedDateTime ? new Date(order.shippedDateTime).toLocaleString() : 'N/A'}
-├─ 🔢 Код группы: ${order.groupCode || 'N/A'}
-├─ 🎯 Кросс-док: ${order.crossDock ? 'Да' : 'Нет'}
-├─ ⚠️ Статус повреждения: ${order.damagedStatus || 'N/A'}
-├─ 🚛 Курьер: ${order.courierName || 'N/A'}
-└─ 🆔 Номер лота: ${order.lotExternalId || 'N/A'}
-            `);
-            
-            // Дополнительная информация о грузоместах
-            if (orders.length > 1) {
-                console.log('📦 Связанные грузоместа:');
-                orders.forEach((o, index) => {
-                    console.log(`   ${index + 1}. ${o.sortableBarcode} (${o.sortableId}) - ${o.sortableType || 'N/A'}`);
-                });
-            }
-            
             return order;
         }
     }
     
-    console.log('❌ Заказ не найден в ответе');
     return null;
 }
 
-// Функция поиска по штрихкоду
+// ===== ФУНКЦИЯ ПОИСКА ПО ШТРИХКОДУ =====
 function searchByBarcode(barcode, tryFallback = true) {
-    console.log(`🔍 Поиск по штрихкоду: ${barcode}`);
-    
     const url = new URL('https://logistics.market.yandex.ru/api/resolve/');
     url.searchParams.append('r', 'sortingCenter/sortables/resolveSortableReport:resolveSortableReport');
 
@@ -116,8 +72,7 @@ function searchByBarcode(barcode, tryFallback = true) {
         "path": `/sorting-center/21972131/sortables?sortableTypes=PLACE,PALLET,TOT,BATCH&sortableStatuses=&sortableStatusesLeafs=&sortableBarcode=${barcode}&outboundIdTitle=&groupingDirectionId=&groupingDirectionName=`
     };
 
-    // Используем токен из переменной
-    const skToken = tpiUserTOKEN;
+    const skToken = window.tpiUserTOKEN;
 
     return fetch(url.toString(), {
         method: 'POST',
@@ -137,9 +92,7 @@ function searchByBarcode(barcode, tryFallback = true) {
             const result = data.results[0];
             
             if (result.error) {
-                console.log('❌ Ошибка API:', result.error.message);
                 if (tryFallback) {
-                    console.log('🔄 Пробуем поиск по номеру заказа...');
                     return searchByOrderNumber(barcode, false);
                 }
                 return null;
@@ -148,41 +101,31 @@ function searchByBarcode(barcode, tryFallback = true) {
             if (result.data && result.data.content && result.data.content.length > 0) {
                 const order = result.data.content[0];
                 
-                // Проверяем совпадение штрихкода
                 if (checkOrderMatch(order, barcode, 'first')) {
-                    console.log('✅ Заказ найден по штрихкоду!');
                     return processAndLogOrderData(data, 'штрихкоду');
                 } else {
-                    console.log('⚠️ Найден заказ, но штрихкод не совпадает');
                     if (tryFallback) {
-                        console.log('🔄 Пробуем поиск по номеру заказа...');
                         return searchByOrderNumber(barcode, false);
                     }
                 }
             }
         }
         
-        console.log('❌ Заказ не найден по штрихкоду');
         if (tryFallback) {
-            console.log('🔄 Пробуем поиск по номеру заказа...');
             return searchByOrderNumber(barcode, false);
         }
         return null;
     })
     .catch(error => {
-        console.error('💥 Ошибка:', error);
         if (tryFallback) {
-            console.log('🔄 Пробуем поиск по номеру заказа...');
             return searchByOrderNumber(barcode, false);
         }
         return null;
     });
 }
 
-// Функция поиска по номеру заказа
+// ===== ФУНКЦИЯ ПОИСКА ПО НОМЕРУ ЗАКАЗА =====
 function searchByOrderNumber(orderNumber, tryFallback = true) {
-    console.log(`🔍 Поиск по номеру заказа: ${orderNumber}`);
-    
     const url = new URL('https://logistics.market.yandex.ru/api/resolve/');
     url.searchParams.append('r', 'sortingCenter/sortables/resolveSortableReport:resolveSortableReport');
 
@@ -203,8 +146,7 @@ function searchByOrderNumber(orderNumber, tryFallback = true) {
         "path": `/sorting-center/21972131/sortables?sortableTypes=PLACE,PALLET,TOT,BATCH&sortableStatuses=&sortableStatusesLeafs=&orderExternalId=${orderNumber}&outboundIdTitle=&groupingDirectionId=&groupingDirectionName=`
     };
 
-    // Используем токен из переменной
-    const skToken = tpiUserTOKEN;
+    const skToken = window.tpiUserTOKEN;
 
     return fetch(url.toString(), {
         method: 'POST',
@@ -229,9 +171,7 @@ function searchByOrderNumber(orderNumber, tryFallback = true) {
             const result = data.results[0];
             
             if (result.error) {
-                console.log('❌ Ошибка:', result.error.message);
                 if (tryFallback) {
-                    console.log('🔄 Пробуем поиск по штрихкоду...');
                     return searchByBarcode(orderNumber, false);
                 }
                 return null;
@@ -240,76 +180,144 @@ function searchByOrderNumber(orderNumber, tryFallback = true) {
             if (result.data && result.data.content && result.data.content.length > 0) {
                 const order = result.data.content[0];
                 
-                // Проверяем совпадение номера заказа
                 if (checkOrderMatch(order, orderNumber, 'second')) {
-                    console.log('✅ Заказ найден по номеру!');
                     return processAndLogOrderData(data, 'номеру');
                 } else {
-                    console.log('⚠️ Найден заказ, но номер не совпадает');
                     if (tryFallback) {
-                        console.log('🔄 Пробуем поиск по штрихкоду...');
                         return searchByBarcode(orderNumber, false);
                     }
                 }
             }
         }
         
-        console.log('❌ Заказ не найден по номеру');
         if (tryFallback) {
-            console.log('🔄 Пробуем поиск по штрихкоду...');
             return searchByBarcode(orderNumber, false);
         }
         return null;
     })
     .catch(error => {
-        console.error('❌ Ошибка:', error);
         if (tryFallback) {
-            console.log('🔄 Пробуем поиск по штрихкоду...');
             return searchByBarcode(orderNumber, false);
         }
         return null;
     });
 }
 
-// Основная функция поиска
-async function tpi_sto_SearchOrder(value) {
-    console.log(`🔍 Запуск поиска для: "${value}"`);
-    
-    // Проверяем наличие токена
-    if (!tpiUserTOKEN) {
-        console.log('❌ Токен не загружен, невозможно выполнить поиск');
-        return null;
-    }
-    
-    console.log('✅ Токен готов, начинаем поиск...');
-    
+// ===== ОСНОВНАЯ ФУНКЦИЯ ПОИСКА (ДЛЯ ОДНОГО ЗАКАЗА) =====
+function tpi_sto_SearchOrder(value) {
     const searchType = determineSearchType(value);
-    console.log(`📊 Определен тип поиска: ${searchType === 'first' ? 'по штрихкоду' : 'по номеру заказа'}`);
     
     if (searchType === 'first') {
         return searchByBarcode(value, true)
-            .then(result => {
-                if (!result) {
-                    console.log('❌❌❌ Ничего не нашлось :/');
-                }
-                return result;
-            });
+            .then(result => result);
     } else {
         return searchByOrderNumber(value, true)
-            .then(result => {
-                if (!result) {
-                    console.log('❌❌❌ Ничего не нашлось :/');
-                }
-                return result;
-            });
+            .then(result => result);
     }
 }
 
-// Дополнительные функции для обратной совместимости
-function tpiSearchOrder_sortable(value) {
-    return tpi_sto_SearchOrder(value);
+// ===== НОВЫЕ ФУНКЦИИ ДЛЯ ПАРАЛЛЕЛЬНОГО ПОИСКА =====
+function processSingleOrder(value) {
+    return tpi_sto_SearchOrder(value)
+        .then(result => {
+            return {
+                value: value,
+                result: result,
+                success: !!result
+            };
+        })
+        .catch(error => {
+            return {
+                value: value,
+                result: null,
+                success: false,
+                error: error.message || 'Ошибка выполнения'
+            };
+        });
 }
 
-function getOrderData(value) {
-    return tpi_sto_SearchOrder(value);
+function showResultsAlert(results) {
+    let message = '📊 РЕЗУЛЬТАТЫ ПОИСКА\n';
+    message += '═══════════════════════════════════\n\n';
+    
+    const successCount = results.filter(r => r.success).length;
+    const failCount = results.filter(r => !r.success).length;
+    
+    message += `✅ Найдено: ${successCount}\n`;
+    message += `❌ Не найдено: ${failCount}\n`;
+    message += `📦 Всего: ${results.length}\n\n`;
+    message += '═══════════════════════════════════\n\n';
+    
+    results.forEach((item, index) => {
+        const status = item.success ? '✅' : '❌';
+        message += `${index + 1}. ${status} ${item.value}\n`;
+        
+        if (item.success && item.result) {
+            message += `   📦 Номер: ${item.result.orderExternalId || 'N/A'}\n`;
+            message += `   🏷️ Штрихкод: ${item.result.sortableBarcode || 'N/A'}\n`;
+            if (item.result.status) {
+                message += `   🚚 Статус: ${item.result.status}\n`;
+            }
+        } else if (!item.success && item.error) {
+            message += `   ⚠️ Ошибка: ${item.error}\n`;
+        } else {
+            message += `   ⚠️ Не найден\n`;
+        }
+        message += '\n';
+    });
+    
+    alert(message);
 }
+
+async function tpi_sto_SearchOrdersBatch(values) {
+    if (!Array.isArray(values)) {
+        return tpi_sto_SearchOrder(values);
+    }
+    
+    if (!values || values.length === 0) {
+        alert('❌ Список заказов пуст');
+        return [];
+    }
+    
+    if (!window.tpiUserTOKEN) {
+        alert('❌ Токен не загружен, невозможно выполнить поиск');
+        return values.map(v => ({
+            value: v,
+            result: null,
+            success: false,
+            error: 'Токен не загружен'
+        }));
+    }
+    
+    const promises = values.map(value => processSingleOrder(value));
+    const results = await Promise.allSettled(promises);
+    
+    const processedResults = results.map((result, index) => {
+        if (result.status === 'fulfilled') {
+            return result.value;
+        } else {
+            return {
+                value: values[index],
+                result: null,
+                success: false,
+                error: result.reason?.message || 'Неизвестная ошибка'
+            };
+        }
+    });
+    
+    showResultsAlert(processedResults);
+    return processedResults;
+}
+
+// ===== ПРОСТАЯ ФУНКЦИЯ ДЛЯ ЗАПУСКА =====
+async function searchOrders(ordersArray) {
+    return await tpi_sto_SearchOrdersBatch(ordersArray);
+}
+
+// ===== ЭКСПОРТ В ГЛОБАЛЬНУЮ ОБЛАСТЬ =====
+window.searchOrders = searchOrders;
+window.tpi_sto_SearchOrdersBatch = tpi_sto_SearchOrdersBatch;
+window.tpi_sto_SearchOrder = tpi_sto_SearchOrder;
+window.determineSearchType = determineSearchType;
+
+console.log('✅ Функции загружены! Используйте: await searchOrders([массив])');

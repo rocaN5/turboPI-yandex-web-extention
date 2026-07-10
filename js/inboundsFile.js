@@ -328,9 +328,9 @@ async function fetchShipmentsToTable() {
         const day = String(selectedDate.getDate()).padStart(2, '0');
         const dateString = `${year}-${month}-${day}`;
         
-        const url = `https://hubs.market.yandex.ru/api/gateway/logpoint/21972131/inbounds/get-list?platformType=SORTING_CENTER&courierQuery=&dateFrom=${dateString}&dateTo=${dateString}&movementTypes=LINEHAUL&statuses=ARRIVED%2CIN_PROGRESS%2CSIGNED%2CFIXED%2CCREATED&types=&page=0&size=100`;
-        // const url = `https://hubs.market.yandex.ru/api/gateway/logpoint/21972131/inbounds/get-list?platformType=SORTING_CENTER&dateFrom=${dateString}&dateTo=${dateString}&movementTypes=LINEHAUL&statuses=ARRIVED%2CIN_PROGRESS%2CSIGNED%2CFIXED%2CCREATED`;
-        // const url = `https://hubs.market.yandex.ru/api/gateway/logpoint/21972131/inbounds/get-list?platformType=SORTING_CENTER&dateFrom=2025-09-25&dateTo=2025-09-25&movementTypes=LINEHAUL&statuses=ARRIVED%2CIN_PROGRESS%2CSIGNED%2CFIXED%2CCREATED`;
+        const url = `https://sorting-center.logistics.yandex.ru/api/gateway/logpoint/21972131/inbounds/get-list?platformType=SORTING_CENTER&courierQuery=&dateFrom=${dateString}&dateTo=${dateString}&movementTypes=LINEHAUL&statuses=ARRIVED%2CIN_PROGRESS%2CSIGNED%2CFIXED%2CCREATED&types=&page=0&size=100`;
+        // const url = `https://sorting-center.logistics.yandex.ru/api/gateway/logpoint/21972131/inbounds/get-list?platformType=SORTING_CENTER&dateFrom=${dateString}&dateTo=${dateString}&movementTypes=LINEHAUL&statuses=ARRIVED%2CIN_PROGRESS%2CSIGNED%2CFIXED%2CCREATED`;
+        // const url = `https://sorting-center.logistics.yandex.ru/api/gateway/logpoint/21972131/inbounds/get-list?platformType=SORTING_CENTER&dateFrom=2025-09-25&dateTo=2025-09-25&movementTypes=LINEHAUL&statuses=ARRIVED%2CIN_PROGRESS%2CSIGNED%2CFIXED%2CCREATED`;
         
         const response = await fetch(url);
         
@@ -350,7 +350,16 @@ async function fetchShipmentsToTable() {
         }
         
         // Очищаем существующие данные и показываем прелоадер
-        tbody.innerHTML = '<tr class="tpi-infi--table-preloader"><td colspan="9" style="text-align: center; padding: 20px;">Загрузка данных...</td></tr>';
+        tbody.innerHTML = /*html*/ `
+            <tr class="tpi-infi--table-preloader">
+                <td colspan="10" style="text-align: center; padding: 20px;">
+                    <div class="tpi-infi--table-loader"">
+                        <div class="tpi-infi--table-loader-spinner"></div>
+                        <p>Загрузка данных...</p>
+                    </div>
+                </td>
+            </tr>
+        `;
         
         // Переменные для статистики
         let totalShipments = 0;
@@ -481,10 +490,10 @@ async function fetchShipmentsToTable() {
                 
                 // Колонка поставщиков
                 driverShipments.forEach((data, index) => {
-                    rowHTML += `<div>${shortenSupplierName(data.shipment.supplierName) || 'Не указан'}</div>`;
+                    rowHTML += /*html*/ `<div>${shortenSupplierName(data.shipment.supplierName) || 'Не указан'}</div>`;
                 });
                 
-                rowHTML += `
+                rowHTML += /*html*/ `
                         </td>
                         <td class="tpi-infi--table-driver tpi-infi--table-multiple-inbounds-driver">
                             <div>
@@ -502,14 +511,14 @@ async function fetchShipmentsToTable() {
                         </td>
                 `;
                 
-                rowHTML += `
+                rowHTML += /*html*/ `
                         </td>
                         <td class="tpi-infi--table-orders-data tpi-infi--table-multiple-inbounds">
                 `;
                 
                 // Колонка поставок/перемещений
                 driverShipments.forEach(data => {
-                    rowHTML += `
+                    rowHTML += /*html*/ `
                             <div>
                                 <span class="tpi-infi--table-data-wrapper">
                                     <p>
@@ -522,35 +531,35 @@ async function fetchShipmentsToTable() {
                     `;
                 });
                 
-                rowHTML += `
+                rowHTML += /*html*/ `
                         </td>
                         <td class="tpi-infi--table-orders-data tpi-infi--table-multiple-inbounds">
                 `;
                 
                 // Колонка посылок принято/план
                 driverShipments.forEach(data => {
-                    rowHTML += `
+                    rowHTML += /*html*/ `
                             <div>
                                 <a target="_blank" href="https://hubs.market.yandex.ru/sorting-center/21972131/sortables?inboundIdTitle=${data.shipment.externalId}&sortableStatuses=&sortableStatusesLeafs=" class="tpi-infi--inbound-incom-data tpi-infi--table-orders-data">${tpiIcon__box}${data.shipment.acceptance?.place?.accepted || 0} / ${data.shipment.acceptance?.place?.total || 0}</a>
                             </div>
                     `;
                 });
                 
-                rowHTML += `
+                rowHTML += /*html*/ `
                         </td>
                         <td class="tpi-infi--table-lots-data tpi-infi--table-multiple-inbounds">
                 `;
                 
                 // Колонка лотов принято/план
                 driverShipments.forEach(data => {
-                    rowHTML += `
+                    rowHTML += /*html*/ `
                             <div>
                                 <a target="_blank" href="https://hubs.market.yandex.ru/sorting-center/21972131/sortables?inboundIdTitle=${data.shipment.externalId}&sortableStatuses=&sortableStatusesLeafs=&sortableTypes=DROP_PALLET&sortableTypes=ORPHAN_PALLET&sortableTypes=PALLET&sortableTypes=XDOC_PALLET" class="tpi-infi--inbound-incom-data">${tpiIcon__pallet}${data.shipment.acceptance?.lot?.accepted || 0} / ${data.shipment.acceptance?.lot?.total || 0}</a>
                             </div>
                     `;
                 });
                 
-                rowHTML += `
+                rowHTML += /*html*/ `
                         </td>
                         <td class="tpi-infi--table-combined-orders-data tpi-infi--table-multiple-inbounds-part-left">
                             <div>
@@ -566,7 +575,7 @@ async function fetchShipmentsToTable() {
                 `;
                 
                 // Колонка прибытия
-                    rowHTML += `
+                    rowHTML += /*html*/ `
                     <div>
                         <span class="tpi-infi--table-data-wrapper">
                             <p class="tpi-infi-arival-planned-day">${firstShipment.shipment.arrival?.planned?.finish ? formatDate(firstShipment.shipment.arrival.planned.finish) : 'Не указано'}</p>
@@ -575,14 +584,14 @@ async function fetchShipmentsToTable() {
                     </div>
             `;
                 
-                rowHTML += `
+                rowHTML += /*html*/ `
                         </td>
                         <td class="tpi-infi--table-driver-truck-data tpi-infi--table-multiple-inbounds">
                 `;
                 
                 // Колонка машина/прицеп
                 driverShipments.forEach(data => {
-                    rowHTML += `
+                    rowHTML += /*html*/ `
                             <div>
                                 <span class="tpi-infi--table-data-wrapper">
                                     <p>${data.shipment.courier?.carNumber || 'Не указан'}</p>
@@ -592,14 +601,14 @@ async function fetchShipmentsToTable() {
                     `;
                 });
                 
-                rowHTML += `
+                rowHTML += /*html*/ `
                         </td>
                         <td class="tpi-infi--table-inbound-document-wrapper tpi-infi--table-multiple-inbounds">
                 `;
                 
                 // Колонка документы
                 driverShipments.forEach(data => {
-                    rowHTML += `
+                    rowHTML += /*html*/ `
                             <div>
                                 <button tpi-tmu-id="${data.shipment.externalId}">
                                     ${tpiIcon__EAPP} ЭАПП Поставки
@@ -608,7 +617,7 @@ async function fetchShipmentsToTable() {
                     `;
                 });
                 
-                rowHTML += `
+                rowHTML += /*html*/ `
                         </td>
                     </tr>
                 `;
@@ -720,7 +729,7 @@ async function fetchShipmentsToTable() {
             button.addEventListener('click', (e)=>{
                 e.preventDefault();
                 const tmuData = button.getAttribute('tpi-tmu-id')
-                let documentURL= `https://hubs.market.yandex.ru/api/gateway/logpoint/21972131/inbounds/print-document?type=DIGITAL_TRANSFER_ACT&platformType=SORTING_CENTER&externalId=${tmuData}`
+                let documentURL= `https://sorting-center.logistics.yandex.ru/api/gateway/logpoint/21972131/inbounds/print-document?type=DIGITAL_TRANSFER_ACT&platformType=SORTING_CENTER&externalId=${tmuData}`
                 window.open(documentURL, '_blank');
                 return false;
             })
@@ -840,7 +849,7 @@ async function fetchDriverInfo(nameId, phoneId) {
         const encodedNameId = encodeURIComponent(nameId);
         const encodedPhoneId = encodeURIComponent(phoneId);
         
-        const url = `https://hubs.market.yandex.ru/api/gateway/logpoint/21972131/personal/get-bulk?platformType=SORTING_CENTER&ids=${encodedNameId}%2C${encodedPhoneId}`;
+        const url = `https://sorting-center.logistics.yandex.ru/api/gateway/logpoint/21972131/personal/get-bulk?platformType=SORTING_CENTER&ids=${encodedNameId}%2C${encodedPhoneId}`;
         
         const response = await fetch(url);
         const driverData = await response.json();
@@ -929,7 +938,7 @@ async function fetchShipmentsToTableHTML() {
         const day = String(selectedDate.getDate()).padStart(2, '0');
         const dateString = `${year}-${month}-${day}`;
         
-        const url = `https://hubs.market.yandex.ru/api/gateway/logpoint/21972131/inbounds/get-list?platformType=SORTING_CENTER&courierQuery=&dateFrom=${dateString}&dateTo=${dateString}&movementTypes=LINEHAUL&statuses=ARRIVED%2CIN_PROGRESS%2CSIGNED%2CFIXED%2CCREATED&types=&page=0&size=100`;
+        const url = `https://sorting-center.logistics.yandex.ru/api/gateway/logpoint/21972131/inbounds/get-list?platformType=SORTING_CENTER&courierQuery=&dateFrom=${dateString}&dateTo=${dateString}&movementTypes=LINEHAUL&statuses=ARRIVED%2CIN_PROGRESS%2CSIGNED%2CFIXED%2CCREATED&types=&page=0&size=100`;
         
         const response = await fetch(url);
         
@@ -1071,10 +1080,10 @@ async function fetchShipmentsToTableHTML() {
                 
                 // Колонка поставщиков
                 driverShipments.forEach((data, index) => {
-                    rowHTML += `<div>${shortenSupplierName(data.shipment.supplierName) || 'Не указан'}</div>`;
+                    rowHTML += /*html*/ `<div>${shortenSupplierName(data.shipment.supplierName) || 'Не указан'}</div>`;
                 });
                 
-                rowHTML += `
+                rowHTML += /*html*/ `
                         </td>
                         <td class="tpi-infi--table-driver tpi-infi--table-multiple-inbounds-driver">
                             <div>
@@ -1092,14 +1101,14 @@ async function fetchShipmentsToTableHTML() {
                         </td>
                 `;
                 
-                rowHTML += `
+                rowHTML += /*html*/ `
                         </td>
                         <td class="tpi-infi--table-orders-data tpi-infi--table-multiple-inbounds">
                 `;
                 
                 // Колонка поставок/перемещений
                 driverShipments.forEach(data => {
-                    rowHTML += `
+                    rowHTML += /*html*/ `
                             <div>
                                 <span class="tpi-infi--table-data-wrapper">
                                     <p>
@@ -1112,35 +1121,35 @@ async function fetchShipmentsToTableHTML() {
                     `;
                 });
                 
-                rowHTML += `
+                rowHTML += /*html*/ `
                         </td>
                         <td class="tpi-infi--table-orders-data tpi-infi--table-multiple-inbounds">
                 `;
                 
                 // Колонка посылок принято/план
                 driverShipments.forEach(data => {
-                    rowHTML += `
+                    rowHTML += /*html*/ `
                             <div>
                                 <a target="_blank" href="https://hubs.market.yandex.ru/sorting-center/21972131/sortables?inboundIdTitle=${data.shipment.externalId}&sortableStatuses=&sortableStatusesLeafs=" class="tpi-infi--inbound-incom-data tpi-infi--table-orders-data">${tpiIcon__box}${data.shipment.acceptance?.place?.accepted || 0} / ${data.shipment.acceptance?.place?.total || 0}</a>
                             </div>
                     `;
                 });
                 
-                rowHTML += `
+                rowHTML += /*html*/ `
                         </td>
                         <td class="tpi-infi--table-lots-data tpi-infi--table-multiple-inbounds">
                 `;
                 
                 // Колонка лотов принято/план
                 driverShipments.forEach(data => {
-                    rowHTML += `
+                    rowHTML += /*html*/ `
                             <div>
                                 <a target="_blank" href="https://hubs.market.yandex.ru/sorting-center/21972131/sortables?inboundIdTitle=${data.shipment.externalId}&sortableStatuses=&sortableStatusesLeafs=&sortableTypes=DROP_PALLET&sortableTypes=ORPHAN_PALLET&sortableTypes=PALLET&sortableTypes=XDOC_PALLET" class="tpi-infi--inbound-incom-data">${tpiIcon__pallet}${data.shipment.acceptance?.lot?.accepted || 0} / ${data.shipment.acceptance?.lot?.total || 0}</a>
                             </div>
                     `;
                 });
                 
-                rowHTML += `
+                rowHTML += /*html*/ `
                         </td>
                         <td class="tpi-infi--table-combined-orders-data tpi-infi--table-multiple-inbounds-part-left">
                             <div>
@@ -1156,7 +1165,7 @@ async function fetchShipmentsToTableHTML() {
                 `;
                 
                 // Колонка прибытия
-                rowHTML += `
+                rowHTML += /*html*/ `
                     <div>
                         <span class="tpi-infi--table-data-wrapper">
                             <p class="tpi-infi-arival-planned-day">${firstShipment.shipment.arrival?.planned?.finish ? formatDate(firstShipment.shipment.arrival.planned.finish) : 'Не указано'}</p>
@@ -1165,14 +1174,14 @@ async function fetchShipmentsToTableHTML() {
                     </div>
                 `;
                 
-                rowHTML += `
+                rowHTML += /*html*/ `
                         </td>
                         <td class="tpi-infi--table-driver-truck-data tpi-infi--table-multiple-inbounds">
                 `;
                 
                 // Колонка машина/прицеп
                 driverShipments.forEach(data => {
-                    rowHTML += `
+                    rowHTML += /*html*/ `
                             <div>
                                 <span class="tpi-infi--table-data-wrapper">
                                     <p>${data.shipment.courier?.carNumber || 'Не указан'}</p>
@@ -1182,14 +1191,14 @@ async function fetchShipmentsToTableHTML() {
                     `;
                 });
                 
-                rowHTML += `
+                rowHTML += /*html*/ `
                         </td>
                         <td class="tpi-infi--table-inbound-document-wrapper tpi-infi--table-multiple-inbounds">
                 `;
                 
                 // Колонка документы
                 driverShipments.forEach(data => {
-                    rowHTML += `
+                    rowHTML += /*html*/ `
                             <div>
                                 <button tpi-tmu-id="${data.shipment.externalId}">
                                     ${tpiIcon__EAPP} ЭАПП Поставки
@@ -1198,7 +1207,7 @@ async function fetchShipmentsToTableHTML() {
                     `;
                 });
                 
-                rowHTML += `
+                rowHTML += /*html*/ `
                         </td>
                     </tr>
                 `;
@@ -1308,7 +1317,7 @@ function initEAPPHandlers() {
         button.addEventListener('click', (e) => {
             e.preventDefault();
             const tmuData = button.getAttribute('tpi-tmu-id');
-            let documentURL = `https://hubs.market.yandex.ru/api/gateway/logpoint/21972131/inbounds/print-document?type=DIGITAL_TRANSFER_ACT&platformType=SORTING_CENTER&externalId=${tmuData}`;
+            let documentURL = `https://sorting-center.logistics.yandex.ru/api/gateway/logpoint/21972131/inbounds/print-document?type=DIGITAL_TRANSFER_ACT&platformType=SORTING_CENTER&externalId=${tmuData}`;
             window.open(documentURL, '_blank');
             return false;
         });
@@ -1516,7 +1525,7 @@ function checkiIs__onInboundsFile() {
 
     // Функция проверки URL
     function isInboundsFilePage(url) {
-        const base = 'https://hubs.market.yandex.ru/sorting-center/';
+        const base = 'https://sorting-center.logistics.yandex.ru/sorting-center/';
         if (!url.startsWith(base)) return false;
         
         const params = new URLSearchParams(url.split('?')[1] || '');
@@ -1531,8 +1540,9 @@ function checkiIs__onInboundsFile() {
 
         const overlay = document.createElement('div');
         overlay.className = 'tpi-infi--wrapper';
+        overlay.setAttribute('data-tpi-injected', 'true');
 
-        overlay.innerHTML = 
+        overlay.innerHTML = /*html*/ 
         `
         <div class="tpi-infi--wrapper-title">
             <div class="tpi-infi-title-container">
@@ -1737,8 +1747,11 @@ function checkiIs__onInboundsFile() {
                 </thead>
                 <tbody class="tpi-infi--table--tbody">
                     <tr class="tpi-infi--table-preloader">
-                        <td colspan="9" style="text-align: center; padding: 20px;">
-                            Загрузка данных...
+                        <td colspan="10" style="text-align: center; padding: 20px;">
+                            <div class="tpi-infi--table-loader"">
+                                <div class="tpi-infi--table-loader-spinner"></div>
+                                <p>Загрузка данных...</p>
+                            </div>
                         </td>
                     </tr>
                 </tbody>
@@ -1747,6 +1760,12 @@ function checkiIs__onInboundsFile() {
         `
         
         function tryInsertOverlay() {
+            if (document.querySelector('.tpi-infi--wrapper[data-tpi-injected="true"]')) {
+                return true;
+            }
+
+            console.log('пробую')
+            
             const targetSpan = document.querySelector('span[data-i18n-key="pages.billing-stat:header.title"]');
             
             if (targetSpan) {
@@ -1783,7 +1802,6 @@ function checkiIs__onInboundsFile() {
     
         // Пытаемся вставить сразу
         if (!tryInsertOverlay()) {
-            // Если не получилось, ждем появления элемента
             const insertionObserver = new MutationObserver(() => {
                 if (tryInsertOverlay()) {
                     document.title = "Файл поставок";
@@ -1848,9 +1866,10 @@ function checkiIs__onInboundsFile() {
 
     let observer = new MutationObserver(() => {
         if (isInboundsFilePage(location.href)) {
-            addTurboBlock();
-            document.title = "Файл поставок";
-            console.log("changed")
+            if (!document.querySelector('.tpi-infi--wrapper[data-tpi-injected="true"]')) {
+                addTurboBlock();
+                document.title = "Файл поставок";
+            }
         }
     });
     observer.observe(document, { subtree: true, childList: true });
@@ -1874,7 +1893,8 @@ function shortenSupplierName(name) {
         { regex: /ООО «Маркет\.Операции» \(Софьино КГТ\)/, replacement: 'Софьино КГТ' },
         { regex: /СЦ Яндекс\.?Маркет (.+)/, replacement: 'СЦ $1' },
         { regex: /Склад СЦ Яндекс\.?Маркет (.+)/, replacement: 'СЦ $1' },
-        { regex: /ООО «Маркет\.Операции» \((.+)\)/, replacement: '$1' }
+        { regex: /ООО «Маркет\.Операции» \((.+)\)/, replacement: '$1' },
+        { regex: /Склад СЦ МК Тула/, replacement: 'СЦ МК Тула' },
     ];
     for (const pattern of patterns) {
         if (pattern.regex.test(name)) return name.replace(pattern.regex, pattern.replacement);
@@ -2200,7 +2220,7 @@ function initStatisticsGraph() {
             driver.shipments.forEach((shipment, index) => {
               if (index === 0) {
                 // Первая поставка - более выделенно
-                html += `
+                html += /*html*/ `
                                 <div class="tpi-infi--graph-flex-wrapper" style="margin-bottom:${
                                   driver.shipments.length > 1 ? "18px" : "0"
                                 }">
@@ -2218,7 +2238,7 @@ function initStatisticsGraph() {
                                 </div>`;
               } else {
                 // Остальные поставки
-                html += `
+                html += /*html*/ `
                                 <div class="tpi-infi--graph-flex-wrapper" style="margin-bottom:${
                                   index < driver.shipments.length - 1
                                     ? "6px"
@@ -2240,7 +2260,7 @@ function initStatisticsGraph() {
             });
 
             // Общая информация
-            html += `
+            html += /*html*/ `
                             <div class="tpi-infi--graph-flex-wrapper" style="border-top:1px solid #eee;margin-top:8px;padding-top:8px;">
                                 <div class="tpi-infi--graph-tooltip-driver-total-data">
                                     ${tpiIcon__packages}Всего заказов: ${driver.total}
@@ -3132,14 +3152,14 @@ function buildLineChart(chart, dailyData) {
                         </div>`;
                 
                 params.forEach(param => {
-                    html += `
+                    html += /*html*/ `
                         <div style="margin-bottom:4px;display:flex;align-items:center;">
                             <span style="display:inline-block;width:8px;height:8px;background:${param.color};border-radius:50%;margin-right:8px;"></span>
                             ${param.seriesName}: <strong style="margin-left:auto;">${param.value}</strong>
                         </div>`;
                 });
                 
-                html += `</div>`;
+                html += /*html*/ `</div>`;
                 return html;
             }
         },
@@ -3340,8 +3360,8 @@ async function fetchMonthDataInChunks(startDate, endDate) {
 }
 
 async function fetchShipmentsForPeriod(dateFrom, dateTo) {
-    // const url = `https://hubs.market.yandex.ru/api/gateway/logpoint/21972131/inbounds/get-list?platformType=SORTING_CENTER&dateFrom=${dateFrom}&dateTo=${dateTo}&movementTypes=LINEHAUL&statuses=ARRIVED%2CIN_PROGRESS%2CSIGNED%2CFIXED%2CCREATED&page=0&size=1000`;
-    const url = `https://hubs.market.yandex.ru/api/gateway/logpoint/21972131/inbounds/get-list?platformType=SORTING_CENTER&dateFrom=${dateFrom}&dateTo=${dateTo}&movementTypes=LINEHAUL&statuses=ARRIVED%2CIN_PROGRESS%2CSIGNED%2CFIXED%2CCREATED&types=&page=0&size=100`;
+    // const url = `https://sorting-center.logistics.yandex.ru/api/gateway/logpoint/21972131/inbounds/get-list?platformType=SORTING_CENTER&dateFrom=${dateFrom}&dateTo=${dateTo}&movementTypes=LINEHAUL&statuses=ARRIVED%2CIN_PROGRESS%2CSIGNED%2CFIXED%2CCREATED&page=0&size=1000`;
+    const url = `https://sorting-center.logistics.yandex.ru/api/gateway/logpoint/21972131/inbounds/get-list?platformType=SORTING_CENTER&dateFrom=${dateFrom}&dateTo=${dateTo}&movementTypes=LINEHAUL&statuses=ARRIVED%2CIN_PROGRESS%2CSIGNED%2CFIXED%2CCREATED&types=&page=0&size=100`;
     
     const response = await fetch(url);
     

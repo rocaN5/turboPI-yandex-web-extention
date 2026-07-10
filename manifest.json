@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Яндекс Турбо ПИ",
-  "version": "3.22.0",
-  "version_name": "3.22.0_dev0",
+  "version": "3.22.1",
+  "version_name": "3.22.1_dev1",
   "description": "Расширение для получения дополнительной информации из ПИ 💛",
   "permissions": [
     "activeTab",
@@ -13,7 +13,11 @@
   ],
   "content_scripts": [
     {
-      "matches": ["https://logistics.market.yandex.ru/*", "https://hubs.market.yandex.ru/*"],
+      "matches": [
+        "https://logistics.market.yandex.ru/*",
+        "https://hubs.market.yandex.ru/*",
+        "https://sorting-center.logistics.yandex.ru/*"
+      ],
       "js": [
         "libs/firebase-app.js",
         "libs/firebase-firestore.js",
@@ -88,7 +92,10 @@
         "libs/three/three.min.js",
         "libs/three/OrbitControls.js",
         "concept/*",
-        "libs/three/*"
+        "libs/three/*",
+        "libs/pdf.min.js",
+        "libs/pdf.mjs",
+        "libs/pdf.worker.mjs"
       ],
       "matches": ["<all_urls>"]
     }

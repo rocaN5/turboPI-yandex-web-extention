@@ -74,7 +74,7 @@ if (!isTokenAlreadyProcessed()) {
         let token = null;
         const currentUrl = window.location.href;
         
-        if (currentUrl.includes('https://hubs.market.yandex.ru')) {
+        if (currentUrl.includes('https://hubs.market.yandex.ru') || currentUrl.includes('https://sorting-center.logistics.yandex.ru/') ) {
             console.log('🌐 Домен 1 (hubs.market.yandex.ru) - ищем токен в meta-тегах...');
             window.tpiCurrentDomain = 'new';
             token = extractTokenFromMetaTags();

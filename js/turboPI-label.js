@@ -23,7 +23,7 @@ tpi_i_label_ordersFromEAPP = `
 `
 
 function getTPIversion(url) {
-    if (url.startsWith('https://hubs.market.yandex.ru/')) {
+    if (url.startsWith('https://hubs.market.yandex.ru/') || 'https://sorting-center.logistics.yandex.ru/') {
         return "new";
     } else if (url.startsWith('https://logistics.market.yandex.ru/')) {
         return "old";

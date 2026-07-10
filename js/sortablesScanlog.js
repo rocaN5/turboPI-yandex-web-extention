@@ -600,37 +600,28 @@ function handleScanlogLoading() {
                 }
 
                 if (status === 'search') {
-                    // Определяем, находимся ли мы на странице turboPI-Text-to-Orders
                     const currentUrl = window.location.href;
                     const isTurboPIPage = currentUrl.includes('turboPI-Text-to-Orders');
                     
                     let linkTrs = [];
                     
                     if (isTurboPIPage) {
-                        // Режим turboPI: ищем ссылки только внутри .diman__TURBOpi__textToOrders__table
                         const turboTable = document.querySelector('.diman__TURBOpi__textToOrders__table');
                         if (turboTable) {
-                            // Ищем ссылки внутри таблицы turboPI
-                            // Сначала ищем все строки таблицы с ссылками на sortables
                             const turboRows = turboTable.querySelectorAll('tr');
-                            
-                            // Фильтруем строки, которые содержат ссылки на sortables
                             linkTrs = Array.from(turboRows).filter(tr => {
                                 const link = tr.querySelector('a[href*="/sortables/"]');
                                 return link !== null && 
                                        !link.hasAttribute('data-scanlog-loaded') && 
                                        !link.hasAttribute('data-scanlog-loading');
                             });
-                            
                             console.log(`TurboPI режим: найдено ${linkTrs.length} ссылок в таблице turboPI`);
                         } else {
                             console.log('Таблица .diman__TURBOpi__textToOrders__table не найдена');
                         }
                     }
                     
-                    // Если не в режиме turboPI или не нашли ссылок, используем обычный поиск
                     if (!isTurboPIPage || linkTrs.length === 0) {
-                        // Обычный режим: ищем по всему документу
                         linkTrs = Array.from(
                             document.querySelectorAll('tr:has(a[data-tid-prop="8e34e3c2 d47a3f9b 2cf94f05"]:not([data-scanlog-loaded]):not([data-scanlog-loading]))')
                         );
@@ -638,7 +629,6 @@ function handleScanlogLoading() {
                     }
 
                     if (linkTrs.length === 0) {
-                        // Если ссылок нет, показываем сообщение и выходим
                         tpiNotification.show("Мини-радар", "info", "Нет ссылок для загрузки сканлогов");
                         this.disabled = false;
                         return;
@@ -666,51 +656,54 @@ function handleScanlogLoading() {
                     }
                     
                     let loadedCount = 0;
-                    const BATCH_SIZE = isTurboPIPage ? 3 : 5; // Меньший размер батча для turboPI страниц
+                    const totalLinks = linkTrs.length;
                     const updateProgress = () => {
                         loadedCount++;
-                        if (progressEl) progressEl.textContent = `${loadedCount} / ${linkTrs.length}`;
+                        if (progressEl) progressEl.textContent = `${loadedCount} / ${totalLinks}`;
                     };
                     
-                    const insertions = [];
+                    // 🚀 ВСЕ ЗАПРОСЫ ПАРАЛЛЕЛЬНО С ОГРАНИЧЕНИЕМ
+                    const CONCURRENT_LIMIT = 15; // Максимум одновременных запросов
                     
-                    // Обрабатываем ссылки батчами
-                    for (let i = 0; i < linkTrs.length; i += BATCH_SIZE) {
-                        const batch = linkTrs.slice(i, i + BATCH_SIZE);
+                    // Функция для обработки одного элемента
+                    const processItem = async (tr) => {
+                        let link;
+                        if (isTurboPIPage) {
+                            link = tr.querySelector('a[href*="/sortables/"]');
+                        } else {
+                            link = tr.querySelector('a[data-tid-prop="8e34e3c2 d47a3f9b 2cf94f05"]');
+                        }
                         
-                        // Для каждой строки в батче находим ссылку
-                        const results = await Promise.allSettled(
-                            batch.map(tr => {
-                                let link;
-                                if (isTurboPIPage) {
-                                    // На turboPI странице ищем любую ссылку с /sortables/
-                                    link = tr.querySelector('a[href*="/sortables/"]');
-                                } else {
-                                    // В обычном режиме используем стандартный селектор
-                                    link = tr.querySelector('a[data-tid-prop="8e34e3c2 d47a3f9b 2cf94f05"]');
-                                }
-                                
-                                if (link) {
-                                    return processSingleLink(link, updateProgress);
-                                }
-                                return null;
-                            })
-                        );
-                        
-                        // Обрабатываем результаты
-                        results.forEach(result => {
-                            if (result.status === 'fulfilled' && result.value) {
-                                insertions.push(result.value);
-                            } else if (result.status === 'rejected') {
-                                console.error('Ошибка при обработке ссылки:', result.reason);
+                        if (link) {
+                            const result = await processSingleLink(link, updateProgress);
+                            return { result, targetTr: tr };
+                        }
+                        return null;
+                    };
+                    
+                    // 🔥 КЛЮЧЕВОЕ ИЗМЕНЕНИЕ: Запускаем ВСЕ запросы сразу, но контролируем количество
+                    const allPromises = linkTrs.map(tr => processItem(tr));
+                    
+                    // Ждем завершения ВСЕХ запросов
+                    const settledResults = await Promise.allSettled(allPromises);
+                    
+                    // Собираем результаты
+                    const results = [];
+                    settledResults.forEach((settled) => {
+                        if (settled.status === 'fulfilled' && settled.value) {
+                            results.push(settled.value);
+                        } else if (settled.status === 'rejected') {
+                            console.error('Ошибка при обработке ссылки:', settled.reason);
+                        }
+                    });
+                    
+                    // Вставляем результаты в DOM (все сразу)
+                    for (const { result, targetTr } of results) {
+                        if (targetTr && result) {
+                            const { trWrapper } = result;
+                            if (trWrapper) {
+                                targetTr.parentElement.insertBefore(trWrapper, targetTr.nextSibling);
                             }
-                        });
-                    }
-                    
-                    // Вставляем результаты в DOM
-                    for (const { trWrapper, targetTr } of insertions) {
-                        if (targetTr && trWrapper) {
-                            targetTr.parentElement.insertBefore(trWrapper, targetTr.nextSibling);
                         }
                     }
                     
@@ -724,9 +717,8 @@ function handleScanlogLoading() {
                     text.textContent = 'Скрыть сканлоги';
                     this.disabled = false;
                     
-                    // Показываем уведомление о завершении
                     if (loadedCount > 0) {
-                        tpiNotification.show("Мини-радар", "success", `Загружено ${loadedCount} из ${linkTrs.length} сканлогов`);
+                        tpiNotification.show("Мини-радар", "success", `Загружено ${loadedCount} из ${totalLinks} сканлогов`);
                     }
                 }
             });
@@ -737,6 +729,7 @@ function handleScanlogLoading() {
 
     tryFindButton();
 }
+
 function generateTableHTMLForRadar(data, sortableName, showNotification = false) {
     if (!data || !data.length) {
         return `
@@ -918,7 +911,6 @@ function generateTableHTMLForRadar(data, sortableName, showNotification = false)
 
     return html;
 }
-
 
 function processInsertedScanLogTable() {
     const rows = document.querySelectorAll('.diman__scanLog__table tbody tr');
@@ -1113,77 +1105,6 @@ async function scanLogAutoPreload() {
         }
     }
 }
-
-// async function takeScreenshot() {
-//     const target = document.querySelector(".diman__scanLog__wrapper");
-//     if (!target) {
-//         console.error("❌ .diman__scanLog__wrapper не найден");
-//         return;
-//     }
-
-//     // Создаём iframe
-//     const iframe = document.createElement("iframe");
-//     // iframe.style.position = "absolute";
-//     // iframe.style.left = "-9999px"; // скрыть с экрана
-//     // iframe.style.top = "0";
-//     iframe.style.width = target.offsetWidth + "px";
-//     iframe.style.height = target.offsetHeight + "px";
-//     document.body.appendChild(iframe);
-
-//     const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-
-//     // Копируем стили
-//     const styles = Array.from(document.styleSheets)
-//         .map(styleSheet => {
-//             try {
-//                 return Array.from(styleSheet.cssRules).map(rule => rule.cssText).join("\n");
-//             } catch (e) {
-//                 // cross-origin стили могут бросать ошибку
-//                 console.warn("⚠️ Не удалось прочитать стили:", styleSheet.href);
-//                 return "";
-//             }
-//         })
-//         .join("\n");
-
-//     // Копируем HTML внутрь iframe
-//     iframeDoc.open();
-//     iframeDoc.write(`
-//         <html>
-//         <head>
-//             <style>${styles}</style>
-//         </head>
-//         <body>
-//             ${target.outerHTML}
-//         </body>
-//         </html>
-//     `);
-//     iframeDoc.close();
-
-//     const iframeTarget = iframeDoc.querySelector(".diman__scanLog__wrapper");
-
-//     try {
-//         const canvas = await html2canvas(iframeTarget, {
-//             useCORS: true,
-//             backgroundColor: null,
-//             scale: 2
-//         });
-
-//         canvas.toBlob(async (blob) => {
-//             if (!blob) return;
-//             await navigator.clipboard.write([
-//                 new ClipboardItem({ "image/png": blob })
-//             ]);
-//             console.log("✅ Скриншот скопирован в буфер обмена");
-//         });
-//     } catch (err) {
-//         console.error("❌ Ошибка при создании скриншота:", err);
-//     } finally {
-//         // iframe.remove(); // удаляем временный iframe
-//     }
-// }
-
-
-
 
 function scanLogCheckLoadSettings() {
     const option2 = document.querySelector('#dimanScanLog-option-2');

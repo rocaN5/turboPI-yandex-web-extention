@@ -206,7 +206,16 @@ tpi_sort_icon_pallet = `
 tpi_sort_icon_courier = `
 <svg stroke="currentColor" fill="none" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"></path>
-</svg>`,
+</svg>
+`,
+tpi_sort_icon_seller = `
+<svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+    <path d="M22 8.35V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8.35A2 2 0 0 1 3.26 6.5l8-3.2a2 2 0 0 1 1.48 0l8 3.2A2 2 0 0 1 22 8.35Z"></path>
+    <path d="M6 18h12"></path>
+    <path d="M6 14h12"></path>
+    <rect width="12" height="12" x="6" y="10"></rect>
+</svg>
+`,
 tpi_sort_icon_chevron_right =`
 <svg stroke="currentColor" fill="currentColor" stroke-width="0" baseProfile="tiny" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
     <path d="M10 20c-.802 0-1.555-.312-2.122-.879-.566-.566-.878-1.32-.878-2.121s.312-1.555.879-2.122l2.878-2.878-2.878-2.879c-.567-.566-.879-1.32-.879-2.121s.312-1.555.879-2.122c1.133-1.132 3.109-1.133 4.243.001l7.121 7.121-7.122 7.121c-.566.567-1.319.879-2.121.879zm0-14c-.268 0-.518.104-.707.292-.189.19-.293.441-.293.708s.104.518.293.707l4.292 4.293-4.292 4.293c-.189.189-.293.439-.293.707s.104.518.293.707c.378.379 1.037.378 1.414.001l5.708-5.708-5.708-5.707c-.189-.189-.439-.293-.707-.293z"></path>
@@ -319,7 +328,7 @@ tpi_sort_copy_mono = `
 
 (function () {
 
-    const preview_urlPattern = /^https:\/\/hubs\.market\.yandex\.ru\/sorting-center\/\d+\/sortables\/\d+/;
+    const preview_urlPattern = /^https:\/\/sorting-center\.logistics\.yandex\.ru\/sorting-center\/\d+\/sortables\/\d+/;
     if (!preview_urlPattern.test(location.href)) return;
 
     // Функция выполнения запроса
@@ -331,7 +340,7 @@ tpi_sort_copy_mono = `
         const scId = matches[1];
         const sortableId = matches[2];
 
-        const url = `https://hubs.market.yandex.ru/api/gateway/logpoint/${scId}/sortables/get-sortable-by-id?id=${sortableId}`;
+        const url = `https://sorting-center.logistics.yandex.ru/api/gateway/logpoint/${scId}/sortables/get-sortable-by-id?id=${sortableId}`;
         
         // Пробуем получить токен разными способами
         let token = null;
@@ -374,7 +383,7 @@ tpi_sort_copy_mono = `
             return response.json();
         })
         .then(data => {
-            if (data && (data.type === "PLACE" || data.type === "ZASYL" || data.type === "ORPHAN_PALLET")) {
+            if (data && (data.type === "PLACE" || data.type === "ZASYL" || data.type === "ORPHAN_PALLET" || data.type === "POLYBOX")) {
                 replaceGroupingDirection(data);
                 addOrderNumberBlock(data, scId);
                 fetchSupportTickets(data, scId, token);
@@ -531,7 +540,7 @@ tpi_sort_copy_mono = `
         let attempts = 0;
         
         function tryFetch(query) {
-            const url = `https://hubs.market.yandex.ru/api/gateway/logpoint/${scId}/chatterbox/get-support-tickets-list?platformType=SORTING_CENTER&query=${encodeURIComponent(query)}`;
+            const url = `https://sorting-center.logistics.yandex.ru/api/gateway/logpoint/${scId}/chatterbox/get-support-tickets-list?platformType=SORTING_CENTER&query=${encodeURIComponent(query)}`;
             
             fetch(url, {
                 method: 'GET',
@@ -2068,7 +2077,7 @@ async function fetchUserNames(encryptedIds, scId, token) {
     // Отправляем отдельный запрос для каждого encryptedId
     for (const encryptedId of encryptedIds) {
         const encodedId = encodeURIComponent(encryptedId);
-        const url = `https://hubs.market.yandex.ru/api/gateway/logpoint/${scId}/personal/get-bulk?platformType=SORTING_CENTER&ids=${encodedId}`;
+        const url = `https://sorting-center.logistics.yandex.ru/api/gateway/logpoint/${scId}/personal/get-bulk?platformType=SORTING_CENTER&ids=${encodedId}`;
         
         try {
             const response = await fetch(url, {
@@ -2132,7 +2141,7 @@ async function fetchSortableHistory() {
     }
     if (!token) return null;
     
-    const url = `https://hubs.market.yandex.ru/api/gateway/logpoint/${scId}/sortables/get-history?id=${sortableId}`;
+    const url = `https://sorting-center.logistics.yandex.ru/api/gateway/logpoint/${scId}/sortables/get-sortable-history?id=${sortableId}`;
     
     try {
         const response = await fetch(url, {
@@ -2390,7 +2399,7 @@ async function fetchCourierNames(encryptedIds, scId, token) {
     
     for (const encryptedId of encryptedIds) {
         const encodedId = encodeURIComponent(encryptedId);
-        const url = `https://hubs.market.yandex.ru/api/gateway/logpoint/${scId}/personal/get-bulk?platformType=SORTING_CENTER&ids=${encodedId}`;
+        const url = `https://sorting-center.logistics.yandex.ru/api/gateway/logpoint/${scId}/personal/get-bulk?platformType=SORTING_CENTER&ids=${encodedId}`;
         
         try {
             const response = await fetch(url, {
@@ -2563,9 +2572,8 @@ async function updateCourierNamesInHistory() {
 }
 
 async function replaceSortingCenterNames() {
-    
     // Проверка - если иконки уже есть, выходим
-    const existingIcons = document.querySelectorAll('.tpi-sort-table-sc-wrapper');
+    const existingIcons = document.querySelectorAll('.tpi-sort-table-sc-wrapper, .tpi-sort-seller-data-wrapper');
     if (existingIcons.length > 0) {
         return;
     }
@@ -2581,8 +2589,6 @@ async function replaceSortingCenterNames() {
         if (historyTable) {
             const headers = historyTable.querySelectorAll('thead th');
             headersCount = headers.length;
-            
-            // Если заголовков больше 1 - это хороший признак, что таблица загружена
             if (headersCount > 1) {
                 break;
             }
@@ -2598,9 +2604,6 @@ async function replaceSortingCenterNames() {
     // Находим колонку "Курьер"
     let courierColumnIndex = -1;
     const headers = historyTable.querySelectorAll('thead th');
-    headers.forEach((th, idx) => {
-    });
-    
     for (let idx = 0; idx < headers.length; idx++) {
         const th = headers[idx];
         const titleSpan = th.querySelector('span[data-i18n-key="pages.sortable-item:events-table.titles.courier"]');
@@ -2614,7 +2617,7 @@ async function replaceSortingCenterNames() {
         return;
     }
     
-    // Ждём появления данных в таблице (не пустых строк)
+    // Ждём появления данных в таблице
     let rowsCount = 0;
     let rowsAttempts = 0;
     const MAX_ROWS_ATTEMPTS = 20;
@@ -2622,9 +2625,7 @@ async function replaceSortingCenterNames() {
     while (rowsAttempts < MAX_ROWS_ATTEMPTS) {
         const rows = historyTable.querySelectorAll('tbody tr');
         rowsCount = rows.length;
-        
         if (rowsCount > 0) {
-            // Проверяем, есть ли данные в первой строке
             const firstRow = rows[0];
             const cells = firstRow.querySelectorAll('td');
             if (cells.length > 0) {
@@ -2645,6 +2646,7 @@ async function replaceSortingCenterNames() {
         return;
     }
     
+    // Список городов для сопоставления
     const cityMapping = [
         { keywords: ['Тарный'], id: 'tarn' },
         { keywords: ['Царицыно'], id: 'tarn' },
@@ -2653,14 +2655,14 @@ async function replaceSortingCenterNames() {
         { keywords: ['Курск'], id: 'kursk' },
         { keywords: ['Грибки'], id: 'gribki' },
         { keywords: ['Ростов'], id: 'rostov' },
+        { keywords: ['Софьино'], id: 'sofino' },
+        { keywords: ['Склад, СЦ МК Воронеж'], id: 'voronezh' },
     ];
     
-    // Функция для проверки, обработана ли уже ячейка
     function isCellProcessed(cell) {
-        return cell.querySelector('.tpi-sort-table-sc-wrapper') !== null;
+        return cell.querySelector('.tpi-sort-table-sc-wrapper, .tpi-sort-seller-data-wrapper') !== null;
     }
     
-    // Функция для получения текста из ячейки
     function getCellText(cell) {
         const innerDiv = cell.querySelector('.mez-inline-flex.mez-flex-col');
         if (innerDiv) {
@@ -2669,61 +2671,48 @@ async function replaceSortingCenterNames() {
         return cell.textContent.trim();
     }
     
-    // Собираем все ячейки, которые нужно обработать
+    // Собираем все ячейки курьеров
     const allCourierCells = historyTable.querySelectorAll(`tbody tr td:nth-child(${courierColumnIndex + 1})`);
     
     const cellsToProcess = [];
     
     allCourierCells.forEach((cell, index) => {
-        // Пропускаем уже обработанные
         if (isCellProcessed(cell)) {
             return;
         }
         
         const text = getCellText(cell);
-        
         if (!text || text.length === 0) {
             return;
         }
         
         // Проверяем, есть ли совпадение с городами
-        let matched = false;
         let matchedCity = null;
         for (const map of cityMapping) {
             if (map.keywords.some(kw => text.includes(kw))) {
-                matched = true;
                 matchedCity = map.id;
                 break;
             }
         }
         
-        if (matched) {
-            cellsToProcess.push({ cell, text, cityId: matchedCity });
-        } else {
-        }
+        cellsToProcess.push({ cell, text, cityId: matchedCity });
     });
-    
     
     if (cellsToProcess.length === 0) {
         return;
     }
     
     // Обрабатываем ячейки
-    let successCount = 0;
     for (const { cell, text, cityId } of cellsToProcess) {
-        // Проверяем, не была ли ячейка обработана за это время
         if (isCellProcessed(cell)) {
-            successCount++;
             continue;
         }
         
-        // Проверяем, есть ли в ячейке ссылка или другой контент, который может помешать
         const hasLink = cell.querySelector('a');
         if (hasLink) {
             continue;
         }
         
-        // Вставляем иконку
         try {
             const safeText = text.replace(/[&<>]/g, m => {
                 if (m === '&') return '&amp;';
@@ -2732,19 +2721,25 @@ async function replaceSortingCenterNames() {
                 return m;
             });
             
-            
-            cell.innerHTML = `
-                <div class="tpi-sort-table-sc-wrapper">
-                    <icon class="tpi-sort-table-sc-icon" tpi-sort-city-id="${cityId}"></icon>
-                    <p class="tpi-sort-table-sc-text" tpi-tooltip-data="${safeText}">${safeText}</p>
-                </div>
-            `;
-            successCount++;
+            if (cityId) {
+                cell.innerHTML = `
+                    <div class="tpi-sort-table-sc-wrapper">
+                        <icon class="tpi-sort-table-sc-icon" tpi-sort-city-id="${cityId}"></icon>
+                        <p class="tpi-sort-table-sc-text" tpi-tooltip-data="${safeText}">${safeText}</p>
+                    </div>
+                `;
+            } else {
+                cell.innerHTML = `
+                    <div class="tpi-sort-seller-data-wrapper">
+                        <icon>${tpi_sort_icon_seller}</icon>
+                        <p class="tpi-sort-seller-data-text" tpi-tooltip-data="${safeText}">${safeText}</p>
+                    </div>
+                `;
+            }
         } catch (e) {
-            console.log(e)
+            console.log(e);
         }
     }
-    
 }
 
 //D-
@@ -2949,6 +2944,13 @@ function initParentSortableObserver() {
         'sc.display.flow.INITIAL_RETURN_ACCEPTANCE': {
             'Предсортировка посылок': 'Предсортировка (приёмка возврата)',
         },
+        'sc.display.flow.SHIP_MIDDLE_MILE': {
+            'sc.display.operation.SHIP_CARGO': 'Отгрузка на среднюю милю',
+        },
+        'sc.display.flow.SORT': {
+            'sc.display.operation.PRESORT_ON_SORT': 'Сортировка',
+            'default': 'Сортировка'
+        },
     };
     
 
@@ -2979,7 +2981,7 @@ function initParentSortableObserver() {
         if (!match) return null;
         const scId = match[1];
         const sortableId = match[2];
-        return `https://hubs.market.yandex.ru/api/gateway/logpoint/${scId}/sortables/download-sortable-history?id=${sortableId}`;
+        return `https://sorting-center.logistics.yandex.ru/api/gateway/logpoint/${scId}/sortables/download-sortable-history?id=${sortableId}`;
     }
 
     function getSortableName() {
@@ -3137,13 +3139,13 @@ function initParentSortableObserver() {
             } else if (resultCell === "Ошибка") {
                 rowAttr += ' dimanOpertaion="error" coloredRow="true"';
                 iconAttr += ' class="diman__scanLog__td__i__icon" diman__tableOpertaionIcon="error"';
-            } else if (operationCell === "Сортировка") {
+            } else if (operationCell === "Сортировка" || operationCell === "sc.display.flow.SORT") {
                 rowAttr += ' dimanOpertaion="sort" coloredRow="true"';
                 iconAttr += ' class="diman__scanLog__td__i__icon" diman__tableOpertaionIcon="sort"';
             } else if (operationCell === "Предсортировка посылок" || operationCell === "Предсортировка по группам") {
                 rowAttr += ' dimanOpertaion="predsort" coloredRow="true"';
                 iconAttr += ' class="diman__scanLog__td__i__icon" diman__tableOpertaionIcon="predsort"';
-            } else if (operationCell === "[*] Отгрузка заказов" || operationCell === "Отгрузка на средней миле"|| operationCell === "Отгрузка на последней миле" || operationCell === "sc.display.flow.SC_SHIPMENT" || operationCell === "Отгрузка возвратов мерчу") {
+            } else if (operationCell === "[*] Отгрузка заказов" || operationCell === "Отгрузка на средней миле"|| operationCell === "Отгрузка на последней миле" || operationCell === "sc.display.flow.SC_SHIPMENT" || operationCell === "Отгрузка возвратов мерчу" || operationCell === "sc.display.flow.SHIP_MIDDLE_MILE") {
                 rowAttr += ' dimanOpertaion="otgruzka" coloredRow="true"';
                 iconAttr += ' class="diman__scanLog__td__i__icon" diman__tableOpertaionIcon="shipped"';
             } else if (operationCell === "[*] Отгрузка возвратов") {
@@ -3306,7 +3308,7 @@ function initParentSortableObserver() {
                 let operationType = '';
                 if (resultCell === "Ошибка") {
                     operationType = "error";
-                } else if (operationCell === "Сортировка" || operationCell === "sc.display.flow.COLLECT") {
+                } else if (operationCell === "Сортировка" || operationCell === "sc.display.flow.COLLECT" || operationCell === "sc.display.flow.SORT") {
                     operationType = "sort";
                 } else if (operationCell === "Предсортировка посылок" || operationCell === "Предсортировка по группам" || operationCell === "sc.display.flow.INITIAL_RETURN_ACCEPTANCE") {
                     operationType = "predsort";
@@ -3316,7 +3318,7 @@ function initParentSortableObserver() {
                     operationType = "ready-lot";
                 } else if (operationCell === "[*] Подготовка к отгрузке") {
                     operationType = "ready to shipp";
-                } else if (operationCell === "[*] Отгрузка заказов" || operationCell === "Отгрузка на средней миле" || operationCell === "[*] Отгрузка возвратов" || operationCell === "sc.display.flow.SC_SHIPMENT") {
+                } else if (operationCell === "[*] Отгрузка заказов" || operationCell === "Отгрузка на средней миле" || operationCell === "[*] Отгрузка возвратов" || operationCell === "sc.display.flow.SC_SHIPMENT" || operationCell === "sc.display.flow.SHIP_MIDDLE_MILE") {
                     operationType = "shipped";
                 } else if (operationCell === "Приемка возвратов от курьера" || operationCell === "sc.display.flow.INITIAL_RETURN_ACCEPTANCE") {
                     operationType = "return";
@@ -3449,7 +3451,7 @@ function initParentSortableObserver() {
         const scId = scMatch ? scMatch[1] : '21972131';
         
         // Правильный endpoint для скачивания истории грузоместа (лота)
-        const historyUrlTemplate = `https://hubs.market.yandex.ru/api/gateway/logpoint/${scId}/sortables/download-sortable-history?id=`;
+        const historyUrlTemplate = `https://sorting-center.logistics.yandex.ru/api/gateway/logpoint/${scId}/sortables/download-sortable-history?id=`;
 
         // Получаем токен
         let token = null;
@@ -4180,44 +4182,48 @@ function addBarcodeCopyButtons(data) {
     const titleSpan = document.querySelector('span[data-i18n-key="pages.sortable-item:page-title"]');
     if (!titleSpan) return;
     
-    // Проверяем, нет ли уже кнопок
     let parent = titleSpan.parentElement;
     for (let i = 0; i < 5 && parent; i++) {
         if (parent.querySelector('.tpi-sort-copy-sortable-name-wrapper')) return;
         parent = parent.parentElement;
     }
     
-    const hasMultiple = data.barcodes && data.barcodes.length > 1;
-    const primary = hasMultiple ? data.barcodes[1] : '';
-    const secondary = data.barcode || (data.barcodes && data.barcodes[0]) || '';
+    const barcodes = data.barcodes || [];
+    const hasMultiple = barcodes.length > 1;
+    
+    const primary = barcodes.length > 0 ? barcodes[barcodes.length - 1] : data.barcode || '';
+    const secondary = barcodes.length > 1 ? barcodes[0] : '';
     
     const wrapper = document.createElement('div');
     wrapper.className = 'tpi-sort-copy-sortable-name-wrapper';
     wrapper.innerHTML = `
-        <button class="tpi-sort-copy-sortable-name" data-copy-type="default" tpi-tooltip-data="Копировать номер заказа">
+        <button class="tpi-sort-copy-sortable-name" data-copy-type="default" tpi-tooltip-data="Копировать штрихкод">
             ${tpi_sort_copy_default}
         </button>
-        <button class="tpi-sort-copy-sortable-name" data-copy-type="mono" tpi-tooltip-data="Копировать номер заказа моно, для телеграм">
+        <button class="tpi-sort-copy-sortable-name" data-copy-type="mono" tpi-tooltip-data="Копировать штрихкод моно, для телеграм">
             ${tpi_sort_copy_mono}
         </button>
     `;
     
     titleSpan.insertAdjacentElement('afterend', wrapper);
     
-    // Обработчики
     wrapper.querySelector('[data-copy-type="default"]').addEventListener('click', () => {
         const text = hasMultiple ? `${primary} (${secondary})` : primary;
-        navigator.clipboard.writeText(text);
-        if (typeof tpiNotification !== 'undefined') {
-            tpiNotification.show("Скопировано", "success", text);
+        if (text) {
+            navigator.clipboard.writeText(text);
+            if (typeof tpiNotification !== 'undefined') {
+                tpiNotification.show("Скопировано", "success", text);
+            }
         }
     });
     
     wrapper.querySelector('[data-copy-type="mono"]').addEventListener('click', () => {
         const text = hasMultiple ? `\`${primary}\` (\`${secondary}\`)` : `\`${primary}\``;
-        navigator.clipboard.writeText(text);
-        if (typeof tpiNotification !== 'undefined') {
-            tpiNotification.show("Скопировано", "success", text);
+        if (text) {
+            navigator.clipboard.writeText(text);
+            if (typeof tpiNotification !== 'undefined') {
+                tpiNotification.show("Скопировано", "success", text);
+            }
         }
     });
 }
