@@ -142,28 +142,19 @@ function initTooltips() {
 
     // Функция для отслеживания позиции мыши
     function trackMousePosition(event) {
-        tooltipState.lastMousePosition = {
-            x: event.clientX,
-            y: event.clientY
-        };
+        tooltipState.lastMousePosition.x = event.clientX;
+        tooltipState.lastMousePosition.y = event.clientY;
         
-        // Если тултип активен, обновляем его позицию
-        if (tooltipState.activeTooltipElement && tooltipWrapper.style.display !== 'none') {
+        if (tooltipState.activeTooltipElement) {
             positionTooltipNearMouse();
         }
     }
 
     // Функция для позиционирования тултипа рядом с мышью
     function positionTooltipNearMouse() {
-
-        const wasVisible = tooltipWrapper.style.display !== 'none';
-
-        if (!wasVisible) {
-            tooltipWrapper.style.display = 'flex';
-            tooltipWrapper.style.opacity = '0';
-            tooltipWrapper.style.visibility = 'hidden';
-        }
-
+        const wrapper = tooltipState.wrapper;
+        if (!wrapper) return;
+        
         const viewportWidth = window.innerWidth;
         const viewportHeight = window.innerHeight;
 
@@ -173,46 +164,24 @@ function initTooltips() {
         let left;
         let top;
 
-        // если курсор близко к правому краю — показываем слева
         if (tooltipState.lastMousePosition.x > viewportWidth - 280) {
             left = tooltipState.lastMousePosition.x - 250;
-            tooltipWrapper.setAttribute('tpi-tolltip-position-x', 'from-right')
+            wrapper.setAttribute('tpi-tolltip-position-x', 'from-right');
         } else {
             left = tooltipState.lastMousePosition.x + offsetX;
-            tooltipWrapper.setAttribute('tpi-tolltip-position-x', 'from-left')
+            wrapper.setAttribute('tpi-tolltip-position-x', 'from-left');
         }
 
-        // если курсор близко к нижнему краю — показываем сверху
         if (tooltipState.lastMousePosition.y > viewportHeight - 100) {
             top = tooltipState.lastMousePosition.y - 80;
-            tooltipWrapper.setAttribute('tpi-tolltip-position-y', 'from-bottom')
+            wrapper.setAttribute('tpi-tolltip-position-y', 'from-bottom');
         } else {
             top = tooltipState.lastMousePosition.y + offsetY;
-            tooltipWrapper.setAttribute('tpi-tolltip-position-y', 'from-top')
+            wrapper.setAttribute('tpi-tolltip-position-y', 'from-top');
         }
 
-        tooltipWrapper.style.left = left + 'px';
-        tooltipWrapper.style.top = top + 'px';
-
-        const rect = tooltipWrapper.getBoundingClientRect();
-
-        // если вылез справа → переносим налево
-        if (rect.right > viewportWidth) {
-            left = tooltipState.lastMousePosition.x - rect.width - offsetX;
-        }
-
-        // если вылез снизу → переносим вверх
-        if (rect.bottom > viewportHeight) {
-            top = tooltipState.lastMousePosition.y - rect.height - offsetY;
-        }
-
-        tooltipWrapper.style.left = left + 'px';
-        tooltipWrapper.style.top = top + 'px';
-
-        if (!wasVisible) {
-            tooltipWrapper.style.opacity = '1';
-            tooltipWrapper.style.visibility = 'visible';
-        }
+        wrapper.style.left = left + 'px';
+        wrapper.style.top = top + 'px';
     }
 
     // Функция для форматирования текста тултипа с поддержкой типов
@@ -316,42 +285,40 @@ function initTooltips() {
 
     // Функция для показа тултипа
     function showTooltip(element) {
-        // Если это другой элемент, скрываем текущий тултип сразу
+        const wrapper = tooltipState.wrapper;
+        if (!wrapper) return;
+        
         if (tooltipState.activeTooltipElement && tooltipState.activeTooltipElement !== element) {
-            tooltipWrapper.style.display = 'none';
+            wrapper.style.display = 'none';
             tooltipState.activeTooltipElement = null;
         }
 
-        // Запоминаем элемент
         tooltipState.activeTooltipElement = element;
         tooltipState.currentTargetElement = element;
         
-        // Копируем атрибут типа с целевого элемента на обертку
         const tooltipType = element.getAttribute('tpi-tooltip-type');
         if (tooltipType) {
-            tooltipWrapper.setAttribute('tpi-tooltip-type', tooltipType);
+            wrapper.setAttribute('tpi-tooltip-type', tooltipType);
         } else {
-            tooltipWrapper.removeAttribute('tpi-tooltip-type');
+            wrapper.removeAttribute('tpi-tooltip-type');
         }
         
-        // Получаем текст из атрибута
         const tooltipText = element.getAttribute('tpi-tooltip-data');
+        wrapper.innerHTML = formatTooltipContent(element, tooltipText);
         
-        // Формируем HTML содержимого с учетом типа
-        tooltipWrapper.innerHTML = formatTooltipContent(element, tooltipText);
+        wrapper.style.display = 'flex';
+        wrapper.style.opacity = '1';
+        wrapper.style.visibility = 'visible';
         
-        // Позиционируем
         positionTooltipNearMouse();
     }
 
     // Функция для скрытия тултипа
     function hideTooltip() {
-        // Проверяем, не наведена ли мышь на тултип
         if (tooltipState.isMouseOverTooltip) {
             return;
         }
         
-        // Проверяем, не наведена ли мышь на целевой элемент
         if (tooltipState.currentTargetElement) {
             const hoveredElement = document.elementFromPoint(tooltipState.lastMousePosition.x, tooltipState.lastMousePosition.y);
             if (hoveredElement === tooltipState.currentTargetElement || tooltipState.currentTargetElement.contains(hoveredElement)) {
@@ -359,14 +326,13 @@ function initTooltips() {
             }
         }
         
-        // Скрываем тултип
-        tooltipWrapper.style.display = 'none';
-        tooltipWrapper.style.visibility = 'visible'; // Сбрасываем visibility
+        const wrapper = tooltipState.wrapper;
+        if (wrapper) {
+            wrapper.style.display = 'none';
+            wrapper.removeAttribute('tpi-tooltip-type');
+        }
         tooltipState.activeTooltipElement = null;
         tooltipState.currentTargetElement = null;
-        
-        // Удаляем атрибут типа при скрытии
-        tooltipWrapper.removeAttribute('tpi-tooltip-type');
     }
 
     // Обработчик mouseenter для элементов с атрибутом

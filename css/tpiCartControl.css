@@ -331,6 +331,22 @@ a.tpi-cc--table-tbody-data-link{
     }
 }
 
+.tpi-cc-fake-courier-lms-link{
+    color: #a80a0a;
+    
+    &:hover{
+        color: #fff;
+    }
+    
+    &:focus-visible{
+        color: #fff;
+        outline: none;
+    }
+    &::before {
+        color: #a80a0a !important;
+    }
+}
+
 div.tpi-cc--table-tbody-data-courier-extra-info-wrapper{
     display: flex;
     width: 100%;

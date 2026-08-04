@@ -1,5 +1,5 @@
 let onTextToOrdersDomain = false;
-let observer = null; // Будем хранить наблюдатель, чтобы отключить его
+let observer = null; // Будем хранить наблюдатель, чтобы Отключить его
 let stoSelectedVersion = 'old'
 
 function debounce(func, wait) {
@@ -282,6 +282,11 @@ const tpiIcon__tripleDots = `
     <path d="M156,128a28,28,0,1,1-28-28A28,28,0,0,1,156,128ZM48,100a28,28,0,1,0,28,28A28,28,0,0,0,48,100Zm160,0a28,28,0,1,0,28,28A28,28,0,0,0,208,100Z"></path>
 </svg>
 `
+const tpiIcon__nullCells = `
+<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+    <path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm0-144c-14.23,0-26,6.44-34,18.61-6.47,9.86-10,23.14-10,37.39s3.56,27.53,10,37.39c8,12.18,19.74,18.61,34,18.61s26-6.43,34-18.61c6.47-9.86,10-23.14,10-37.39s-3.56-27.53-10-37.39C154,78.44,142.23,72,128,72Zm0,96c-22.1,0-28-25.14-28-40s5.9-40,28-40,28,25.14,28,40S150.1,168,128,168Z"/>
+</svg>
+`
 
 
 const tpi_sto_liquid_glass = `
@@ -386,13 +391,6 @@ const temp__tr_first = `
             </a>
         </div>
     </td>
-    <td class="tpi-sto--table-tbody-item" tpi-sto-tbody-return-sortable>
-        <div class="tpi-sto--table-tbody-data">
-            <a href="#" class="tpi-sto--table-tbody-data-link">
-                VOZ_FBS_23910235
-            </a>
-        </div>
-    </td>
     <td class="tpi-sto--table-tbody-item">
         <div class="tpi-sto--table-tbody-data">
             <i class="tpi-sto--table-tbody-data-icon">${tpiIcon__packageType}</i>
@@ -412,11 +410,8 @@ temp__tr_second = `
         </div>
     </td>
     <td class="tpi-sto--table-tbody-item">
-        <div class="tpi-sto--table-tbody-data" sto-multiple-lines="2">
+        <div class="tpi-sto--table-tbody-data">
             <a href="#" class="tpi-sto--table-tbody-data-link">F1254273B140237AC926</a>
-        </div>
-        <div class="tpi-sto--table-tbody-data" sto-multiple-lines="2">
-            <a href="#" class="tpi-sto--table-tbody-data-link">17 заказов</a>
         </div>
     </td>
     <td class="tpi-sto--table-tbody-item">
@@ -718,7 +713,7 @@ function checkiIs__onStrokeToOrdersPage() {
         const newOverlay = document.createElement('div');
         newOverlay.className = 'tpi-sto--content-section';
         newOverlay.setAttribute('tpi-sto-version-selected', stoSelectedVersion === 'new' ? true : false)
-        newOverlay.innerHTML = `
+        newOverlay.innerHTML = /*html*/`
             <div class="tpi-sto--section" style="height: fit-content;">
                 <div class="tpi-sto--section-title">
                     <p>Строки в заказы</p>
@@ -765,7 +760,7 @@ function checkiIs__onStrokeToOrdersPage() {
                         <div class="tpi-sto--settings-option-tooltips"></div>
                         <div class="tpi-sto--section-wrapper tpi-sto--search-settings-wrapper">
                             <div class="tpi-sto--section-wrapper-title">
-                                <p>Настройки поиска</p>
+                                <p>Настройки таблицы</p>
                                 <div class="tpi-sto--section-settings">
                                     <button class="tpi-sto--settings-switch-pin-sticky" tpi-sto-current-state="marked">
                                         ${tpiIcon__pin}
@@ -782,62 +777,56 @@ function checkiIs__onStrokeToOrdersPage() {
                                 <div class="tpi-sto--settings-arrow" tpi-sto-settings-move="right">
                                     ${tpiIcon_settings_arrowChevron_right}
                                 </div>
-                                <label for="tpi-sto--settings-option-1" class="tpi-sto--settiings-option tpi-sto--settings-tooltip" tooltip-option-id="Анимация расширенных статусов">
-                                    <input type="checkbox" id="tpi-sto--settings-option-1" checked>
-                                    <div class="tpi-sto--settings-option-body"></div>
-                                    <p class="tpi-sto--settings-option-description">Анимация статусов</p>
-                                    <i class="tpi-sto--settings-option-icon">
-                                        ${tpiIcon_settings_animateStatus}
-                                    </i>
-                                </label>
-                                <label for="tpi-sto--settings-option-2" class="tpi-sto--settiings-option tpi-sto--settings-tooltip" tooltip-option-id="Отображать возвратные шк в таблице">
-                                    <input type="checkbox" id="tpi-sto--settings-option-2" checked>
-                                    <div class="tpi-sto--settings-option-body"></div>
-                                    <p class="tpi-sto--settings-option-description">Возвратные шк</p>
-                                    <i class="tpi-sto--settings-option-icon">
-                                        ${tpiIcon_settings_returnBarcode}
-                                    </i>
-                                </label>
-                                <label for="tpi-sto--settings-option-3" class="tpi-sto--settiings-option tpi-sto--settings-tooltip" tooltip-option-id="Жидкое стекло">
-                                    <input type="checkbox" id="tpi-sto--settings-option-3" checked>
-                                    <div class="tpi-sto--settings-option-body"></div>
-                                    <p class="tpi-sto--settings-option-description">Жидкое стекло</p>
-                                    <i class="tpi-sto--settings-option-icon">
-                                        ${tpiIcon_settings_liquidGalss}
-                                    </i>
-                                </label>
-                                <label for="tpi-sto--settings-option-4" class="tpi-sto--settiings-option tpi-sto--settings-tooltip" tooltip-option-id="Доп. иконки">
-                                    <input type="checkbox" id="tpi-sto--settings-option-4" checked>
-                                    <div class="tpi-sto--settings-option-body"></div>
-                                    <p class="tpi-sto--settings-option-description">Доп. иконки</p>
-                                    <i class="tpi-sto--settings-option-icon">
-                                        ${tpiIcon_settings_extraIcons}
-                                    </i>
-                                </label>
-                                <label for="tpi-sto--settings-option-5" class="tpi-sto--settiings-option tpi-sto--settings-tooltip" tooltip-option-id="Доп. иконки">
-                                    <input type="checkbox" id="tpi-sto--settings-option-5">
-                                    <div class="tpi-sto--settings-option-body"></div>
-                                    <p class="tpi-sto--settings-option-description">Доп. сетка</p>
-                                    <i class="tpi-sto--settings-option-icon">
-                                        ${tpiIcon_settings_verticalGrid}
-                                    </i>
-                                </label>
-                                <label for="tpi-sto--settings-option-6" class="tpi-sto--settiings-option tpi-sto--settings-tooltip" tooltip-option-id="Доп. иконки">
-                                    <input type="checkbox" id="tpi-sto--settings-option-6">
-                                    <div class="tpi-sto--settings-option-body"></div>
-                                    <p class="tpi-sto--settings-option-description">Спрятать опции</p>
-                                    <i class="tpi-sto--settings-option-icon">
-                                        ${tpiIcon__tripleDots}
-                                    </i>
-                                </label>
-                                <label for="tpi-sto--settings-option-7" class="tpi-sto--settiings-option tpi-sto--settings-tooltip" tooltip-option-id="Доп. иконки">
-                                    <input type="checkbox" id="tpi-sto--settings-option-7">
-                                    <div class="tpi-sto--settings-option-body"></div>
-                                    <p class="tpi-sto--settings-option-description">Линейка</p>
-                                    <i class="tpi-sto--settings-option-icon">
-                                        ${tpiIcon_settings_ruler}
-                                    </i>
-                                </label>
+                                <div class="tpi-sto--settings-block">
+                                    <label for="tpi-sto--settings-option-1" class="tpi-sto--settiings-option" tpi-tooltip-data="Включить/Отключить анимацию иконок расширенного статуса">
+                                        <input type="checkbox" id="tpi-sto--settings-option-1" checked>
+                                        <div class="tpi-sto--settings-option-body"></div>
+                                        <p class="tpi-sto--settings-option-description">Анимация статусов</p>
+                                        <i class="tpi-sto--settings-option-icon">
+                                            ${tpiIcon_settings_animateStatus}
+                                        </i>
+                                    </label>
+                                    <label for="tpi-sto--settings-option-3" class="tpi-sto--settiings-option" tpi-tooltip-data="Включить/Отключить эффект жидко стекла на заднем фоне плавающих окон">
+                                        <input type="checkbox" id="tpi-sto--settings-option-3" checked>
+                                        <div class="tpi-sto--settings-option-body"></div>
+                                        <p class="tpi-sto--settings-option-description">Жидкое стекло</p>
+                                        <i class="tpi-sto--settings-option-icon">
+                                            ${tpiIcon_settings_liquidGalss}
+                                        </i>
+                                    </label>
+                                    <label for="tpi-sto--settings-option-4" class="tpi-sto--settiings-option" tpi-tooltip-data="Включить/Отключить дополнительные иконки">
+                                        <input type="checkbox" id="tpi-sto--settings-option-4" checked>
+                                        <div class="tpi-sto--settings-option-body"></div>
+                                        <p class="tpi-sto--settings-option-description">Доп. иконки</p>
+                                        <i class="tpi-sto--settings-option-icon">
+                                            ${tpiIcon_settings_extraIcons}
+                                        </i>
+                                    </label>
+                                    <label for="tpi-sto--settings-option-5" class="tpi-sto--settiings-option" tpi-tooltip-data="Включить/Отключить дополнительную сетку таблицы">
+                                        <input type="checkbox" id="tpi-sto--settings-option-5">
+                                        <div class="tpi-sto--settings-option-body"></div>
+                                        <p class="tpi-sto--settings-option-description">Доп. сетка</p>
+                                        <i class="tpi-sto--settings-option-icon">
+                                            ${tpiIcon_settings_verticalGrid}
+                                        </i>
+                                    </label>
+                                    <label for="tpi-sto--settings-option-6" class="tpi-sto--settiings-option" tpi-tooltip-data="Спрятать/Показать дополнительные опции копирования номера заказа и скачивание файла сканлога">
+                                        <input type="checkbox" id="tpi-sto--settings-option-6">
+                                        <div class="tpi-sto--settings-option-body"></div>
+                                        <p class="tpi-sto--settings-option-description">Спрятать опции</p>
+                                        <i class="tpi-sto--settings-option-icon">
+                                            ${tpiIcon__tripleDots}
+                                        </i>
+                                    </label>
+                                    <label for="tpi-sto--settings-option-7" class="tpi-sto--settiings-option" tpi-tooltip-data="Заменять пустые ячейки на null">
+                                        <input type="checkbox" id="tpi-sto--settings-option-7">
+                                        <div class="tpi-sto--settings-option-body"></div>
+                                        <p class="tpi-sto--settings-option-description">Ячейки null</p>
+                                        <i class="tpi-sto--settings-option-icon">
+                                            ${tpiIcon__nullCells}
+                                        </i>
+                                    </label>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -850,9 +839,6 @@ function checkiIs__onStrokeToOrdersPage() {
                                     </th>
                                     <th class="tpi-sto--table-thead-item">
                                         <div class="tpi-sto--table-thead-data">Номер заказа / XDOC</div>
-                                    </th>
-                                    <th class="tpi-sto--table-thead-item" tpi-sto-tbody-return-sortable>
-                                        <div class="tpi-sto--table-thead-data">Номер возврата</div>
                                     </th>
                                     <th class="tpi-sto--table-thead-item">
                                         <div class="tpi-sto--table-thead-data">Тип грузоместа</div>

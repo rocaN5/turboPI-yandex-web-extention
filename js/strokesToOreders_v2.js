@@ -5,7 +5,6 @@ function init_strokesToOreders_v2(){
     changeFloatingWindowSize();
     settingsOverflowControl();
     settingsClickListeners();
-    tableColumnHighlight();
     // copyTableRows();
 }
 
@@ -361,22 +360,12 @@ function settingsClickListeners(){
     const sto_visibilitySwitcher = document.querySelector('.tpi-sto--settings-toggle')
     const sto_pinSwitcher = document.querySelector('.tpi-sto--settings-switch-pin-sticky')
     const tpi_settings_option_1 = document.getElementById('tpi-sto--settings-option-1')
-    const tpi_settings_option_2 = document.getElementById('tpi-sto--settings-option-2')
+    // const tpi_settings_option_2 = document.getElementById('tpi-sto--settings-option-2')
     const tpi_settings_option_3 = document.getElementById('tpi-sto--settings-option-3')
     const tpi_settings_option_4 = document.getElementById('tpi-sto--settings-option-4')
     const tpi_settings_option_5 = document.getElementById('tpi-sto--settings-option-5')
     const tpi_settings_option_6 = document.getElementById('tpi-sto--settings-option-6')
     const tpi_settings_option_7 = document.getElementById('tpi-sto--settings-option-7')
-
-    let tableHighlightController = null;
-    
-    tableHighlightController = tableColumnHighlight();
-    
-    if (!tableHighlightController) {
-        setTimeout(() => {
-            tableHighlightController = tableColumnHighlight();
-        }, 100);
-    }
 
     sto_settingsWrapper.addEventListener('click', (event) => {
         if (sto_visibilitySwitcher.contains(event.target)) {
@@ -410,34 +399,36 @@ function settingsClickListeners(){
                     tpi_sto__tbody.setAttribute('tpi-stop-extended-status-animation', '')
                 }
             }
-        }else if(tpi_settings_option_2.contains(event.target)) {
-            const tpi_sto__tbody = document.querySelector('.tpi-sto--table-tbody-wrapper');
-            const tpi_sto__thead = document.querySelector('.tpi-sto--table-thead-wrapper');
-            const isCurrentlyHidden = tpi_sto__tbody.hasAttribute('tpi-hidden-return-barcode');
+        }
+        // else if(tpi_settings_option_2.contains(event.target)) {
+        //     const tpi_sto__tbody = document.querySelector('.tpi-sto--table-tbody-wrapper');
+        //     const tpi_sto__thead = document.querySelector('.tpi-sto--table-thead-wrapper');
+        //     const isCurrentlyHidden = tpi_sto__tbody.hasAttribute('tpi-hidden-return-barcode');
             
-            if(tpi_settings_option_2.checked){
-                // Показать колонку
-                tpi_sto__tbody.removeAttribute('tpi-hidden-return-barcode');
-                tpi_sto__thead.removeAttribute('tpi-hidden-return-barcode');
+            // if(tpi_settings_option_2.checked){
+            //     // Показать колонку
+            //     tpi_sto__tbody.removeAttribute('tpi-hidden-return-barcode');
+            //     tpi_sto__thead.removeAttribute('tpi-hidden-return-barcode');
                 
-                // Показать все ячейки
-                document.querySelectorAll('[tpi-sto-tbody-return-sortable]').forEach(cell => {
-                    cell.style.display = '';
-                });
-            } else {
-                // Скрыть колонку
-                tpi_sto__tbody.setAttribute('tpi-hidden-return-barcode', '');
-                tpi_sto__thead.setAttribute('tpi-hidden-return-barcode', '');
+            //     // Показать все ячейки
+            //     document.querySelectorAll('[tpi-sto-tbody-return-sortable]').forEach(cell => {
+            //         cell.style.display = '';
+            //     });
+            // } else {
+            //     // Скрыть колонку
+            //     tpi_sto__tbody.setAttribute('tpi-hidden-return-barcode', '');
+            //     tpi_sto__thead.setAttribute('tpi-hidden-return-barcode', '');
                 
-                setTimeout(() => {
-                    if(!tpi_settings_option_2.checked){
-                        document.querySelectorAll('[tpi-sto-tbody-return-sortable]').forEach(cell => {
-                            cell.style.display = 'none';
-                        });
-                    }
-                }, 750);
-            }
-        }else if(tpi_settings_option_3.contains(event.target)) {
+            //     setTimeout(() => {
+            //         if(!tpi_settings_option_2.checked){
+            //             document.querySelectorAll('[tpi-sto-tbody-return-sortable]').forEach(cell => {
+            //                 cell.style.display = 'none';
+            //             });
+            //         }
+            //     }, 750);
+            // }
+        // }
+        else if(tpi_settings_option_3.contains(event.target)) {
             const tpi_sto__contentSection = document.querySelector('.tpi-sto--content-section')
             const sto_option_rawAttribute = tpi_sto__contentSection.hasAttribute('tpi-hide-liquid-glass-effect')
             
@@ -499,202 +490,23 @@ function settingsClickListeners(){
             }
         }else if(tpi_settings_option_7.contains(event.target)) {
             const tpi_sto__tbody = document.querySelector('.tpi-sto--table-tbody-wrapper')
-            const sto_option_rawAttribute = tpi_sto__tbody.hasAttribute('tpi-show-ruler')
+            const sto_option_rawAttribute = tpi_sto__tbody.hasAttribute('tpi-hide-null-cells')
             
-            // Управляем подсветкой в зависимости от состояния чекбокса
-            if(tableHighlightController) {
-                if(tpi_settings_option_7.checked) {
-                    // Включаем подсветку
-                    tableHighlightController.enable();
-                } else {
-                    // Полностью отключаем подсветку
-                    tableHighlightController.disable();
-                }
-            }
-            
-            // Остальной существующий код для управления атрибутом
             if(tpi_settings_option_7.checked && sto_option_rawAttribute){
-                tpi_sto__tbody.setAttribute('tpi-show-ruler', '')
+                tpi_sto__tbody.removeAttribute('tpi-hide-null-cells')
             }else if(!tpi_settings_option_7.checked && sto_option_rawAttribute){
-                tpi_sto__tbody.removeAttribute('tpi-show-ruler')
+                tpi_sto__tbody.setAttribute('tpi-hide-null-cells', '')
             }else if(!sto_option_rawAttribute){
                 if(tpi_settings_option_7.checked){
-                    tpi_sto__tbody.setAttribute('tpi-show-ruler', '')
+                    tpi_sto__tbody.removeAttribute('tpi-hide-null-cells')
                 }else{
-                    tpi_sto__tbody.removeAttribute('tpi-show-ruler')
+                    tpi_sto__tbody.setAttribute('tpi-hide-null-cells', '')
                 }
             }
         }
     });
 }
 
-let settings_option_ruler = true
-
-function tableColumnHighlight() {
-    const tbody = document.querySelector('.tpi-sto--table-tbody-wrapper');
-    if (!tbody) return null;
-
-    let isEnabled = true;
-    let currentTd = null;
-    let leaveTimeout = null;
-    let observer = null;
-    
-    // Вспомогательные функции
-    function clearAllHighlights() {
-        const allTds = tbody.querySelectorAll('.tpi-sto--table-tbody-item');
-        allTds.forEach(td => {
-            td.classList.remove('hovered-current', 'hovered-same-index', 'hovered-row');
-        });
-    }
-    
-    function buildAndHighlight(td) {
-        if (!td || !isEnabled) return;
-        
-        // Очистить все подсветки
-        clearAllHighlights();
-        
-        // Подсветить текущую ячейку
-        td.classList.add('hovered-current');
-        
-        // Подсветить строку
-        const row = td.closest('tr.tpi-sto--table-tbody');
-        if (row) {
-            const rowTds = Array.from(row.querySelectorAll('.tpi-sto--table-tbody-item'));
-            rowTds.forEach(rtd => {
-                if (rtd !== td) rtd.classList.add('hovered-row');
-            });
-        }
-        
-        // Подсветить столбец
-        const allRows = Array.from(tbody.querySelectorAll('tr.tpi-sto--table-tbody'));
-        const tdIndex = Array.from(row.querySelectorAll('.tpi-sto--table-tbody-item')).indexOf(td);
-        
-        if (tdIndex >= 0) {
-            allRows.forEach(otherRow => {
-                if (otherRow === row) return;
-                const otherTds = Array.from(otherRow.querySelectorAll('.tpi-sto--table-tbody-item'));
-                if (otherTds[tdIndex]) {
-                    otherTds[tdIndex].classList.add('hovered-same-index');
-                }
-            });
-        }
-    }
-    
-    // Обработчики событий
-    function handleMouseOver(event) {
-        if (!isEnabled) return;
-        
-        const targetTd = event.target.closest('.tpi-sto--table-tbody-item');
-        if (!targetTd) return;
-        
-        if (targetTd === currentTd) return;
-        
-        if (leaveTimeout) {
-            clearTimeout(leaveTimeout);
-            leaveTimeout = null;
-        }
-        
-        currentTd = targetTd;
-        buildAndHighlight(currentTd);
-    }
-    
-    function handleMouseLeave() {
-        if (!isEnabled) return;
-        
-        if (leaveTimeout) clearTimeout(leaveTimeout);
-        leaveTimeout = setTimeout(() => {
-            currentTd = null;
-            clearAllHighlights();
-        }, 50);
-    }
-    
-    function handleMouseOut(event) {
-        if (!isEnabled) return;
-        
-        const related = event.relatedTarget;
-        if (related && !tbody.contains(related)) {
-            if (leaveTimeout) clearTimeout(leaveTimeout);
-            leaveTimeout = setTimeout(() => {
-                currentTd = null;
-                clearAllHighlights();
-            }, 50);
-        }
-    }
-    
-    // Функция инициализации
-    function initListeners() {
-        // Добавляем слушатели
-        tbody.addEventListener('mouseover', handleMouseOver, true);
-        tbody.addEventListener('mouseleave', handleMouseLeave, true);
-        tbody.addEventListener('mouseout', handleMouseOut, true);
-        
-        // MutationObserver для очистки кэша при изменениях DOM
-        observer = new MutationObserver(() => {
-            // При изменениях DOM просто очищаем подсветку
-            clearAllHighlights();
-            currentTd = null;
-            if (leaveTimeout) {
-                clearTimeout(leaveTimeout);
-                leaveTimeout = null;
-            }
-        });
-        observer.observe(tbody, { childList: true, subtree: true });
-    }
-    
-    // Функция включения подсветки
-    function enable() {
-        if (!observer) {
-            // Если слушатели еще не добавлены - добавляем их
-            initListeners();
-        }
-        isEnabled = true;
-    }
-    
-    // Функция отключения подсветки
-    function disable() {
-        isEnabled = false;
-        // Очищаем все подсветки при отключении
-        clearAllHighlights();
-        currentTd = null;
-        if (leaveTimeout) {
-            clearTimeout(leaveTimeout);
-            leaveTimeout = null;
-        }
-    }
-    
-    // Функция полного удаления
-    function destroy() {
-        isEnabled = false;
-        
-        // Удаляем слушатели
-        if (tbody) {
-            tbody.removeEventListener('mouseover', handleMouseOver, true);
-            tbody.removeEventListener('mouseleave', handleMouseLeave, true);
-            tbody.removeEventListener('mouseout', handleMouseOut, true);
-        }
-        
-        // Останавливаем observer
-        if (observer) {
-            observer.disconnect();
-            observer = null;
-        }
-        
-        // Очищаем состояние
-        clearAllHighlights();
-        currentTd = null;
-        if (leaveTimeout) {
-            clearTimeout(leaveTimeout);
-            leaveTimeout = null;
-        }
-    }
-    
-    // Возвращаем методы управления
-    return {
-        enable: enable,
-        disable: disable,
-        destroy: destroy
-    };
-}
 //! ADMIN temp STUFF
 function copyTableRows() {
     const trElements = document.querySelectorAll('tr.tpi-sto--table-tbody');
