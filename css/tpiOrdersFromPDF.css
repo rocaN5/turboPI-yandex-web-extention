@@ -98,6 +98,9 @@ div.tpi-otp-wrapper{
         gap: 20px;
         /* width: 100%; */
     }
+    .tpi-otp-section-block[tpi-otp-section-block-id="file-data-list"]{
+        max-width: 250px;
+    }
 }
 
 .tpi-otp-section-title{
@@ -287,6 +290,7 @@ label.tpi-otp-file-input-wrapper{
     flex-flow: column;
     border-radius: 12px;
     padding: 10px;
+    border: 2px dashed transparent;
 
     &[tpi-document-type="app-courier"] .tpi-otp-file-list-carousel-icon svg:nth-child(1){
         display: flex;
@@ -296,6 +300,56 @@ label.tpi-otp-file-input-wrapper{
     }
     &[tpi-document-type="eapp-roadway"] .tpi-otp-file-list-carousel-icon svg:nth-child(3){
         display: flex;
+    }
+    &[tpi-document-type="change-file"] .tpi-otp-file-list-carousel-icon svg:nth-child(4){
+        display: flex;
+    }
+
+    &[tpi-document-type="change-file"] .tpi-otp-file-control-button{
+        display: none !important;
+    }
+
+    &[tpi-document-type="change-file"] .tpi-otp-file-change-text-wrapper{
+        display: flex !important;
+    }
+    &[tpi-document-type="change-file"]{
+        border: 2px dashed #bcbcbc;
+        animation: tpi-dragover 300ms infinite ease-in-out alternate;
+        background: #e8e8e8;
+    }
+}
+
+path#tpi_icon_change_file_arrows{
+    transform-origin: center;
+    animation: 1.5s linear 0s infinite tpi_icon_change_file_arrows;
+}
+
+svg:has(path#tpi_icon_change_file_document){
+    transform-origin: center;
+    animation: 1s cubic-bezier(.17,.73,0,1.32) 0s infinite tpi_icon_change_file_document;
+}
+
+@keyframes tpi_icon_change_file_arrows {
+    from{
+        transform: rotate(0turn);
+    }
+    to{
+        transform: rotate(1turn);
+    }
+}
+
+@keyframes tpi_icon_change_file_document {
+    0%{
+        transform: scale(1);
+        opacity: 1;
+    }
+    50%{
+        transform: scale(.7);
+        opacity: .5;
+    }
+    100%{
+        transform: scale(1);
+        opacity: 1;
     }
 }
 
@@ -347,7 +401,6 @@ icon.tpi-otp-file-list-carousel-icon {
 
 button.tpi-otp-file-control-button{
     border-radius: 10px;
-    /* border: 1px solid #e8e8e8; */
     border: 0;
     background: #f7f7f7;
     cursor: pointer;
@@ -358,6 +411,7 @@ button.tpi-otp-file-control-button{
     align-items: center;
     color: #212121;
     transition: 200ms ease-in-out;
+    min-height: 32px;
 
     /* &[tpi-otp-on-click="remove-file"]{
         padding: 8px;
@@ -391,6 +445,25 @@ button.tpi-otp-file-control-button{
     }
 
     p.tpi-otp-file-control-button-text {
+        font-size: .8rem;
+        font-weight: 600;
+    }
+}
+
+.tpi-otp-file-change-text-wrapper{
+    border-radius: 10px;
+    border: 0;
+    background: #f7f7f7;
+    cursor: default;
+    padding: 8px 10px;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    color: #212121;
+    transition: 200ms ease-in-out;
+    min-height: 32px;
+
+    p.tpi-otp-file-change-text{
         font-size: .8rem;
         font-weight: 600;
     }
@@ -480,6 +553,9 @@ p.tpi-otp-file-input-data-title {
     font-size: var(--df-font-s);
     line-height: var(--df-font-s);
     font-weight: 500;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 
 .tpi-otp-lots-table-wrapper{

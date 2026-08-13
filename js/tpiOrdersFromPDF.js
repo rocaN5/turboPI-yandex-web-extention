@@ -102,8 +102,8 @@ tpi_otp_icon_document_eapp_roadway = `
 `,
 tpi_otp_icon_change_file = `
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 512 512">
+    <path id="tpi_icon_change_file_arrows" d="M421.55,325.66c34.73-82.24,3.56-179.4-75.76-225.19-57.31-33.09-125.29-31-178.91-.42l-22.28-38.99c67.03-38.22,151.99-40.83,223.64.53,100.81,58.2,139.4,182.79,92.43,286.66l30.12,17.39-93.5,49.7-3.7-105.83,27.96,16.14ZM90.45,186.34c-34.73,82.24-3.56,179.4,75.76,225.19,57.31,33.09,125.29,31,178.91.43l22.28,38.99c-67.03,38.21-151.99,40.83-223.63-.53C42.94,392.21,4.35,267.63,51.32,163.75l-30.12-17.39,93.5-49.7,3.71,105.83-27.96-16.14Z"/>
    <path id="tpi_icon_change_file_document" d="M341.33,192.79l-53.95-53.95c-5.93-5.93-13.96-9.26-22.34-9.26h-72.47c-17.45,0-31.6,14.15-31.6,31.6v189.63c0,17.45,14.15,31.6,31.6,31.6h126.42c17.45,0,31.6-14.15,31.6-31.6v-135.68c0-8.38-3.33-16.42-9.26-22.34ZM317.2,305.03c0,5.6-4.54,10.13-10.13,10.13h-103.15c-5.6,0-10.13-4.54-10.13-10.13h0c0-5.6,4.54-10.13,10.13-10.13h103.15c5.6,0,10.13,4.54,10.13,10.13h0ZM317.7,264.51c0,5.6-4.54,10.13-10.13,10.13h-103.15c-5.6,0-10.13-4.54-10.13-10.13h0c0-5.6,4.54-10.13,10.13-10.13h103.15c5.6,0,10.13,4.54,10.13,10.13h0Z"/>
-   <path id="tpi_icon_change_file_arrows" d="M421.55,325.66c34.73-82.24,3.56-179.4-75.76-225.19-57.31-33.09-125.29-31-178.91-.42l-22.28-38.99c67.03-38.22,151.99-40.83,223.64.53,100.81,58.2,139.4,182.79,92.43,286.66l30.12,17.39-93.5,49.7-3.7-105.83,27.96,16.14ZM90.45,186.34c-34.73,82.24-3.56,179.4,75.76,225.19,57.31,33.09,125.29,31,178.91.43l22.28,38.99c-67.03,38.21-151.99,40.83-223.63-.53C42.94,392.21,4.35,267.63,51.32,163.75l-30.12-17.39,93.5-49.7,3.71,105.83-27.96-16.14Z"/>
 </svg>
 `
 ;
@@ -159,6 +159,7 @@ function checkiIs__onOrdersToPDF_page() {
                                             ${tpi_otp_icon_document_app_courier}
                                             ${tpi_otp_icon_document_eapp_courier}
                                             ${tpi_otp_icon_document_eapp_roadway}
+                                            ${tpi_otp_icon_change_file}
                                         </icon>
                                     </div>
                                 </div>
@@ -167,11 +168,14 @@ function checkiIs__onOrdersToPDF_page() {
                                         <icon class="tpi-otp-file-control-button-icon">${tpi_otp_icon_trash}</icon>
                                         <p class="tpi-otp-file-control-button-text">Убрать файл</p>
                                     </button>
+                                    <div class="tpi-otp-file-change-text-wrapper">
+                                        <p class="tpi-otp-file-change-text">Заменить файл</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="tpi-otp-section-block">
+                    <div class="tpi-otp-section-block" tpi-otp-section-block-id="file-data-list">
                         <ul class="tpi-otp-file-input-data-wrapper">
                             <li class="tpi-otp-file-input-data-list" tpi-data-type="document-type" style="--tpi-list-index:0">
                                 <div class="tpi-otp-file-input-title">
@@ -436,33 +440,35 @@ function tpi_detectDocumentType(text) {
         type = 'АПП Курьер';
     }
 
-    selected_type = type;  // сохраняем в глобальную переменную
+    selected_type = type;
 
     // Обновляем интерфейс
     const typeEl = document.querySelector('li[tpi-data-type="document-type"] p.tpi-otp-file-input-data-title');
     if (typeEl) typeEl.textContent = type;
 
-    // Стилизация (опционально)
+    // Стилизация
     const container = document.querySelector('li[tpi-data-type="document-type"]');
-    const filePreviewContainer = document.querySelector('.tpi-otp-file-control-wrapper')
+    const filePreviewContainer = document.querySelector('.tpi-otp-file-control-wrapper');
+    
     if (container) {
         container.classList.remove('tpi-type-eapp-roadway', 'tpi-type-eapp-courier', 'tpi-type-app-courier', 'tpi-type-unknown');
-        if (type === 'ЭАПП Магистраль') 
-            {
-                container.classList.add('tpi-type-eapp-roadway');
-                filePreviewContainer.setAttribute('tpi-document-type', 'eapp-roadway');
+        const typeMap = {
+            'ЭАПП Магистраль': { class: 'tpi-type-eapp-roadway', attr: 'eapp-roadway' },
+            'ЭАПП Курьер': { class: 'tpi-type-eapp-courier', attr: 'eapp-courier' },
+            'АПП Курьер': { class: 'tpi-type-app-courier', attr: 'app-courier' }
+        };
+        
+        if (typeMap[type]) {
+            container.classList.add(typeMap[type].class);
+            if (filePreviewContainer) {
+                filePreviewContainer.setAttribute('tpi-document-type', typeMap[type].attr);
             }
-        else if (type === 'ЭАПП Курьер') 
-            {
-                container.classList.add('tpi-type-eapp-courier');
-                filePreviewContainer.setAttribute('tpi-document-type', 'eapp-courier');
+        } else {
+            container.classList.add('tpi-type-unknown');
+            if (filePreviewContainer) {
+                filePreviewContainer.removeAttribute('tpi-document-type');
             }
-        else if (type === 'АПП Курьер') 
-            {
-                container.classList.add('tpi-type-app-courier');
-                filePreviewContainer.setAttribute('tpi-document-type', 'app-courier');
-            }
-        else container.classList.add('tpi-type-unknown');
+        }
     }
 
     return type;
@@ -529,7 +535,10 @@ function tpi_parseAPPCourier(fullText) {
         // Убираем дату, если она попала (формат "27.06.2026 21:08:53")
         courier = courier.replace(/^\d{2}\.\d{2}\.\d{4}\s+\d{2}:\d{2}:\d{2}\s*/, '').trim();
         const el = document.querySelector('li[tpi-data-type="reciver"] p.tpi-otp-file-input-data-title');
-        if (el) el.textContent = courier;
+        if (el) {
+            el.textContent = courier
+            el.setAttribute('tpi-tooltip-data', `${courier}`)
+        };
     }
 
     // 3. Поиск итоговой строки "Итого ..."
@@ -660,6 +669,119 @@ function tpi_addFileControlListeners() {
         button.removeEventListener('click', tpi_handleFileControlClick);
         button.addEventListener('click', tpi_handleFileControlClick);
     });
+
+    tpi_addFileReplaceDropSupport();
+}
+
+function tpi_addFileReplaceDropSupport() {
+    const controlWrapper = document.querySelector('.tpi-otp-file-control-wrapper');
+    if (!controlWrapper) return;
+
+    controlWrapper.removeEventListener('dragover', tpi_handleFileReplaceDragOver);
+    controlWrapper.removeEventListener('dragleave', tpi_handleFileReplaceDragLeave);
+    controlWrapper.removeEventListener('drop', tpi_handleFileReplaceDrop);
+
+    controlWrapper.addEventListener('dragover', tpi_handleFileReplaceDragOver);
+    controlWrapper.addEventListener('dragleave', tpi_handleFileReplaceDragLeave);
+    controlWrapper.addEventListener('drop', tpi_handleFileReplaceDrop);
+}
+
+function tpi_handleFileReplaceDragOver(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    const controlWrapper = event.currentTarget;
+    controlWrapper.setAttribute('tpi-document-type', 'change-file');
+}
+
+function tpi_handleFileReplaceDragLeave(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    const relatedTarget = event.relatedTarget;
+    const controlWrapper = event.currentTarget;
+    
+    if (relatedTarget && controlWrapper.contains(relatedTarget)) {
+        return;
+    }
+    
+    const fileInput = document.getElementById('tpi_file_input');
+    
+    if (fileInput && fileInput.files.length > 0) {
+        const docType = selected_type || 'unknown';
+        const typeMap = {
+            'ЭАПП Магистраль': 'eapp-roadway',
+            'ЭАПП Курьер': 'eapp-courier',
+            'АПП Курьер': 'app-courier'
+        };
+        const typeAttr = typeMap[docType] || 'unknown';
+        controlWrapper.setAttribute('tpi-document-type', typeAttr);
+    } else {
+        controlWrapper.removeAttribute('tpi-document-type');
+    }
+}
+
+function tpi_handleFileReplaceDrop(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    const controlWrapper = event.currentTarget;
+    const files = event.dataTransfer.files;
+    
+    if (files.length === 0) return;
+    
+    const file = files[0];
+    if (file.type !== 'application/pdf') {
+        tpiNotification.show('Ошибка', 'error', 'Пожалуйста, загрузите файл в формате PDF');
+        tpi_restoreDocumentType(controlWrapper);
+        return;
+    }
+
+    const fileInput = document.getElementById('tpi_file_input');
+    if (!fileInput) {
+        tpi_restoreDocumentType(controlWrapper);
+        return;
+    }
+
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    fileInput.files = dt.files;
+
+    const fileWrapper = document.querySelector('.tpi-otp-file-input-wrapper');
+    if (fileWrapper) {
+        fileWrapper.classList.remove('tpi-has-file');
+    }
+
+    const dataItems = document.querySelectorAll('.tpi-otp-file-input-data-title');
+    dataItems.forEach(el => el.textContent = '');
+
+    controlWrapper.setAttribute('tpi-document-type', 'change-file');
+
+    fileInput.dispatchEvent(new Event('change'));
+
+    setTimeout(() => {
+        if (fileWrapper && fileInput.files.length > 0) {
+            fileWrapper.classList.add('tpi-has-file');
+        }
+        tpi_restoreDocumentType(controlWrapper);
+    }, 2);
+}
+
+function tpi_restoreDocumentType(controlWrapper) {
+    const fileInput = document.getElementById('tpi_file_input');
+    if (!controlWrapper) return;
+
+    if (fileInput && fileInput.files.length > 0) {
+        const docType = selected_type || 'unknown';
+        const typeMap = {
+            'ЭАПП Магистраль': 'eapp-roadway',
+            'ЭАПП Курьер': 'eapp-courier',
+            'АПП Курьер': 'app-courier'
+        };
+        const typeAttr = typeMap[docType] || 'unknown';
+        controlWrapper.setAttribute('tpi-document-type', typeAttr);
+    } else {
+        controlWrapper.removeAttribute('tpi-document-type');
+    }
 }
 
 function tpi_handleFileControlClick(event) {
@@ -685,30 +807,28 @@ function tpi_removeFile() {
     const fileInput = document.getElementById('tpi_file_input');
     if (!fileInput) return;
     
-    // Очищаем input
     fileInput.value = '';
     const dt = new DataTransfer();
     fileInput.files = dt.files;
     
-    // Сбрасываем отображение данных
     const dataItems = document.querySelectorAll('.tpi-otp-file-input-data-title');
     dataItems.forEach(el => el.textContent = '');
     
-    // Убираем класс, показывающий что файл загружен
     const label = document.querySelector('.tpi-otp-file-input-wrapper');
     if (label) label.classList.remove('tpi-has-file');
     
-    // Сбрасываем тип
     selected_type = null;
     const typeEl = document.querySelector('li[tpi-data-type="document-type"]');
     if (typeEl) {
         typeEl.classList.remove('tpi-type-eapp-roadway', 'tpi-type-eapp-courier', 'tpi-type-app-courier', 'tpi-type-unknown');
     }
     
-    // Показываем уведомление
-    tpiNotification.show('Успешно', 'info', 'Файл удален');
+    const controlWrapper = document.querySelector('.tpi-otp-file-control-wrapper');
+    if (controlWrapper) {
+        controlWrapper.removeAttribute('tpi-document-type');
+    }
     
-    console.log('🗑️ Файл удален');
+    tpiNotification.show('Успешно', 'info', 'Файл удален');
 }
 
 function tpi_moveFileCarousel(direction) {

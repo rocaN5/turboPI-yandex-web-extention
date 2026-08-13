@@ -12,6 +12,7 @@ let scanlogBlocks = [];
 let currentScanlogIndex = 0;
 let mainScanlogBlock = null;
 let isLotMode = false;
+let isDamaged = null;
 
 const tpi_sort_icon_cell = `
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" fill="currentColor">
@@ -313,6 +314,12 @@ tpi_sort_icon_ticket_cloud = `
         <path d="M16 12h.01"></path>
     </svg>
 `,
+tpi_sort_icon_ticket_damaged = `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+	<path d="M7.9,20c4.42,2.27,9.85.52,12.12-3.9,2.27-4.42.52-9.85-3.9-12.12-4.42-2.27-9.85-.52-12.12,3.9-1.32,2.58-1.32,5.64,0,8.22l-2,5.9,5.9-2Z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+	<path d="M16.68,10.98l-.37-.37c-.1-.1-.27-.1-.37,0l-.19.19-.48-.48c.09-.35,0-.74-.27-1.02l-.75-.75c-1.03-1.03-2.7-1.03-3.74,0l1.49.75v.31c0,.28.11.55.31.75l.81.81c.28.28.67.36,1.02.27l.48.48-.19.19c-.1.1-.1.27,0,.37l.37.37c.1.1.27.1.37,0l1.49-1.49c.1-.1.1-.27,0-.37h0ZM11.94,10.72c-.06-.06-.11-.13-.16-.2l-4.21,3.93c-.42.39-.43,1.06-.03,1.47.41.41,1.07.4,1.47-.03l3.93-4.21c-.07-.05-.13-.1-.19-.16l-.81-.81h0Z" fill="currentColor"/>
+</svg>
+`,
 tpi_sort_copy_default = `
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
@@ -322,6 +329,60 @@ tpi_sort_copy_default = `
 tpi_sort_copy_mono = `
 <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
     <path d="M17.0943 7.14643C17.6874 6.93123 17.9818 6.85378 18.1449 6.82608C18.1461 6.87823 18.1449 6.92051 18.1422 6.94825C17.9096 9.39217 16.8906 15.4048 16.3672 18.2026C16.2447 18.8578 16.1507 19.1697 15.5179 18.798C15.1014 18.5532 14.7245 18.2452 14.3207 17.9805C12.9961 17.1121 11.1 15.8189 11.2557 15.8967C9.95162 15.0373 10.4975 14.5111 11.2255 13.8093C11.3434 13.6957 11.466 13.5775 11.5863 13.4525C11.64 13.3967 11.9027 13.1524 12.2731 12.8081C13.4612 11.7035 15.7571 9.56903 15.8151 9.32202C15.8246 9.2815 15.8334 9.13045 15.7436 9.05068C15.6539 8.97092 15.5215 8.9982 15.4259 9.01989C15.2904 9.05064 13.1326 10.4769 8.95243 13.2986C8.33994 13.7192 7.78517 13.9242 7.28811 13.9134L7.29256 13.9156C6.63781 13.6847 5.9849 13.4859 5.32855 13.286C4.89736 13.1546 4.46469 13.0228 4.02904 12.8812C3.92249 12.8466 3.81853 12.8137 3.72083 12.783C8.24781 10.8109 11.263 9.51243 12.7739 8.884C14.9684 7.97124 16.2701 7.44551 17.0943 7.14643ZM19.5169 5.21806C19.2635 5.01244 18.985 4.91807 18.7915 4.87185C18.5917 4.82412 18.4018 4.80876 18.2578 4.8113C17.7814 4.81969 17.2697 4.95518 16.4121 5.26637C15.5373 5.58382 14.193 6.12763 12.0058 7.03736C10.4638 7.67874 7.39388 9.00115 2.80365 11.001C2.40046 11.1622 2.03086 11.3451 1.73884 11.5619C1.46919 11.7622 1.09173 12.1205 1.02268 12.6714C0.970519 13.0874 1.09182 13.4714 1.33782 13.7738C1.55198 14.037 1.82635 14.1969 2.03529 14.2981C2.34545 14.4483 2.76276 14.5791 3.12952 14.6941C3.70264 14.8737 4.27444 15.0572 4.84879 15.233C6.62691 15.7773 8.09066 16.2253 9.7012 17.2866C10.8825 18.0651 12.041 18.8775 13.2243 19.6531C13.6559 19.936 14.0593 20.2607 14.5049 20.5224C14.9916 20.8084 15.6104 21.0692 16.3636 20.9998C17.5019 20.8951 18.0941 19.8479 18.3331 18.5703C18.8552 15.7796 19.8909 9.68351 20.1332 7.13774C20.1648 6.80544 20.1278 6.433 20.097 6.25318C20.0653 6.068 19.9684 5.58448 19.5169 5.21806Z"></path>
+</svg>
+`,
+tpi_sort_damaged = `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+	<path d="M12,21.76c-.54,0-.98-.44-.98-.98v-6.83c0-.54.44-.98.98-.98s.98.44.98.98v6.83c0,.54-.44.98-.98.98Z"/>
+    <path d="M14.93,19.81h-5.86c-.54,0-.98.44-.98.98s.44.98.98.98h5.86c.54,0,.98-.44.98-.98s-.44-.98-.98-.98Z"/>
+ 	<path d="M15.9,2.24h-1.55l-1.95,2.93h1.07c.36,0,.69.2.86.52.17.32.15.7-.05.99l-1.95,2.93c-.18.28-.48.44-.81.44-.18,0-.34-.07-.49-.16-.45-.3-.57-.9-.28-1.35l.98-1.42h-1.19c-.36,0-.69-.2-.86-.52-.16-.31-.14-.68.05-.98l2.28-3.38h-3.9c-1.08,0-1.95.87-1.95,1.95v4.88c0,3.24,2.62,5.86,5.86,5.86s5.86-2.62,5.86-5.86v-4.88c0-1.08-.87-1.95-1.95-1.95Z"/>
+</svg>
+`,
+tpi_sort_canceled_flow = `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
+	<path d="M88.5,320c0,127.85,103.65,231.5,231.5,231.5s231.5-103.65,231.5-231.5-103.65-231.5-231.5-231.5-231.5,103.65-231.5,231.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="48"/>
+	<path d="M483.7,156.3L156.3,483.7" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="48"/>
+</svg>
+`,
+tpi_sort_canceled_flow_true = `
+<svg stroke="currentColor" fill="#4CAF50" stroke-width="0" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+    <path d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z"/>
+</svg>
+`,
+tpi_sort_canceled_flow_false = `
+<svg stroke="currentColor" fill="#ff4436" stroke-width="0" viewBox="0 0 384 512" xmlns="http://www.w3.org/2000/svg">
+  <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/>
+</svg>
+`,
+tpi_sort_chevron_right = `
+<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 320 512" xmlns="http://www.w3.org/2000/svg">
+    <path d="M285.476 272.971L91.132 467.314c-9.373 9.373-24.569 9.373-33.941 0l-22.667-22.667c-9.357-9.357-9.375-24.522-.04-33.901L188.505 256 34.484 101.255c-9.335-9.379-9.317-24.544.04-33.901l22.667-22.667c9.373-9.373 24.569-9.373 33.941 0L285.475 239.03c9.373 9.372 9.373 24.568.001 33.941z"/>
+</svg>
+`,
+tpi_sort_chevron_left = `
+<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 320 512" xmlns="http://www.w3.org/2000/svg">
+    <path d="M34.52 239.03L228.87 44.69c9.37-9.37 24.57-9.37 33.94 0l22.67 22.67c9.36 9.36 9.37 24.52.04 33.9L131.49 256l154.02 154.75c9.34 9.38 9.32 24.54-.04 33.9l-22.67 22.67c-9.37 9.37-24.57 9.37-33.94 0L34.52 272.97c-9.37-9.37-9.37-24.57 0-33.94z"/>
+</svg>
+`,
+tpi_sort_damaged_document = `
+<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+    <path d="M12,14a1,1,0,0,0-1,1v2a1,1,0,0,0,2,0V15A1,1,0,0,0,12,14Zm.38-2.92A1,1,0,0,0,11.8,11l-.18.06-.18.09-.15.12A1,1,0,0,0,11,12a1,1,0,0,0,.29.71,1,1,0,0,0,.33.21A.84.84,0,0,0,12,13a1,1,0,0,0,.71-.29A1,1,0,0,0,13,12a1,1,0,0,0-.29-.71A1.15,1.15,0,0,0,12.38,11.08ZM20,8.94a1.31,1.31,0,0,0-.06-.27l0-.09a1.07,1.07,0,0,0-.19-.28h0l-6-6h0a1.07,1.07,0,0,0-.28-.19l-.1,0A1.1,1.1,0,0,0,13.06,2H7A3,3,0,0,0,4,5V19a3,3,0,0,0,3,3H17a3,3,0,0,0,3-3V9S20,9,20,8.94ZM14,5.41,16.59,8H15a1,1,0,0,1-1-1ZM18,19a1,1,0,0,1-1,1H7a1,1,0,0,1-1-1V5A1,1,0,0,1,7,4h5V7a3,3,0,0,0,3,3h3Z"/>
+</svg>
+`,
+tpi_sort_x_mark = `
+<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 384 512" xmlns="http://www.w3.org/2000/svg">
+    <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/>
+</svg>
+`,
+tpi_sort_pdf_file = `
+<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+    <path d="M64 464l48 0 0 48-48 0c-35.3 0-64-28.7-64-64L0 64C0 28.7 28.7 0 64 0L229.5 0c17 0 33.3 6.7 45.3 18.7l90.5 90.5c12 12 18.7 28.3 18.7 45.3L384 304l-48 0 0-144-80 0c-17.7 0-32-14.3-32-32l0-80L64 48c-8.8 0-16 7.2-16 16l0 384c0 8.8 7.2 16 16 16zM176 352l32 0c30.9 0 56 25.1 56 56s-25.1 56-56 56l-16 0 0 32c0 8.8-7.2 16-16 16s-16-7.2-16-16l0-48 0-80c0-8.8 7.2-16 16-16zm32 80c13.3 0 24-10.7 24-24s-10.7-24-24-24l-16 0 0 48 16 0zm96-80l32 0c26.5 0 48 21.5 48 48l0 64c0 26.5-21.5 48-48 48l-32 0c-8.8 0-16-7.2-16-16l0-128c0-8.8 7.2-16 16-16zm32 128c8.8 0 16-7.2 16-16l0-64c0-8.8-7.2-16-16-16l-16 0 0 96 16 0zm80-112c0-8.8 7.2-16 16-16l48 0c8.8 0 16 7.2 16 16s-7.2 16-16 16l-32 0 0 32 32 0c8.8 0 16 7.2 16 16s-7.2 16-16 16l-32 0 0 48c0 8.8-7.2 16-16 16s-16-7.2-16-16l0-64 0-64z"/>
+</svg>
+`,
+tpi_sort_map_marker = `
+<svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+    <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
 </svg>
 `
 ;
@@ -400,7 +461,11 @@ tpi_sort_copy_mono = `
                     };
                 }
                 sortableType = data.type;
+                isDamaged = data.isDamaged || false;
                 insert3DViewer();
+                if (data.barcode) {
+                    fetchDamagedInfo(data.barcode, scId, token);
+                }
             }
             if(data){
                 window.currentSortableBarcode = data.barcode || '';
@@ -4207,6 +4272,17 @@ function addBarcodeCopyButtons(data) {
     
     titleSpan.insertAdjacentElement('afterend', wrapper);
     
+    // Добавляем индикатор брака, если isDamaged === true
+    if (data.isDamaged === true) {
+        const damageWrapper = document.createElement('div');
+        damageWrapper.className = 'tpi-damage-indicator-wrapper';
+        damageWrapper.innerHTML = `
+            <icon class="tpi-damage-indicator-icon">${tpi_sort_damaged}</icon>
+            <p class="tpi-damage-indicator-title">БРАК</p>
+        `;
+        wrapper.insertAdjacentElement('afterend', damageWrapper);
+    }
+    
     wrapper.querySelector('[data-copy-type="default"]').addEventListener('click', () => {
         const text = hasMultiple ? `${primary} (${secondary})` : primary;
         if (text) {
@@ -4226,4 +4302,798 @@ function addBarcodeCopyButtons(data) {
             }
         }
     });
+}
+
+async function fetchDamagedInfo(barcode, scId, token) {
+    const url = `https://sorting-center.logistics.yandex.ru/api/gateway/logpoint/${scId}/sortables/get-damaged-history?barcode=${encodeURIComponent(barcode)}`;
+    try {
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-Token': token
+            },
+            credentials: 'include'
+        });
+        if (!response.ok) return;
+        const data = await response.json();
+        if (data && Array.isArray(data.damagedInfos) && data.damagedInfos.length > 0) {
+            addDamagedInfoBlock(data.damagedInfos, scId);
+        } else {
+            const oldBlock = document.querySelector('.tpi-sort-info-card-item[data-damaged-card="true"]');
+            if (oldBlock) oldBlock.remove();
+        }
+    } catch (e) {
+        console.warn('Ошибка загрузки истории брака:', e);
+    }
+}
+
+function getCityInfo(scName) {
+    if (!scName) return null;
+    const cityMapping = [
+        { keywords: ['Воронеж'], display: 'СЦ Воронеж', id: 'voronezh' },
+        { keywords: ['Липецк'], display: 'СЦ Липецк', id: 'lipetsk' },
+        { keywords: ['Курск'], display: 'СЦ Курск', id: 'kursk' },
+        { keywords: ['Белгород'], display: 'СЦ Белгород', id: 'belgorod' },
+        { keywords: ['Грибки'], display: 'СЦ Грибки', id: 'gribki' },
+        { keywords: ['Софьино'], display: 'Софьино ФФЦ', id: 'sofino' },
+        { keywords: ['Тарный', 'Царицыно'], display: 'СЦ Тарный', id: 'tarn' },
+        { keywords: ['Ростов'], display: 'СЦ Ростов', id: 'rostov' }
+    ];
+    for (const map of cityMapping) {
+        if (map.keywords.some(kw => scName.includes(kw))) {
+            return map;
+        }
+    }
+    return null;
+}
+
+function addDamagedInfoBlock(damagedInfos, scId) {
+    if (!damagedInfos || damagedInfos.length === 0) return;
+
+    const wdhCard = document.querySelector('.tpi-sort-info-card-item:has(span[data-i18n-key="pages.sortable-item:weight-and-size-info.title"])');
+    if (!wdhCard) return;
+
+    const oldBlock = wdhCard.parentElement?.querySelector('.tpi-sort-info-card-item[data-damaged-card="true"]');
+    if (oldBlock) oldBlock.remove();
+
+    // Создаём контейнер карточки
+    const container = document.createElement('div');
+    container.className = 'tpi-sort-info-card-item';
+    container.setAttribute('data-damaged-card', 'true');
+
+    container.innerHTML = /*html*/ `
+        <div class="tpi-sort-info-card-item-wrapper">
+            <div class="tpi-sort-info-card-item-title-wrapper">
+                <icon class="tpi-sort-card-item-title-icon">${tpi_sort_damaged}</icon>
+                <p class="tpi-sort-card-item-title-text">Информация о браке</p>
+            </div>
+            <div class="tpi-sort-info-card-item-content-block">
+                <div class="tpi-sort-damaged-image-block">
+                    <div class="tpi-sort-damaged-image-wrapper" style="height:220px;"></div>
+                    <div class="tpi-sort-damaged-ticket-control-wrapper">
+                        <button class="tpi-sort-damaged-ticket-control" tpi-sort-damaged-ticket="prev">
+                            <icon>${tpi_sort_chevron_left}</icon>
+                        </button>
+                        <span class="tpi-sort-damaged-ticket-control-amount">1 из 1</span>
+                        <button class="tpi-sort-damaged-ticket-control" tpi-sort-damaged-ticket="next">
+                            <icon>${tpi_sort_chevron_right}</icon>
+                        </button>
+                    </div>
+                </div>
+                <div class="tpi-sort-damaged-data-wrapper">
+                    <ul class="tpi-sort-damaged-data-list">
+                        <li class="tpi-sort-damaged-list" tpi-damaged-data-list-id="created-date">
+                            <div class="tpi-sort-damaged-list-title-wrapper">
+                                <icon class="tpi-sort-damaged-list-title-icon">${tpi_sort_icon_date}</icon>
+                                <p class="tpi-sort-damaged-list-title">Дата создания</p>
+                            </div>
+                            <div class="tpi-sort-damaged-list-data-wrapper">
+                                <p class="tpi-sort-damaged-list-data"></p>
+                            </div>
+                        </li>
+                        <li class="tpi-sort-damaged-list" tpi-damaged-data-list-id="is-canceled">
+                            <div class="tpi-sort-damaged-list-title-wrapper">
+                                <icon class="tpi-sort-damaged-list-title-icon">${tpi_sort_canceled_flow}</icon>
+                                <p class="tpi-sort-damaged-list-title">Отменен</p>
+                            </div>
+                            <div class="tpi-sort-damaged-list-data-wrapper">
+                                <p class="tpi-sort-damaged-list-data"></p>
+                                <icon class="tpi-sort-damaged-list-cancel-icon"></icon>
+                            </div>
+                        </li>
+                        <li class="tpi-sort-damaged-list" tpi-damaged-data-list-id="damage-iniziator">
+                            <div class="tpi-sort-damaged-list-title-wrapper">
+                                <icon class="tpi-sort-damaged-list-title-icon">${tpi_sort_map_marker}</icon>
+                                <p class="tpi-sort-damaged-list-title">Место фиксации</p>
+                            </div>
+                            <div class="tpi-sort-damaged-list-data-wrapper">
+                                <p class="tpi-sort-damaged-list-data"></p>
+                                <icon class="tpi-sort-table-sc-icon" tpi-sort-city-id="unset"></icon>
+                            </div>
+                        </li>
+                        <li class="tpi-sort-damaged-list" tpi-damaged-data-list-id="damage-type">
+                            <div class="tpi-sort-damaged-list-title-wrapper">
+                                <icon class="tpi-sort-damaged-list-title-icon">${tpi_sort_icon_type}</icon>
+                                <p class="tpi-sort-damaged-list-title">Тип повреждения</p>
+                            </div>
+                            <div class="tpi-sort-damaged-list-data-wrapper">
+                                <p class="tpi-sort-damaged-list-data"></p>
+                            </div>
+                        </li>
+                        <li class="tpi-sort-damaged-list" tpi-damaged-data-list-id="documents">
+                            <div class="tpi-sort-damaged-list-title-wrapper">
+                                <icon class="tpi-sort-damaged-list-title-icon">${tpi_sort_damaged_document}</icon>
+                                <p class="tpi-sort-damaged-list-title">Документы</p>
+                            </div>
+                            <div class="tpi-sort-damaged-list-data-wrapper" id="doc-container"></div>
+                        </li>
+                        <li class="tpi-sort-damaged-list" tpi-damaged-data-list-id="ticket-brak">
+                            <div class="tpi-sort-damaged-list-title-wrapper">
+                                <icon class="tpi-sort-damaged-list-title-icon">${tpi_sort_icon_ticket_damaged}</icon>
+                                <p class="tpi-sort-damaged-list-title">Тикет брака</p>
+                            </div>
+                            <div class="tpi-sort-damaged-list-data-wrapper">
+                                <a href="#" class="tpi-sort-damaged-list-data" target="_blank"></a>
+                            </div>
+                        </li>
+                        <li class="tpi-sort-damaged-list" tpi-damaged-data-list-id="ticket-rash">
+                            <div class="tpi-sort-damaged-list-title-wrapper">
+                                <icon class="tpi-sort-damaged-list-title-icon">${tpi_sort_icon_ticket_cloud}</icon>
+                                <p class="tpi-sort-damaged-list-title">Тикет расхождения</p>
+                            </div>
+                            <div class="tpi-sort-damaged-list-data-wrapper">
+                                <a href="#" class="tpi-sort-damaged-list-data" target="_blank"></a>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    `;
+
+    wdhCard.insertAdjacentElement('afterend', container);
+
+    // -------- Модальное окно (создаём один раз) --------
+    let modal = document.querySelector('.tpi-damaged-modal-overlay');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.className = 'tpi-damaged-modal-overlay';
+        modal.innerHTML = /*html*/`
+            <button class="tpi-damaged-modal-close">
+                <icon>${tpi_sort_x_mark}</icon>
+            </button>
+            <div class="tpi-damaged-modal-content">
+                <div class="tpi-damaged-modal-image-container">
+                    <img src="" alt="просмотр" />
+                </div>
+                <div class="tpi-damaged-modal-controls">
+                    <button class="tpi-damaged-zoom-out">−</button>
+                    <span class="zoom-level">100%</span>
+                    <button class="tpi-damaged-zoom-in">+</button>
+                </div>
+                <div class="tpi-damaged-modal-thumbnails"></div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        // A- Ускоренный зум и уменьшенная плавность
+        const style = document.createElement('style');
+        style.textContent = `
+            .tpi-damaged-modal-image-container img {
+                transition: transform 0.1s ease-out !important;
+            }
+        `;
+        modal.appendChild(style);
+    }
+
+    // -------- Состояние модалки и обработчики --------
+    let modalState = {
+        images: [],
+        currentIndex: 0,
+        zoom: 1,
+        translateX: 0,
+        translateY: 0,
+        naturalWidth: 0,
+        naturalHeight: 0,
+        containerWidth: 0,
+        containerHeight: 0,
+        isDragging: false,
+        dragJustEnded: false,
+        startX: 0,
+        startY: 0,
+        startTranslateX: 0,
+        startTranslateY: 0,
+        isTouching: false,
+        touchStartX: 0,
+        touchStartY: 0,
+        touchStartTranslateX: 0,
+        touchStartTranslateY: 0
+    };
+
+    const modalImg = modal.querySelector('.tpi-damaged-modal-image-container img');
+    const modalContainer = modal.querySelector('.tpi-damaged-modal-image-container');
+    const modalThumbs = modal.querySelector('.tpi-damaged-modal-thumbnails');
+    const zoomLevelSpan = modal.querySelector('.zoom-level');
+
+    modalContainer.style.cursor = 'default';
+
+    function updateContainerSize() {
+        const rect = modalContainer.getBoundingClientRect();
+        modalState.containerWidth = rect.width;
+        modalState.containerHeight = rect.height;
+    }
+
+    function clampTranslate() {
+        const { naturalWidth, naturalHeight, containerWidth, containerHeight, zoom, translateX, translateY } = modalState;
+        if (naturalWidth === 0 || naturalHeight === 0) return;
+        const aspect = naturalWidth / naturalHeight;
+        let displayWidth, displayHeight;
+        if (aspect > containerWidth / containerHeight) {
+            displayWidth = containerWidth;
+            displayHeight = containerWidth / aspect;
+        } else {
+            displayHeight = containerHeight;
+            displayWidth = containerHeight * aspect;
+        }
+        const zoomedWidth = displayWidth * zoom;
+        const zoomedHeight = displayHeight * zoom;
+        const overflowX = Math.max(0, (zoomedWidth - containerWidth) / 2);
+        const overflowY = Math.max(0, (zoomedHeight - containerHeight) / 2);
+        let newTx = translateX;
+        let newTy = translateY;
+        if (zoomedWidth <= containerWidth) newTx = 0;
+        else newTx = Math.min(Math.max(newTx, -overflowX), overflowX);
+        if (zoomedHeight <= containerHeight) newTy = 0;
+        else newTy = Math.min(Math.max(newTy, -overflowY), overflowY);
+        modalState.translateX = newTx;
+        modalState.translateY = newTy;
+        applyModalTransform();
+    }
+
+    function applyModalTransform() {
+        modalImg.style.transform = `translate(${modalState.translateX}px, ${modalState.translateY}px) scale(${modalState.zoom})`;
+        zoomLevelSpan.textContent = Math.round(modalState.zoom * 100) + '%';
+    }
+
+    function setModalTransition(enable) {
+        modalImg.classList.toggle('no-transition', !enable);
+    }
+
+    // B- Загрузка изображения с принудительным сбросом зума
+    function loadModalImage(src, callback) {
+        const img = new Image();
+        img.onload = function() {
+            modalState.naturalWidth = this.naturalWidth;
+            modalState.naturalHeight = this.naturalHeight;
+            // Сброс зума при каждой загрузке
+            modalState.zoom = 1;
+            modalState.translateX = 0;
+            modalState.translateY = 0;
+            updateContainerSize();
+            modalImg.src = src;
+            setModalTransition(false);
+            clampTranslate();
+            setModalTransition(true);
+            if (callback) callback();
+        };
+        img.onerror = function() {
+            modalState.naturalWidth = 800;
+            modalState.naturalHeight = 600;
+            modalState.zoom = 1;
+            modalState.translateX = 0;
+            modalState.translateY = 0;
+            updateContainerSize();
+            modalImg.src = src;
+            setModalTransition(false);
+            clampTranslate();
+            setModalTransition(true);
+            if (callback) callback();
+        };
+        img.src = src;
+    }
+
+    function openModal(images, index) {
+        if (!images || images.length === 0) return;
+        modalState.images = images;
+        modalState.currentIndex = Math.min(index, images.length - 1);
+        modalState.zoom = 1;
+        modalState.translateX = 0;
+        modalState.translateY = 0;
+        updateContainerSize();
+        setModalTransition(false);
+        loadModalImage(images[modalState.currentIndex], () => {
+            renderModalThumbnails();
+            modal.classList.add('open');
+            document.body.style.overflow = 'hidden';
+            setModalTransition(true);
+            updateContainerSize();
+            clampTranslate();
+        });
+    }
+
+    function closeModal() {
+        modal.classList.remove('open');
+        document.body.style.overflow = '';
+        modalState.dragJustEnded = false;
+    }
+
+    function renderModalThumbnails() {
+        modalThumbs.innerHTML = '';
+        modalState.images.forEach((src, i) => {
+            const thumb = document.createElement('img');
+            thumb.src = src;
+            thumb.alt = 'миниатюра';
+            thumb.dataset.index = i;
+            thumb.addEventListener('click', () => {
+                modalState.currentIndex = i;
+                setModalTransition(false);
+                loadModalImage(modalState.images[i], () => {
+                    updateContainerSize();
+                    clampTranslate();
+                    setModalTransition(true);
+                    const thumbs = modalThumbs.querySelectorAll('img');
+                    thumbs.forEach((t, idx) => {
+                        t.classList.toggle('active', idx === modalState.currentIndex);
+                    });
+                });
+            });
+            modalThumbs.appendChild(thumb);
+        });
+        const thumbs = modalThumbs.querySelectorAll('img');
+        thumbs.forEach((t, i) => {
+            t.classList.toggle('active', i === modalState.currentIndex);
+        });
+    }
+
+    modal.querySelector('.tpi-damaged-modal-close').addEventListener('click', closeModal);
+
+    modalContainer.addEventListener('click', (e) => {
+        if (e.target === modalContainer && !modalState.dragJustEnded) {
+            closeModal();
+        }
+    });
+
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal && !modalState.dragJustEnded) {
+            closeModal();
+        }
+    });
+
+    // C- Увеличенный шаг зума
+    modal.querySelector('.tpi-damaged-zoom-in').addEventListener('click', () => {
+        setModalTransition(true);
+        modalState.zoom = Math.min(modalState.zoom + 0.5, 5);
+        clampTranslate();
+    });
+    modal.querySelector('.tpi-damaged-zoom-out').addEventListener('click', () => {
+        setModalTransition(true);
+        modalState.zoom = Math.max(modalState.zoom - 0.5, 0.5);
+        clampTranslate();
+    });
+
+    modalContainer.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        if (e.ctrlKey) {
+            const delta = e.deltaY > 0 ? -0.5 : 0.5;
+            setModalTransition(true);
+            modalState.zoom = Math.min(Math.max(modalState.zoom + delta, 0.5), 5);
+            clampTranslate();
+        } else {
+            if (e.deltaY > 0) {
+                modalState.currentIndex = (modalState.currentIndex + 1) % modalState.images.length;
+            } else {
+                modalState.currentIndex = (modalState.currentIndex - 1 + modalState.images.length) % modalState.images.length;
+            }
+            setModalTransition(false);
+            loadModalImage(modalState.images[modalState.currentIndex], () => {
+                updateContainerSize();
+                clampTranslate();
+                setModalTransition(true);
+                const thumbs = modalThumbs.querySelectorAll('img');
+                thumbs.forEach((t, idx) => {
+                    t.classList.toggle('active', idx === modalState.currentIndex);
+                });
+            });
+        }
+    }, { passive: false });
+
+    // Drag (на изображении)
+    modalImg.addEventListener('mousedown', (e) => {
+        if (modalState.zoom <= 1) return;
+        if (modalState.naturalWidth === 0) return;
+        const aspect = modalState.naturalWidth / modalState.naturalHeight;
+        let displayWidth, displayHeight;
+        if (aspect > modalState.containerWidth / modalState.containerHeight) {
+            displayWidth = modalState.containerWidth;
+            displayHeight = modalState.containerWidth / aspect;
+        } else {
+            displayHeight = modalState.containerHeight;
+            displayWidth = modalState.containerHeight * aspect;
+        }
+        if (displayWidth * modalState.zoom <= modalState.containerWidth &&
+            displayHeight * modalState.zoom <= modalState.containerHeight) return;
+        modalState.isDragging = true;
+        modalState.dragJustEnded = false;
+        modalState.startX = e.clientX;
+        modalState.startY = e.clientY;
+        modalState.startTranslateX = modalState.translateX;
+        modalState.startTranslateY = modalState.translateY;
+        modalImg.style.cursor = 'grabbing';
+        setModalTransition(false);
+        e.preventDefault();
+    });
+
+    window.addEventListener('mousemove', (e) => {
+        if (!modalState.isDragging) return;
+        const dx = e.clientX - modalState.startX;
+        const dy = e.clientY - modalState.startY;
+        modalState.translateX = modalState.startTranslateX + dx;
+        modalState.translateY = modalState.startTranslateY + dy;
+        clampTranslate();
+    });
+
+    window.addEventListener('mouseup', () => {
+        if (modalState.isDragging) {
+            modalState.isDragging = false;
+            modalState.dragJustEnded = true;
+            modalImg.style.cursor = 'default';
+            setModalTransition(true);
+            setTimeout(() => { modalState.dragJustEnded = false; }, 100);
+        }
+    });
+
+    // Touch
+    modalImg.addEventListener('touchstart', (e) => {
+        if (modalState.zoom <= 1) return;
+        if (modalState.naturalWidth === 0) return;
+        const aspect = modalState.naturalWidth / modalState.naturalHeight;
+        let displayWidth, displayHeight;
+        if (aspect > modalState.containerWidth / modalState.containerHeight) {
+            displayWidth = modalState.containerWidth;
+            displayHeight = modalState.containerWidth / aspect;
+        } else {
+            displayHeight = modalState.containerHeight;
+            displayWidth = modalState.containerHeight * aspect;
+        }
+        if (displayWidth * modalState.zoom <= modalState.containerWidth &&
+            displayHeight * modalState.zoom <= modalState.containerHeight) return;
+        const touch = e.touches[0];
+        modalState.isTouching = true;
+        modalState.dragJustEnded = false;
+        modalState.touchStartX = touch.clientX;
+        modalState.touchStartY = touch.clientY;
+        modalState.touchStartTranslateX = modalState.translateX;
+        modalState.touchStartTranslateY = modalState.translateY;
+        setModalTransition(false);
+    }, { passive: true });
+
+    modalImg.addEventListener('touchmove', (e) => {
+        if (!modalState.isTouching) return;
+        const touch = e.touches[0];
+        const dx = touch.clientX - modalState.touchStartX;
+        const dy = touch.clientY - modalState.touchStartY;
+        modalState.translateX = modalState.touchStartTranslateX + dx;
+        modalState.translateY = modalState.touchStartTranslateY + dy;
+        clampTranslate();
+    }, { passive: true });
+
+    modalImg.addEventListener('touchend', () => {
+        if (modalState.isTouching) {
+            modalState.isTouching = false;
+            modalState.dragJustEnded = true;
+            setModalTransition(true);
+            setTimeout(() => { modalState.dragJustEnded = false; }, 100);
+        }
+    }, { passive: true });
+
+    document.addEventListener('keydown', (e) => {
+        if (!modal.classList.contains('open')) return;
+        if (e.key === 'Escape') closeModal();
+        if (e.key === 'ArrowLeft') {
+            modalState.currentIndex = (modalState.currentIndex - 1 + modalState.images.length) % modalState.images.length;
+            setModalTransition(false);
+            loadModalImage(modalState.images[modalState.currentIndex], () => {
+                updateContainerSize();
+                clampTranslate();
+                setModalTransition(true);
+                const thumbs = modalThumbs.querySelectorAll('img');
+                thumbs.forEach((t, idx) => {
+                    t.classList.toggle('active', idx === modalState.currentIndex);
+                });
+            });
+        }
+        if (e.key === 'ArrowRight') {
+            modalState.currentIndex = (modalState.currentIndex + 1) % modalState.images.length;
+            setModalTransition(false);
+            loadModalImage(modalState.images[modalState.currentIndex], () => {
+                updateContainerSize();
+                clampTranslate();
+                setModalTransition(true);
+                const thumbs = modalThumbs.querySelectorAll('img');
+                thumbs.forEach((t, idx) => {
+                    t.classList.toggle('active', idx === modalState.currentIndex);
+                });
+            });
+        }
+    });
+
+    window.addEventListener('resize', () => {
+        if (modal.classList.contains('open')) {
+            updateContainerSize();
+            clampTranslate();
+        }
+    });
+
+    //A- -------- Функция рендера фото-грида --------
+    function renderPhotoGrid(container, photos) {
+        if (!container) return;
+        container.innerHTML = '';
+        const total = photos.length;
+        if (total === 0) {
+            container.innerHTML = '<p class="tpi-damaged-no-photos">Нет фотографий</p>';
+            return;
+        }
+
+        const grid = document.createElement('div');
+        grid.className = 'tpi-damaged-photo-grid';
+
+        let gridTemplateColumns = '';
+        let gridTemplateRows = '';
+        let positions = [];
+        let visibleCount = 0;
+
+        if (total >= 6) {
+            gridTemplateColumns = 'repeat(3, 1fr)';
+            gridTemplateRows = '1fr 1fr';
+            visibleCount = 6;
+            for (let i = 0; i < 6; i++) {
+                const row = Math.floor(i / 3) + 1;
+                const col = (i % 3) + 1;
+                positions.push({ row, col, rowSpan: 1, colSpan: 1 });
+            }
+        } else if (total === 5) {
+            // оставляем старую логику для 5 фото (2fr, 1fr, 1fr, 2 строки)
+            gridTemplateColumns = '2fr 1fr 1fr';
+            gridTemplateRows = '1fr 1fr';
+            visibleCount = 5;
+            positions = [
+                { row: 1, col: 1, rowSpan: 2, colSpan: 1 },
+                { row: 1, col: 2, rowSpan: 1, colSpan: 1 },
+                { row: 1, col: 3, rowSpan: 1, colSpan: 1 },
+                { row: 2, col: 2, rowSpan: 1, colSpan: 1 },
+                { row: 2, col: 3, rowSpan: 1, colSpan: 1 }
+            ];
+        } else if (total === 4) {
+            gridTemplateColumns = '2fr 1fr';
+            gridTemplateRows = '1fr 1fr 1fr';
+            visibleCount = 4;
+            positions = [
+                { row: 1, col: 1, rowSpan: 3, colSpan: 1 },
+                { row: 1, col: 2, rowSpan: 1, colSpan: 1 },
+                { row: 2, col: 2, rowSpan: 1, colSpan: 1 },
+                { row: 3, col: 2, rowSpan: 1, colSpan: 1 }
+            ];
+        } else if (total === 3) {
+            gridTemplateColumns = '2fr 1fr';
+            gridTemplateRows = '1fr 1fr';
+            visibleCount = 3;
+            positions = [
+                { row: 1, col: 1, rowSpan: 2, colSpan: 1 },
+                { row: 1, col: 2, rowSpan: 1, colSpan: 1 },
+                { row: 2, col: 2, rowSpan: 1, colSpan: 1 }
+            ];
+        } else if (total === 2) {
+            gridTemplateColumns = '1fr 1fr';
+            gridTemplateRows = '1fr';
+            visibleCount = 2;
+            positions = [
+                { row: 1, col: 1, rowSpan: 1, colSpan: 1 },
+                { row: 1, col: 2, rowSpan: 1, colSpan: 1 }
+            ];
+        } else if (total === 1) {
+            gridTemplateColumns = '1fr';
+            gridTemplateRows = '1fr';
+            visibleCount = 1;
+            positions = [
+                { row: 1, col: 1, rowSpan: 1, colSpan: 1 }
+            ];
+        }
+
+        grid.style.gridTemplateColumns = gridTemplateColumns;
+        grid.style.gridTemplateRows = gridTemplateRows;
+
+        const allPhotos = photos.map(p => p.link);
+        const hasMore = total > 6;
+        const displayCount = Math.min(visibleCount, total);
+
+        for (let i = 0; i < displayCount; i++) {
+            const pos = positions[i];
+            const item = document.createElement('div');
+            item.className = 'tpi-damaged-photo-item';
+            item.style.gridRow = `${pos.row} / span ${pos.rowSpan}`;
+            item.style.gridColumn = `${pos.col} / span ${pos.colSpan}`;
+
+            const img = document.createElement('img');
+            img.src = photos[i].link;
+            img.alt = photos[i].fileName || 'фото';
+            img.loading = 'lazy';
+            img.dataset.index = i;
+            item.appendChild(img);
+
+            // Если это последняя ячейка и есть ещё фото сверх 6
+            if (i === 5 && hasMore) {
+                const overlay = document.createElement('div');
+                overlay.className = 'tpi-damaged-photo-overlay';
+                overlay.textContent = `+${total - 6}`;
+                item.style.position = 'relative';
+                item.appendChild(overlay);
+            }
+
+            // Открытие модалки по клику – всегда с первого фото
+            item.addEventListener('click', () => {
+                openModal(allPhotos, 0);
+            });
+
+            grid.appendChild(item);
+        }
+
+        container.appendChild(grid);
+    }
+
+    //!!! -------- Функция заполнения данными (рендер блока) --------
+    let currentIndex = 0;
+
+    function renderDamagedItem(index) {
+        const item = damagedInfos[index];
+        if (!item) return;
+
+        // Дата
+        const dateEl = container.querySelector('[tpi-damaged-data-list-id="created-date"] .tpi-sort-damaged-list-data');
+        if (dateEl) {
+            const d = new Date(item.fixedAt);
+            const dateStr = `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+            const timeStr = `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')}`;
+            dateEl.textContent = `${dateStr} в ${timeStr}`;
+        }
+
+        // Отменен
+        const cancelData = container.querySelector('[tpi-damaged-data-list-id="is-canceled"] .tpi-sort-damaged-list-data');
+        const cancelIcon = container.querySelector('[tpi-damaged-data-list-id="is-canceled"] .tpi-sort-damaged-list-cancel-icon');
+        if (cancelData && cancelIcon) {
+            if (item.isCancelled) {
+                cancelData.textContent = 'Да';
+                cancelIcon.innerHTML = tpi_sort_canceled_flow_true;
+            } else {
+                cancelData.textContent = 'Нет';
+                cancelIcon.innerHTML = tpi_sort_canceled_flow_false;
+            }
+        }
+
+        // Тип повреждения
+        const typeEl = container.querySelector('[tpi-damaged-data-list-id="damage-type"] .tpi-sort-damaged-list-data');
+        if (typeEl) typeEl.textContent = item.damagedType || 'Не указан';
+
+        // Документы (PDF)
+        const docContainer = container.querySelector('[tpi-damaged-data-list-id="documents"] .tpi-sort-damaged-list-data-wrapper');
+        if (docContainer) {
+            if (item.documents && item.documents.length > 0) {
+                const doc = item.documents[0];
+                const key = encodeURIComponent(doc.key);
+                docContainer.innerHTML = `
+                    <a href="https://sorting-center.logistics.yandex.ru/api/gateway/logpoint/${scId}/sortables/get-file?fileId=${key}" 
+                    class="tpi-sort-damaged-list-data" 
+                    target="_blank" 
+                    style="display:flex; align-items:center; gap:4px;">
+                        <p>PDF</p>
+                        <icon class="tpi-sort-damaged-list-pdf-icon">${tpi_sort_pdf_file}</icon>
+                    </a>
+                `;
+            } else {
+                docContainer.innerHTML = `
+                    <p class="tpi-sort-damaged-list-data" tpi-sort-missing-pdf>Отсутствует <icon class="tpi-sort-damaged-list-cancel-icon">${tpi_sort_canceled_flow_false}</icon></p>
+                `;
+            }
+        }
+
+        // Тикеты
+        const ticketBrak = container.querySelector('[tpi-damaged-data-list-id="ticket-brak"] .tpi-sort-damaged-list-data');
+        const ticketRash = container.querySelector('[tpi-damaged-data-list-id="ticket-rash"] .tpi-sort-damaged-list-data');
+        if (ticketBrak && ticketRash) {
+            const tickets = item.ticketsKeys || [];
+            const brakTicket = tickets.find(t => t.startsWith('BRAKSC-'));
+            const rashTicket = tickets.find(t => t.startsWith('RASHOZHDENIYA-'));
+            if (brakTicket) {
+                ticketBrak.textContent = brakTicket;
+                ticketBrak.href = `https://st.yandex-team.ru/${brakTicket}`;
+                ticketBrak.style.display = 'inline';
+            } else {
+                ticketBrak.style.display = 'none';
+            }
+            if (rashTicket) {
+                ticketRash.textContent = rashTicket;
+                ticketRash.href = `https://st.yandex-team.ru/${rashTicket}`;
+                ticketRash.style.display = 'inline';
+            } else {
+                ticketRash.style.display = 'none';
+            }
+        }
+
+        // Фото – грид
+        const imageWrapper = container.querySelector('.tpi-sort-damaged-image-wrapper');
+        if (imageWrapper) {
+            const photos = item.photos && item.photos.items ? item.photos.items : [];
+            renderPhotoGrid(imageWrapper, photos);
+        }
+
+        // Счётчик
+        const counter = container.querySelector('.tpi-sort-damaged-ticket-control-amount');
+        if (counter) {
+            counter.textContent = `${index + 1} из ${damagedInfos.length}`;
+        }
+
+        const initiatorEl = container.querySelector('[tpi-damaged-data-list-id="damage-iniziator"]');
+        const initiatorText = initiatorEl?.querySelector('.tpi-sort-damaged-list-data');
+        const initiatorIcon = initiatorEl?.querySelector('.tpi-sort-table-sc-icon');
+        if (initiatorEl && initiatorText && initiatorIcon) {
+            const scName = item.scName || item.sortingCenterName || null;
+            if (scName) {
+                const cityInfo = getCityInfo(scName);
+                if (cityInfo) {
+                    initiatorText.textContent = cityInfo.display;
+                    initiatorIcon.setAttribute('tpi-sort-city-id', cityInfo.id);
+                    initiatorEl.style.display = 'flex';
+                } else {
+                    initiatorText.textContent = scName;
+                    initiatorIcon.setAttribute('tpi-sort-city-id', 'unset');
+                    initiatorEl.style.display = 'flex';
+                }
+            } else {
+                initiatorEl.style.display = 'none';
+            }
+        }
+
+        const wrappers = container.querySelectorAll('.tpi-sort-damaged-list-data-wrapper');
+        wrappers.forEach(wrapper => {
+            wrapper.style.animation = 'none';
+            void wrapper.offsetHeight; // reflow
+            wrapper.style.animation = '';
+        });
+
+        // D- Кнопки переключения — теперь с inert и циклическим переключением
+        const prevBtn = container.querySelector('[tpi-sort-damaged-ticket="prev"]');
+        const nextBtn = container.querySelector('[tpi-sort-damaged-ticket="next"]');
+        if (prevBtn && nextBtn) {
+            if (damagedInfos.length <= 1) {
+                prevBtn.setAttribute('inert', 'true');
+                nextBtn.setAttribute('inert', 'true');
+            } else {
+                prevBtn.removeAttribute('inert');
+                nextBtn.removeAttribute('inert');
+            }
+        }
+    }
+
+    renderDamagedItem(0);
+
+    const prevBtn = container.querySelector('[tpi-sort-damaged-ticket="prev"]');
+    const nextBtn = container.querySelector('[tpi-sort-damaged-ticket="next"]');
+    if (prevBtn) {
+        prevBtn.addEventListener('click', () => {
+            if (damagedInfos.length <= 1) return;
+            currentIndex = (currentIndex - 1 + damagedInfos.length) % damagedInfos.length;
+            renderDamagedItem(currentIndex);
+            if (modal.classList.contains('open')) closeModal();
+        });
+    }
+    if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+            if (damagedInfos.length <= 1) return;
+            currentIndex = (currentIndex + 1) % damagedInfos.length;
+            renderDamagedItem(currentIndex);
+            if (modal.classList.contains('open')) closeModal();
+        });
+    }
 }

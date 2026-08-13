@@ -17,7 +17,7 @@ let tpi_cc_currentFilterDirection = null;
 let tpi_cc_tableSortInitialized = false;
 window.tpi_getRoutesSummary = tpi_getRoutesSummary;
 let tpiChartInstance = null;
-const TPI_RECORD_START_HOUR = 22
+const TPI_RECORD_START_HOUR = 22 //! Время послего которого можно записывать новую отгрузку 
 
 // Функция для предзагрузки данных календаря
 async function preloadCalendarData() {
