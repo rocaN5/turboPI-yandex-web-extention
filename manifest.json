@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Яндекс Турбо ПИ",
-  "version": "3.22.5",
-  "version_name": "3.22.5_dev0",
+  "name": "TURBOpi",
+  "version": "3.23.0",
+  "version_name": "3.23.0_dev0",
   "description": "Расширение для получения дополнительной информации из ПИ 💛",
   "permissions": [
     "activeTab",
@@ -10,6 +10,10 @@
     "downloads",
     "clipboardWrite",
     "storage"
+  ],
+    "host_permissions": [
+    "https://hubs.market.yandex.ru/*",
+    "https://logistics.market.yandex.ru/*"
   ],
   "content_scripts": [
     {
@@ -48,7 +52,8 @@
         "js/fixOutboundsNames.js",
         "js/tpiSortables.js",
         "js/tpiSortablesTable.js",
-        "js/tpiOrdersFromPDF.js"
+        "js/tpiOrdersFromPDF.js",
+        "js/tpiUtilData.js"
       ],
       "css": [
         "css/styles.css",
@@ -77,7 +82,8 @@
         "css/anomalyBoard.css",
         "css/tpiSortables.css",
         "css/tpiSortablesTable.css",
-        "css/tpiOrdersFromPDF.css"
+        "css/tpiOrdersFromPDF.css",
+        "css/tpiUtilData.css"
       ]
     }
   ],

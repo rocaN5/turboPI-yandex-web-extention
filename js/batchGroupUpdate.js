@@ -1268,7 +1268,7 @@ function checkiIs__onGroupHistory() {
                     fifthParent.classList.add('tpi-infi--default-layout');
                     
                     // Проставляем атрибут родителю overlay
-                    fifthParent.parentElement.setAttribute('tpi-blocked', 'true');
+                    fifthParent.parentElement.setAttribute('tpi-blocked', 'false');
                     
                     fifthParent.insertAdjacentElement('afterend', overlay);
                     document.title = "История группировок";

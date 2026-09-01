@@ -1652,6 +1652,7 @@ p.tpi-cc--table-tbody-data-courier-print-text {
 .tpi-cc-filters-wrapper-title{
     display: flex;
     justify-content: space-between;
+    align-items: center;
     p{
         margin: 0;
         font-size: 20px;
@@ -1674,6 +1675,7 @@ p.tpi-cc--table-tbody-data-courier-print-text {
     justify-content: center;
     align-items: center;
     position: relative;
+    gap: 1rem;
 }
 
 .tpi-cc-filters-reset{
@@ -1687,6 +1689,7 @@ p.tpi-cc--table-tbody-data-courier-print-text {
     height: 100%;
     padding: 0px 10px;
     cursor: pointer;
+    height: stretch;
 
     &:hover{
         background: #ededef;
@@ -1700,6 +1703,217 @@ p.tpi-cc--table-tbody-data-courier-print-text {
     &:active{
         background: #f3f3f3;
         transform: scale(.95);
+    }
+}
+
+.tpi-cc-table-settings{
+    --buttonSize: 30px;
+    width: var(--buttonSize);
+    height: var(--buttonSize);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    border: 0;
+    background: #e8e8e8;
+    padding: 6px;
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible{
+        outline: 0;
+        filter: brightness(.95);
+        color: #212121;
+    }
+    
+    &:active{
+        filter: brightness(.85);
+        transform: scale(.97);
+        color: #212121;
+    }
+
+    icon.tpi-cc-table-settings-icon{
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #212121;
+        transition: 200ms;
+    }
+    
+    icon.tpi-cc-table-settings-icon svg{
+        width: 100%;
+        height: 100%;
+        color: currentColor;
+    }
+}
+
+.tpi-cc-modal-settings-wrapper{
+    display: none; /*! ! ! ! ! ! ! ! !*/
+    position: fixed;
+    justify-content: center;
+    align-items: center;
+    left: 0px;
+    top: 0px;
+    width: 100dvw;
+    height: 100dvh;
+    z-index: 99;
+    isolation: isolate;
+    backdrop-filter: blur(8px);
+    box-shadow: #000000 0px 0px 100px 0px inset;
+    background: #000000cf;
+    animation: 200ms ease-in-out 0s 1 normal none running tpi-cc-modal-window-wrapper;
+
+    *{
+        margin: 0;
+    }
+}
+
+.tpi-cc-modal-settings-container{
+    min-width: 33dvw;
+    min-height: 50dvh;
+    gap: 40px;
+    background: #212121;
+    border-radius: 20px;
+    box-shadow: 0px 0px 40px -10px #000;
+    border: 2px solid #2b2b2b;
+    padding: 40px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-flow: column;
+    animation: tpi-cc-modal-window-container 400ms cubic-bezier(.17,.73,0,1.32) forwards;
+}
+
+.tpi-cc-modal-settings-title {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    &[sheva_r6]{color: red;}
+
+    p.tpi-cc-modal-settings-title-text{
+        color: #e8e8e8;
+        font-size: 1.5rem;
+        font-weight: 800;
+    }
+}
+
+.tpi-cc-modal-settings-item-description{
+    font-size: .7rem;
+    color: #6d6d6d;
+    white-space: break-spaces;
+    max-width: 260px;
+}
+
+.tpi-cc-modal-settings-block {
+    display: flex;
+    flex-flow: column;
+}
+
+.tpi-cc-modal-settings-item-wrapper {
+    display: flex;
+    &:not(:last-child){
+        border-bottom: 1px solid #282828;
+    }
+}
+
+.tpi-cc-modal-settings-item {
+    width: 50%;
+    display: flex;
+    flex-flow: column;
+    gap: 10px;
+    padding: 20px;
+}
+
+p.tpi-cc-modal-settings-item-title {
+    color: #e8e8e8;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+label.tpi-cc-modal-settings-item-label-amount{
+    padding: 10px;
+    width: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #404040;
+    border-radius: 8px;
+    box-shadow: 0px 0px 0px 2px inset #0000008a;
+    position: relative;
+
+    input[type="number"]{
+        background: transparent;
+        border: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        width: 100%;
+        height: 100%;
+        color: #fff;
+    }
+
+    input[type="number"]:focus{
+        outline: none;
+        border: none;
+    }
+
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+    }
+
+    icon.tpi-cc-modal-settings-item-label-amount-icon{
+        display: none;
+    }
+
+    &:hover icon.tpi-cc-modal-settings-item-label-amount-icon,
+    &:has(input[type="number"]:hover) icon.tpi-cc-modal-settings-item-label-amount-icon{
+        display: flex;
+    }
+
+    &:hover input[type="number"],
+    &:has(input[type="number"]:hover) input[type="number"]{
+        color: transparent;
+    }
+
+    &:has(input[type="number"]:focus-visible) icon.tpi-cc-modal-settings-item-label-amount-icon{
+        display: none;
+    }
+
+    &:has(input[type="number"]:focus-visible) input[type="number"]{
+        color: #fff;
+    }
+}
+
+icon.tpi-cc-modal-settings-item-label-amount-icon{
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    color: #fff;
+    background: #404040;
+    justify-content: center;
+    align-items: center;
+    padding: 2px;
+    transition: 300ms;
+    animation: tpi-cc-modal-settings-item-label-amount-icon infinite ease-in-out alternate 300ms;
+    pointer-events: none;
+}
+
+@keyframes tpi-cc-modal-settings-item-label-amount-icon {
+    from{
+        transform: translate(-50%, -50%) scale(1.0);
+    }
+    to{
+        transform: translate(-50%, -50%) scale(1.2);
     }
 }
 
@@ -2692,22 +2906,7 @@ span.tpi-cc--no-data-loader-spinner {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background: rgba(255, 255, 255, 0.9);
-    z-index: 10;
-    border-radius: 8px;
-}
-
-.tpi-cc-graph-loader {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    background: rgba(255, 255, 255, 0.9);
+    background: #ffffffe6;
     z-index: 10;
     border-radius: 8px;
 }
@@ -3303,7 +3502,8 @@ i.tpi-cc-modal-wolf-img {
     }
 }
 
-.tpi-cc-modal-window-close{
+.tpi-cc-modal-window-close,
+.tpi-cc-modal-settings-close{
     background: transparent;
     border-radius: 10px;
     width: 40px;

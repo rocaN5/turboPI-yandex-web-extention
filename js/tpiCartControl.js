@@ -17,7 +17,8 @@ let tpi_cc_currentFilterDirection = null;
 let tpi_cc_tableSortInitialized = false;
 window.tpi_getRoutesSummary = tpi_getRoutesSummary;
 let tpiChartInstance = null;
-const TPI_RECORD_START_HOUR = 22 //! Время послего которого можно записывать новую отгрузку 
+const TPI_RECORD_START_HOUR = 22 //! Время послего которого можно записывать новую отгрузку
+window.TPI_GENERATION_PALLET_AMOUNT = 1;
 
 // Функция для предзагрузки данных календаря
 async function preloadCalendarData() {
@@ -38,10 +39,8 @@ async function preloadCalendarData() {
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             
-            // 🔥 ПРЕДЗАГРУЖАЕМ ТОЛЬКО 5 ДНЕЙ, А НЕ 30
             const datesToCheck = [];
             
-            // Проверяем только последние 2 дня и следующие 2 дня
             for (let i = -2; i <= 2; i++) {
                 const date = new Date(today);
                 date.setDate(date.getDate() + i);
@@ -49,13 +48,11 @@ async function preloadCalendarData() {
                 datesToCheck.push(dateStr);
             }
             
-            // Добавляем сегодня, если вдруг не попал в диапазон
             const todayStr = formatDateToDDMMYYYY(today);
             if (!datesToCheck.includes(todayStr)) {
                 datesToCheck.push(todayStr);
             }
             
-            // Если сейчас после 22:00, добавляем завтра
             if (currentHour >= TPI_RECORD_START_HOUR) {
                 const tomorrow = new Date(today);
                 tomorrow.setDate(tomorrow.getDate() + 1);
@@ -71,11 +68,9 @@ async function preloadCalendarData() {
                 window.tpiCalendarDatesCache = {};
             }
             
-            // Используем массовую проверку ТОЛЬКО для этих дат
             const uniqueDates = [...new Set(datesToCheck)];
             const firebaseResults = await tpiCheckMultipleDatesInFirebase(uniqueDates);
             
-            // Обновляем кэш
             uniqueDates.forEach(dateStr => {
                 const result = firebaseResults[dateStr] || { exists: false };
                 
@@ -125,9 +120,7 @@ async function preloadCalendarData() {
     return tpiCalendarPreloadPromise;
 }
 
-// Функция для показа/скрытия лоадера предзагрузки календаря
 function showCalendarPreloader(show) {
-    // Можно добавить небольшой лоадер в угол экрана
     if (show) {
         console.log('⏳ Идет предзагрузка данных календаря...');
     } else {
@@ -1146,6 +1139,18 @@ tpi_cc_i_blocked_button = `
 <svg stroke="currentColor" fill="currentColor" stroke-width="0" version="1" viewBox="0 0 48 48" enable-background="new 0 0 48 48" xmlns="http://www.w3.org/2000/svg">
     <path d="M24,6C14.1,6,6,14.1,6,24s8.1,18,18,18s18-8.1,18-18S33.9,6,24,6z M24,10c3.1,0,6,1.1,8.4,2.8L12.8,32.4 C11.1,30,10,27.1,10,24C10,16.3,16.3,10,24,10z M24,38c-3.1,0-6-1.1-8.4-2.8l19.6-19.6C36.9,18,38,20.9,38,24C38,31.7,31.7,38,24,38 z"></path>
 </svg>
+`,
+tpi_cc_i_settings_cog = `
+<svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+    <path d="M19.875 6.27a2.225 2.225 0 0 1 1.125 1.948v7.284c0 .809 -.443 1.555 -1.158 1.948l-6.75 4.27a2.269 2.269 0 0 1 -2.184 0l-6.75 -4.27a2.225 2.225 0 0 1 -1.158 -1.948v-7.285c0 -.809 .443 -1.554 1.158 -1.947l6.75 -3.98a2.33 2.33 0 0 1 2.25 0l6.75 3.98h-.033"/>
+    <path d="M9 12a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/>
+</svg>
+`,
+tpi_cc_i_settings_edit = `
+<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+    <path d="M880 836H144c-17.7 0-32 14.3-32 32v36c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-36c0-17.7-14.3-32-32-32zm-622.3-84c2 0 4-.2 6-.5L431.9 722c2-.4 3.9-1.3 5.3-2.8l423.9-423.9a9.96 9.96 0 0 0 0-14.1L694.9 114.9c-1.9-1.9-4.4-2.9-7.1-2.9s-5.2 1-7.1 2.9L256.8 538.8c-1.5 1.5-2.4 3.3-2.8 5.3l-29.5 168.2a33.5 33.5 0 0 0 9.4 29.8c6.6 6.4 14.9 9.9 23.8 9.9z"/>
+</svg>
+
 `
 
 function checkiIs__onCartControlsPage() {
@@ -1169,8 +1174,7 @@ function checkiIs__onCartControlsPage() {
         const overlay = document.createElement('div');
         overlay.className = 'tpi-cc--wrapper';
 
-        overlay.innerHTML = 
-        `
+        overlay.innerHTML = /*html*/`
         <div class="tpi-tooltip-by-sheva_r6"></div>
         <div class="tpi-cc--wrapper-title">
             Управление MK
@@ -1220,6 +1224,9 @@ function checkiIs__onCartControlsPage() {
                     <p>Фильтры</p>
                     <div class="tpi-cc-filters-item">
                         <button class="tpi-cc-filters-reset" tpi-tooltip-data="Кнопка для сброса всех фильтров в таблице">Сбросить фильтры</button>
+                        <button class="tpi-cc-table-settings" tpi-tooltip-data="Настройки">
+                            <icon class="tpi-cc-table-settings-icon">${tpi_cc_i_settings_cog}</icon>
+                        </button>
                     </div>
                 </div>
                 <div class="tpi-cc-filters-items-wrapper">
@@ -1479,7 +1486,7 @@ function checkiIs__onCartControlsPage() {
                     <button class="tpi-cc-modal-window-close">${tpi_cc_i_cancel}</button>
                 </div>
                 <div class="tpi-cc-modal-window-courier-data-wrapper">
-                <div class="tpi-cc-modal-window-courier-data-container">
+                    <div class="tpi-cc-modal-window-courier-data-container">
                         <div class="tpi-cc-modal-window-courier-data-item">
                             <p class="tpi-cc-modal-window-courier-data-item-title">Курьер:</p>
                             <p class="tpi-cc-modal-window-courier-data-item-text" tpi-data-anchor="courier-name">Лунев Никита Сергеевич</p>
@@ -1501,7 +1508,7 @@ function checkiIs__onCartControlsPage() {
                             <p class="tpi-cc-modal-window-courier-data-item-text" tpi-data-anchor="courier-status">В работе</p>
                         </div>
                     </div>
-                <div class="tpi-cc-modal-window-courier-data-container">
+                    <div class="tpi-cc-modal-window-courier-data-container">
                         <div class="tpi-cc-modal-window-courier-data-item">
                             <p class="tpi-cc-modal-window-courier-data-item-title">Отсортировано:</p>
                             <p class="tpi-cc-modal-window-courier-data-item-text" tpi-data-anchor="courier-sorted">107 / 231</p>
@@ -1554,6 +1561,29 @@ function checkiIs__onCartControlsPage() {
                 </div>
                 <i class="tpi-cc-modal-wolf-img"></i>
                 <i class="tpi-cc-modal-wolf-img"></i>
+            </div>
+        </div>
+        <div class="tpi-cc-modal-settings-wrapper">
+            <div class="tpi-cc-modal-settings-container">
+                <div class="tpi-cc-modal-settings-title">
+                    <p class="tpi-cc-modal-settings-title-text">Настройки</p>
+                    <button class="tpi-cc-modal-settings-close">${tpi_cc_i_cancel}</button>
+                </div>
+                <div class="tpi-cc-modal-settings-block">
+                    <div class="tpi-cc-modal-settings-item-wrapper">
+                        <div class="tpi-cc-modal-settings-item">
+                            <p class="tpi-cc-modal-settings-item-title">Количество CART</p>
+                            <p class="tpi-cc-modal-settings-item-description">Переменная, определяющая количество CART, создаваемых на каждого курьера при формировании новой отгрузки</p>
+                            <label class="tpi-cc-modal-settings-item-label-amount" for="tpi-cc-settings-gen-ammount-cart">
+                                <input type="number" id="tpi-cc-settings-gen-ammount-cart" value="4" min="1" max="4">
+                                <icon class="tpi-cc-modal-settings-item-label-amount-icon">${tpi_cc_i_settings_edit}</icon>
+                            </label>
+                        </div>
+                        <div class="tpi-cc-modal-settings-item">
+                            <p class="tpi-cc-modal-settings-item-title">Пример</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         ${tpi_cc_liquid_glass}
@@ -1838,40 +1868,29 @@ function generateDefaultCourierNumbers(courierData, index, palletNumbersByDefaul
         cartNumbers: [],
         palletNumbers: []
     };
-    
-    // Извлекаем индекс из ячейки (например, из "DEFAULT_COURIER (15)" или "DEFAULT_COURIER (15)")
     let defaultIndex = 0;
     if (courierData.cell) {
-        // Ищем число в скобках
         const match = courierData.cell.match(/\((\d+)\)/);
         if (match) {
             defaultIndex = parseInt(match[1]);
         }
     }
-    
-    // Если индекс не найден, используем 1 как запасной вариант
     if (defaultIndex === 0) {
         defaultIndex = 1;
         console.warn(`⚠️ Не удалось определить индекс для DEFAULT_COURIER, используем 1`);
     }
-    
-    // Инициализируем хранилище для DEFAULT_COURIER, если его нет
     if (!window.tpiDefaultCourierNumbers) {
         window.tpiDefaultCourierNumbers = {
             cart: new Set(),
             pallet: new Set()
         };
     }
-    
-    // Генерируем CART номера (4 штуки: 60(индекс)1, 60(индекс)2, 60(индекс)3, 60(индекс)4)
     for (let i = 1; i <= 4; i++) {
         const cartNumber = 600 + (defaultIndex * 10) + i;
-        // Проверяем, не занят ли номер
         if (!window.tpiDefaultCourierNumbers.cart.has(cartNumber)) {
             numbers.cartNumbers.push(`CART-${cartNumber}`);
             window.tpiDefaultCourierNumbers.cart.add(cartNumber);
         } else {
-            // Если номер занят, ищем следующий свободный
             let nextNumber = cartNumber + 1;
             while (window.tpiDefaultCourierNumbers.cart.has(nextNumber) && nextNumber < 700) {
                 nextNumber++;
@@ -1882,16 +1901,12 @@ function generateDefaultCourierNumbers(courierData, index, palletNumbersByDefaul
             }
         }
     }
-    
-    // Генерируем PALLET номера (2 штуки: 60(индекс)1, 60(индекс)2)
-    for (let i = 1; i <= 2; i++) {
+    for (let i = 1; i <= window.TPI_GENERATION_PALLET_AMOUNT; i++) {
         const palletNumber = 600 + (defaultIndex * 10) + i;
-        // Проверяем, не занят ли номер
         if (!window.tpiDefaultCourierNumbers.pallet.has(palletNumber)) {
             numbers.palletNumbers.push(`PALLET-${palletNumber}`);
             window.tpiDefaultCourierNumbers.pallet.add(palletNumber);
         } else {
-            // Если номер занят, ищем следующий свободный
             let nextNumber = palletNumber + 1;
             while (window.tpiDefaultCourierNumbers.pallet.has(nextNumber) && nextNumber < 700) {
                 nextNumber++;
@@ -1902,7 +1917,6 @@ function generateDefaultCourierNumbers(courierData, index, palletNumbersByDefaul
             }
         }
     }
-    
     return numbers;
 }
 
@@ -3344,7 +3358,7 @@ function createCourierTableRow(courierData, index) {
                                 tpi-data-courier-spec-cell="${palletNumber}" 
                                 tpi-tooltip-data="КГТ Паллеты заблокированы" 
                                 tpi-cc-button-is-blocked 
-                                disabled>
+                                >
                             <div class="tpi-cc-blocked-button-indicator">${tpi_cc_i_blocked_button}</div>
                             <i class="tpi-cc-table-tbody-data-pallet-icon">${tpi_cc_i_pallet}</i>
                             -${palletId}
@@ -3604,41 +3618,25 @@ function createCourierTableRow(courierData, index) {
 async function fillCouriersTableAndSaveToFirebase() {
     try {
         console.log('🚀 Начинаем заполнение таблицы и сохранение в Firebase...');
-        
-        // Получаем выбранную дату
         const searchDateButton = document.querySelector('.tpi-cc-search-date');
         const selectedDate = searchDateButton.getAttribute('tpi-cc-selected-date-value');
-        
         if (!selectedDate) {
             tpiNotification.show('Ошибка', "error", "Не удалось определить дату");
             return;
         }
-        
-        // Обновляем статус загрузки
         updateLoadingStatus(0, 'in-progress');
-        
-        // Шаг 0: Проверка ключа
         if (!tpiUserTOKEN) {
             throw new Error('Токен не найден');
         }
-        
         await new Promise(resolve => setTimeout(resolve, 1500));
         updateLoadingStatus(0, 'complete');
-        
-        // Шаг 1: Поиск маршрутов
         updateLoadingStatus(1, 'in-progress');
-        
-        // Получаем данные о курьерах для выбранной даты (уже с onlineTransferActId)
         const data = await tpi_getCouriersAndCells(selectedDate);
-        
         if (!data || data.length === 0) {
-            // ПОКАЗЫВАЕМ ОШИБКУ В UI
             const noDataContainer = document.querySelector('.tpi-cc--no-ds-data-container');
             if (noDataContainer) {
                 noDataContainer.setAttribute('tpi-current-state', 'error');
-                
-                document.querySelector('.tpi-cc--no-ds-data-title p p').innerText = "Ошибка"
-
+                document.querySelector('.tpi-cc--no-ds-data-title p p').innerText = "Ошибка";
                 const descriptionBlock = document.querySelector('.tpi-cc--no-ds-data-description');
                 if (descriptionBlock) {
                     descriptionBlock.innerHTML = `
@@ -3650,26 +3648,13 @@ async function fillCouriersTableAndSaveToFirebase() {
             }
             return;
         }
-        
         await new Promise(resolve => setTimeout(resolve, 1500));
         updateLoadingStatus(1, 'complete');
-        
-        // Шаг 2: Расшифровка данных курьеров
         updateLoadingStatus(2, 'in-progress');
-        
-        // Сортируем курьеров по группам в правильном порядке
         const sortedCouriersData = sortCouriersByGroupsForDisplay(data);
-        
         await new Promise(resolve => setTimeout(resolve, 1500));
         updateLoadingStatus(2, 'complete');
-        
-        // Шаг 3: Запись информации в базу данных
         updateLoadingStatus(3, 'in-progress');
-        
-        // ВАЖНО: Теперь перед сохранением в Firebase мы добавляем сгенерированные номера CART и PALLET
-        // и сохраняем onlineTransferActId к данным каждого курьера
-        
-        // Инициализируем массивы для отслеживания сгенерированных PALLET номеров по сотням
         const palletNumbersByHundred = {
             '1': new Set(),
             '2': new Set(),
@@ -3677,211 +3662,140 @@ async function fillCouriersTableAndSaveToFirebase() {
             '5': new Set(),
             '6': new Set()
         };
-
         window.tpiDefaultCourierNumbers = {
             cart: new Set(),
             pallet: new Set()
         };
-
-        
         const couriersWithGeneratedNumbers = sortedCouriersData.map((courier, index) => {
-            // Создаем копию объекта курьера
             const courierWithNumbers = { ...courier };
-            
-            // Проверяем, является ли ячейка DEFAULT_COURIER
             const isDefaultCourier = courier.cell && courier.cell.toUpperCase().startsWith('DEFAULT_COURIER');
             const isKGT = courier.cell && courier.cell.toUpperCase().startsWith('KGT');
             const isNullCell = courier.cell === 'null';
-            
             if (isDefaultCourier) {
-                // Генерируем номера для DEFAULT_COURIER
                 const defaultNumbers = generateDefaultCourierNumbers(courier, index, palletNumbersByHundred);
                 courierWithNumbers.cartNumbers = defaultNumbers.cartNumbers;
                 courierWithNumbers.palletNumbers = defaultNumbers.palletNumbers;
                 courierWithNumbers.isDefaultCourier = true;
             } else {
-                // Генерируем номера CART (только для обычных курьеров, не для null ячеек и не для КГТ)
                 if (!isNullCell && !isKGT) {
-                    // Извлекаем номер из ячейки
                     let cellNumber = "000";
                     if (courier.cell && courier.cell !== 'null' && courier.cell !== 'Нет ячейки') {
                         const match = courier.cell.match(/\d+/);
                         cellNumber = match ? match[0].padStart(3, '0') : "000";
                     }
-                    
-                    // Генерируем 4 номера CART
                     const cartNumbers = [];
                     for (let i = 1; i <= 4; i++) {
                         const cartNumber = `CART-${cellNumber}${i}`;
                         cartNumbers.push(cartNumber);
                     }
-                    
-                    // Добавляем в данные курьера
                     courierWithNumbers.cartNumbers = cartNumbers;
                 }
-                
-                // Генерируем номера PALLET
                 if (!isNullCell) {
                     const palletNumbers = [];
-                    
                     if (isKGT) {
-                        // Для КГТ - один номер PALLET с номером ячейки
                         const kgtNumber = courier.cell.replace('KGT-', '').replace('kgt-', '');
                         const palletNumber = `PALLET-${kgtNumber}`;
                         palletNumbers.push(palletNumber);
-                        
-                        // Сохраняем информацию, что это КГТ паллет
                         courierWithNumbers.isKGT = true;
-                        
-                        // Для КГТ добавляем в массив соответствующей сотни
                         const firstDigit = kgtNumber.toString()[0];
                         if (palletNumbersByHundred[firstDigit]) {
                             palletNumbersByHundred[firstDigit].add(parseInt(kgtNumber));
                         }
                     } else {
-                        // Для обычных курьеров
-                        // Извлекаем базовый номер ячейки (например, 101 из MK-101)
                         let baseNumber = 0;
                         if (courier.cell && courier.cell !== 'null' && courier.cell !== 'Нет ячейки') {
                             const match = courier.cell.match(/\d+/);
                             baseNumber = match ? parseInt(match[0]) : 0;
                         }
-                        
                         if (baseNumber > 0) {
-                            const firstDigit = baseNumber.toString()[0];
-                            
-                            // --- ПЕРВЫЙ PALLET (номер ячейки) ---
-                            // Проверяем, есть ли уже такой номер в массиве для первой цифры
-                            if (!palletNumbersByHundred[firstDigit].has(baseNumber)) {
-                                palletNumbers.push(`PALLET-${baseNumber}`);
-                                palletNumbersByHundred[firstDigit].add(baseNumber);
-                            } else {
-                                // Если номер уже занят, находим следующий свободный в этой сотне
-                                let nextNumber = baseNumber;
-                                while (palletNumbersByHundred[firstDigit].has(nextNumber) && nextNumber < (parseInt(firstDigit) * 100 + 99)) {
-                                    nextNumber++;
+                            for (let i = 1; i <= window.TPI_GENERATION_PALLET_AMOUNT; i++) {
+                                let candidate = baseNumber + (i - 1) * 200;
+                                if (candidate > 999) {
+                                    console.warn(`Номер ${candidate} превышает 999, генерация остановлена`);
+                                    break;
                                 }
-                                palletNumbers.push(`PALLET-${nextNumber}`);
-                                palletNumbersByHundred[firstDigit].add(nextNumber);
-                            }
-                            
-                            // --- ВТОРОЙ PALLET (номер ячейки + 200) ---
-                            const secondPalletNumber = baseNumber + 200;
-                            const secondDigit = '3'; // Вторая сотня всегда начинается с 3
-                            
-                            // Проверяем, есть ли уже такой номер в массиве для третьей сотни
-                            if (!palletNumbersByHundred[secondDigit].has(secondPalletNumber)) {
-                                palletNumbers.push(`PALLET-${secondPalletNumber}`);
-                                palletNumbersByHundred[secondDigit].add(secondPalletNumber);
-                            } else {
-                                // Если номер уже занят, находим следующий свободный в третьей сотне
-                                let nextNumber = secondPalletNumber;
-                                while (palletNumbersByHundred[secondDigit].has(nextNumber) && nextNumber < 400) {
-                                    nextNumber++;
+                                const hundred = Math.floor(candidate / 100);
+                                const hundredStr = hundred.toString();
+                                if (!palletNumbersByHundred[hundredStr]) {
+                                    palletNumbersByHundred[hundredStr] = new Set();
                                 }
-                                if (nextNumber < 400) {
-                                    palletNumbers.push(`PALLET-${nextNumber}`);
-                                    palletNumbersByHundred[secondDigit].add(nextNumber);
+                                if (!palletNumbersByHundred[hundredStr].has(candidate)) {
+                                    palletNumbers.push(`PALLET-${candidate}`);
+                                    palletNumbersByHundred[hundredStr].add(candidate);
+                                } else {
+                                    let nextCandidate = candidate;
+                                    while (palletNumbersByHundred[hundredStr].has(nextCandidate) && nextCandidate < (hundred * 100 + 99)) {
+                                        nextCandidate++;
+                                    }
+                                    if (nextCandidate <= (hundred * 100 + 99)) {
+                                        palletNumbers.push(`PALLET-${nextCandidate}`);
+                                        palletNumbersByHundred[hundredStr].add(nextCandidate);
+                                    } else {
+                                        console.warn(`Нет свободных номеров в сотне ${hundredStr} для ячейки ${courier.cell}`);
+                                    }
                                 }
                             }
+                            courierWithNumbers.palletNumbers = palletNumbers;
                         }
                     }
-                    
-                    // Добавляем в данные курьера
                     courierWithNumbers.palletNumbers = palletNumbers;
                 }
             }
-            
-            // Сохраняем onlineTransferActId (он уже есть в courier)
             return courierWithNumbers;
         });
-        
-        // Сохраняем данные ВМЕСТЕ с номерами CART/PALLET и onlineTransferActId в Firebase
         const saveResult = await tpiSaveDataToFirebase(selectedDate, couriersWithGeneratedNumbers);
-        
         if (!saveResult) {
             throw new Error('Не удалось сохранить данные в Firebase');
         }
-        
-        // ОБНОВЛЯЕМ КЭШ КАЛЕНДАРЯ ДЛЯ ЭТОЙ ДАТЫ
         if (window.tpiCalendarDatesCache) {
             window.tpiCalendarDatesCache[selectedDate] = 'has-bd-data';
             updateCalendarDateStatus(selectedDate, 'has-bd-data');
         }
-        
-        // Задержка 3 секунды для имитации записи в БД
         await new Promise(resolve => setTimeout(resolve, 3000));
         updateLoadingStatus(3, 'complete');
-        
-        // Шаг 4: Построение и внедрение таблицы в DOM
         updateLoadingStatus(4, 'in-progress');
         resetTableSortState();
         await new Promise(resolve => setTimeout(resolve, 1500));
-        
-        // ВАЖНО: Сначала меняем статус на complete
         updateLoadingStatus(4, 'complete');
-
         await new Promise(resolve => setTimeout(resolve, 500));
-        const progressContainerWrapper = document.querySelector('.tpi-cc--no-ds-data-container')
-        progressContainerWrapper.setAttribute('tpi-current-state', 'loading-data-animation')
-        
+        const progressContainerWrapper = document.querySelector('.tpi-cc--no-ds-data-container');
+        progressContainerWrapper.setAttribute('tpi-current-state', 'loading-data-animation');
         await new Promise(resolve => setTimeout(resolve, 1500));
-        document.querySelector('.tpi-cc-no-ds-data-loading-item[tpi-cc-search-id="2"] p').innerText = 
-            "Данные успешно загружены, обработаны и сохранены в базу данных, хорошей сортировки!"
-        progressContainerWrapper.setAttribute('tpi-current-state', 'done')
-
+        document.querySelector('.tpi-cc-no-ds-data-loading-item[tpi-cc-search-id="2"] p').innerText =
+            "Данные успешно загружены, обработаны и сохранены в базу данных, хорошей сортировки!";
+        progressContainerWrapper.setAttribute('tpi-current-state', 'done');
         await new Promise(resolve => setTimeout(resolve, 2000));
-
-        progressContainerWrapper.setAttribute('tpi-current-state', 'hidden')
-
+        progressContainerWrapper.setAttribute('tpi-current-state', 'hidden');
         await new Promise(resolve => setTimeout(resolve, 600));
-        
-        // Обновляем статус даты в календаре
         updateCalendarDateStatus(selectedDate, 'has-bd-data');
-
-        // Очищаем таблицу и заполняем ее данными с сохраненными номерами и onlineTransferActId
         const tpi_cc_tableBody = document.querySelector('.tpi-cc--table-tbody-wrapper');
         tpi_cc_tableBody.innerHTML = '';
-        
-        // Теперь при создании строк таблицы будут использоваться сохраненные номера и onlineTransferActId из couriersWithGeneratedNumbers
         couriersWithGeneratedNumbers.forEach((courier, index) => {
-            // Добавляем сохраненные номера и onlineTransferActId в данные курьера для правильного отображения
             courier._savedCartNumbers = courier.cartNumbers || [];
             courier._savedPalletNumbers = courier.palletNumbers || [];
             courier._savedOnlineTransferActId = courier.onlineTransferActId;
             courier._rowIndex = index;
-            
             const row = createCourierTableRow(courier, index);
             tpi_cc_tableBody.appendChild(row);
-            
         });
-
         initializePrintRowButtons();
         initializeAddCartButtons();
         initializeAddPalletButtons();
         initializeDeleteButton();
-        
-        // Скрываем блок загрузки и показываем таблицу
         document.querySelector('.tpi-cc--no-ds-data-wrapper').style.display = 'none';
         document.querySelector('.tpi-cc--table-wrapper').style.display = 'flex';
-        
-        // Инициализируем систему
         saveOriginalRowOrder();
         initializeAllFilters();
         cartPallet_btnActions();
         tpi_cc_filteringColumnData();
         initializePrintRowHighlight();
         initializeRestoreModal();
-        
     } catch (error) {
         console.log('💥 Ошибка при заполнении таблицы и сохранении в Firebase:', error);
         updateLoadingStatus(0, 'error');
-        
-        // ПОКАЗЫВАЕМ ОШИБКУ В UI
         const noDataContainer = document.querySelector('.tpi-cc--no-ds-data-container');
         if (noDataContainer) {
             noDataContainer.setAttribute('tpi-current-state', 'error');
-            
             const descriptionBlock = document.querySelector('.tpi-cc--no-ds-data-description');
             if (descriptionBlock) {
                 descriptionBlock.innerHTML = `
@@ -3890,14 +3804,11 @@ async function fillCouriersTableAndSaveToFirebase() {
                     <p class="tpi-cc--no-ds-data-description-block-sub">Окно для записи данных - с 23:00 по МСК, убедитесь, что у вас стоит верное время</p>
                 `;
             }
-            
-            // Скрываем кнопку "Начать"
             const startButton = document.querySelector('.tpi-cc--no-ds-data-start');
             if (startButton) {
                 startButton.style.display = 'none';
             }
         }
-        
         window.dataCapturingFlag = false;
     }
 }
@@ -6256,6 +6167,7 @@ function initializeAllFilters() {
     initializeStatusFilter();
     initializeResetFiltersButton();
     initializeTotalCourierCount();
+    tpiCartControlSettings()
 }
 
 // Фильтр по ФИО курьера
@@ -6368,6 +6280,13 @@ function initializeResetFiltersButton() {
         // Применяем фильтры (покажет все строки)
         applyAllFilters();
     });
+}
+
+function tpiCartControlSettings(){
+    const settingsButton = document.querySelector('.tpi-cc-table-settings')
+    settingsButton.addEventListener('click', ()=>{
+        tpiNotification.show('Упс', 'error', `Функционал ещё в разработке`);
+    })
 }
 
 function initializeTotalCourierCount() {

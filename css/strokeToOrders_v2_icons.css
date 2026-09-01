@@ -8,6 +8,7 @@ div.tpi-sto--table-extanded-sortable-status-icon-wrapper{
 }
 
 div.tpi-sto--table-extanded-sortable-status-icon-wrapper i.tpi-sto--table-extanded-sortable-status-icon,
+icon.tpi-sto--table-extanded-sortable-status-icon,
 table.tpi-sort-history-status-table icon.tpi-sort-extanded-status-icon{
     display: flex;
     justify-content: center;
