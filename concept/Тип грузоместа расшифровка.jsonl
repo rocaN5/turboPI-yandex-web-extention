@@ -1,0 +1,16 @@
+"common.sorting-center:sortable-type.PLACE": "Посылка", //B- tpi_sto_icon_TYPE_place
+"common.sorting-center:sortable-type.PALLET": "Палета", //B- tpi_sto_icon_TYPE_pallet
+"common.sorting-center:sortable-type.ORPHAN_PALLET": "Обезличенная палета", //B- tpi_sto_icon_TYPE_emptyLot
+"common.sorting-center:sortable-type.DROP_PALLET": "Палета ФФЦ (дропка)",//B- tpi_sto_icon_TYPE_UNKNOWN
+"common.sorting-center:sortable-type.TOT": "TOT", //B- tpi_sto_icon_TYPE_tot
+"common.sorting-center:sortable-type.BATCH": "Батч", //B- tpi_sto_icon_TYPE_batch
+"common.sorting-center:sortable-type.POLYBOX": "Короб полибокса", //B- tpi_sto_icon_TYPE_polybox
+"common.sorting-center:sortable-type.POLYBOX_CAP": "Крышка полибокса", //B- tpi_sto_icon_TYPE_polybox
+"common.sorting-center:sortable-type.POLYBOX_TRAY": "Поддон полибокса", //B- tpi_sto_icon_TYPE_polybox
+"common.sorting-center:sortable-type.XDOC_PALLET": "XDOC палета", //B- tpi_sto_icon_TYPE_pallet
+"common.sorting-center:sortable-type.XDOC_BOX": "XDOC короб", //B- tpi_sto_icon_TYPE_place
+"common.sorting-center:sortable-type.ANOMALY": "Аномалия", //B- tpi_sto_icon_TYPE_anomaly
+"common.sorting-center:sortable-type.CART": "Тележка", //B- tpi_sto_icon_TYPE_cart
+"common.sorting-center:sortable-type.COURIER_PALLET": "Палета МК", //B- tpi_sto_icon_TYPE_pallet
+"common.sorting-center:sortable-type.CLIENT_RETURN": "Клиентский возврат",  //B- tpi_sto_icon_TYPE_clientReturn
+"common.sorting-center:sortable-type.ZASYL": "Засыл",  //B- tpi_sto_icon_TYPE_zasyl

@@ -549,11 +549,7 @@ tpi_util_icon_info_copyMono = `
                         </div>
                     `;
                 } else {
-                    timeHtml = /*html*/`
-                        <div class="tpi-util--sortables-data-item" tpi-util-table-data-id="${fieldId}" tpi-util-table-data-anchor="Time">
-                            <p class="tpi-util--sortables-null">null</p>
-                        </div>
-                    `;
+                    timeHtml = /*html*/``
                 }
 
                 return /*html*/`
@@ -598,7 +594,7 @@ tpi_util_icon_info_copyMono = `
                 </td>
                 <td class="tpi-util--sortables-td">
                     <div class="tpi-util--sortables-td-data-wrapper">
-                        <div class="tpi-util--sortables-data-item" tpi-util-table-data-id="stageSystemName" tpi-tooltip-data="${stageDisplayName}">
+                        <div class="tpi-util--sortables-data-item" tpi-util-table-data-id="stageSystemName" tpi-tooltip-data="${tooltipFix(stageDisplayName)}">
                             <icon class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="${iconAttrs.extendedStatus}" tpi-sto-status-direction="${iconAttrs.direction}"></icon>
                             <p class="tpi-util--sortables-data">${stageDisplayName}</p>
                         </div>
@@ -661,7 +657,7 @@ tpi_util_icon_info_copyMono = `
                 </td>
                 <td class="tpi-util--sortables-td">
                     <div class="tpi-util--sortables-td-data-wrapper">
-                        <div class="tpi-util--sortables-data-item" tpi-util-table-data-id="warehouseReturn" tpi-tooltip-data="${warehouseReturn}">
+                        <div class="tpi-util--sortables-data-item" tpi-util-table-data-id="warehouseReturn" tpi-tooltip-data="${tooltipFix(warehouseReturn)}">
                             <p class="tpi-util--sortables-data">${warehouseReturn}</p>
                         </div>
                     </div>
@@ -1355,7 +1351,7 @@ tpi_util_icon_info_copyMono = `
                         ${uniqueWarehouses.map((name, index) => `
                             <li class="tpi-util--info-merch-item">
                                 <div class="tpi-util--info-merch-item-index">${index + 1}</div>
-                                <div class="tpi-util--info-merch-item-name" tpi-tooltip-data="${name}">${name}</div>
+                                <div class="tpi-util--info-merch-item-name" tpi-tooltip-data="${tooltipFix(name)}">${name}</div>
                             </li>
                         `).join('')}
                     </ul>
@@ -1395,13 +1391,26 @@ tpi_util_icon_info_copyMono = `
             if (type === 'util' && stage !== 'FINAL_ACCEPT_DIRECT') return;
             const orderId = tr.dataset.orderId || '';
             const barcode = tr.dataset.sortableBarcode || '';
-            if (orderId && barcode) {
-                items.push(`${orderId} (${barcode})`);
-            } else if (orderId) {
-                items.push(orderId);
-            } else if (barcode) {
-                items.push(barcode);
+
+            let formatted = '';
+            if (action === 'copyMono') {
+                if (orderId && barcode) {
+                    formatted = `\`${orderId}\` (\`${barcode}\`)`;
+                } else if (orderId) {
+                    formatted = `\`${orderId}\``;
+                } else if (barcode) {
+                    formatted = `\`${barcode}\``;
+                }
+            } else { // обычное копирование
+                if (orderId && barcode) {
+                    formatted = `${orderId} (${barcode})`;
+                } else if (orderId) {
+                    formatted = orderId;
+                } else if (barcode) {
+                    formatted = barcode;
+                }
             }
+            if (formatted) items.push(formatted);
         });
 
         if (items.length === 0) {

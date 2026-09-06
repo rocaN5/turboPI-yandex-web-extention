@@ -41,6 +41,15 @@ tpi_tooltip_ticket_description = `
     </svg>
 `;
 
+function tooltipFix(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+}
 
 let tooltip_ATTEMPTS = 0;
 let tooltip_MAXATTEMPTS = 10;

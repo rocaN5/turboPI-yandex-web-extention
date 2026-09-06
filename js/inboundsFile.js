@@ -383,12 +383,12 @@ async function fetchShipmentsToTable() {
             if (shipment.arrival && shipment.arrival.planned && shipment.arrival.planned.start) {
                 const plannedStartTime = shipment.arrival.planned.start;
                 const plannedDate = new Date(plannedStartTime);
-                const hour = plannedDate.getHours();
+                // const hour = plannedDate.getHours();
                 
-                // Пропускаем поставки с временем после 19:00
-                if (hour > 19) {
-                    continue;
-                }
+                // // Пропускаем поставки с временем после 19:00
+                // if (hour > 19) {
+                //     continue;
+                // }
             }
             
             // Проверяем название поставщика на наличие исключенных городов
@@ -973,12 +973,12 @@ async function fetchShipmentsToTableHTML() {
             if (shipment.arrival && shipment.arrival.planned && shipment.arrival.planned.start) {
                 const plannedStartTime = shipment.arrival.planned.start;
                 const plannedDate = new Date(plannedStartTime);
-                const hour = plannedDate.getHours();
+                // const hour = plannedDate.getHours();
                 
-                // Пропускаем поставки с временем после 19:00
-                if (hour > 19) {
-                    continue;
-                }
+                // // Пропускаем поставки с временем после 19:00
+                // if (hour > 19) {
+                //     continue;
+                // }
             }
             
             // Проверяем название поставщика на наличие исключенных городов
@@ -1397,13 +1397,13 @@ function calculateStatisticsFromTable() {
             const timeText = timeCell.textContent.trim();
             // Ищем время в формате "HH:MM — HH:MM"
             const timeMatch = timeText.match(/(\d{1,2}):(\d{2})\s*—\s*(\d{1,2}):(\d{2})/);
-            if (timeMatch) {
-                const startHour = parseInt(timeMatch[1]);
-                // Пропускаем поставки с временем после 19:00
-                if (startHour > 19) {
-                    return;
-                }
-            }
+            // if (timeMatch) {
+            //     const startHour = parseInt(timeMatch[1]);
+            //     // Пропускаем поставки с временем после 19:00
+            //     if (startHour > 19) {
+            //         return;
+            //     }
+            // }
         }
         
         if (row.hasAttribute('multiple-inbound-driver')) {
@@ -1509,10 +1509,10 @@ function shouldExcludeByTime(timeText) {
     
     // Ищем время в формате "HH:MM — HH:MM"
     const timeMatch = timeText.match(/(\d{1,2}):(\d{2})\s*—\s*(\d{1,2}):(\d{2})/);
-    if (timeMatch) {
-        const startHour = parseInt(timeMatch[1]);
-        return startHour > 19;
-    }
+    // if (timeMatch) {
+    //     const startHour = parseInt(timeMatch[1]);
+    //     return startHour > 19;
+    // }
     
     return false;
 }

@@ -1,0 +1,17 @@
+//! Статус грузоместа
+"common.sorting-center:sortable-status.AWAITING_DIRECT": "Ожидает приемки", //B- tpi_sto_icon_STATUS_waiting_accept
+"common.sorting-center:sortable-status.ARRIVED_DIRECT": "Принят", //B- tpi_sto_icon_STATUS_accept
+"common.sorting-center:sortable-status.SORTED_DIRECT": "Отсортирован", //B- tpi_sto_icon_STATUS_sorted
+"common.sorting-center:sortable-status.KEEPED_DIRECT": "На хранении", //B- tpi_sto_icon_STATUS_hran
+"common.sorting-center:sortable-status.PREPARED_DIRECT": "Подготовлен", //B- tpi_sto_icon_STATUS_ready
+"common.sorting-center:sortable-status.SHIPPED_DIRECT": "Отгружен", //B- tpi_sto_icon_STATUS_shipped
+"common.sorting-center:sortable-status.CONSOLIDATED": "Консолидирован в лоте", //B- tpi_sto_icon_STATUS_consolidated
+//! ВП:
+"common.sorting-center:sortable-status.AWAITING_RETURN": "Ожидает приемки (ВП)", //B- tpi_sto_icon_STATUS_waiting_accept
+"common.sorting-center:sortable-status.ACCEPTED_RETURN": "Принят (ВП)", //B- tpi_sto_icon_STATUS_accept
+"common.sorting-center:sortable-status.SORTED_RETURN": "Отсортирован (ВП)", //B- tpi_sto_icon_STATUS_sorted
+"common.sorting-center:sortable-status.KEEPED_RETURN": "На хранении (ВП)", //B- tpi_sto_icon_STATUS_hran
+"common.sorting-center:sortable-status.PREPARED_RETURN": "Подготовлен (ВП)", //B- tpi_sto_icon_STATUS_ready
+"common.sorting-center:sortable-status.SHIPPED_RETURN": "Отгружен (ВП)", //B- tpi_sto_icon_STATUS_shipped
+"common.sorting-center:sortable-status.CANCELLED": "Отменен", //B- tpi_sto_icon_STATUS_canceled
+"common.sorting-center:sortable-status.DELETED": "Удален", //B- tpi_sto_icon_STATUS_deleted

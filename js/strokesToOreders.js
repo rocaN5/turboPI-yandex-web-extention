@@ -14,7 +14,7 @@ function debounce(func, wait) {
     };
 }
 
-const theadForTables = `
+const theadForTables = /*html*/`
 <thead data-tid="511d58e0 c4185b1" data-tid-prop="c4185b1" class="___thead___FJGT0">
     <tr class="___tr___ZW2Ux __use--withSorting___IXLep" data-tid="cb9e12e0">
         <td data-tid="9bbd4620 2f44a68b" data-tid-prop="2f44a68b" class="___td___HLB5g _stickyColumn___BusWf" style="left: 0px;">
@@ -188,7 +188,7 @@ const tpiIcon__search = `
 `
 const tpiIcon__copy = `
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 512">
-                        <path d="M280 64l40 0c35.3 0 64 28.7 64 64l0 320c0 35.3-28.7 64-64 64L64 512c-35.3 0-64-28.7-64-64L0 128C0 92.7 28.7 64 64 64l40 0 9.6 0C121 27.5 153.3 0 192 0s71 27.5 78.4 64l9.6 0zM64 112c-8.8 0-16 7.2-16 16l0 320c0 8.8 7.2 16 16 16l256 0c8.8 0 16-7.2 16-16l0-320c0-8.8-7.2-16-16-16l-16 0 0 24c0 13.3-10.7 24-24 24l-88 0-88 0c-13.3 0-24-10.7-24-24l0-24-16 0zm128-8a24 24 0 1 0 0-48 24 24 0 1 0 0 48z"></path>
+    <path d="M280 64l40 0c35.3 0 64 28.7 64 64l0 320c0 35.3-28.7 64-64 64L64 512c-35.3 0-64-28.7-64-64L0 128C0 92.7 28.7 64 64 64l40 0 9.6 0C121 27.5 153.3 0 192 0s71 27.5 78.4 64l9.6 0zM64 112c-8.8 0-16 7.2-16 16l0 320c0 8.8 7.2 16 16 16l256 0c8.8 0 16-7.2 16-16l0-320c0-8.8-7.2-16-16-16l-16 0 0 24c0 13.3-10.7 24-24 24l-88 0-88 0c-13.3 0-24-10.7-24-24l0-24-16 0zm128-8a24 24 0 1 0 0-48 24 24 0 1 0 0 48z"></path>
 </svg>
 `
 const tpiIcon__copyMono = `
@@ -209,11 +209,70 @@ const tpiIcon__copySortable = `
     <path d="M20.6 2.001H7.4a1.402 1.402 0 0 0-1.4 1.4v2.602H3.401a1.401 1.401 0 0 0-1.4 1.4v13.2a1.402 1.402 0 0 0 1.4 1.4h13.2a1.4 1.4 0 0 0 1.4-1.4V18h2.6a1.401 1.401 0 0 0 1.4-1.4V3.4a1.402 1.402 0 0 0-1.4-1.4ZM16 20.003H4v-12h12v12ZM20 16h-1.999V7.402a1.401 1.401 0 0 0-1.4-1.4h-8.6v-2h12v12Z"></path><path d="M9 17.994h2v-3h3v-2h-3v-3H9v3H6v2h3v3Z"></path>
 </svg>
 `
-const tpiIcon__packageType = `
+const tpiIcon__packageType_place = `
 <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="14px" width="14px" xmlns="http://www.w3.org/2000/svg">
     <path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"></path><path d="M12 22V12"></path><path d="m3.3 7 7.703 4.734a2 2 0 0 0 1.994 0L20.7 7"></path><path d="m7.5 4.27 9 5.15"></path>
 </svg>
-`
+`,
+tpiIcon__packageType_pallet = `
+<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 640 512" xmlns="http://www.w3.org/2000/svg">
+    <path d="M144 256h352c8.8 0 16-7.2 16-16V16c0-8.8-7.2-16-16-16H384v128l-64-32-64 32V0H144c-8.8 0-16 7.2-16 16v224c0 8.8 7.2 16 16 16zm480 128c8.8 0 16-7.2 16-16v-32c0-8.8-7.2-16-16-16H16c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h48v64H16c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h608c8.8 0 16-7.2 16-16v-32c0-8.8-7.2-16-16-16h-48v-64h48zm-336 64H128v-64h160v64zm224 0H352v-64h160v64z"/>
+</svg>
+`,
+tpiIcon__packageType_emptyLot = `
+<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 384 512" xmlns="http://www.w3.org/2000/svg">
+    <path d="M369.9 97.9L286 14C277 5 264.8-.1 252.1-.1H48C21.5 0 0 21.5 0 48v416c0 26.5 21.5 48 48 48h288c26.5 0 48-21.5 48-48V131.9c0-12.7-5.1-25-14.1-34zM332.1 128H256V51.9l76.1 76.1zM48 464V48h160v104c0 13.3 10.7 24 24 24h104v288H48z"/>
+</svg>
+`,
+tpiIcon__packageType_batch = `
+<svg stroke="currentColor" fill="currentColor" stroke-width="1" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M20.37,17.65a16.777,16.777,0,0,0-2.01-5.54,17.037,17.037,0,0,0-3.74-4.55l-.1-.08a.121.121,0,0,1-.02-.15l1.49-2.59a1.12,1.12,0,0,0,0-1.12,1.092,1.092,0,0,0-.97-.55H8.98a1.1,1.1,0,0,0-.97.55,1.12,1.12,0,0,0,0,1.12l1.5,2.59a.124.124,0,0,1-.03.15l-.09.08A17.327,17.327,0,0,0,3.63,17.65a4.051,4.051,0,0,0-.04.48,2.8,2.8,0,0,0,2.8,2.8H17.62a2.782,2.782,0,0,0,2.13-.99A2.834,2.834,0,0,0,20.37,17.65ZM8.88,4.24a.1.1,0,0,1,0-.12.106.106,0,0,1,.1-.05h6.04a.143.143,0,0,1,.11.05.163.163,0,0,1,0,.12l-1.59,2.8H10.46Zm5.09,4.08a16.436,16.436,0,0,1,5.42,9.5,1.817,1.817,0,0,1-.4,1.47,1.786,1.786,0,0,1-1.37.64H6.39a1.805,1.805,0,0,1-1.8-1.8,1.628,1.628,0,0,1,.03-.31,16.286,16.286,0,0,1,5.42-9.5l.32-.28h3.28Z"></path>
+</svg>
+`,
+tpiIcon__packageType_tot = `
+<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M20 3H4a2 2 0 0 0-2 2v2a2 2 0 0 0 1 1.72V19a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.72A2 2 0 0 0 22 7V5a2 2 0 0 0-2-2zM4 5h16v2H4zm1 14V9h14v10z"></path>
+    <path d="M8 11h8v2H8z"></path>
+</svg>
+`,
+tpiIcon__packageType_polybox = `
+<svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+    <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+    <line x1="12" y1="22.08" x2="12" y2="12"/>
+</svg>
+`,
+tpiIcon__packageType_anomaly = `
+<svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+    <path d="M19.875 6.27a2.225 2.225 0 0 1 1.125 1.948v7.284c0 .809 -.443 1.555 -1.158 1.948l-6.75 4.27a2.269 2.269 0 0 1 -2.184 0l-6.75 -4.27a2.225 2.225 0 0 1 -1.158 -1.948v-7.285c0 -.809 .443 -1.554 1.158 -1.947l6.75 -3.98a2.33 2.33 0 0 1 2.25 0l6.75 3.98h-.033"/>
+    <path d="M10 16v-6a2 2 0 1 1 4 0v6"/>
+    <path d="M10 13h4"/>
+</svg>
+`,
+tpiIcon__packageType_cart = `
+<svg stroke="currentColor" fill="currentColor" stroke-width="0" version="1.2" baseProfile="tiny" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M20.756 5.345c-.191-.219-.466-.345-.756-.345h-13.819l-.195-1.164c-.08-.482-.497-.836-.986-.836h-2.25c-.553 0-1 .447-1 1s.447 1 1 1h1.403l1.86 11.164.045.124.054.151.12.179.095.112.193.13.112.065c.116.047.238.075.367.075h11.001c.553 0 1-.447 1-1s-.447-1-1-1h-10.153l-.166-1h11.319c.498 0 .92-.366.99-.858l1-7c.041-.288-.045-.579-.234-.797zm-1.909 1.655l-.285 2h-3.562v-2h3.847zm-4.847 0v2h-3v-2h3zm0 3v2h-3v-2h3zm-4-3v2h-3l-.148.03-.338-2.03h3.486zm-2.986 3h2.986v2h-2.653l-.333-2zm7.986 2v-2h3.418l-.285 2h-3.133z"/>
+    <circle cx="8.5" cy="19.5" r="1.5"/>
+    <circle cx="17.5" cy="19.5" r="1.5"/>
+</svg>
+`,
+tpiIcon__packageType_clientReturn = `
+<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+    <path d="M105.1 202.6c7.7-21.8 20.2-42.3 37.8-59.8c62.5-62.5 163.8-62.5 226.3 0L386.3 160 352 160c-17.7 0-32 14.3-32 32s14.3 32 32 32l111.5 0c0 0 0 0 0 0l.4 0c17.7 0 32-14.3 32-32l0-112c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 35.2L414.4 97.6c-87.5-87.5-229.3-87.5-316.8 0C73.2 122 55.6 150.7 44.8 181.4c-5.9 16.7 2.9 34.9 19.5 40.8s34.9-2.9 40.8-19.5zM39 289.3c-5 1.5-9.8 4.2-13.7 8.2c-4 4-6.7 8.8-8.1 14c-.3 1.2-.6 2.5-.8 3.8c-.3 1.7-.4 3.4-.4 5.1L16 432c0 17.7 14.3 32 32 32s32-14.3 32-32l0-35.1 17.6 17.5c0 0 0 0 0 0c87.5 87.4 229.3 87.4 316.7 0c24.4-24.4 42.1-53.1 52.9-83.8c5.9-16.7-2.9-34.9-19.5-40.8s-34.9 2.9-40.8 19.5c-7.7 21.8-20.2 42.3-37.8 59.8c-62.5 62.5-163.8 62.5-226.3 0l-.1-.1L125.6 352l34.4 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L48.4 288c-1.6 0-3.2 .1-4.8 .3s-3.1 .5-4.6 1z"/>
+</svg>
+`,
+tpiIcon__packageType_zasyl = `
+<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path fill="none" d="M0 0h24v24H0z"/>
+    <path d="m3 8.41 9 9 7-7V15h2V7h-8v2h4.59L12 14.59 4.41 7z"/>
+</svg>
+`,
+tpiIcon__packageType_UNKNOWN = `
+<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+    <path d="M256 8C119.043 8 8 119.083 8 256c0 136.997 111.043 248 248 248s248-111.003 248-248C504 119.083 392.957 8 256 8zm0 448c-110.532 0-200-89.431-200-200 0-110.495 89.472-200 200-200 110.491 0 200 89.471 200 200 0 110.53-89.431 200-200 200zm107.244-255.2c0 67.052-72.421 68.084-72.421 92.863V300c0 6.627-5.373 12-12 12h-45.647c-6.627 0-12-5.373-12-12v-8.659c0-35.745 27.1-50.034 47.579-61.516 17.561-9.845 28.324-16.541 28.324-29.579 0-17.246-21.999-28.693-39.784-28.693-23.189 0-33.894 10.977-48.942 29.969-4.057 5.12-11.46 6.071-16.666 2.124l-27.824-21.098c-5.107-3.872-6.251-11.066-2.644-16.363C184.846 131.491 214.94 112 261.794 112c49.071 0 101.45 38.304 101.45 88.8zM298 368c0 23.159-18.841 42-42 42s-42-18.841-42-42 18.841-42 42-42 42 18.841 42 42z"/>
+</svg>
+`;
+
 const tpiIcon__warehouse = `
 <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 256 256" height="14px" width="14px" xmlns="http://www.w3.org/2000/svg">
     <path d="M240,188h-4V98.67A20,20,0,0,0,227.09,82l-88-58.66a19.94,19.94,0,0,0-22.18,0L28.91,82A20,20,0,0,0,20,98.67V188H16a12,12,0,0,0,0,24H240a12,12,0,0,0,0-24ZM44,100.81l84-56,84,56V188H196V120a12,12,0,0,0-12-12H72a12,12,0,0,0-12,12v68H44ZM172,132v16H140V132Zm-56,16H84V132h32ZM84,172h32v16H84Zm56,0h32v16H140Z"></path>
@@ -256,25 +315,9 @@ const tpiIcon__crossDock =`
     <path d="M4 9h3.5c.736 0 1.393.391 1.851 1.001.325-.604.729-1.163 1.191-1.662-.803-.823-1.866-1.339-3.042-1.339h-3.5c-.553 0-1 .448-1 1s.447 1 1 1zM11.685 12.111c.551-1.657 2.256-3.111 3.649-3.111h1.838l-1.293 1.293c-.391.391-.391 1.023 0 1.414.195.195.451.293.707.293s.512-.098.707-.293l3.707-3.707-3.707-3.707c-.391-.391-1.023-.391-1.414 0s-.391 1.023 0 1.414l1.293 1.293h-1.838c-2.274 0-4.711 1.967-5.547 4.479l-.472 1.411c-.641 1.926-2.072 3.11-2.815 3.11h-2.5c-.553 0-1 .448-1 1s.447 1 1 1h2.5c1.837 0 3.863-1.925 4.713-4.479l.472-1.41zM15.879 13.293c-.391.391-.391 1.023 0 1.414l1.293 1.293h-2.338c-1.268 0-2.33-.891-2.691-2.108-.256.75-.627 1.499-1.09 2.185.886 1.162 2.243 1.923 3.781 1.923h2.338l-1.293 1.293c-.391.391-.391 1.023 0 1.414.195.195.451.293.707.293s.512-.098.707-.293l3.707-3.707-3.707-3.707c-.391-.391-1.023-.391-1.414 0z"></path>
 </svg>
 `
-const tpiIcon__pin = `
-<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" height="14px" width="14px" xmlns="http://www.w3.org/2000/svg">
-    <path d="M22.3126 10.1753L20.8984 11.5895L20.1913 10.8824L15.9486 15.125L15.2415 18.6606L13.8273 20.0748L9.58466 15.8321L4.63492 20.7819L3.2207 19.3677L8.17045 14.4179L3.92781 10.1753L5.34202 8.76107L8.87756 8.05396L13.1202 3.81132L12.4131 3.10422L13.8273 1.69L22.3126 10.1753Z"></path>
-</svg>
-`
 const tpiIcon__unPin = `
 <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" height="14px" width="14px" xmlns="http://www.w3.org/2000/svg">
     <path d="M20.9711 17.1715 19.5568 18.5858 16.0223 15.0513 15.9486 15.125 15.2415 18.6605 13.8273 20.0747 9.58466 15.8321 4.63492 20.7818 3.2207 19.3676 8.17045 14.4179 3.92781 10.1752 5.34202 8.76101 8.87756 8.0539 8.95127 7.98019 5.4147 4.44362 6.82892 3.02941 20.9711 17.1715ZM18.8508 12.2228 20.1913 10.8823 20.8984 11.5894 22.3126 10.1752 13.8273 1.68994 12.4131 3.10416 13.1202 3.81126 11.7797 5.15176 18.8508 12.2228Z"></path>
-</svg>
-`
-const tpiIcon__decrease = `
-<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" height="14px" width="14px" xmlns="http://www.w3.org/2000/svg">
-    <path fill="none" d="M0 0h24v24H0z"></path><path d="M22 3.41 16.71 8.7 20 12h-8V4l3.29 3.29L20.59 2 22 3.41zM3.41 22l5.29-5.29L12 20v-8H4l3.29 3.29L2 20.59 3.41 22z"></path>
-</svg>
-`
-const tpiIcon__increase = `
-<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" height="14px" width="14px" xmlns="http://www.w3.org/2000/svg">
-    <path fill="none" d="M0 0h24v24H0z"></path>
-    <path d="M21 11V3h-8l3.29 3.29-10 10L3 13v8h8l-3.29-3.29 10-10z"></path>
 </svg>
 `
 const tpiIcon__tripleDots = `
@@ -291,39 +334,20 @@ const tpiIcon__nullCells = `
 
 const tpi_sto_liquid_glass = `
 <svg style="display: none;">
-  <filter id="container-glass" x="0%" y="0%" width="100%" height="100%">
-    <feTurbulence type="fractalNoise" baseFrequency="0.008 0.008" numOctaves="2" seed="92" result="noise"></feTurbulence>
-    <feGaussianBlur in="noise" stdDeviation="0.02" result="blur"></feGaussianBlur>
-    <feDisplacementMap in="SourceGraphic" in2="blur" scale="50" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
-  </filter>
-  <filter id="settings-glass" x="0%" y="0%" width="100%" height="100%">
-    <feTurbulence type="fractalNoise" baseFrequency="0.005 0.05" numOctaves="5" seed="15" result="noise"></feTurbulence>
-    <feGaussianBlur in="noise" stdDeviation="0.02" result="blur"></feGaussianBlur>
-    <feDisplacementMap in="SourceGraphic" in2="blur" scale="30" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
-  </filter>
+    <filter id="container-glass" x="0%" y="0%" width="100%" height="100%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.008 0.008" numOctaves="2" seed="92" result="noise"></feTurbulence>
+        <feGaussianBlur in="noise" stdDeviation="0.02" result="blur"></feGaussianBlur>
+        <feDisplacementMap in="SourceGraphic" in2="blur" scale="50" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
+    </filter>
+    <filter id="settings-glass" x="0%" y="0%" width="100%" height="100%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.005 0.05" numOctaves="5" seed="15" result="noise"></feTurbulence>
+        <feGaussianBlur in="noise" stdDeviation="0.02" result="blur"></feGaussianBlur>
+        <feDisplacementMap in="SourceGraphic" in2="blur" scale="30" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
+    </filter>
 </svg>
 `
 //! settings
-const tpiIcon_settings_chevronUp = `
-<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-    <path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="48" d="m112 328 144-144 144 144"></path>
-</svg>
-`,
-tpiIcon_settings_chevronDown = `
-<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-    <path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="48" d="m112 328 144-144 144 144"></path>
-</svg>
-`,
-tpiIcon_settings_animateStatus =`
-<svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
-    <path d="M6.5 6.5m-3.5 0a3.5 3.5 0 1 0 7 0a3.5 3.5 0 1 0 -7 0"></path>
-    <path d="M2.5 21h8l-4 -7z"></path>
-    <path d="M14 3l7 7"></path>
-    <path d="M14 10l7 -7"></path>
-    <path d="M14 14h7v7h-7z"></path>
-</svg>
-`,
-tpiIcon_settings_returnBarcode = `
+const tpiIcon_settings_returnBarcode = `
 <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
     <path d="M24 32C10.7 32 0 42.7 0 56L0 456c0 13.3 10.7 24 24 24l16 0c13.3 0 24-10.7 24-24L64 56c0-13.3-10.7-24-24-24L24 32zm88 0c-8.8 0-16 7.2-16 16l0 416c0 8.8 7.2 16 16 16s16-7.2 16-16l0-416c0-8.8-7.2-16-16-16zm72 0c-13.3 0-24 10.7-24 24l0 400c0 13.3 10.7 24 24 24l16 0c13.3 0 24-10.7 24-24l0-400c0-13.3-10.7-24-24-24l-16 0zm96 0c-13.3 0-24 10.7-24 24l0 400c0 13.3 10.7 24 24 24l16 0c13.3 0 24-10.7 24-24l0-400c0-13.3-10.7-24-24-24l-16 0zM448 56l0 400c0 13.3 10.7 24 24 24l16 0c13.3 0 24-10.7 24-24l0-400c0-13.3-10.7-24-24-24l-16 0c-13.3 0-24 10.7-24 24zm-64-8l0 416c0 8.8 7.2 16 16 16s16-7.2 16-16l0-416c0-8.8-7.2-16-16-16s-16 7.2-16 16z"></path>
 </svg>
@@ -365,163 +389,6 @@ tpiIcon_settings_ruler = `
 </svg>
 `
 //! settings END
-
-const temp__tr_first = `
-<tr class="tpi-sto--table-tbody">
-    <td class="tpi-sto--table-tbody-item">
-        <div class="tpi-sto--table-tbody-data-sortable">
-            <button class="tpi-sto--table-action-button-shrinker">${tpiIcon__tripleDots}</button>
-            <div class="tpi-sto--table-sortable-actions">
-                <button class="tpi-sto--table-action-button" tpi-action-type="copy">${tpiIcon__copy}</button>
-                <button class="tpi-sto--table-action-button" tpi-action-type="copy-mono">${tpiIcon__copyMono}</button>
-                <button class="tpi-sto--table-action-button" tpi-action-type="scan-download">${tpiIcon__scanDownload}</button>
-                <button class="tpi-sto--table-action-button" tpi-action-type="copy-sortable">${tpiIcon__copySortable}</button>
-            </div>
-            <div class="tpi-sto--sortable-data-wrapper tpi-sto--sortable-id-data-wrapper">
-                <a href="https://hubs.market.yandex.ru/sorting-center/21972131/support" target="_blank" class="tpi-sto--sortable-data-link">
-                    <p class="tpi-sto--sortable-data-link-test">725692808525</p>
-                </a>
-            </div>
-        </div>
-    </td>
-    <td class="tpi-sto--table-tbody-item">
-        <div class="tpi-sto--table-tbody-data">
-            <a href="#" class="tpi-sto--table-tbody-data-link">
-                49357575939
-            </a>
-        </div>
-    </td>
-    <td class="tpi-sto--table-tbody-item">
-        <div class="tpi-sto--table-tbody-data">
-            <i class="tpi-sto--table-tbody-data-icon">${tpiIcon__packageType}</i>
-            <p class="tpi-sto--table-tbody-data-sortable-type" sto-sortable-type="place">
-                Посылка
-            </p>
-        </div>
-    </td>
-`,
-temp__tr_second = `
-    <td class="tpi-sto--table-tbody-item">
-        <div class="tpi-sto--table-tbody-data">
-            <i class="tpi-sto--table-tbody-data-icon">${tpiIcon__warehouse}</i>
-            <p class="tpi-sto--table-tbody-data-sortable-status" sto-sortable-type="on-storage">
-                На хренении
-            </p>
-        </div>
-    </td>
-    <td class="tpi-sto--table-tbody-item">
-        <div class="tpi-sto--table-tbody-data">
-            <a href="#" class="tpi-sto--table-tbody-data-link">F1254273B140237AC926</a>
-        </div>
-    </td>
-    <td class="tpi-sto--table-tbody-item">
-        <div class="tpi-sto--table-tbody-data">
-            <p class="tpi-sto--table-null-data">
-                ${null}
-            </p>
-        </div>
-    </td>
-    <td class="tpi-sto--table-tbody-item">
-        <div class="tpi-sto--table-tbody-data">
-            <p class="tpi-sto--table-null-data">
-                ${null}
-            </p>
-        </div>
-    </td>
-    <td class="tpi-sto--table-tbody-item">
-        <div class="tpi-sto--table-tbody-data">
-            <p class="tpi-sto--table-null-data">
-                ${null}
-            </p>
-        </div>
-    </td>
-    <td class="tpi-sto--table-tbody-item">
-        <div class="tpi-sto--table-tbody-data">
-            <p class="tpi-sto--table-null-data">
-                ${null}
-            </p>
-        </div>
-    </td>
-    <td class="tpi-sto--table-tbody-item">
-        <div class="tpi-sto--table-tbody-data">
-            <p class="tpi-sto--table-null-data">
-                ${null}
-            </p>
-        </div>
-    </td>
-    <td class="tpi-sto--table-tbody-item">
-        <div class="tpi-sto--table-tbody-data">
-            <p class="tpi-sto--table-null-data">
-                ${null}
-            </p>
-        </div>
-    </td>
-    <td class="tpi-sto--table-tbody-item">
-        <div class="tpi-sto--table-tbody-data">
-            <p class="tpi-sto--table-null-data">
-                ${null}
-            </p>
-        </div>
-    </td>
-    <td class="tpi-sto--table-tbody-item">
-        <div class="tpi-sto--table-tbody-data">
-            <p class="tpi-sto--table-null-data">
-                ${null}
-            </p>
-        </div>
-    </td>
-    <td class="tpi-sto--table-tbody-item">
-        <div class="tpi-sto--table-tbody-data">
-            <p class="tpi-sto--table-null-data">
-                ${null}
-            </p>
-        </div>
-    </td>
-    <td class="tpi-sto--table-tbody-item">
-        <div class="tpi-sto--table-tbody-data" sto-multiple-lines="2">
-            <i class="tpi-sto--table-tbody-data-icon">${tpiIcon__calendar}</i>
-            <p class="tpi-sto--table-tbody-data-sortable-status" sto-sortable-type="on-storage">
-                03/10/2025
-            </p>
-        </div>
-        <div class="tpi-sto--table-tbody-data" sto-multiple-lines="2">
-            <i class="tpi-sto--table-tbody-data-icon">${tpiIcon__clock}</i>
-            <p class="tpi-sto--table-tbody-data-sortable-status" sto-sortable-type="on-storage">
-                12:48:24
-            </p>
-        </div>
-    </td>
-    <td class="tpi-sto--table-tbody-item">
-        <div class="tpi-sto--table-tbody-data" sto-multiple-lines="2">
-            <i class="tpi-sto--table-tbody-data-icon">${tpiIcon__calendar}</i>
-            <p class="tpi-sto--table-tbody-data-sortable-status" sto-sortable-type="on-storage">
-                03/10/2025
-            </p>
-        </div>
-        <div class="tpi-sto--table-tbody-data" sto-multiple-lines="2">
-            <i class="tpi-sto--table-tbody-data-icon">${tpiIcon__clock}</i>
-            <p class="tpi-sto--table-tbody-data-sortable-status" sto-sortable-type="on-storage">
-                12:48:24
-            </p>
-        </div>
-    </td>
-    <td class="tpi-sto--table-tbody-item">
-        <div class="tpi-sto--table-tbody-data" sto-multiple-lines="2">
-            <i class="tpi-sto--table-tbody-data-icon">${tpiIcon__calendar}</i>
-            <p class="tpi-sto--table-tbody-data-sortable-status" sto-sortable-type="on-storage">
-                03/10/2025
-            </p>
-        </div>
-        <div class="tpi-sto--table-tbody-data" sto-multiple-lines="2">
-            <i class="tpi-sto--table-tbody-data-icon">${tpiIcon__clock}</i>
-            <p class="tpi-sto--table-tbody-data-sortable-status" sto-sortable-type="on-storage">
-                12:48:24
-            </p>
-        </div>
-    </td>
-</tr>
-`
-
 const forcedMultipleLines = new Set();
 
 const tpiIconByStatus = {
@@ -710,517 +577,14 @@ function checkiIs__onStrokeToOrdersPage() {
         document.title = "Строки в заказы"
 
         // Создаём и вставляем блок
-        const newOverlay = document.createElement('div');
-        newOverlay.className = 'tpi-sto--content-section';
-        newOverlay.setAttribute('tpi-sto-version-selected', stoSelectedVersion === 'new' ? true : false)
-        newOverlay.innerHTML = /*html*/`
-            <div class="tpi-sto--section" style="height: fit-content;">
-                <div class="tpi-sto--section-title">
-                    <p>Строки в заказы</p>
-                    <button class="tpi-sto--switch-version">${tpiIcon__version}</button>
-                </div>
-            </div>
-            <div class="tpi-sto--section-block" tpi-sto-current-state="default" tpi-sto-animate-state="default">
-                <div class="tpi-sto--floating-expandable-section">
-                    <div class="tpi-sto--section-wrapper tpi-sto--floating-search-wrapper">
-                        <div class="tpi-sto--section-wrapper-title tpi-sto--floating-wrapper-title">
-                            <p>Данные поиска</p>
-                            <div class="tpi-sto--switch-controls-wrapper">
-                                <button class="tpi-sto--switch-size-window-switch" tpi-sto-current-state="unmarked">
-                                    ${tpiIcon__decrease}
-                                </button>
-                                <button class="tpi-sto--switch-pin-floating-window-switch">
-                                    ${tpiIcon__pin}
-                                </button>
-                            </div>
-                        </div>
-                        <div class="tpi-sto--section-wrapper-item tpi-sto--odrder-searh-data-wrapper" tpi-sto-current-state="visible">
-                            <div class="tpi-sto--odrder-status-visibility-container">
-                                <button class="tpi-sto--odrder-status-switch-visibility">
-                                    Скрыть статусы
-                                </button>
-                            </div>
-                            <div class="tpi-sto--odrder-searh-data-container">
-                                <div class="tpi-sto--textarea-status">
-                                    <ul>
-                                    </ul>
-                                </div>
-                                <textarea class="tpi--sto-textarea-data-container" spellcheck="false"></textarea>
-                            </div>
-                        </div>
-                        <button class="tpi-sto--start-searching">
-                            ${tpiIcon__search}
-                            <p>Найти</p>
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="tpi-sto--main-section-wrapper">
-                    <div class="tpi-sto--search-settings-container">
-                        <div class="tpi-sto--settings-option-tooltips"></div>
-                        <div class="tpi-sto--section-wrapper tpi-sto--search-settings-wrapper">
-                            <div class="tpi-sto--section-wrapper-title">
-                                <p>Настройки таблицы</p>
-                                <div class="tpi-sto--section-settings">
-                                    <button class="tpi-sto--settings-switch-pin-sticky" tpi-sto-current-state="marked">
-                                        ${tpiIcon__pin}
-                                    </button>
-                                    <button class="tpi-sto--settings-toggle" tpi-sto-current-state="visible">
-                                        ${tpiIcon_settings_chevronUp}
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="tpi-sto--section-wrapper-item tpi-sto-settings-container">
-                                <div class="tpi-sto--settings-arrow" tpi-sto-settings-move="left">
-                                    ${tpiIcon_settings_arrowChevron_left}
-                                </div>
-                                <div class="tpi-sto--settings-arrow" tpi-sto-settings-move="right">
-                                    ${tpiIcon_settings_arrowChevron_right}
-                                </div>
-                                <div class="tpi-sto--settings-block">
-                                    <label for="tpi-sto--settings-option-1" class="tpi-sto--settiings-option" tpi-tooltip-data="Включить/Отключить анимацию иконок расширенного статуса">
-                                        <input type="checkbox" id="tpi-sto--settings-option-1" checked>
-                                        <div class="tpi-sto--settings-option-body"></div>
-                                        <p class="tpi-sto--settings-option-description">Анимация статусов</p>
-                                        <i class="tpi-sto--settings-option-icon">
-                                            ${tpiIcon_settings_animateStatus}
-                                        </i>
-                                    </label>
-                                    <label for="tpi-sto--settings-option-3" class="tpi-sto--settiings-option" tpi-tooltip-data="Включить/Отключить эффект жидко стекла на заднем фоне плавающих окон">
-                                        <input type="checkbox" id="tpi-sto--settings-option-3" checked>
-                                        <div class="tpi-sto--settings-option-body"></div>
-                                        <p class="tpi-sto--settings-option-description">Жидкое стекло</p>
-                                        <i class="tpi-sto--settings-option-icon">
-                                            ${tpiIcon_settings_liquidGalss}
-                                        </i>
-                                    </label>
-                                    <label for="tpi-sto--settings-option-4" class="tpi-sto--settiings-option" tpi-tooltip-data="Включить/Отключить дополнительные иконки">
-                                        <input type="checkbox" id="tpi-sto--settings-option-4" checked>
-                                        <div class="tpi-sto--settings-option-body"></div>
-                                        <p class="tpi-sto--settings-option-description">Доп. иконки</p>
-                                        <i class="tpi-sto--settings-option-icon">
-                                            ${tpiIcon_settings_extraIcons}
-                                        </i>
-                                    </label>
-                                    <label for="tpi-sto--settings-option-5" class="tpi-sto--settiings-option" tpi-tooltip-data="Включить/Отключить дополнительную сетку таблицы">
-                                        <input type="checkbox" id="tpi-sto--settings-option-5">
-                                        <div class="tpi-sto--settings-option-body"></div>
-                                        <p class="tpi-sto--settings-option-description">Доп. сетка</p>
-                                        <i class="tpi-sto--settings-option-icon">
-                                            ${tpiIcon_settings_verticalGrid}
-                                        </i>
-                                    </label>
-                                    <label for="tpi-sto--settings-option-6" class="tpi-sto--settiings-option" tpi-tooltip-data="Спрятать/Показать дополнительные опции копирования номера заказа и скачивание файла сканлога">
-                                        <input type="checkbox" id="tpi-sto--settings-option-6">
-                                        <div class="tpi-sto--settings-option-body"></div>
-                                        <p class="tpi-sto--settings-option-description">Спрятать опции</p>
-                                        <i class="tpi-sto--settings-option-icon">
-                                            ${tpiIcon__tripleDots}
-                                        </i>
-                                    </label>
-                                    <label for="tpi-sto--settings-option-7" class="tpi-sto--settiings-option" tpi-tooltip-data="Заменять пустые ячейки на null">
-                                        <input type="checkbox" id="tpi-sto--settings-option-7">
-                                        <div class="tpi-sto--settings-option-body"></div>
-                                        <p class="tpi-sto--settings-option-description">Ячейки null</p>
-                                        <i class="tpi-sto--settings-option-icon">
-                                            ${tpiIcon__nullCells}
-                                        </i>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="tpi-sto--table-wrapper">
-                        <table class="tpi-sto--table-data-output">
-                            <thead class="tpi-sto--table-thead-wrapper">
-                                <tr class="tpi-sto--table-thead">
-                                    <th class="tpi-sto--table-thead-item">
-                                        <div class="tpi-sto--table-thead-data">Код грузоместа</div>
-                                    </th>
-                                    <th class="tpi-sto--table-thead-item">
-                                        <div class="tpi-sto--table-thead-data">Номер заказа / XDOC</div>
-                                    </th>
-                                    <th class="tpi-sto--table-thead-item">
-                                        <div class="tpi-sto--table-thead-data">Тип грузоместа</div>
-                                    </th>
-                                    <th class="tpi-sto--table-thead-item">
-                                        <div class="tpi-sto--table-thead-data">Расширенный статус</div>
-                                    </th>
-                                    <th class="tpi-sto--table-thead-item">
-                                        <div class="tpi-sto--table-thead-data">Статус грузоместа</div>
-                                    </th>
-                                    <th class="tpi-sto--table-thead-item">
-                                        <div class="tpi-sto--table-thead-data">Родительское грузоместо</div>
-                                    </th>
-                                    <th class="tpi-sto--table-thead-item">
-                                        <div class="tpi-sto--table-thead-data">Грузоместа</div>
-                                    </th>
-                                    <th class="tpi-sto--table-thead-item">
-                                        <div class="tpi-sto--table-thead-data">Имя ячейки</div>
-                                    </th>
-                                    <th class="tpi-sto--table-thead-item">
-                                        <div class="tpi-sto--table-thead-data">Адрес ячейки</div>
-                                    </th>
-                                    <th class="tpi-sto--table-thead-item">
-                                        <div class="tpi-sto--table-thead-data">Маркировка</div>
-                                    </th>
-                                    <th class="tpi-sto--table-thead-item">
-                                        <div class="tpi-sto--table-thead-data">Номер поставки</div>
-                                    </th>
-                                    <th class="tpi-sto--table-thead-item">
-                                        <div class="tpi-sto--table-thead-data">Номер отгрузки</div>
-                                    </th>
-                                    <th class="tpi-sto--table-thead-item">
-                                        <div class="tpi-sto--table-thead-data">Откуда</div>
-                                    </th>
-                                    <th class="tpi-sto--table-thead-item">
-                                        <div class="tpi-sto--table-thead-data">Куда</div>
-                                    </th>
-                                    <th class="tpi-sto--table-thead-item">
-                                        <div class="tpi-sto--table-thead-data">Группировка</div>
-                                    </th>
-                                    <th class="tpi-sto--table-thead-item">
-                                        <div class="tpi-sto--table-thead-data">Дата создания</div>
-                                    </th>
-                                    <th class="tpi-sto--table-thead-item">
-                                        <div class="tpi-sto--table-thead-data">Дата приемки</div>
-                                    </th>
-                                    <th class="tpi-sto--table-thead-item">
-                                        <div class="tpi-sto--table-thead-data">Дата отгрузки</div>
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody class="tpi-sto--table-tbody-wrapper">
-                                ${temp__tr_first}
-                                <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="Вторая приёмка завершена, прямой поток">
-                                        <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
-                                            <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="second-accept-complete" tpi-sto-status-direction="forward"></i>
-                                        </div>
-                                        <p class="tpi-sto--table-tbody-data-sortable-extended-status">
-                                            Вторая приёмка завершена, прямой поток
-                                        </p>
-                                    </div>
-                                </td>
-                                ${temp__tr_second}
-                                ${temp__tr_first}
-                                <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="Вторая приемка завершена, возвратный поток">
-                                        <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
-                                            <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="second-accept-complete" tpi-sto-status-direction="return"></i>
-                                        </div>
-                                        <p class="tpi-sto--table-tbody-data-sortable-extended-status">
-                                            Вторая приемка завершена, возвратный поток
-                                        </p>
-                                    </div>
-                                </td>
-                                ${temp__tr_second}
-                                ${temp__tr_first}
-                                <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="Первая приемка завершена, прямой поток (прибыл на СЦ в лоте, лот прошел 1 приемку)">
-                                        <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
-                                            <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="first-accept-complete" tpi-sto-status-direction="forward"></i>
-                                        </div>
-                                        <p class="tpi-sto--table-tbody-data-sortable-extended-status">
-                                            Первая приемка завершена, прямой поток (прибыл на СЦ в лоте, лот прошел 1 приемку)
-                                        </p>
-                                    </div>
-                                </td>
-                                ${temp__tr_second}
-                                ${temp__tr_first}
-                                <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="Первая приёмка завершена, возвратный поток (прибыл на СЦ в лоте, лот прошел 1 приемку)">
-                                        <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
-                                            <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="first-accept-complete" tpi-sto-status-direction="return"></i>
-                                        </div>
-                                        <p class="tpi-sto--table-tbody-data-sortable-extended-status">
-                                            Первая приёмка завершена, возвратный поток (прибыл на СЦ в лоте, лот прошел 1 приемку)
-                                        </p>
-                                    </div>
-                                </td>
-                                ${temp__tr_second}
-                                ${temp__tr_first}
-                                <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="Предсорт пройден, прямой поток">
-                                        <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
-                                            <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="predsort-complete" tpi-sto-status-direction="forward"></i>
-                                        </div>
-                                        <p class="tpi-sto--table-tbody-data-sortable-extended-status">
-                                            Предсорт пройден, прямой поток
-                                        </p>
-                                    </div>
-                                </td>
-                                ${temp__tr_second}
-                                ${temp__tr_first}
-                                <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="Предсорт пройден, возвратный поток">
-                                        <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
-                                            <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="predsort-complete" tpi-sto-status-direction="return"></i>
-                                        </div>
-                                        <p class="tpi-sto--table-tbody-data-sortable-extended-status">
-                                            Предсорт пройден, возвратный поток
-                                        </p>
-                                    </div>
-                                </td>
-                                ${temp__tr_second}
-                                ${temp__tr_first}
-                                <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="Ожидает прибытия, прямой поток">
-                                        <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
-                                            <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="waiting-accept" tpi-sto-status-direction="forward"></i>
-                                        </div>
-                                        <p class="tpi-sto--table-tbody-data-sortable-extended-status">
-                                            Ожидает прибытия, прямой поток
-                                        </p>
-                                    </div>
-                                </td>
-                                ${temp__tr_second}
-                                ${temp__tr_first}
-                                <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="Ожидает прибытия, возвратный поток">
-                                        <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
-                                            <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="waiting-accept" tpi-sto-status-direction="return"></i>
-                                        </div>
-                                        <p class="tpi-sto--table-tbody-data-sortable-extended-status">
-                                            Ожидает прибытия, возвратный поток
-                                        </p>
-                                    </div>
-                                </td>
-                                ${temp__tr_second}
-                                ${temp__tr_first}
-                                <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="На хранении, прямой поток">
-                                        <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
-                                            <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="on-hran" tpi-sto-status-direction="forward"></i>
-                                        </div>
-                                        <p class="tpi-sto--table-tbody-data-sortable-extended-status">
-                                            На хранении, прямой поток
-                                        </p>
-                                    </div>
-                                </td>
-                                ${temp__tr_second}
-                                ${temp__tr_first}
-                                <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="На хранении, возвратный поток">
-                                        <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
-                                            <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="on-hran" tpi-sto-status-direction="return"></i>
-                                        </div>
-                                        <p class="tpi-sto--table-tbody-data-sortable-extended-status">
-                                            На хранении, возвратный поток
-                                        </p>
-                                    </div>
-                                </td>
-                                ${temp__tr_second}
-                                ${temp__tr_first}
-                                <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="Ожидает приемки курьером, прямой поток">
-                                        <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
-                                            <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="awaiting-courier-accept" tpi-sto-status-direction="any"></i>
-                                        </div>
-                                        <p class="tpi-sto--table-tbody-data-sortable-extended-status">
-                                            Ожидает приемки курьером, прямой поток
-                                        </p>
-                                    </div>
-                                </td>
-                                ${temp__tr_second}
-                                ${temp__tr_first}
-                                <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="Консолидирован в лоте">
-                                        <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
-                                            <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="consolidated" tpi-sto-status-direction="any"></i>
-                                        </div>
-                                        <p class="tpi-sto--table-tbody-data-sortable-extended-status">
-                                            Консолидирован в лоте
-                                        </p>
-                                    </div>
-                                </td>
-                                ${temp__tr_second}
-                                ${temp__tr_first}
-                                <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="Удален">
-                                        <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
-                                            <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="deleted" tpi-sto-status-direction="any"></i>
-                                        </div>
-                                        <p class="tpi-sto--table-tbody-data-sortable-extended-status">
-                                            Удален
-                                        </p>
-                                    </div>
-                                </td>
-                                ${temp__tr_second}
-                                ${temp__tr_first}
-                                <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="Отмена из внешней системы">
-                                        <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
-                                            <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="canceled" tpi-sto-status-direction="any"></i>
-                                        </div>
-                                        <p class="tpi-sto--table-tbody-data-sortable-extended-status">
-                                            Отмена из внешней системы
-                                        </p>
-                                    </div>
-                                </td>
-                                ${temp__tr_second}
-                                ${temp__tr_first}
-                                <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="Пустой лот создан (обезличенный), прямой поток">
-                                        <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
-                                            <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="orphan-lot-created" tpi-sto-status-direction="any"></i>
-                                        </div>
-                                        <p class="tpi-sto--table-tbody-data-sortable-extended-status">
-                                            Пустой лот создан (обезличенный), прямой поток
-                                        </p>
-                                    </div>
-                                </td>
-                                ${temp__tr_second}
-                                ${temp__tr_first}
-                                <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="Пустой лот создан (на направление), прямой поток">
-                                        <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
-                                            <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="lot-created" tpi-sto-status-direction="any"></i>
-                                        </div>
-                                        <p class="tpi-sto--table-tbody-data-sortable-extended-status">
-                                            Пустой лот создан (на направление), прямой поток
-                                        </p>
-                                    </div>
-                                </td>
-                                ${temp__tr_second}
-                                ${temp__tr_first}
-                                <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="Лот наполняется посылками, прямой поток">
-                                        <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
-                                            <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="lot-filling" tpi-sto-status-direction="forward"></i>
-                                        </div>
-                                        <p class="tpi-sto--table-tbody-data-sortable-extended-status">
-                                            Лот наполняется посылками, прямой поток
-                                        </p>
-                                    </div>
-                                </td>
-                                ${temp__tr_second}
-                                ${temp__tr_first}
-                                <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="Лот наполняется посылками, возвратный поток">
-                                        <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
-                                            <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="lot-filling" tpi-sto-status-direction="return"></i>
-                                        </div>
-                                        <p class="tpi-sto--table-tbody-data-sortable-extended-status">
-                                            Лот наполняется посылками, возвратный поток
-                                        </p>
-                                    </div>
-                                </td>
-                                ${temp__tr_second}
-                                ${temp__tr_first}
-                                <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="Лот упакован для хранения, прямой поток">
-                                        <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
-                                            <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="lot-packed-for-hran" tpi-sto-status-direction="any"></i>
-                                        </div>
-                                        <p class="tpi-sto--table-tbody-data-sortable-extended-status">
-                                            Лот упакован для хранения, прямой поток
-                                        </p>
-                                    </div>
-                                </td>
-                                ${temp__tr_second}
-                                ${temp__tr_first}
-                                <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="Не принят курьером, прямой поток">
-                                        <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
-                                            <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="not-accept-by-courier" tpi-sto-status-direction="any"></i>
-                                        </div>
-                                        <p class="tpi-sto--table-tbody-data-sortable-extended-status">
-                                            Не принят курьером, прямой поток
-                                        </p>
-                                    </div>
-                                </td>
-                                ${temp__tr_second}
-                                ${temp__tr_first}
-                                <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="Загружен в ТС, прямой поток">
-                                        <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
-                                            <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="loaded-in-vehicle" tpi-sto-status-direction="any"></i>
-                                        </div>
-                                        <p class="tpi-sto--table-tbody-data-sortable-extended-status">
-                                            Загружен в ТС, прямой поток
-                                        </p>
-                                    </div>
-                                </td>
-                                ${temp__tr_second}
-                                ${temp__tr_first}
-                                <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="Отгружен, прямой поток">
-                                        <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
-                                            <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="shipped" tpi-sto-status-direction="forward"></i>
-                                        </div>
-                                        <p class="tpi-sto--table-tbody-data-sortable-extended-status">
-                                            Отгружен, прямой поток
-                                        </p>
-                                    </div>
-                                </td>
-                                ${temp__tr_second}
-                                ${temp__tr_first}
-                                <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="Отгружен, возвратный поток">
-                                        <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
-                                            <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="shipped" tpi-sto-status-direction="return"></i>
-                                        </div>
-                                        <p class="tpi-sto--table-tbody-data-sortable-extended-status">
-                                            Отгружен, возвратный поток
-                                        </p>
-                                    </div>
-                                </td>
-                                ${temp__tr_second}
-                                ${temp__tr_first}
-                                <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="Отгружен и заменен, прямой поток">
-                                        <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
-                                            <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="shipped-and-replaced" tpi-sto-status-direction="forward"></i>
-                                        </div>
-                                        <p class="tpi-sto--table-tbody-data-sortable-extended-status">
-                                            Отгружен и заменен, прямой поток
-                                        </p>
-                                    </div>
-                                </td>
-                                ${temp__tr_second}
-                                ${temp__tr_first}
-                                <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="Подготовлен к отгрузке, прямой поток">
-                                        <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
-                                            <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="ready-to-shipment" tpi-sto-status-direction="forward"></i>
-                                        </div>
-                                        <p class="tpi-sto--table-tbody-data-sortable-extended-status">
-                                            Подготовлен к отгрузке, прямой поток
-                                        </p>
-                                    </div>
-                                </td>
-                                ${temp__tr_second}
-                                ${temp__tr_first}
-                                <td class="tpi-sto--table-tbody-item">
-                                    <div class="tpi-sto--table-tbody-data" tpi-tooltip-data="Подготовлен к отгрузке, возвратный поток">
-                                        <div class="tpi-sto--table-extanded-sortable-status-icon-wrapper">
-                                            <i class="tpi-sto--table-extanded-sortable-status-icon" sto-extended-status="ready-to-shipment" tpi-sto-status-direction="return"></i>
-                                        </div>
-                                        <p class="tpi-sto--table-tbody-data-sortable-extended-status">
-                                            Подготовлен к отгрузке, возвратный поток
-                                        </p>
-                                    </div>
-                                </td>
-                                ${temp__tr_second}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            ${tpi_sto_liquid_glass}
-        `
-
-        // Создаём и вставляем блок
         const overlay = document.createElement('div');
         overlay.className = 'diman__TURBOpi__textToOrders__wrapper';
         overlay.setAttribute('tpi-sto-version-selected', stoSelectedVersion === 'old' ? true : false)
 
-        overlay.innerHTML = `
+        overlay.innerHTML = /*html*/`
             <div class="diman__TURBOpi__textToOrders__controlsBlock">
                 <div class="diman__TURBOpi__textToOrders__wrapper__text">
                     Строки в заказы
-                    <button class="tpi-sto--switch-version">${tpiIcon__version}</button>
                 </div>
 
                 <div class="diman__TURBOpi__textToOrders__searchWrapper">
@@ -1310,7 +674,6 @@ function checkiIs__onStrokeToOrdersPage() {
         appID.style.display = "none"
         headerTitle.style.display = "none"
 
-        document.querySelector(".p-layout__content").appendChild(newOverlay);
         document.querySelector(".p-layout__content").appendChild(overlay);
         document.querySelector(".p-layout__content").classList.add('tpi-sto--custom-fulPage')
 
@@ -1369,30 +732,30 @@ function checkiIs__onStrokeToOrdersPage() {
             }
         });
 
-        //~ switch versions
-        const switchVersion = document.querySelectorAll('.tpi-sto--switch-version')
-        switchVersion.forEach(button =>{
-            button.addEventListener('click', changeVersionVisibility)
-        })
+        // //~ switch versions
+        // const switchVersion = document.querySelectorAll('.tpi-sto--switch-version')
+        // switchVersion.forEach(button =>{
+        //     button.addEventListener('click', changeVersionVisibility)
+        // })
 
-        function changeVersionVisibility(){
-            const stoVersions = document.querySelectorAll('div[tpi-sto-version-selected]')
-            stoVersions.forEach(option => {
-                if (option.getAttribute('tpi-sto-version-selected') === 'true') {
-                    stoSelectedVersion = 'old';
-                    option.setAttribute('tpi-sto-version-selected', 'false');
-                } else {
-                    stoSelectedVersion = 'new';
-                    option.setAttribute('tpi-sto-version-selected', 'true');
+        // function changeVersionVisibility(){
+        //     const stoVersions = document.querySelectorAll('div[tpi-sto-version-selected]')
+        //     stoVersions.forEach(option => {
+        //         if (option.getAttribute('tpi-sto-version-selected') === 'true') {
+        //             stoSelectedVersion = 'old';
+        //             option.setAttribute('tpi-sto-version-selected', 'false');
+        //         } else {
+        //             stoSelectedVersion = 'new';
+        //             option.setAttribute('tpi-sto-version-selected', 'true');
                     
-                }
-            });
-            if(stoSelectedVersion === 'new'){
-                tpiNotification.show("Смена версии", 'version' , "Стркои в заказы, версия: старая");
-            }else{
-                tpiNotification.show("Смена версии", 'version' , "Стркои в заказы, версия: Новая");
-            }
-        }
+        //         }
+        //     });
+        //     if(stoSelectedVersion === 'new'){
+        //         tpiNotification.show("Смена версии", 'version' , "Стркои в заказы, версия: старая");
+        //     }else{
+        //         tpiNotification.show("Смена версии", 'version' , "Стркои в заказы, версия: Новая");
+        //     }
+        // }
 
         const textArea = overlay.querySelector('.diman__TURBOpi__textToOrders__textArea');
         textArea.removeEventListener('input', handleTextAreaChange);
@@ -1490,7 +853,6 @@ function checkiIs__onStrokeToOrdersPage() {
         onTextToOrdersDomain = true;
         callTurboPI__once();
         addTurboPiTitle()
-        init_strokesToOreders_v2()
         if (observer) {
             observer.disconnect();
             observer = null;
@@ -2301,7 +1663,7 @@ function updateStatusList() {
     if (isUpdatingStatus) return;
     isUpdatingStatus = true;
 
-     requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
         try {
             const ul = document.querySelector("ul.tpi-sto--search-status-list");
             if (!ul) {
@@ -3064,6 +2426,4 @@ function handleHotkeys(e) {
 }
 
 checkiIs__onStrokeToOrdersPage();
-
-//@@@@@@@ NEW Version code
 

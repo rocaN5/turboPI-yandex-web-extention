@@ -560,6 +560,11 @@ button.hubOption{
     cursor: pointer;
     border: none;
     transition: 200ms;
+
+    i{
+        display: flex;
+        align-items: center;
+    }
 }
 
 .hubOption:hover{

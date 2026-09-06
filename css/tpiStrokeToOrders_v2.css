@@ -109,13 +109,13 @@ textarea.tpi--sto-textarea-data-container{
 
     &::-webkit-scrollbar-track:horizontal {
         background-color: #f1f1f1;
-        margin-left: 20px;
-        margin-right: 20px;
+        border-bottom: 9px solid #fff;
+        margin-left: 10px;
+        margin-right: 10px;
     }
 
     &::-webkit-scrollbar-track:vertical {
         background-color: #f1f1f1;
-        /* border-left: 5px solid #fff; */
         border-right: 9px solid #fff;
         margin-top: 10px;
         margin-bottom: 10px;
@@ -124,13 +124,12 @@ textarea.tpi--sto-textarea-data-container{
     &::-webkit-scrollbar-thumb:horizontal {
         background-color: #fc0;
         cursor: default;
+        border-bottom: 9px solid #fff;
     }
 
     &::-webkit-scrollbar-thumb:vertical {
         background-color: #fc0;
         cursor: default;
-        /* border-radius: 10px; */
-        /* border-left: 5px solid #fff; */
         border-right: 9px solid #fff;
     }
 
@@ -389,6 +388,10 @@ textarea.tpi--sto-textarea-data-container{
     display: flex;
     align-items: center;
     gap: .5ch;
+    color: #212121;
+    &[tpi-data-state-return]{
+        color: #670000;
+    }
 }
 
 .tpi-sto--textarea-status{
@@ -928,6 +931,7 @@ a.tpi-sto--table-tbody-data-link{
     position: relative;
     width: fit-content;
     z-index: 0;
+    gap: .5ch;
     &[sheva_r6]{
         color: red;
     }
@@ -986,6 +990,15 @@ a.tpi-sto--table-tbody-data-link{
     }
 }
 
+a.tpi-sto--sortable-data-link{
+    p{
+        max-width: 170px;
+        text-overflow: ellipsis;
+        direction: rtl;
+        overflow: hidden;
+    }
+}
+
 button.tpi-sto--table-action-button-shrinker,
 div.tpi-sto--table-sortable-actions button.tpi-sto--table-action-button{
     position: relative;
@@ -1002,7 +1015,6 @@ div.tpi-sto--table-sortable-actions button.tpi-sto--table-action-button{
     border-radius: 8px;
     border: 0;
     background: transparent;
-    top: -2px;
     transition: all 300ms, 300ms outline 0s;
     outline: none;
     box-shadow: 0px 1px 4px -1px transparent;
@@ -1290,8 +1302,10 @@ tbody[tpi-hide-extra-option-buttons]{
         top: 50%;
         transform: translateY(-50%);
         left: 10px;
-        display: none !important;
+        display: flex;
         box-shadow: 0px 0px 10px 0px #e8e8e8, 0px 0px 10px 0px #e8e8e8;
+        pointer-events: none;
+        opacity: 0;
     }
 
     .tpi-sto--table-tbody-data-sortable:has(.tpi-sto--table-action-button-shrinker:hover) .tpi-sto--table-sortable-actions,
@@ -1299,15 +1313,16 @@ tbody[tpi-hide-extra-option-buttons]{
     .tpi-sto--table-sortable-actions:hover,
     .tpi-sto--table-sortable-actions:has(*:hover),
     .tpi-sto--table-sortable-actions:has(*:active),
-    .tpi-sto--table-sortable-actions:has(*:focus-within),
-    .tpi-sto--table-sortable-actions:has(*:focus-within),
-    .tpi-sto--table-sortable-actions:has(*:focus){
-        display: flex !important;
+    .tpi-sto--table-sortable-actions:has(*:focus-visible){
+        pointer-events: all;
+        opacity: 1;
     }
 }
 
-i.tpi-sto--table-tbody-data-icon{
+tbody.tpi-sto--table-tbody-wrapper i,
+tbody.tpi-sto--table-tbody-wrapper i.tpi-sto--table-tbody-data-icon{
     width: 14px;
+    min-width: 14px;
     height: 14px;
     display: flex;
     align-items: center;
@@ -1322,6 +1337,7 @@ i.tpi-sto--table-tbody-data-icon{
 
 tbody[tpi-hide-extra-icons] i.tpi-sto--table-tbody-data-icon{
     width: 0px;
+    min-width: 0px;
 }
 
 tbody[tpi-hide-null-cells] p.tpi-sto--table-null-data{
@@ -1402,3 +1418,26 @@ tbody[tpi-show-ruler] .tpi-sto--table-tbody-item.hovered-row {
     box-shadow: 0px 1px 0px 0px #fc0 inset, 0px -1px 0px 0px #fc0 inset !important;
     /* при желании можно добавить лёгкий inset-шадоу, но не обязательно */
 }
+
+/* ! Тип грузоместа */
+/* ! Тип грузоместа */
+/* ! Тип грузоместа */
+
+.tpi-sto--table-tbody-data-sortable-type{
+    &[tpi-sto-search-anchor="sortableType"]{
+        max-width: 130px;
+        text-overflow: ellipsis;
+        height: fit-content;
+        display: -webkit-inline-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        line-height: 16px;
+        position: relative;
+        overflow: hidden;
+        white-space: normal;
+    }
+}
+
+/* ! Тип грузоместа END */
+/* ! Тип грузоместа END */
+/* ! Тип грузоместа END */

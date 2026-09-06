@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "TURBOpi",
-  "version": "3.23.0",
-  "version_name": "3.23.0_dev0",
+  "version": "3.23.1",
+  "version_name": "3.23.1_dev0",
   "description": "Расширение для получения дополнительной информации из ПИ 💛",
   "permissions": [
     "activeTab",
@@ -41,7 +41,6 @@
         "js/notifications.js",
         "js/sortablesScanlog.js",
         "js/content.js",
-        "js/strokesToOreders_v2.js",
         "js/strokesToOreders.js",
         "js/firebase.js",
         "js/quickLots.js",
@@ -53,15 +52,16 @@
         "js/tpiSortables.js",
         "js/tpiSortablesTable.js",
         "js/tpiOrdersFromPDF.js",
-        "js/tpiUtilData.js"
+        "js/tpiUtilData.js",
+        "js/tpiStrokeToOrders_v2.js"
       ],
       "css": [
         "css/styles.css",
         "css/tpiTooltips.css",
         "css/turboPI-label.css",
         "css/strokesToOreders.css",
-        "css/strokeToOrders_v2.css",
-        "css/strokeToOrders_v2_icons.css",
+        "css/tpiStrokeToOrders_v2.css",
+        "css/tpiStrokeToOrders_v2_icons.css",
         "css/batchGroupUpdate.css",
         "css/quickLots.css",
         "css/quickLots-icons.css",

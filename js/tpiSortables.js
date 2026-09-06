@@ -4340,7 +4340,8 @@ function getCityInfo(scName) {
         { keywords: ['Грибки'], display: 'СЦ Грибки', id: 'gribki' },
         { keywords: ['Софьино'], display: 'Софьино ФФЦ', id: 'sofino' },
         { keywords: ['Тарный', 'Царицыно'], display: 'СЦ Тарный', id: 'tarn' },
-        { keywords: ['Ростов'], display: 'СЦ Ростов', id: 'rostov' }
+        { keywords: ['Ростов'], display: 'СЦ Ростов', id: 'rostov' },
+        { keywords: ['Тула'], display: 'СЦ МК Тула', id: 'tula' },
     ];
     for (const map of cityMapping) {
         if (map.keywords.some(kw => scName.includes(kw))) {
